@@ -1,0 +1,7 @@
+BasedOnStyle: Microsoft
+IndentWidth: 4
+UseTab: ForIndentation
+SortIncludes: false
+ColumnLimit: 100
+AlignEscapedNewlines: Left
+AlwaysBreakTemplateDeclarations : Yes
