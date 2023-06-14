@@ -99,6 +99,18 @@ void ScalarQuadraticFunction::canonicalize(CoeffT threshold)
 	std::ranges::sort(std::views::zip(variable_1s, variable_2s, coefficients));
 }
 
+bool VariablePair::operator==(const VariablePair &x) const
+{
+	return var_1 == x.var_1 && var_2 == x.var_2;
+}
+bool VariablePair::operator<(const VariablePair &x) const
+{
+	if (var_1 != x.var_1)
+		return var_1 < x.var_1;
+	else
+		return var_1 < var_2;
+}
+
 TermsTable::TermsTable(const VariableIndex &v)
 {
 	this->operator+=(v);

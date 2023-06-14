@@ -75,17 +75,8 @@ struct VariablePair
 	IndexT var_1;
 	IndexT var_2;
 
-	bool operator==(const VariablePair &x) const
-	{
-		return var_1 == x.var_1 && var_2 == x.var_2;
-	}
-	bool operator<(const VariablePair &x) const
-	{
-		if (var_1 != x.var_1)
-			return var_1 < x.var_1;
-		else
-			return var_1 < var_2;
-	}
+	bool operator==(const VariablePair &x) const;
+	bool operator<(const VariablePair &x) const;
 };
 
 template <>
