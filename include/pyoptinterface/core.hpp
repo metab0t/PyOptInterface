@@ -21,9 +21,19 @@ struct ScalarAffineFunction;
 struct ScalarQuadraticFunction;
 struct TermsTable;
 
+enum class FunctionType
+{
+	VariableIndex,
+	ScalarAffineFunction,
+	ScalarQuadraticFunction
+};
+
 struct VariableIndex
 {
 	IndexT index;
+
+	VariableIndex() = default;
+	VariableIndex(IndexT v);
 };
 
 struct ConstraintIndex

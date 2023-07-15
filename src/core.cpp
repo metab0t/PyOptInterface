@@ -5,6 +5,10 @@
 #include <format>
 #include <assert.h>
 
+VariableIndex::VariableIndex(IndexT v) : index(v)
+{
+}
+
 ScalarAffineFunction::ScalarAffineFunction(CoeffT c) : constant(c)
 {
 }

@@ -4,8 +4,13 @@ project(pyoptinterface_nb)
 
 set(CMAKE_CXX_STANDARD 23)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 add_library(pyoptinterface_core STATIC)
-target_sources(pyoptinterface_core PRIVATE src/core.cpp)
+target_sources(pyoptinterface_core PRIVATE
+	include/pyoptinterface/core.hpp
+	src/core.cpp
+)
 target_include_directories(pyoptinterface_core PUBLIC include thirdparty)
 
 add_executable(test_main src/main.cpp)
@@ -64,3 +69,19 @@ catch_discover_tests(test_basic)
 
 endif()
 
+# Solvers
+
+# Gurobi
+set(ENABLE_GUROBI ON CACHE BOOL "Enable gurobi?")
+if(ENABLE_GUROBI)
+	find_package(Gurobi)
+	if(NOT Gurobi_FOUND)
+		message(FATAL_ERROR "Gurobi not found!")
+	endif()
+	add_library(gurobi_wrapper STATIC)
+	target_sources(gurobi_wrapper PRIVATE
+		src/gurobi_wrapper.cpp
+	)
+	target_link_libraries(gurobi_wrapper PUBLIC pyoptinterface_core)
+	target_link_libraries(gurobi_wrapper PUBLIC Gurobi::GurobiC)
+endif()

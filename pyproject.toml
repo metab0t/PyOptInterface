@@ -20,3 +20,6 @@ Homepage = "https://github.com/wjakob/nanobind_example"
 [tool.scikit-build]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
+
+[tool.scikit-build.cmake.define]
+ENABLE_GUROBI_CXX = "OFF"
