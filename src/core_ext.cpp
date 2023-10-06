@@ -38,6 +38,21 @@ NB_MODULE(core_ext, m)
 	    .value("Minimize", ObjectiveSense::Minimize)
 	    .value("Maximize", ObjectiveSense::Maximize);
 
+	// AttributeType
+	nb::enum_<AttributeType>(m, "AttributeType")
+	    .value("Int", AttributeType::Int)
+	    .value("Char", AttributeType::Char)
+	    .value("Double", AttributeType::Double)
+	    .value("String", AttributeType::String);
+
+	// VariableAttribute
+	nb::enum_<VariableAttribute>(m, "VariableAttribute")
+	    .value("Name", VariableAttribute::Name)
+	    .value("Domain", VariableAttribute::Domain)
+	    .value("LowerBound", VariableAttribute::LowerBound)
+	    .value("UpperBound", VariableAttribute::UpperBound)
+	    .value("Value", VariableAttribute::Value);
+
 	nb::class_<VariableIndex>(m, "VariableIndex")
 	    .def(nb::init<IndexT>())
 	    .def_ro("index", &VariableIndex::index)

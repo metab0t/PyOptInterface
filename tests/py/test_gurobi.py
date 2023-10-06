@@ -12,11 +12,11 @@ def test_gurobi():
     x = model.add_variable()
     y = model.add_variable()
 
-    model.set_variable_raw_attribute_double(x, "LB", 0.0)
-    model.set_variable_raw_attribute_double(x, "UB", 20.0)
+    model.set_variable_attribute_double(x, core.VariableAttribute.LowerBound, 0.0)
+    model.set_variable_attribute_double(x, core.VariableAttribute.UpperBound, 20.0)
 
-    model.set_variable_raw_attribute_double(y, "LB", 8.0)
-    model.set_variable_raw_attribute_double(y, "UB", 20.0)
+    model.set_variable_attribute_double(y, core.VariableAttribute.LowerBound, 8.0)
+    model.set_variable_attribute_double(y, core.VariableAttribute.UpperBound, 20.0)
 
     model.set_objective(x * x + y * y, core.ObjectiveSense.Minimize)
 
@@ -27,8 +27,8 @@ def test_gurobi():
     status = model.get_model_raw_attribute_int("Status")
     assert status == gurobi.GRB.OPTIMAL
 
-    x_val = model.get_variable_raw_attribute_double(x, "X")
-    y_val = model.get_variable_raw_attribute_double(y, "X")
+    x_val = model.get_variable_attribute_double(x, core.VariableAttribute.Value)
+    y_val = model.get_variable_attribute_double(y, core.VariableAttribute.Value)
     assert x_val == approx(2.0)
     assert y_val == approx(8.0)
 
@@ -39,7 +39,7 @@ def test_gurobi():
     status = model.get_model_raw_attribute_int("Status")
     assert status == gurobi.GRB.OPTIMAL
 
-    x_val = model.get_variable_raw_attribute_double(x, "X")
-    y_val = model.get_variable_raw_attribute_double(y, "X")
+    x_val = model.get_variable_attribute_double(x, core.VariableAttribute.Value)
+    y_val = model.get_variable_attribute_double(y, core.VariableAttribute.Value)
     assert x_val == approx(10.0)
     assert y_val == approx(10.0)

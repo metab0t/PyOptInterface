@@ -13,6 +13,9 @@ constexpr CoeffT COEFTHRESHOLD = 1e-12;
 template <typename K, typename V>
 using Hashmap = ankerl::unordered_dense::map<K, V>;
 
+template <typename K>
+using Hashset = ankerl::unordered_dense::set<K>;
+
 template <typename V>
 using Vector = std::vector<V>;
 
@@ -235,4 +238,23 @@ enum class ObjectiveSense
 {
 	Minimize,
 	Maximize
+};
+
+/* Attribute type */
+enum class AttributeType
+{
+	Int,
+	Double,
+	String,
+	Char
+};
+
+/* Common variable attributes */
+enum class VariableAttribute
+{
+	Name,
+	Domain,
+	LowerBound,
+	UpperBound,
+	Value
 };

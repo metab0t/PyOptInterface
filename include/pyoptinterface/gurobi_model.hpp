@@ -4,7 +4,6 @@
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
-#include "pyoptinterface/abstract_model.hpp"
 
 class GurobiEnv
 {
@@ -26,7 +25,7 @@ struct GRBfreemodelT
 	};
 };
 
-class GurobiModel : AbstractModel
+class GurobiModel
 {
   public:
 	GurobiModel() = default;
@@ -78,7 +77,24 @@ class GurobiModel : AbstractModel
 	int get_variable_raw_attribute_int(const VariableIndex &variable, const char *attr_name);
 	char get_variable_raw_attribute_char(const VariableIndex &variable, const char *attr_name);
 	double get_variable_raw_attribute_double(const VariableIndex &variable, const char *attr_name);
-	char *get_variable_raw_attribute_string(const VariableIndex &variable, const char *attr_name);
+	std::string get_variable_raw_attribute_string(const VariableIndex &variable,
+	                                              const char *attr_name);
+
+	bool support_variable_attribute(VariableAttribute attr);
+	AttributeType variable_attribute_type(VariableAttribute attr);
+	void set_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr,
+	                                int value);
+	void set_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr,
+	                                 char value);
+	void set_variable_attribute_double(const VariableIndex &variable, VariableAttribute attr,
+	                                   double value);
+	void set_variable_attribute_string(const VariableIndex &variable, VariableAttribute attr,
+	                                   const char *value);
+	int get_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr);
+	char get_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr);
+	double get_variable_attribute_double(const VariableIndex &variable, VariableAttribute attr);
+	std::string get_variable_attribute_string(const VariableIndex &variable,
+	                                          VariableAttribute attr);
 
   private:
 	MonotoneVector<int> m_variable_index;

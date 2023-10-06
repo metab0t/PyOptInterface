@@ -58,6 +58,23 @@ ConstraintType gurobi_sostype(int type)
 	}
 }
 
+const char *gurobi_var_attr(VariableAttribute attr)
+{
+	switch (attr)
+	{
+	case VariableAttribute::Name:
+		return "VarName";
+	case VariableAttribute::Domain:
+		return "VType";
+	case VariableAttribute::LowerBound:
+		return "LB";
+	case VariableAttribute::UpperBound:
+		return "UB";
+	case VariableAttribute::Value:
+		return "X";
+	}
+}
+
 GurobiModel::GurobiModel(const GurobiEnv &env)
 {
 	init(env);
@@ -468,8 +485,8 @@ double GurobiModel::get_variable_raw_attribute_double(const VariableIndex &varia
 	return retval;
 }
 
-char *GurobiModel::get_variable_raw_attribute_string(const VariableIndex &variable,
-                                                     const char *attr_name)
+std::string GurobiModel::get_variable_raw_attribute_string(const VariableIndex &variable,
+                                                           const char *attr_name)
 {
 	auto column = m_variable_index.get_index(variable.index);
 	if (column < 0)
@@ -478,7 +495,81 @@ char *GurobiModel::get_variable_raw_attribute_string(const VariableIndex &variab
 	}
 	char *retval;
 	int error = GRBgetstrattrelement(m_model.get(), attr_name, column, &retval);
-	return retval;
+	return std::string(retval);
+}
+
+bool GurobiModel::support_variable_attribute(VariableAttribute attr)
+{
+	return true;
+}
+
+AttributeType GurobiModel::variable_attribute_type(VariableAttribute attr)
+{
+	switch (attr)
+	{
+	case VariableAttribute::Name:
+		return AttributeType::String;
+	case VariableAttribute::Domain:
+		return AttributeType::Char;
+	case VariableAttribute::LowerBound:
+	case VariableAttribute::UpperBound:
+	case VariableAttribute::Value:
+		return AttributeType::Double;
+	}
+}
+
+void GurobiModel::set_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr,
+                                             int value)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	set_variable_raw_attribute_int(variable, attr_name, value);
+}
+
+void GurobiModel::set_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr,
+                                              char value)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	set_variable_raw_attribute_char(variable, attr_name, value);
+}
+
+void GurobiModel::set_variable_attribute_double(const VariableIndex &variable,
+                                                VariableAttribute attr, double value)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	set_variable_raw_attribute_double(variable, attr_name, value);
+}
+
+void GurobiModel::set_variable_attribute_string(const VariableIndex &variable,
+                                                VariableAttribute attr, const char *value)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	set_variable_raw_attribute_string(variable, attr_name, value);
+}
+
+int GurobiModel::get_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	return get_variable_raw_attribute_int(variable, attr_name);
+}
+
+char GurobiModel::get_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	return get_variable_raw_attribute_char(variable, attr_name);
+}
+
+double GurobiModel::get_variable_attribute_double(const VariableIndex &variable,
+                                                  VariableAttribute attr)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	return get_variable_raw_attribute_double(variable, attr_name);
+}
+
+std::string GurobiModel::get_variable_attribute_string(const VariableIndex &variable,
+                                                       VariableAttribute attr)
+{
+	auto attr_name = gurobi_var_attr(attr);
+	return get_variable_raw_attribute_string(variable, attr_name);
 }
 
 GurobiEnv::GurobiEnv()
