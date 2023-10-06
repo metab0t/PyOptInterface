@@ -1,4 +1,4 @@
-from pyoptinterface_nb import pyoptinterface_nb_ext as ext
+from pyoptinterface_nb import core_ext as ext
 import numpy as np
 
 
@@ -14,7 +14,7 @@ def test_basic():
     assert t.empty() == False
 
     t = ext.TermsTable(v)
-    t.add_affine_term(1, 2.0)
+    t.add_affine_term(vars[1], 2.0)
     t += 3.0 * vars[2]
     t -= 4.0 * vars[3]
     assert t.degree() == 1

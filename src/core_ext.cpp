@@ -8,16 +8,39 @@
 
 namespace nb = nanobind;
 
-NB_MODULE(pyoptinterface_nb_ext, m)
+NB_MODULE(core_ext, m)
 {
 	nb::bind_vector<Vector<IndexT>>(m, "IndexVector");
 	nb::bind_vector<Vector<CoeffT>>(m, "CoefVector");
-	nb::bind_map<Hashmap<VariablePair, CoeffT>>(m, "QuadTermMap");
-	nb::bind_map<Hashmap<IndexT, CoeffT>>(m, "LinTermMap");
+
+	// VariableDomain
+	nb::enum_<VariableDomain>(m, "VariableDomain")
+	    .value("Continuous", VariableDomain::Continuous)
+	    .value("Integer", VariableDomain::Integer)
+	    .value("Binary", VariableDomain::Binary)
+	    .value("SemiContinuous", VariableDomain::SemiContinuous);
+
+	// ConstraintSense
+	nb::enum_<ConstraintSense>(m, "ConstraintSense")
+	    .value("LessEqual", ConstraintSense::LessEqual)
+	    .value("Equal", ConstraintSense::Equal)
+	    .value("GreaterEqual", ConstraintSense::GreaterEqual);
+
+	// ConstraintType
+	nb::enum_<ConstraintType>(m, "ConstraintType")
+	    .value("Linear", ConstraintType::Linear)
+	    .value("Quadratic", ConstraintType::Quadratic)
+	    .value("SOS1", ConstraintType::SOS1)
+	    .value("SOS2", ConstraintType::SOS2);
+
+	// ObjectiveSense
+	nb::enum_<ObjectiveSense>(m, "ObjectiveSense")
+	    .value("Minimize", ObjectiveSense::Minimize)
+	    .value("Maximize", ObjectiveSense::Maximize);
 
 	nb::class_<VariableIndex>(m, "VariableIndex")
 	    .def(nb::init<IndexT>())
-	    .def_rw("index", &VariableIndex::index)
+	    .def_ro("index", &VariableIndex::index)
 	    .def(nb::self + CoeffT())
 	    .def(CoeffT() + nb::self)
 	    .def(nb::self + VariableIndex())
@@ -33,8 +56,8 @@ NB_MODULE(pyoptinterface_nb_ext, m)
 	    .def(nb::self * ScalarAffineFunction());
 
 	nb::class_<ConstraintIndex>(m, "ConstraintIndex")
-	    .def(nb::init<IndexT>())
-	    .def_rw("index", &ConstraintIndex::index);
+	    .def_ro("type", &ConstraintIndex::type)
+	    .def_ro("index", &ConstraintIndex::index);
 
 	nb::class_<ScalarAffineFunction>(m, "ScalarAffineFunction")
 	    .def(nb::init<CoeffT>())

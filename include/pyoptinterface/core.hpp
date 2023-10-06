@@ -21,11 +21,12 @@ struct ScalarAffineFunction;
 struct ScalarQuadraticFunction;
 struct TermsTable;
 
-enum class FunctionType
+enum class VariableDomain
 {
-	VariableIndex,
-	ScalarAffineFunction,
-	ScalarQuadraticFunction
+	Continuous,
+	Integer,
+	Binary,
+	SemiContinuous,
 };
 
 struct VariableIndex
@@ -34,11 +35,6 @@ struct VariableIndex
 
 	VariableIndex() = default;
 	VariableIndex(IndexT v);
-};
-
-struct ConstraintIndex
-{
-	IndexT index;
 };
 
 struct ScalarAffineFunction
@@ -77,6 +73,7 @@ struct ScalarQuadraticFunction
 	                        const std::optional<ScalarAffineFunction> &);
 	ScalarQuadraticFunction(const TermsTable &t);
 
+	size_t size() const;
 	void canonicalize(CoeffT threshold = COEFTHRESHOLD);
 };
 
@@ -135,8 +132,10 @@ struct TermsTable
 
 	void clear();
 	void clean_nearzero_terms(CoeffT threshold = COEFTHRESHOLD);
-	void add_quadratic_term(IndexT i, IndexT j, CoeffT coeff);
-	void add_affine_term(IndexT i, CoeffT coeff);
+	void _add_quadratic_term(IndexT i, IndexT j, CoeffT coeff);
+	void add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff);
+	void _add_affine_term(IndexT i, CoeffT coeff);
+	void add_affine_term(const VariableIndex &i, CoeffT coeff);
 };
 
 auto operator+(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
@@ -190,3 +189,50 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction;
 auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 auto operator*(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+
+enum class ConstraintType
+{
+	Linear,
+	Quadratic,
+	SOS1,
+	SOS2
+};
+
+enum class ConstraintSense
+{
+	LessEqual,
+	GreaterEqual,
+	Equal
+};
+
+struct ConstraintIndex
+{
+	ConstraintType type;
+	IndexT index;
+};
+
+struct LinearConstraint
+{
+	ScalarAffineFunction function;
+	ConstraintSense sense;
+	CoeffT rhs;
+};
+
+struct QuadraticConstraint
+{
+	ScalarQuadraticFunction function;
+	ConstraintSense sense;
+	CoeffT rhs;
+};
+
+struct SOSConstraint
+{
+	Vector<VariableIndex> variables;
+	Vector<CoeffT> weights;
+};
+
+enum class ObjectiveSense
+{
+	Minimize,
+	Maximize
+};

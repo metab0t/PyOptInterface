@@ -93,7 +93,10 @@ ScalarQuadraticFunction::ScalarQuadraticFunction(const TermsTable &t)
 		affine_part = ScalarAffineFunction(t);
 	}
 }
-
+size_t ScalarQuadraticFunction::size() const
+{
+	return coefficients.size();
+}
 void ScalarQuadraticFunction::canonicalize(CoeffT threshold)
 {
 	TermsTable t(*this);
@@ -196,7 +199,7 @@ void TermsTable::clean_nearzero_terms(CoeffT threshold)
 	}
 }
 
-void TermsTable::add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
+void TermsTable::_add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
 {
 	if (i > j)
 	{
@@ -212,8 +215,12 @@ void TermsTable::add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
 		it->second += coeff;
 	}
 }
+void TermsTable::add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff)
+{
+	_add_quadratic_term(i.index, j.index, coeff);
+}
 
-void TermsTable::add_affine_term(IndexT i, CoeffT coeff)
+void TermsTable::_add_affine_term(IndexT i, CoeffT coeff)
 {
 	auto it = affine_terms.find(i);
 	if (it == affine_terms.end())
@@ -225,6 +232,10 @@ void TermsTable::add_affine_term(IndexT i, CoeffT coeff)
 		it->second += coeff;
 	}
 }
+void TermsTable::add_affine_term(const VariableIndex &i, CoeffT coeff)
+{
+	_add_affine_term(i.index, coeff);
+}
 
 TermsTable &TermsTable::operator+=(CoeffT c)
 {
@@ -233,7 +244,7 @@ TermsTable &TermsTable::operator+=(CoeffT c)
 }
 TermsTable &TermsTable::operator+=(const VariableIndex &v)
 {
-	add_affine_term(v.index, 1.0);
+	_add_affine_term(v.index, 1.0);
 	return *this;
 }
 TermsTable &TermsTable::operator+=(const ScalarAffineFunction &a)
@@ -241,7 +252,7 @@ TermsTable &TermsTable::operator+=(const ScalarAffineFunction &a)
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
 	{
-		add_affine_term(a.variables[i], a.coefficients[i]);
+		_add_affine_term(a.variables[i], a.coefficients[i]);
 	}
 
 	if (a.constant)
@@ -260,7 +271,7 @@ TermsTable &TermsTable::operator+=(const ScalarQuadraticFunction &q)
 	auto N = q.coefficients.size();
 	for (auto i = 0; i < N; i++)
 	{
-		add_quadratic_term(q.variable_1s[i], q.variable_2s[i], q.coefficients[i]);
+		_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], q.coefficients[i]);
 	}
 	return *this;
 }
@@ -268,11 +279,11 @@ TermsTable &TermsTable::operator+=(const TermsTable &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
-		add_quadratic_term(varpair.var_1, varpair.var_2, c);
+		_add_quadratic_term(varpair.var_1, varpair.var_2, c);
 	}
 	for (const auto &[v, c] : t.affine_terms)
 	{
-		add_affine_term(v, c);
+		_add_affine_term(v, c);
 	}
 	if (t.constant_term)
 	{
@@ -288,7 +299,7 @@ TermsTable &TermsTable::operator-=(CoeffT c)
 }
 TermsTable &TermsTable::operator-=(const VariableIndex &v)
 {
-	add_affine_term(v.index, -1.0);
+	_add_affine_term(v.index, -1.0);
 	return *this;
 }
 TermsTable &TermsTable::operator-=(const ScalarAffineFunction &a)
@@ -296,7 +307,7 @@ TermsTable &TermsTable::operator-=(const ScalarAffineFunction &a)
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
 	{
-		add_affine_term(a.variables[i], -a.coefficients[i]);
+		_add_affine_term(a.variables[i], -a.coefficients[i]);
 	}
 
 	if (a.constant)
@@ -315,7 +326,7 @@ TermsTable &TermsTable::operator-=(const ScalarQuadraticFunction &q)
 	auto N = q.coefficients.size();
 	for (auto i = 0; i < N; i++)
 	{
-		add_quadratic_term(q.variable_1s[i], q.variable_2s[i], -q.coefficients[i]);
+		_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], -q.coefficients[i]);
 	}
 	return *this;
 }
@@ -323,11 +334,11 @@ TermsTable &TermsTable::operator-=(const TermsTable &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
-		add_quadratic_term(varpair.var_1, varpair.var_2, -c);
+		_add_quadratic_term(varpair.var_1, varpair.var_2, -c);
 	}
 	for (const auto &[v, c] : t.affine_terms)
 	{
-		add_affine_term(v, -c);
+		_add_affine_term(v, -c);
 	}
 	if (t.constant_term)
 	{
@@ -357,7 +368,7 @@ TermsTable &TermsTable::operator*=(const VariableIndex &v)
 	quadratic_terms.reserve(N);
 	for (const auto &[var2, c] : affine_terms)
 	{
-		add_quadratic_term(v.index, var2, c);
+		_add_quadratic_term(v.index, var2, c);
 	}
 
 	if (constant_term)
@@ -390,7 +401,7 @@ TermsTable &TermsTable::operator*=(const ScalarAffineFunction &a)
 		{
 			auto dj = a.coefficients[j];
 			auto xj = a.variables[j];
-			add_quadratic_term(xi, xj, ci * dj);
+			_add_quadratic_term(xi, xj, ci * dj);
 		}
 	}
 
@@ -410,7 +421,7 @@ TermsTable &TermsTable::operator*=(const ScalarAffineFunction &a)
 		{
 			auto dj = a.coefficients[j];
 			auto xj = a.variables[j];
-			add_affine_term(xj, c0 * dj);
+			_add_affine_term(xj, c0 * dj);
 		}
 	}
 
@@ -437,7 +448,7 @@ TermsTable &TermsTable::operator*=(const ScalarQuadraticFunction &q)
 		auto c = constant_term.value();
 		for (auto i = 0; i < N; i++)
 		{
-			add_quadratic_term(q.variable_1s[i], q.variable_2s[i], c * q.coefficients[i]);
+			_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], c * q.coefficients[i]);
 		}
 	}
 	return *this;
@@ -463,14 +474,14 @@ TermsTable &TermsTable::operator*=(const TermsTable &t)
 			quadratic_terms.reserve(N);
 			for (const auto &[varpair, c2] : t.quadratic_terms)
 			{
-				add_quadratic_term(varpair.var_1, varpair.var_2, c * c2);
+				_add_quadratic_term(varpair.var_1, varpair.var_2, c * c2);
 			}
 
 			N = t.affine_terms.size();
 			affine_terms.reserve(N);
 			for (const auto &[v, c1] : t.affine_terms)
 			{
-				add_affine_term(v, c * c1);
+				_add_affine_term(v, c * c1);
 			}
 
 			if (t.constant_term)
@@ -494,7 +505,7 @@ TermsTable &TermsTable::operator*=(const TermsTable &t)
 			{
 				for (const auto &[xj, dj] : t.affine_terms)
 				{
-					add_quadratic_term(xi, xj, ci * dj);
+					_add_quadratic_term(xi, xj, ci * dj);
 				}
 			}
 		}
@@ -513,7 +524,7 @@ TermsTable &TermsTable::operator*=(const TermsTable &t)
 			auto c0 = constant_term.value();
 			for (const auto &[xj, dj] : t.affine_terms)
 			{
-				add_affine_term(xj, c0 * dj);
+				_add_affine_term(xj, c0 * dj);
 			}
 		}
 
@@ -804,7 +815,7 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
 		{
 			auto dj = b.coefficients[j];
 			auto xj = b.variables[j];
-			t.add_quadratic_term(xi, xj, ci * dj);
+			t._add_quadratic_term(xi, xj, ci * dj);
 		}
 	}
 	if (b.constant)
@@ -814,7 +825,7 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
 		{
 			auto ci = b.coefficients[i];
 			auto xi = b.variables[i];
-			t.add_affine_term(xi, ci * d0);
+			t._add_affine_term(xi, ci * d0);
 		}
 	}
 	if (a.constant)
@@ -824,7 +835,7 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
 		{
 			auto dj = b.coefficients[j];
 			auto xj = b.variables[j];
-			t.add_affine_term(xj, c0 * dj);
+			t._add_affine_term(xj, c0 * dj);
 		}
 	}
 	if (a.constant && b.constant)
