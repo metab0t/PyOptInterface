@@ -1,14 +1,15 @@
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/bind_vector.h>
-#include <nanobind/stl/bind_map.h>
-#include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/gurobi_model.hpp"
 
 namespace nb = nanobind;
 
+extern void bind_gurobi_constants(nb::module_ &m);
+
 NB_MODULE(gurobi_model_ext, m)
 {
+	bind_gurobi_constants(m);
+
 	nb::class_<GurobiEnv>(m, "Env").def(nb::init<>());
 
 	nb::class_<GurobiModel>(m, "Model")
@@ -31,6 +32,12 @@ NB_MODULE(gurobi_model_ext, m)
 	                              &GurobiModel::set_objective))
 	    .def("optimize", &GurobiModel::optimize)
 	    .def("update", &GurobiModel::update)
+	    .def("set_model_raw_attribute_int", &GurobiModel::set_model_raw_attribute_int)
+		.def("set_model_raw_attribute_double", &GurobiModel::set_model_raw_attribute_double)
+		.def("set_model_raw_attribute_string", &GurobiModel::set_model_raw_attribute_string)
+		.def("get_model_raw_attribute_int", &GurobiModel::get_model_raw_attribute_int)
+		.def("get_model_raw_attribute_double", &GurobiModel::get_model_raw_attribute_double)
+		.def("get_model_raw_attribute_string", &GurobiModel::get_model_raw_attribute_string)
 	    .def("set_variable_raw_attribute_int", &GurobiModel::set_variable_raw_attribute_int)
 	    .def("set_variable_raw_attribute_char", &GurobiModel::set_variable_raw_attribute_char)
 	    .def("set_variable_raw_attribute_double", &GurobiModel::set_variable_raw_attribute_double)

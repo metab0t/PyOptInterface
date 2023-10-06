@@ -349,6 +349,42 @@ void GurobiModel::update()
 	int error = GRBupdatemodel(m_model.get());
 }
 
+void GurobiModel::set_model_raw_attribute_int(const char *attr_name, int value)
+{
+	int error = GRBsetintattr(m_model.get(), attr_name, value);
+}
+
+void GurobiModel::set_model_raw_attribute_double(const char *attr_name, double value)
+{
+	int error = GRBsetdblattr(m_model.get(), attr_name, value);
+}
+
+void GurobiModel::set_model_raw_attribute_string(const char *attr_name, const char *value)
+{
+	int error = GRBsetstrattr(m_model.get(), attr_name, value);
+}
+
+int GurobiModel::get_model_raw_attribute_int(const char *attr_name)
+{
+	int retval;
+	int error = GRBgetintattr(m_model.get(), attr_name, &retval);
+	return retval;
+}
+
+double GurobiModel::get_model_raw_attribute_double(const char *attr_name)
+{
+	double retval;
+	int error = GRBgetdblattr(m_model.get(), attr_name, &retval);
+	return retval;
+}
+
+char *GurobiModel::get_model_raw_attribute_string(const char *attr_name)
+{
+	char *retval;
+	int error = GRBgetstrattr(m_model.get(), attr_name, &retval);
+	return retval;
+}
+
 void GurobiModel::set_variable_raw_attribute_int(const VariableIndex &variable,
                                                  const char *attr_name, int value)
 {

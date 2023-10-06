@@ -58,6 +58,15 @@ class GurobiModel : AbstractModel
 
 	void update();
 
+	// model attribute
+	void set_model_raw_attribute_int(const char *attr_name, int value);
+	void set_model_raw_attribute_double(const char *attr_name, double value);
+	void set_model_raw_attribute_string(const char *attr_name, const char *value);
+	int get_model_raw_attribute_int(const char *attr_name);
+	double get_model_raw_attribute_double(const char *attr_name);
+	char *get_model_raw_attribute_string(const char *attr_name);
+
+	// variable attribute
 	void set_variable_raw_attribute_int(const VariableIndex &variable, const char *attr_name,
 	                                    int value);
 	void set_variable_raw_attribute_char(const VariableIndex &variable, const char *attr_name,
