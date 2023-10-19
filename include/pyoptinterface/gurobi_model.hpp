@@ -57,13 +57,22 @@ class GurobiModel
 
 	void update();
 
+	// parameter
+	int parameter_type(const char *param_name);
+	void set_parameter_int(const char *param_name, int value);	
+	void set_parameter_double(const char *param_name, double value);
+	void set_parameter_string(const char *param_name, const char *value);
+	int get_parameter_int(const char *param_name);
+	double get_parameter_double(const char *param_name);
+	std::string get_parameter_string(const char *param_name);
+
 	// model attribute
 	void set_model_raw_attribute_int(const char *attr_name, int value);
 	void set_model_raw_attribute_double(const char *attr_name, double value);
 	void set_model_raw_attribute_string(const char *attr_name, const char *value);
 	int get_model_raw_attribute_int(const char *attr_name);
 	double get_model_raw_attribute_double(const char *attr_name);
-	char *get_model_raw_attribute_string(const char *attr_name);
+	std::string get_model_raw_attribute_string(const char *attr_name);
 
 	// variable attribute
 	void set_variable_raw_attribute_int(const VariableIndex &variable, const char *attr_name,
@@ -80,21 +89,9 @@ class GurobiModel
 	std::string get_variable_raw_attribute_string(const VariableIndex &variable,
 	                                              const char *attr_name);
 
-	bool support_variable_attribute(VariableAttribute attr);
-	AttributeType variable_attribute_type(VariableAttribute attr);
-	void set_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr,
-	                                int value);
-	void set_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr,
-	                                 char value);
-	void set_variable_attribute_double(const VariableIndex &variable, VariableAttribute attr,
-	                                   double value);
-	void set_variable_attribute_string(const VariableIndex &variable, VariableAttribute attr,
-	                                   const char *value);
-	int get_variable_attribute_int(const VariableIndex &variable, VariableAttribute attr);
-	char get_variable_attribute_char(const VariableIndex &variable, VariableAttribute attr);
-	double get_variable_attribute_double(const VariableIndex &variable, VariableAttribute attr);
-	std::string get_variable_attribute_string(const VariableIndex &variable,
-	                                          VariableAttribute attr);
+	void check_error(int error);
+
+	void *get_raw_model();
 
   private:
 	MonotoneVector<int> m_variable_index;
@@ -106,6 +103,6 @@ class GurobiModel
 	MonotoneVector<int> m_sos_constraint_index;
 
 	/* Gurobi part */
-	GRBenv *m_env;
+	GRBenv *m_env = nullptr;
 	std::unique_ptr<GRBmodel, GRBfreemodelT> m_model;
 };

@@ -22,7 +22,7 @@ using Vector = std::vector<V>;
 struct VariableIndex;
 struct ScalarAffineFunction;
 struct ScalarQuadraticFunction;
-struct TermsTable;
+struct ExprBuilder;
 
 enum class VariableDomain
 {
@@ -57,7 +57,7 @@ struct ScalarAffineFunction
 	ScalarAffineFunction(const Vector<CoeffT> &, const Vector<IndexT> &,
 	                     const std::optional<CoeffT> &);
 
-	ScalarAffineFunction(const TermsTable &t);
+	ScalarAffineFunction(const ExprBuilder &t);
 
 	size_t size() const;
 	void canonicalize(CoeffT threshold = COEFTHRESHOLD);
@@ -74,7 +74,7 @@ struct ScalarQuadraticFunction
 	ScalarQuadraticFunction(const Vector<CoeffT> &, const Vector<IndexT> &, const Vector<IndexT> &);
 	ScalarQuadraticFunction(const Vector<CoeffT> &, const Vector<IndexT> &, const Vector<IndexT> &,
 	                        const std::optional<ScalarAffineFunction> &);
-	ScalarQuadraticFunction(const TermsTable &t);
+	ScalarQuadraticFunction(const ExprBuilder &t);
 
 	size_t size() const;
 	void canonicalize(CoeffT threshold = COEFTHRESHOLD);
@@ -101,34 +101,34 @@ struct ankerl::unordered_dense::hash<VariablePair>
 	}
 };
 
-struct TermsTable
+struct ExprBuilder
 {
 	Hashmap<VariablePair, CoeffT> quadratic_terms;
 	Hashmap<IndexT, CoeffT> affine_terms;
 	std::optional<CoeffT> constant_term;
 
-	TermsTable() = default;
-	TermsTable(const VariableIndex &v);
-	TermsTable(const ScalarAffineFunction &a);
-	TermsTable(const ScalarQuadraticFunction &q);
+	ExprBuilder() = default;
+	ExprBuilder(const VariableIndex &v);
+	ExprBuilder(const ScalarAffineFunction &a);
+	ExprBuilder(const ScalarQuadraticFunction &q);
 
-	TermsTable &operator+=(CoeffT c);
-	TermsTable &operator+=(const VariableIndex &v);
-	TermsTable &operator+=(const ScalarAffineFunction &a);
-	TermsTable &operator+=(const ScalarQuadraticFunction &q);
-	TermsTable &operator+=(const TermsTable &t);
+	ExprBuilder &operator+=(CoeffT c);
+	ExprBuilder &operator+=(const VariableIndex &v);
+	ExprBuilder &operator+=(const ScalarAffineFunction &a);
+	ExprBuilder &operator+=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator+=(const ExprBuilder &t);
 
-	TermsTable &operator-=(CoeffT c);
-	TermsTable &operator-=(const VariableIndex &v);
-	TermsTable &operator-=(const ScalarAffineFunction &a);
-	TermsTable &operator-=(const ScalarQuadraticFunction &q);
-	TermsTable &operator-=(const TermsTable &t);
+	ExprBuilder &operator-=(CoeffT c);
+	ExprBuilder &operator-=(const VariableIndex &v);
+	ExprBuilder &operator-=(const ScalarAffineFunction &a);
+	ExprBuilder &operator-=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator-=(const ExprBuilder &t);
 
-	TermsTable &operator*=(CoeffT c);
-	TermsTable &operator*=(const VariableIndex &v);
-	TermsTable &operator*=(const ScalarAffineFunction &a);
-	TermsTable &operator*=(const ScalarQuadraticFunction &q);
-	TermsTable &operator*=(const TermsTable &t);
+	ExprBuilder &operator*=(CoeffT c);
+	ExprBuilder &operator*=(const VariableIndex &v);
+	ExprBuilder &operator*=(const ScalarAffineFunction &a);
+	ExprBuilder &operator*=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator*=(const ExprBuilder &t);
 
 	bool empty() const;
 	int degree() const;
@@ -238,23 +238,4 @@ enum class ObjectiveSense
 {
 	Minimize,
 	Maximize
-};
-
-/* Attribute type */
-enum class AttributeType
-{
-	Int,
-	Double,
-	String,
-	Char
-};
-
-/* Common variable attributes */
-enum class VariableAttribute
-{
-	Name,
-	Domain,
-	LowerBound,
-	UpperBound,
-	Value
 };

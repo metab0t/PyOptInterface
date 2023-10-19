@@ -1,2 +1,16 @@
-from pyoptinterface_nb import core_ext as core
-from pyoptinterface_nb import gurobi_model_ext as gurobi
+from pyoptinterface_nb.core_ext import (
+    VariableIndex,
+    ConstraintIndex,
+    ExprBuilder,
+    VariableDomain,
+    ConstraintSense,
+    ConstraintType,
+    ObjectiveSense,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction
+)
+
+from pyoptinterface_nb.attributes import (
+    VariableAttribute,
+    ModelAttribute
+)

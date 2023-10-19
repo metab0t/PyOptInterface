@@ -54,7 +54,10 @@ class MonotoneVector
 	}
 	T &get_index(const IndexT &index)
 	{
-		update();
+		if (index >= m_first_dirty_index)
+		{
+			update();
+		}
 		return m_data[index];
 	}
 	std::size_t size() const

@@ -35,7 +35,7 @@ auto test_gurobi() -> void
 		VariableIndex x = model.add_variable(VariableDomain::Continuous);
 		VariableIndex y = model.add_variable(VariableDomain::Continuous);
 
-		TermsTable expr;
+		ExprBuilder expr;
 		expr += x;
 		expr += y;
 		ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);

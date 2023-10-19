@@ -33,7 +33,7 @@ ScalarAffineFunction::ScalarAffineFunction(const Vector<CoeffT> &a, const Vector
     : coefficients(a), variables(b), constant(c)
 {
 }
-ScalarAffineFunction::ScalarAffineFunction(const TermsTable &t)
+ScalarAffineFunction::ScalarAffineFunction(const ExprBuilder &t)
 {
 	const auto &affine_terms = t.affine_terms;
 
@@ -54,7 +54,7 @@ size_t ScalarAffineFunction::size() const
 }
 void ScalarAffineFunction::canonicalize(CoeffT threshold)
 {
-	TermsTable t(*this);
+	ExprBuilder t(*this);
 	t.clean_nearzero_terms(threshold);
 
 	*this = ScalarAffineFunction(t);
@@ -73,7 +73,7 @@ ScalarQuadraticFunction::ScalarQuadraticFunction(const Vector<CoeffT> &c, const 
     : coefficients(c), variable_1s(v1), variable_2s(v2), affine_part(a)
 {
 }
-ScalarQuadraticFunction::ScalarQuadraticFunction(const TermsTable &t)
+ScalarQuadraticFunction::ScalarQuadraticFunction(const ExprBuilder &t)
 {
 	const auto &quadratic_terms = t.quadratic_terms;
 	auto N = quadratic_terms.size();
@@ -99,7 +99,7 @@ size_t ScalarQuadraticFunction::size() const
 }
 void ScalarQuadraticFunction::canonicalize(CoeffT threshold)
 {
-	TermsTable t(*this);
+	ExprBuilder t(*this);
 	t.clean_nearzero_terms(threshold);
 
 	*this = ScalarQuadraticFunction(t);
@@ -118,12 +118,12 @@ bool VariablePair::operator<(const VariablePair &x) const
 		return var_1 < var_2;
 }
 
-TermsTable::TermsTable(const VariableIndex &v)
+ExprBuilder::ExprBuilder(const VariableIndex &v)
 {
 	this->operator+=(v);
 }
 
-TermsTable::TermsTable(const ScalarAffineFunction &a)
+ExprBuilder::ExprBuilder(const ScalarAffineFunction &a)
 {
 	auto N = a.coefficients.size();
 	affine_terms.reserve(N);
@@ -131,7 +131,7 @@ TermsTable::TermsTable(const ScalarAffineFunction &a)
 	this->operator+=(a);
 }
 
-TermsTable::TermsTable(const ScalarQuadraticFunction &q)
+ExprBuilder::ExprBuilder(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
@@ -143,12 +143,12 @@ TermsTable::TermsTable(const ScalarQuadraticFunction &q)
 	this->operator+=(q);
 }
 
-bool TermsTable::empty() const
+bool ExprBuilder::empty() const
 {
 	return quadratic_terms.empty() && affine_terms.empty() && !constant_term;
 }
 
-int TermsTable::degree() const
+int ExprBuilder::degree() const
 {
 	if (!quadratic_terms.empty())
 	{
@@ -161,14 +161,14 @@ int TermsTable::degree() const
 	return 0;
 }
 
-void TermsTable::clear()
+void ExprBuilder::clear()
 {
 	quadratic_terms.clear();
 	affine_terms.clear();
 	constant_term.reset();
 }
 
-void TermsTable::clean_nearzero_terms(CoeffT threshold)
+void ExprBuilder::clean_nearzero_terms(CoeffT threshold)
 {
 	// clear all coeficients if abs(coefficient) < threshold
 	for (auto it = quadratic_terms.begin(); it != quadratic_terms.end();)
@@ -199,7 +199,7 @@ void TermsTable::clean_nearzero_terms(CoeffT threshold)
 	}
 }
 
-void TermsTable::_add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
+void ExprBuilder::_add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
 {
 	if (i > j)
 	{
@@ -215,12 +215,12 @@ void TermsTable::_add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
 		it->second += coeff;
 	}
 }
-void TermsTable::add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff)
+void ExprBuilder::add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff)
 {
 	_add_quadratic_term(i.index, j.index, coeff);
 }
 
-void TermsTable::_add_affine_term(IndexT i, CoeffT coeff)
+void ExprBuilder::_add_affine_term(IndexT i, CoeffT coeff)
 {
 	auto it = affine_terms.find(i);
 	if (it == affine_terms.end())
@@ -232,22 +232,22 @@ void TermsTable::_add_affine_term(IndexT i, CoeffT coeff)
 		it->second += coeff;
 	}
 }
-void TermsTable::add_affine_term(const VariableIndex &i, CoeffT coeff)
+void ExprBuilder::add_affine_term(const VariableIndex &i, CoeffT coeff)
 {
 	_add_affine_term(i.index, coeff);
 }
 
-TermsTable &TermsTable::operator+=(CoeffT c)
+ExprBuilder &ExprBuilder::operator+=(CoeffT c)
 {
 	constant_term = constant_term.value_or(0.0) + c;
 	return *this;
 }
-TermsTable &TermsTable::operator+=(const VariableIndex &v)
+ExprBuilder &ExprBuilder::operator+=(const VariableIndex &v)
 {
 	_add_affine_term(v.index, 1.0);
 	return *this;
 }
-TermsTable &TermsTable::operator+=(const ScalarAffineFunction &a)
+ExprBuilder &ExprBuilder::operator+=(const ScalarAffineFunction &a)
 {
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
@@ -261,7 +261,7 @@ TermsTable &TermsTable::operator+=(const ScalarAffineFunction &a)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator+=(const ScalarQuadraticFunction &q)
+ExprBuilder &ExprBuilder::operator+=(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
@@ -275,7 +275,7 @@ TermsTable &TermsTable::operator+=(const ScalarQuadraticFunction &q)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator+=(const TermsTable &t)
+ExprBuilder &ExprBuilder::operator+=(const ExprBuilder &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
@@ -292,17 +292,17 @@ TermsTable &TermsTable::operator+=(const TermsTable &t)
 	return *this;
 }
 
-TermsTable &TermsTable::operator-=(CoeffT c)
+ExprBuilder &ExprBuilder::operator-=(CoeffT c)
 {
 	constant_term = constant_term.value_or(0.0) - c;
 	return *this;
 }
-TermsTable &TermsTable::operator-=(const VariableIndex &v)
+ExprBuilder &ExprBuilder::operator-=(const VariableIndex &v)
 {
 	_add_affine_term(v.index, -1.0);
 	return *this;
 }
-TermsTable &TermsTable::operator-=(const ScalarAffineFunction &a)
+ExprBuilder &ExprBuilder::operator-=(const ScalarAffineFunction &a)
 {
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
@@ -316,7 +316,7 @@ TermsTable &TermsTable::operator-=(const ScalarAffineFunction &a)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator-=(const ScalarQuadraticFunction &q)
+ExprBuilder &ExprBuilder::operator-=(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
@@ -330,7 +330,7 @@ TermsTable &TermsTable::operator-=(const ScalarQuadraticFunction &q)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator-=(const TermsTable &t)
+ExprBuilder &ExprBuilder::operator-=(const ExprBuilder &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
@@ -347,7 +347,7 @@ TermsTable &TermsTable::operator-=(const TermsTable &t)
 	return *this;
 }
 
-TermsTable &TermsTable::operator*=(CoeffT c)
+ExprBuilder &ExprBuilder::operator*=(CoeffT c)
 {
 	if (constant_term)
 	{
@@ -355,13 +355,13 @@ TermsTable &TermsTable::operator*=(CoeffT c)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator*=(const VariableIndex &v)
+ExprBuilder &ExprBuilder::operator*=(const VariableIndex &v)
 {
 	auto deg = degree();
 	if (deg > 1)
 	{
 		throw std::logic_error(
-		    std::format("TermsTable with degree {} cannot multiply with VariableIndex", deg));
+		    std::format("ExprBuilder with degree {} cannot multiply with VariableIndex", deg));
 	}
 
 	auto N = affine_terms.size();
@@ -383,13 +383,13 @@ TermsTable &TermsTable::operator*=(const VariableIndex &v)
 
 	return *this;
 }
-TermsTable &TermsTable::operator*=(const ScalarAffineFunction &a)
+ExprBuilder &ExprBuilder::operator*=(const ScalarAffineFunction &a)
 {
 	auto deg = degree();
 	if (deg > 1)
 	{
 		throw std::logic_error(std::format(
-		    "TermsTable with degree {} cannot multiply with ScalarAffineFunction", deg));
+		    "ExprBuilder with degree {} cannot multiply with ScalarAffineFunction", deg));
 	}
 
 	auto N1 = affine_terms.size();
@@ -432,13 +432,13 @@ TermsTable &TermsTable::operator*=(const ScalarAffineFunction &a)
 
 	return *this;
 }
-TermsTable &TermsTable::operator*=(const ScalarQuadraticFunction &q)
+ExprBuilder &ExprBuilder::operator*=(const ScalarQuadraticFunction &q)
 {
 	auto deg = degree();
 	if (deg > 0)
 	{
 		throw std::logic_error(std::format(
-		    "TermsTable with degree {} cannot multiply with ScalarQuadraticFunction", deg));
+		    "ExprBuilder with degree {} cannot multiply with ScalarQuadraticFunction", deg));
 	}
 
 	auto N = q.coefficients.size();
@@ -453,14 +453,14 @@ TermsTable &TermsTable::operator*=(const ScalarQuadraticFunction &q)
 	}
 	return *this;
 }
-TermsTable &TermsTable::operator*=(const TermsTable &t)
+ExprBuilder &ExprBuilder::operator*=(const ExprBuilder &t)
 {
 	auto deg1 = degree();
 	auto deg2 = t.degree();
 	if (deg1 + deg2 > 2)
 	{
 		throw std::logic_error(
-		    std::format("TermsTable with degree {} cannot multiply with TermsTable with degree {}",
+		    std::format("ExprBuilder with degree {} cannot multiply with ExprBuilder with degree {}",
 		                deg1, deg2));
 	}
 
@@ -603,7 +603,7 @@ auto operator+(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarA
 
 auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	TermsTable t(a);
+	ExprBuilder t(a);
 	t += b;
 	return ScalarAffineFunction(t);
 }
@@ -655,7 +655,7 @@ auto operator+(const ScalarAffineFunction &b, const ScalarQuadraticFunction &a)
 auto operator+(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction
 {
-	TermsTable t(a);
+	ExprBuilder t(a);
 	t += b;
 	return ScalarQuadraticFunction(t);
 }
@@ -805,7 +805,7 @@ auto operator*(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarQ
 auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction
 {
-	auto t = TermsTable();
+	auto t = ExprBuilder();
 
 	for (int i = 0; i < a.coefficients.size(); i++)
 	{

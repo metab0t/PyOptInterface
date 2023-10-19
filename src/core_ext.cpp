@@ -14,7 +14,7 @@ NB_MODULE(core_ext, m)
 	nb::bind_vector<Vector<CoeffT>>(m, "CoefVector");
 
 	// VariableDomain
-	nb::enum_<VariableDomain>(m, "VariableDomain")
+	nb::enum_<VariableDomain>(m, "VariableDomain", nb::is_arithmetic())
 	    .value("Continuous", VariableDomain::Continuous)
 	    .value("Integer", VariableDomain::Integer)
 	    .value("Binary", VariableDomain::Binary)
@@ -37,21 +37,6 @@ NB_MODULE(core_ext, m)
 	nb::enum_<ObjectiveSense>(m, "ObjectiveSense")
 	    .value("Minimize", ObjectiveSense::Minimize)
 	    .value("Maximize", ObjectiveSense::Maximize);
-
-	// AttributeType
-	nb::enum_<AttributeType>(m, "AttributeType")
-	    .value("Int", AttributeType::Int)
-	    .value("Char", AttributeType::Char)
-	    .value("Double", AttributeType::Double)
-	    .value("String", AttributeType::String);
-
-	// VariableAttribute
-	nb::enum_<VariableAttribute>(m, "VariableAttribute")
-	    .value("Name", VariableAttribute::Name)
-	    .value("Domain", VariableAttribute::Domain)
-	    .value("LowerBound", VariableAttribute::LowerBound)
-	    .value("UpperBound", VariableAttribute::UpperBound)
-	    .value("Value", VariableAttribute::Value);
 
 	nb::class_<VariableIndex>(m, "VariableIndex")
 	    .def(nb::init<IndexT>())
@@ -83,7 +68,7 @@ NB_MODULE(core_ext, m)
 	         nb::arg("variables"))
 	    .def(nb::init<const Vector<CoeffT> &, const Vector<IndexT> &, CoeffT>(),
 	         nb::arg("coefficients"), nb::arg("variables"), nb::arg("constant"))
-	    .def(nb::init<const TermsTable &>())
+	    .def(nb::init<const ExprBuilder &>())
 	    .def_ro("coefficients", &ScalarAffineFunction::coefficients)
 	    .def_ro("variables", &ScalarAffineFunction::variables)
 	    .def_ro("constant", &ScalarAffineFunction::constant)
@@ -110,7 +95,7 @@ NB_MODULE(core_ext, m)
 	    .def(nb::init<const Vector<CoeffT> &, const Vector<IndexT> &, const Vector<IndexT> &,
 	                  const ScalarAffineFunction &>(),
 	         nb::arg("coefficients"), nb::arg("var1s"), nb::arg("var2s"), nb::arg("affine_part"))
-	    .def(nb::init<const TermsTable &>())
+	    .def(nb::init<const ExprBuilder &>())
 	    .def_ro("coefficients", &ScalarQuadraticFunction::coefficients)
 	    .def_ro("variable_1s", &ScalarQuadraticFunction::variable_1s)
 	    .def_ro("variable_2s", &ScalarQuadraticFunction::variable_2s)
@@ -132,34 +117,34 @@ NB_MODULE(core_ext, m)
 
 	nb::class_<VariablePair>(m, "VariablePair").def(nb::init<IndexT, IndexT>());
 
-	nb::class_<TermsTable>(m, "TermsTable")
+	nb::class_<ExprBuilder>(m, "ExprBuilder")
 	    .def(nb::init<>())
 	    .def(nb::init<const VariableIndex &>())
 	    .def(nb::init<const ScalarAffineFunction &>())
 	    .def(nb::init<const ScalarQuadraticFunction &>())
-	    .def_ro("quadratic_terms", &TermsTable::quadratic_terms)
-	    .def_ro("affine_terms", &TermsTable::affine_terms)
-	    .def_ro("constant_term", &TermsTable::constant_term)
-	    .def("empty", &TermsTable::empty)
-	    .def("degree", &TermsTable::degree)
-	    .def("clear", &TermsTable::clear)
-	    .def("clean_nearzero_terms", &TermsTable::clean_nearzero_terms,
+	    .def_ro("quadratic_terms", &ExprBuilder::quadratic_terms)
+	    .def_ro("affine_terms", &ExprBuilder::affine_terms)
+	    .def_ro("constant_term", &ExprBuilder::constant_term)
+	    .def("empty", &ExprBuilder::empty)
+	    .def("degree", &ExprBuilder::degree)
+	    .def("clear", &ExprBuilder::clear)
+	    .def("clean_nearzero_terms", &ExprBuilder::clean_nearzero_terms,
 	         nb::arg("threshold") = COEFTHRESHOLD)
-	    .def("add_quadratic_term", &TermsTable::add_quadratic_term)
-	    .def("add_affine_term", &TermsTable::add_affine_term)
+	    .def("add_quadratic_term", &ExprBuilder::add_quadratic_term)
+	    .def("add_affine_term", &ExprBuilder::add_affine_term)
 	    .def(nb::self += CoeffT())
 	    .def(nb::self += VariableIndex())
 	    .def(nb::self += ScalarAffineFunction())
 	    .def(nb::self += ScalarQuadraticFunction())
-	    .def(nb::self += TermsTable())
+	    .def(nb::self += ExprBuilder())
 	    .def(nb::self -= CoeffT())
 	    .def(nb::self -= VariableIndex())
 	    .def(nb::self -= ScalarAffineFunction())
 	    .def(nb::self -= ScalarQuadraticFunction())
-	    .def(nb::self -= TermsTable())
+	    .def(nb::self -= ExprBuilder())
 	    .def(nb::self *= CoeffT())
 	    .def(nb::self *= VariableIndex())
 	    .def(nb::self *= ScalarAffineFunction())
 	    .def(nb::self *= ScalarQuadraticFunction())
-	    .def(nb::self *= TermsTable());
+	    .def(nb::self *= ExprBuilder());
 }

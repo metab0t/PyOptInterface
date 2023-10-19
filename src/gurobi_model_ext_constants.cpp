@@ -4,10 +4,10 @@
 
 namespace nb = nanobind;
 
-void bind_gurobi_constants(nb::module_& m)
+void bind_gurobi_constants(nb::module_ &m)
 {
 	nb::module_ GRB = m.def_submodule("GRB");
-	
+
 	GRB.attr("LOADED") = GRB_LOADED;
 	GRB.attr("OPTIMAL") = GRB_OPTIMAL;
 	GRB.attr("INFEASIBLE") = GRB_INFEASIBLE;
@@ -25,4 +25,9 @@ void bind_gurobi_constants(nb::module_& m)
 	GRB.attr("USER_OBJ_LIMIT") = GRB_USER_OBJ_LIMIT;
 	GRB.attr("WORK_LIMIT") = GRB_WORK_LIMIT;
 	GRB.attr("MEM_LIMIT") = GRB_MEM_LIMIT;
+
+	GRB.attr("CONTINUOUS") = GRB_CONTINUOUS;
+	GRB.attr("BINARY") = GRB_BINARY;
+	GRB.attr("INTEGER") = GRB_INTEGER;
+	GRB.attr("SEMICONT") = GRB_SEMICONT;
 }

@@ -10,9 +10,7 @@ add_library(pyoptinterface_core STATIC)
 target_sources(pyoptinterface_core PRIVATE
   include/pyoptinterface/core.hpp
   include/pyoptinterface/container.hpp
-  include/pyoptinterface/abstract_model.hpp
   src/core.cpp
-  src/abstract_model.cpp
   src/cache_model.cpp
 )
 target_include_directories(pyoptinterface_core PUBLIC include thirdparty)

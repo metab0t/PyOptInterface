@@ -7,13 +7,13 @@ def test_basic():
     v = vars[0]
     assert v.index == 0
 
-    t = ext.TermsTable()
+    t = ext.ExprBuilder()
     t += v
     t += v * v
     assert t.degree() == 2
     assert t.empty() == False
 
-    t = ext.TermsTable(v)
+    t = ext.ExprBuilder(v)
     t.add_affine_term(vars[1], 2.0)
     t += 3.0 * vars[2]
     t -= 4.0 * vars[3]
