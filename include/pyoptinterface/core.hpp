@@ -214,25 +214,25 @@ struct ConstraintIndex
 	IndexT index;
 };
 
-struct LinearConstraint
-{
-	ScalarAffineFunction function;
-	ConstraintSense sense;
-	CoeffT rhs;
-};
-
-struct QuadraticConstraint
-{
-	ScalarQuadraticFunction function;
-	ConstraintSense sense;
-	CoeffT rhs;
-};
-
-struct SOSConstraint
-{
-	Vector<VariableIndex> variables;
-	Vector<CoeffT> weights;
-};
+// struct LinearConstraint
+//{
+//	ScalarAffineFunction function;
+//	ConstraintSense sense;
+//	CoeffT rhs;
+// };
+//
+// struct QuadraticConstraint
+//{
+//	ScalarQuadraticFunction function;
+//	ConstraintSense sense;
+//	CoeffT rhs;
+// };
+//
+// struct SOSConstraint
+//{
+//	Vector<VariableIndex> variables;
+//	Vector<CoeffT> weights;
+// };
 
 enum class ObjectiveSense
 {

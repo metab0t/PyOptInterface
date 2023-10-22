@@ -8,7 +8,7 @@ Model = gurobi.Model
 def main():
     model = Model()
 
-    model_ptr = model.raw_model_ptr
+    model_ptr = model.c_pointer
 
     libgurobi = ctypes.CDLL("gurobi100.dll")
 

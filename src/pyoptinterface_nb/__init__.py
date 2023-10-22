@@ -7,10 +7,12 @@ from pyoptinterface_nb.core_ext import (
     ConstraintType,
     ObjectiveSense,
     ScalarAffineFunction,
-    ScalarQuadraticFunction
+    ScalarQuadraticFunction,
 )
 
 from pyoptinterface_nb.attributes import (
     VariableAttribute,
-    ModelAttribute
+    ModelAttribute,
+    TerminationStatusCode,
+    ResultStatusCode,
 )

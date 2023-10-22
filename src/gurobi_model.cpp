@@ -1,4 +1,5 @@
 #include "pyoptinterface/gurobi_model.hpp"
+#include <format>
 
 char gurobi_con_sense(ConstraintSense sense)
 {
@@ -228,7 +229,7 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	// Delete the corresponding Gurobi constraint
 	int constraint_row = -1;
-	int error;
+	int error = 0;
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
@@ -256,6 +257,8 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 			error = GRBdelsos(m_model.get(), 1, &constraint_row);
 		}
 		break;
+	default:
+		throw std::runtime_error("Unknown constraint type");
 	}
 	check_error(error);
 }
@@ -358,7 +361,7 @@ void GurobiModel::update()
 	check_error(error);
 }
 
-int GurobiModel::parameter_type(const char *param_name)
+int GurobiModel::raw_parameter_type(const char *param_name)
 {
 	return GRBgetparamtype(m_env, param_name);
 }
@@ -405,6 +408,14 @@ std::string GurobiModel::get_parameter_string(const char *param_name)
 	return std::string(retval);
 }
 
+int GurobiModel::raw_attribute_type(const char *attr_name)
+{
+	int datatypeP;
+	int error = GRBgetattrinfo(m_model.get(), attr_name, &datatypeP, NULL, NULL);
+	check_error(error);
+	return datatypeP;
+}
+
 void GurobiModel::set_model_raw_attribute_int(const char *attr_name, int value)
 {
 	int error = GRBsetintattr(m_model.get(), attr_name, value);
@@ -445,6 +456,25 @@ std::string GurobiModel::get_model_raw_attribute_string(const char *attr_name)
 	int error = GRBgetstrattr(m_model.get(), attr_name, &retval);
 	check_error(error);
 	return std::string(retval);
+}
+
+std::vector<double> GurobiModel::get_model_raw_attribute_vector_double(const char *attr_name,
+                                                                       int start, int len)
+{
+	std::vector<double> retval(len);
+	int error = GRBgetdblattrarray(m_model.get(), attr_name, start, len, retval.data());
+	check_error(error);
+	return retval;
+}
+
+std::vector<double> GurobiModel::get_model_raw_attribute_list_double(const char *attr_name,
+                                                                     const std::vector<int> &ind)
+{
+	std::vector<double> retval(ind.size());
+	int error =
+	    GRBgetdblattrlist(m_model.get(), attr_name, ind.size(), (int *)ind.data(), retval.data());
+	check_error(error);
+	return retval;
 }
 
 void GurobiModel::set_variable_raw_attribute_int(const VariableIndex &variable,
@@ -562,6 +592,13 @@ void GurobiModel::check_error(int error)
 void *GurobiModel::get_raw_model()
 {
 	return m_model.get();
+}
+
+std::string GurobiModel::version_string()
+{
+	std::string version =
+	    std::format("v{}.{}.{}", GRB_VERSION_MAJOR, GRB_VERSION_MINOR, GRB_VERSION_TECHNICAL);
+	return version;
 }
 
 GurobiEnv::GurobiEnv()

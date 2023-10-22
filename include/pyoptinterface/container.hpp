@@ -18,6 +18,7 @@ class MonotoneVector
 	T m_start = 0;
 	bool m_is_dirty = false;
 	IndexT m_first_dirty_index = 0;
+	std::size_t m_cardinality = 0;
 
   public:
 	MonotoneVector() = default;
@@ -27,16 +28,22 @@ class MonotoneVector
 
 	IndexT add_index()
 	{
-		m_data.push_back(1);
+		m_data.push_back(m_start);
 		if (!m_is_dirty)
 		{
 			m_is_dirty = true;
 			m_first_dirty_index = m_data.size() - 1;
 		}
-		return m_data.size() - 1;
+		IndexT index = m_data.size() - 1;
+		m_cardinality += 1;
+		return index;
 	}
 	void delete_index(const IndexT &index)
 	{
+		if (m_data[index] < 0)
+		{
+			return;
+		}
 		if (!m_is_dirty)
 		{
 			m_is_dirty = true;
@@ -47,6 +54,7 @@ class MonotoneVector
 			m_first_dirty_index = index;
 		}
 		m_data[index] = -1;
+		m_cardinality -= 1;
 	}
 	bool has_index(const IndexT &index) const
 	{
@@ -60,14 +68,22 @@ class MonotoneVector
 		}
 		return m_data[index];
 	}
-	std::size_t size() const
-	{
-		return m_data.size();
-	}
 	std::size_t num_active_indices() const
 	{
-		// count elements >= 0
-		return std::count_if(m_data.begin(), m_data.end(), [](const T &x) { return x >= 0; });
+		return m_cardinality;
+	}
+	std::vector<IndexT> get_active_indices() const
+	{
+		std::vector<IndexT> indices;
+		indices.reserve(m_cardinality);
+		for (IndexT i = 0; i < m_data.size(); i++)
+		{
+			if (m_data[i] >= 0)
+			{
+				indices.push_back(i);
+			}
+		}
+		return indices;
 	}
 	void update()
 	{
@@ -103,5 +119,6 @@ class MonotoneVector
 		m_data.clear();
 		m_is_dirty = false;
 		m_first_dirty_index = 0;
+		m_cardinality = 0;
 	}
 };

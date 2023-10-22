@@ -54,17 +54,21 @@ class GurobiModel
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 
 	void optimize();
-
 	void update();
+	void *get_raw_model();
+	std::string version_string();
 
 	// parameter
-	int parameter_type(const char *param_name);
-	void set_parameter_int(const char *param_name, int value);	
+	int raw_parameter_type(const char *param_name);
+	void set_parameter_int(const char *param_name, int value);
 	void set_parameter_double(const char *param_name, double value);
 	void set_parameter_string(const char *param_name, const char *value);
 	int get_parameter_int(const char *param_name);
 	double get_parameter_double(const char *param_name);
 	std::string get_parameter_string(const char *param_name);
+
+	// attribute
+	int raw_attribute_type(const char *attr_name);
 
 	// model attribute
 	void set_model_raw_attribute_int(const char *attr_name, int value);
@@ -73,6 +77,11 @@ class GurobiModel
 	int get_model_raw_attribute_int(const char *attr_name);
 	double get_model_raw_attribute_double(const char *attr_name);
 	std::string get_model_raw_attribute_string(const char *attr_name);
+
+	std::vector<double> get_model_raw_attribute_vector_double(const char *attr_name, int start,
+	                                                          int len);
+	std::vector<double> get_model_raw_attribute_list_double(const char *attr_name,
+	                                                        const std::vector<int> &ind);
 
 	// variable attribute
 	void set_variable_raw_attribute_int(const VariableIndex &variable, const char *attr_name,
@@ -89,9 +98,8 @@ class GurobiModel
 	std::string get_variable_raw_attribute_string(const VariableIndex &variable,
 	                                              const char *attr_name);
 
+	// Non-exported functions
 	void check_error(int error);
-
-	void *get_raw_model();
 
   private:
 	MonotoneVector<int> m_variable_index;

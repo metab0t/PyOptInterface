@@ -30,8 +30,8 @@ def default_variable_attribute_type(attribute):
 
 class ModelAttribute(Enum):
     # ModelLike API
-    NumberOfConstraints = auto()
-    NumberOfVariables = auto()
+    # NumberOfConstraints = auto()
+    # NumberOfVariables = auto()
     Name = auto()
     ObjectiveSense = auto()
 
@@ -51,9 +51,9 @@ class ModelAttribute(Enum):
     SimplexIterations = auto()
     SolverName = auto()
     SolverVersion = auto()
-    SolverTimeSec = auto()
+    SolveTimeSec = auto()
     TimeLimitSec = auto()
-    ObjectiveLimit = auto()
+    # ObjectiveLimit = auto()
 
 
 class ResultStatusCode(Enum):
@@ -98,8 +98,6 @@ class TerminationStatusCode(Enum):
 
 
 model_attr_type_map = {
-    ModelAttribute.NumberOfConstraints: int,
-    ModelAttribute.NumberOfVariables: int,
     ModelAttribute.Name: str,
     ModelAttribute.ObjectiveSense: ObjectiveSense,
     ModelAttribute.DualStatus: ResultStatusCode,
@@ -117,9 +115,8 @@ model_attr_type_map = {
     ModelAttribute.SimplexIterations: int,
     ModelAttribute.SolverName: str,
     ModelAttribute.SolverVersion: str,
-    ModelAttribute.SolverTimeSec: float,
+    ModelAttribute.SolveTimeSec: float,
     ModelAttribute.TimeLimitSec: float,
-    ModelAttribute.ObjectiveLimit: float,
 }
 
 

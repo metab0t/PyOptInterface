@@ -23,8 +23,8 @@ def test_gurobi():
 
     model.optimize()
 
-    status = model.get_model_raw_attribute_int("Status")
-    assert status == gurobi.GRB.OPTIMAL
+    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
+    assert status == core.TerminationStatusCode.OPTIMAL
 
     x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
@@ -35,8 +35,8 @@ def test_gurobi():
     con2 = model.add_linear_constraint(x + y, core.ConstraintSense.GreaterEqual, 20.0)
     model.optimize()
 
-    status = model.get_model_raw_attribute_int("Status")
-    assert status == gurobi.GRB.OPTIMAL
+    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
+    assert status == core.TerminationStatusCode.OPTIMAL
 
     x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
@@ -50,8 +50,8 @@ def test_gurobi():
     )
     model.optimize()
 
-    status = model.get_model_raw_attribute_int("Status")
-    assert status == gurobi.GRB.OPTIMAL
+    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
+    assert status == core.TerminationStatusCode.OPTIMAL
 
     x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
