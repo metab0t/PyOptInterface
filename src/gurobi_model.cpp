@@ -122,7 +122,7 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction fu
 	std::vector<double> cval_v(numnz);
 	for (int i = 0; i < numnz; i++)
 	{
-		cind_v[i] = m_variable_index.get_index(function.variables[i]);
+		cind_v[i] = _variable_index(function.variables[i]);
 		cval_v[i] = function.coefficients[i];
 	}
 	int *cind = cind_v.data();
@@ -155,7 +155,7 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 		std::vector<double> lval_v(numlnz);
 		for (int i = 0; i < numlnz; i++)
 		{
-			lind_v[i] = m_variable_index.get_index(affine_function.variables[i]);
+			lind_v[i] = _variable_index(affine_function.variables[i]);
 			lval_v[i] = function.coefficients[i];
 		}
 		lind = lind_v.data();
@@ -168,8 +168,8 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	std::vector<double> qval_v(numqnz);
 	for (int i = 0; i < numqnz; i++)
 	{
-		qrow_v[i] = m_variable_index.get_index(function.variable_1s[i]);
-		qcol_v[i] = m_variable_index.get_index(function.variable_2s[i]);
+		qrow_v[i] = _variable_index(function.variable_1s[i]);
+		qcol_v[i] = _variable_index(function.variable_2s[i]);
 		qval_v[i] = function.coefficients[i];
 	}
 	int *qrow = qrow_v.data();
@@ -214,7 +214,7 @@ ConstraintIndex GurobiModel::_add_sos_constraint(const Vector<VariableIndex> &va
 	std::vector<double> weight_v(nummembers);
 	for (int i = 0; i < nummembers; i++)
 	{
-		ind_v[i] = m_variable_index.get_index(variables[i].index);
+		ind_v[i] = _variable_index(variables[i].index);
 		weight_v[i] = weights[i];
 	}
 	int *ind = ind_v.data();
@@ -288,7 +288,7 @@ void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveS
 	int numnz = function.size();
 	for (int i = 0; i < numnz; i++)
 	{
-		auto column = m_variable_index.get_index(function.variables[i]);
+		auto column = _variable_index(function.variables[i]);
 		if (column < 0)
 		{
 			throw std::runtime_error("Variable does not exist");
@@ -323,8 +323,8 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 		std::vector<double> qval_v(numqnz);
 		for (int i = 0; i < numqnz; i++)
 		{
-			qrow_v[i] = m_variable_index.get_index(function.variable_1s[i]);
-			qcol_v[i] = m_variable_index.get_index(function.variable_2s[i]);
+			qrow_v[i] = _variable_index(function.variable_1s[i]);
+			qcol_v[i] = _variable_index(function.variable_2s[i]);
 			qval_v[i] = function.coefficients[i];
 		}
 		int *qrow = qrow_v.data();
@@ -480,7 +480,7 @@ std::vector<double> GurobiModel::get_model_raw_attribute_list_double(const char 
 void GurobiModel::set_variable_raw_attribute_int(const VariableIndex &variable,
                                                  const char *attr_name, int value)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -492,7 +492,7 @@ void GurobiModel::set_variable_raw_attribute_int(const VariableIndex &variable,
 void GurobiModel::set_variable_raw_attribute_char(const VariableIndex &variable,
                                                   const char *attr_name, char value)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -504,7 +504,7 @@ void GurobiModel::set_variable_raw_attribute_char(const VariableIndex &variable,
 void GurobiModel::set_variable_raw_attribute_double(const VariableIndex &variable,
                                                     const char *attr_name, double value)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -516,7 +516,7 @@ void GurobiModel::set_variable_raw_attribute_double(const VariableIndex &variabl
 void GurobiModel::set_variable_raw_attribute_string(const VariableIndex &variable,
                                                     const char *attr_name, const char *value)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -528,7 +528,7 @@ void GurobiModel::set_variable_raw_attribute_string(const VariableIndex &variabl
 int GurobiModel::get_variable_raw_attribute_int(const VariableIndex &variable,
                                                 const char *attr_name)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -542,7 +542,7 @@ int GurobiModel::get_variable_raw_attribute_int(const VariableIndex &variable,
 char GurobiModel::get_variable_raw_attribute_char(const VariableIndex &variable,
                                                   const char *attr_name)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -556,7 +556,7 @@ char GurobiModel::get_variable_raw_attribute_char(const VariableIndex &variable,
 double GurobiModel::get_variable_raw_attribute_double(const VariableIndex &variable,
                                                       const char *attr_name)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -570,7 +570,7 @@ double GurobiModel::get_variable_raw_attribute_double(const VariableIndex &varia
 std::string GurobiModel::get_variable_raw_attribute_string(const VariableIndex &variable,
                                                            const char *attr_name)
 {
-	auto column = m_variable_index.get_index(variable.index);
+	auto column = _variable_index(variable.index);
 	if (column < 0)
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -579,6 +579,99 @@ std::string GurobiModel::get_variable_raw_attribute_string(const VariableIndex &
 	int error = GRBgetstrattrelement(m_model.get(), attr_name, column, &retval);
 	check_error(error);
 	return std::string(retval);
+}
+
+int GurobiModel::_variable_index(const VariableIndex &variable)
+{
+	return m_variable_index.get_index(variable.index);
+}
+
+void GurobiModel::set_constraint_raw_attribute_int(const ConstraintIndex &constraint,
+                                                   const char *attr_name, int value)
+{
+	int row = _constraint_index(constraint);
+	int error = GRBsetintattrelement(m_model.get(), attr_name, row, value);
+	check_error(error);
+}
+
+void GurobiModel::set_constraint_raw_attribute_char(const ConstraintIndex &constraint,
+                                                    const char *attr_name, char value)
+{
+	int row = _constraint_index(constraint);
+	int error = GRBsetcharattrelement(m_model.get(), attr_name, row, value);
+	check_error(error);
+}
+
+void GurobiModel::set_constraint_raw_attribute_double(const ConstraintIndex &constraint,
+                                                      const char *attr_name, double value)
+{
+	int row = _constraint_index(constraint);
+	int error = GRBsetdblattrelement(m_model.get(), attr_name, row, value);
+	check_error(error);
+}
+
+void GurobiModel::set_constraint_raw_attribute_string(const ConstraintIndex &constraint,
+                                                      const char *attr_name, const char *value)
+{
+	int row = _constraint_index(constraint);
+	int error = GRBsetstrattrelement(m_model.get(), attr_name, row, value);
+	check_error(error);
+}
+
+int GurobiModel::get_constraint_raw_attribute_int(const ConstraintIndex &constraint,
+                                                  const char *attr_name)
+{
+	int row = _constraint_index(constraint);
+	int retval;
+	int error = GRBgetintattrelement(m_model.get(), attr_name, row, &retval);
+	check_error(error);
+	return retval;
+}
+
+char GurobiModel::get_constraint_raw_attribute_char(const ConstraintIndex &constraint,
+                                                    const char *attr_name)
+{
+	int row = _constraint_index(constraint);
+	char retval;
+	int error = GRBgetcharattrelement(m_model.get(), attr_name, row, &retval);
+	check_error(error);
+	return retval;
+}
+
+double GurobiModel::get_constraint_raw_attribute_double(const ConstraintIndex &constraint,
+                                                        const char *attr_name)
+{
+	int row = _constraint_index(constraint);
+	double retval;
+	int error = GRBgetdblattrelement(m_model.get(), attr_name, row, &retval);
+	check_error(error);
+	return retval;
+}
+
+std::string GurobiModel::get_constraint_raw_attribute_string(const ConstraintIndex &constraint,
+                                                             const char *attr_name)
+{
+	int row = _constraint_index(constraint);
+	char *retval;
+	int error = GRBgetstrattrelement(m_model.get(), attr_name, row, &retval);
+	check_error(error);
+	return std::string(retval);
+}
+
+int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
+{
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+		return m_linear_constraint_index.get_index(constraint.index);
+	case ConstraintType::Quadratic:
+		return m_quadratic_constraint_index.get_index(constraint.index);
+	case ConstraintType::SOS1:
+	case ConstraintType::SOS2:
+		return m_sos_constraint_index.get_index(constraint.index);
+	default:
+		throw std::runtime_error("Unknown constraint type");
+	}
 }
 
 void GurobiModel::check_error(int error)

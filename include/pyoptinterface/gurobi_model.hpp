@@ -98,6 +98,27 @@ class GurobiModel
 	std::string get_variable_raw_attribute_string(const VariableIndex &variable,
 	                                              const char *attr_name);
 
+	int _variable_index(const VariableIndex &variable);
+
+	// constraint attribute
+	void set_constraint_raw_attribute_int(const ConstraintIndex &constraint, const char *attr_name,
+	                                      int value);
+	void set_constraint_raw_attribute_char(const ConstraintIndex &constraint, const char *attr_name,
+	                                       char value);
+	void set_constraint_raw_attribute_double(const ConstraintIndex &constraint,
+	                                         const char *attr_name, double value);
+	void set_constraint_raw_attribute_string(const ConstraintIndex &constraint,
+	                                         const char *attr_name, const char *value);
+	int get_constraint_raw_attribute_int(const ConstraintIndex &constraint, const char *attr_name);
+	char get_constraint_raw_attribute_char(const ConstraintIndex &constraint,
+	                                       const char *attr_name);
+	double get_constraint_raw_attribute_double(const ConstraintIndex &constraint,
+	                                           const char *attr_name);
+	std::string get_constraint_raw_attribute_string(const ConstraintIndex &constraint,
+	                                                const char *attr_name);
+
+	int _constraint_index(const ConstraintIndex &constraint);
+
 	// Non-exported functions
 	void check_error(int error);
 

@@ -1,6 +1,7 @@
 from .gurobi_model_ext import RawModel, Env, GRB
 from .attributes import (
     VariableAttribute,
+    ConstraintAttribute,
     ModelAttribute,
     var_attr_type_map,
     default_variable_attribute_type,
@@ -64,7 +65,7 @@ constraint_type_attribute_name_map = {
 }
 
 _RAW_STATUS_STRINGS = [
-    # TerminationStatus,          RawStatusString
+    # TerminationStatus, RawStatusString
     (
         TerminationStatusCode.OPTIMIZE_NOT_CALLED,
         "Model is loaded, but no solution information is available.",
@@ -242,7 +243,80 @@ model_attribute_get_func_map = {
 }
 
 
-model_attribute_set_func_map = {}
+def set_silent(model, value: bool):
+    if value:
+        model.set_model_raw_parameter_int("OutputFlag", 0)
+    else:
+        model.set_model_raw_parameter_int("OutputFlag", 1)
+
+
+model_attribute_set_func_map = {
+    ModelAttribute.Silent: set_silent,
+}
+
+
+def get_constraint_name(model, constraint):
+    type = constraint.type
+    attr_name_dict = {
+        ConstraintType.Linear: "ConstrName",
+        ConstraintType.Quadratric: "QConstrName",
+    }
+    attr_name = attr_name_dict.get(type, None)
+    if not attr_name:
+        raise ValueError(f"Unknown constraint type: {type}")
+    return model.get_constraint_raw_attribute_string(constraint, attr_name)
+
+
+def get_constraint_primal(model, constraint):
+    # Linear : RHS - Slack
+    # Quadratic : QCRHS - QCSlack
+    type = constraint.type
+    attr_name_dict = {
+        ConstraintType.Linear: ("RHS", "Slack"),
+        ConstraintType.Quadratric: ("QCRHS", "QCSlack"),
+    }
+    attr_name = attr_name_dict.get(type, None)
+    if not attr_name:
+        raise ValueError(f"Unknown constraint type: {type}")
+    rhs = model.get_constraint_raw_attribute_double(constraint, attr_name[0])
+    slack = model.get_constraint_raw_attribute_double(constraint, attr_name[1])
+    return rhs - slack
+
+
+def get_constraint_dual(model, constraint):
+    type = constraint.type
+    attr_name_dict = {
+        ConstraintType.Linear: "Pi",
+        ConstraintType.Quadratric: "QCPi",
+    }
+    attr_name = attr_name_dict.get(type, None)
+    if not attr_name:
+        raise ValueError(f"Unknown constraint type: {type}")
+    return model.get_constraint_raw_attribute_string(constraint, attr_name)
+
+
+constraint_attribute_get_func_map = {
+    ConstraintAttribute.Name: get_constraint_name,
+    ConstraintAttribute.Primal: get_constraint_primal,
+    ConstraintAttribute.Dual: get_constraint_dual,
+}
+
+
+def set_constraint_name(model, constraint, value):
+    type = constraint.type
+    attr_name_dict = {
+        ConstraintType.Linear: "ConstrName",
+        ConstraintType.Quadratric: "QConstrName",
+    }
+    attr_name = attr_name_dict.get(type, None)
+    if not attr_name:
+        raise ValueError(f"Unknown constraint type: {type}")
+    model.set_constraint_raw_attribute_string(constraint, attr_name, value)
+
+
+constraint_attribute_set_func_map = {
+    ConstraintAttribute.Name: set_constraint_name,
+}
 
 
 class Model(RawModel):
@@ -362,3 +436,38 @@ class Model(RawModel):
             func(self, value)
 
         raise ValueError(f"Unknown model attribute: {attribute}")
+
+    def get_constraint_attribute(self, constraint, attribute: ConstraintAttribute):
+        func = constraint_attribute_get_func_map.get(attribute, None)
+        if func:
+            return func(self, constraint)
+
+        raise ValueError(f"Unknown constraint attribute: {attribute}")
+
+    def set_constraint_attribute(
+        self, constraint, attribute: ConstraintAttribute, value
+    ):
+        func = constraint_attribute_set_func_map.get(attribute, None)
+        if func:
+            return func(self, constraint, value)
+        raise ValueError(f"Unknown constraint attribute: {attribute}")
+
+    def get_model_raw_parameter(model, param_name:str):
+        param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
+        get_function_map = {
+            int: model.get_model_raw_parameter_int,
+            float: model.get_model_raw_parameter_double,
+            str: model.get_model_raw_parameter_string,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(param_name)
+    
+    def set_model_raw_parameter(model, param_name:str, value):
+        param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
+        set_function_map = {
+            int: model.set_model_raw_parameter_int,
+            float: model.set_model_raw_parameter_double,
+            str: model.set_model_raw_parameter_string,
+        }
+        set_function = set_function_map[param_type]
+        set_function(param_name, value)

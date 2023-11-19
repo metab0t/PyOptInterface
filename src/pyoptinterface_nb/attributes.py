@@ -21,7 +21,7 @@ var_attr_type_map = {
 }
 
 
-def default_variable_attribute_type(attribute):
+def default_variable_attribute_type(attribute: VariableAttribute):
     T = var_attr_type_map.get(attribute, None)
     if not T:
         raise ValueError(f"Unknown variable attribute: {attribute}")
@@ -120,8 +120,31 @@ model_attr_type_map = {
 }
 
 
-def default_model_attribute_type(attribute):
+def default_model_attribute_type(attribute: ModelAttribute):
     T = model_attr_type_map.get(attribute, None)
     if not T:
         raise ValueError(f"Unknown model attribute: {attribute}")
+    return T
+
+
+class ConstraintAttribute(Enum):
+    Name = auto()
+    # PrimalStart = auto()
+    # DualStart = auto()
+    Primal = auto()
+    Dual = auto()
+    # BasisStatus = auto()
+
+
+constraint_attr_type_map = {
+    ConstraintAttribute.Name: str,
+    ConstraintAttribute.Primal: float,
+    ConstraintAttribute.Dual: float,
+}
+
+
+def default_constraint_attribute_type(attribute: ConstraintAttribute):
+    T = constraint_attr_type_map.get(attribute, None)
+    if not T:
+        raise ValueError(f"Unknown constraint attribute: {attribute}")
     return T

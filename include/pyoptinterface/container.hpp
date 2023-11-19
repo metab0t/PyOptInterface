@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <concepts>
 
-#include "ankerl/unordered_dense.h"
 #include "pyoptinterface/core.hpp"
 
 // index as the key, variable as the value
