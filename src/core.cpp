@@ -120,7 +120,7 @@ bool VariablePair::operator<(const VariablePair &x) const
 
 ExprBuilder::ExprBuilder(const VariableIndex &v)
 {
-	this->operator+=(v);
+	this->add(v);
 }
 
 ExprBuilder::ExprBuilder(const ScalarAffineFunction &a)
@@ -128,7 +128,7 @@ ExprBuilder::ExprBuilder(const ScalarAffineFunction &a)
 	auto N = a.coefficients.size();
 	affine_terms.reserve(N);
 
-	this->operator+=(a);
+	this->add(a);
 }
 
 ExprBuilder::ExprBuilder(const ScalarQuadraticFunction &q)
@@ -140,7 +140,7 @@ ExprBuilder::ExprBuilder(const ScalarQuadraticFunction &q)
 	auto N = q.coefficients.size();
 	quadratic_terms.reserve(N);
 
-	this->operator+=(q);
+	this->add(q);
 }
 
 bool ExprBuilder::empty() const
@@ -237,17 +237,15 @@ void ExprBuilder::add_affine_term(const VariableIndex &i, CoeffT coeff)
 	_add_affine_term(i.index, coeff);
 }
 
-ExprBuilder &ExprBuilder::operator+=(CoeffT c)
+void ExprBuilder::add(CoeffT c)
 {
 	constant_term = constant_term.value_or(0.0) + c;
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator+=(const VariableIndex &v)
+void ExprBuilder::add(const VariableIndex &v)
 {
 	_add_affine_term(v.index, 1.0);
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator+=(const ScalarAffineFunction &a)
+void ExprBuilder::add(const ScalarAffineFunction &a)
 {
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
@@ -259,13 +257,12 @@ ExprBuilder &ExprBuilder::operator+=(const ScalarAffineFunction &a)
 	{
 		constant_term = constant_term.value_or(0.0) + a.constant.value();
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator+=(const ScalarQuadraticFunction &q)
+void ExprBuilder::add(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
-		this->operator+=(q.affine_part.value());
+		this->add(q.affine_part.value());
 	}
 
 	auto N = q.coefficients.size();
@@ -273,9 +270,8 @@ ExprBuilder &ExprBuilder::operator+=(const ScalarQuadraticFunction &q)
 	{
 		_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], q.coefficients[i]);
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator+=(const ExprBuilder &t)
+void ExprBuilder::add(const ExprBuilder &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
@@ -289,20 +285,17 @@ ExprBuilder &ExprBuilder::operator+=(const ExprBuilder &t)
 	{
 		constant_term = constant_term.value_or(0.0) + t.constant_term.value();
 	}
-	return *this;
 }
 
-ExprBuilder &ExprBuilder::operator-=(CoeffT c)
+void ExprBuilder::sub(CoeffT c)
 {
 	constant_term = constant_term.value_or(0.0) - c;
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator-=(const VariableIndex &v)
+void ExprBuilder::sub(const VariableIndex &v)
 {
 	_add_affine_term(v.index, -1.0);
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator-=(const ScalarAffineFunction &a)
+void ExprBuilder::sub(const ScalarAffineFunction &a)
 {
 	auto N = a.coefficients.size();
 	for (auto i = 0; i < N; i++)
@@ -314,13 +307,12 @@ ExprBuilder &ExprBuilder::operator-=(const ScalarAffineFunction &a)
 	{
 		constant_term = constant_term.value_or(0.0) - a.constant.value();
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator-=(const ScalarQuadraticFunction &q)
+void ExprBuilder::sub(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
-		this->operator-=(q.affine_part.value());
+		this->add(q.affine_part.value());
 	}
 
 	auto N = q.coefficients.size();
@@ -328,9 +320,8 @@ ExprBuilder &ExprBuilder::operator-=(const ScalarQuadraticFunction &q)
 	{
 		_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], -q.coefficients[i]);
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator-=(const ExprBuilder &t)
+void ExprBuilder::sub(const ExprBuilder &t)
 {
 	for (const auto &[varpair, c] : t.quadratic_terms)
 	{
@@ -344,18 +335,16 @@ ExprBuilder &ExprBuilder::operator-=(const ExprBuilder &t)
 	{
 		constant_term = constant_term.value_or(0.0) - t.constant_term.value();
 	}
-	return *this;
 }
 
-ExprBuilder &ExprBuilder::operator*=(CoeffT c)
+void ExprBuilder::mul(CoeffT c)
 {
 	if (constant_term)
 	{
 		constant_term = constant_term.value() * c;
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator*=(const VariableIndex &v)
+void ExprBuilder::mul(const VariableIndex &v)
 {
 	auto deg = degree();
 	if (deg > 1)
@@ -380,10 +369,8 @@ ExprBuilder &ExprBuilder::operator*=(const VariableIndex &v)
 	{
 		affine_terms.clear();
 	}
-
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator*=(const ScalarAffineFunction &a)
+void ExprBuilder::mul(const ScalarAffineFunction &a)
 {
 	auto deg = degree();
 	if (deg > 1)
@@ -429,10 +416,8 @@ ExprBuilder &ExprBuilder::operator*=(const ScalarAffineFunction &a)
 	{
 		constant_term = a.constant.value() * constant_term.value();
 	}
-
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator*=(const ScalarQuadraticFunction &q)
+void ExprBuilder::mul(const ScalarQuadraticFunction &q)
 {
 	auto deg = degree();
 	if (deg > 0)
@@ -451,17 +436,16 @@ ExprBuilder &ExprBuilder::operator*=(const ScalarQuadraticFunction &q)
 			_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], c * q.coefficients[i]);
 		}
 	}
-	return *this;
 }
-ExprBuilder &ExprBuilder::operator*=(const ExprBuilder &t)
+void ExprBuilder::mul(const ExprBuilder &t)
 {
 	auto deg1 = degree();
 	auto deg2 = t.degree();
 	if (deg1 + deg2 > 2)
 	{
-		throw std::logic_error(
-		    std::format("ExprBuilder with degree {} cannot multiply with ExprBuilder with degree {}",
-		                deg1, deg2));
+		throw std::logic_error(std::format(
+		    "ExprBuilder with degree {} cannot multiply with ExprBuilder with degree {}", deg1,
+		    deg2));
 	}
 
 	if (deg1 == 0)
@@ -559,7 +543,6 @@ ExprBuilder &ExprBuilder::operator*=(const ExprBuilder &t)
 			clear();
 		}
 	}
-	return *this;
 }
 
 // Operator overloading functions
@@ -604,7 +587,7 @@ auto operator+(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarA
 auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
 	ExprBuilder t(a);
-	t += b;
+	t.add(b);
 	return ScalarAffineFunction(t);
 }
 
@@ -656,7 +639,7 @@ auto operator+(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &
     -> ScalarQuadraticFunction
 {
 	ExprBuilder t(a);
-	t += b;
+	t.add(b);
 	return ScalarQuadraticFunction(t);
 }
 

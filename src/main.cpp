@@ -36,17 +36,17 @@ auto test_gurobi() -> void
 		VariableIndex y = model.add_variable(VariableDomain::Continuous);
 
 		ExprBuilder expr;
-		expr += x;
-		expr += y;
+		expr.add(x);
+		expr.add(y);
 		ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
 
 		expr.clear();
-		expr += x;
+		expr.add(x);
 		ConstraintIndex con2 =
 		    model.add_linear_constraint(expr, ConstraintSense::GreaterEqual, 2.0);
 
 		expr.clear();
-		expr += y;
+		expr.add(y);
 		ConstraintIndex con3 =
 		    model.add_linear_constraint(expr, ConstraintSense::GreaterEqual, 2.0);
 
@@ -62,8 +62,27 @@ end:
 	GRBfreeenv(env);
 }
 
+void bench()
+{
+	auto N = 50000;
+	std::vector<VariableIndex> x(N);
+	for	(auto i = 0; i < N; i++)
+	{
+		x[i].index = i;
+	}
+
+	ExprBuilder expr;
+	for (const auto& v : x)
+	{
+		expr.add(v);
+	}
+	ScalarAffineFunction saf(expr);
+
+	int k = 0;
+}
+
 auto main() -> int
 {
-	test_gurobi();
+	bench();
 	return 0;
 }

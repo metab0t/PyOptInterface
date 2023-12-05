@@ -112,23 +112,23 @@ struct ExprBuilder
 	ExprBuilder(const ScalarAffineFunction &a);
 	ExprBuilder(const ScalarQuadraticFunction &q);
 
-	ExprBuilder &operator+=(CoeffT c);
-	ExprBuilder &operator+=(const VariableIndex &v);
-	ExprBuilder &operator+=(const ScalarAffineFunction &a);
-	ExprBuilder &operator+=(const ScalarQuadraticFunction &q);
-	ExprBuilder &operator+=(const ExprBuilder &t);
+	void add(CoeffT c);
+	void add(const VariableIndex &v);
+	void add(const ScalarAffineFunction &a);
+	void add(const ScalarQuadraticFunction &q);
+	void add(const ExprBuilder &t);
 
-	ExprBuilder &operator-=(CoeffT c);
-	ExprBuilder &operator-=(const VariableIndex &v);
-	ExprBuilder &operator-=(const ScalarAffineFunction &a);
-	ExprBuilder &operator-=(const ScalarQuadraticFunction &q);
-	ExprBuilder &operator-=(const ExprBuilder &t);
+	void sub(CoeffT c);
+	void sub(const VariableIndex &v);
+	void sub(const ScalarAffineFunction &a);
+	void sub(const ScalarQuadraticFunction &q);
+	void sub(const ExprBuilder &t);
 
-	ExprBuilder &operator*=(CoeffT c);
-	ExprBuilder &operator*=(const VariableIndex &v);
-	ExprBuilder &operator*=(const ScalarAffineFunction &a);
-	ExprBuilder &operator*=(const ScalarQuadraticFunction &q);
-	ExprBuilder &operator*=(const ExprBuilder &t);
+	void mul(CoeffT c);
+	void mul(const VariableIndex &v);
+	void mul(const ScalarAffineFunction &a);
+	void mul(const ScalarQuadraticFunction &q);
+	void mul(const ExprBuilder &t);
 
 	bool empty() const;
 	int degree() const;

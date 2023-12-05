@@ -53,10 +53,6 @@ void bind_gurobi_constants(nb::module_ &m)
 	GRB.attr("SOS_TYPE1") = GRB_SOS_TYPE1;
 	GRB.attr("SOS_TYPE2") = GRB_SOS_TYPE2;
 
-	// General constraint types
-	GRB.attr("GENCONSTR_MAX") = GRB_GENCONSTR_MAX;
-	// ... continue with all other general constraint types ...
-
 	// Basis status
 	GRB.attr("BASIC") = GRB_BASIC;
 	GRB.attr("NONBASIC_LOWER") = GRB_NONBASIC_LOWER;

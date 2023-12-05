@@ -259,9 +259,9 @@ model_attribute_get_func_map = {
 
 def set_silent(model, value: bool):
     if value:
-        model.set_model_raw_parameter_int("OutputFlag", 0)
+        model.set_parameter_int("OutputFlag", 0)
     else:
-        model.set_model_raw_parameter_int("OutputFlag", 1)
+        model.set_parameter_int("OutputFlag", 1)
 
 
 model_attribute_set_func_map = {
@@ -444,6 +444,7 @@ class Model(RawModel):
                     ObjectiveSense.Maximize: GRB.MAXIMIZE,
                 }[value]
             set_function(attr_name, value)
+            return
 
         param_name = model_attribute_parameter_name_map.get(attribute, None)
         if param_name:
@@ -455,10 +456,12 @@ class Model(RawModel):
             }
             set_function = set_function_map[param_type]
             set_function(param_name, value)
+            return
 
         func = model_attribute_set_func_map.get(attribute, None)
         if func:
             func(self, value)
+            return
 
         raise ValueError(f"Unknown model attribute: {attribute}")
 
