@@ -119,14 +119,12 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction fu
 	// Create a new Gurobi linear constraint
 	int numnz = function.size();
 	std::vector<int> cind_v(numnz);
-	std::vector<double> cval_v(numnz);
 	for (int i = 0; i < numnz; i++)
 	{
 		cind_v[i] = _variable_index(function.variables[i]);
-		cval_v[i] = function.coefficients[i];
 	}
 	int *cind = cind_v.data();
-	double *cval = cval_v.data();
+	double *cval = (double *)function.coefficients.data();
 	char g_sense = gurobi_con_sense(sense);
 	double g_rhs = rhs - function.constant.value_or(0.0);
 
@@ -147,34 +145,31 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	int numlnz = 0;
 	int *lind = NULL;
 	double *lval = NULL;
+	std::vector<int> lind_v;
 	if (affine_part.has_value())
 	{
 		const auto &affine_function = affine_part.value();
 		numlnz = affine_function.coefficients.size();
-		std::vector<int> lind_v(numlnz);
-		std::vector<double> lval_v(numlnz);
+		lind_v.resize(numlnz);
 		for (int i = 0; i < numlnz; i++)
 		{
 			lind_v[i] = _variable_index(affine_function.variables[i]);
-			lval_v[i] = function.coefficients[i];
 		}
 		lind = lind_v.data();
-		lval = lval_v.data();
+		lval = (double *)affine_function.coefficients.data();
 	}
 
 	int numqnz = function.size();
 	std::vector<int> qrow_v(numqnz);
 	std::vector<int> qcol_v(numqnz);
-	std::vector<double> qval_v(numqnz);
 	for (int i = 0; i < numqnz; i++)
 	{
 		qrow_v[i] = _variable_index(function.variable_1s[i]);
 		qcol_v[i] = _variable_index(function.variable_2s[i]);
-		qval_v[i] = function.coefficients[i];
 	}
 	int *qrow = qrow_v.data();
 	int *qcol = qcol_v.data();
-	double *qval = qval_v.data();
+	double *qval = (double *)function.coefficients.data();
 
 	char g_sense = gurobi_con_sense(sense);
 	double g_rhs = rhs;

@@ -66,13 +66,13 @@ void bench()
 {
 	auto N = 50000;
 	std::vector<VariableIndex> x(N);
-	for	(auto i = 0; i < N; i++)
+	for (auto i = 0; i < N; i++)
 	{
 		x[i].index = i;
 	}
 
 	ExprBuilder expr;
-	for (const auto& v : x)
+	for (const auto &v : x)
 	{
 		expr.add(v);
 	}
