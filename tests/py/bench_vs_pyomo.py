@@ -1,5 +1,5 @@
 import pyoptinterface_nb as poi
-from pyoptinterface_nb import gurobi, copt
+from pyoptinterface_nb import gurobi
 import pyoptinterface_nb.aml as aml
 
 import xarray as xr

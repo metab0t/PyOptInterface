@@ -310,3 +310,9 @@ class Model(RawModel):
         if func:
             return func(self, constraint, value)
         raise ValueError(f"Unknown constraint attribute: {attribute}")
+
+    def optimize(self):
+        if self._is_mip():
+            # TODO addMIPStart
+            pass
+        super().optimize()
