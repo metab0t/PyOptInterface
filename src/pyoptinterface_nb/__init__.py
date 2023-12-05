@@ -15,4 +15,5 @@ from pyoptinterface_nb.attributes import (
     ModelAttribute,
     TerminationStatusCode,
     ResultStatusCode,
+    ConstraintAttribute,
 )

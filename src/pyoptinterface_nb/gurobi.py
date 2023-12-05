@@ -1,4 +1,21 @@
-from .gurobi_model_ext import RawModel, Env, GRB
+# try to load DLL of gurobi in${GUUROBI_HOME}/bin
+# only on windows
+import os, platform
+
+if platform.system() == "Windows":
+    gurobi_home = os.environ.get("GUROBI_HOME", None)
+    if not gurobi_home:
+        raise ValueError("GUROBI_HOME is not set in environment")
+    if not os.path.exists(gurobi_home):
+        raise ValueError(f"GUROBI_HOME does not exist: {gurobi_home}")
+    os.add_dll_directory(os.path.join(gurobi_home, "bin"))
+
+try:
+    from .gurobi_model_ext import RawModel, Env, GRB
+except Exception as e:
+    raise ImportError(
+        f"Failed to import gurobi_model_ext. Please check if GUROBI_HOME is set correctly. Error: {e}"
+    )
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -8,7 +25,7 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType
+from .core_ext import VariableDomain, ConstraintType, ObjectiveSense
 from .ctypes_helper import pycapsule_to_cvoidp
 
 DEFAULT_ENV = None
@@ -174,7 +191,7 @@ def get_terminationstatus(model):
 
 
 def get_primalstatus(model):
-    termination_status = get_solverversion(model)
+    termination_status = get_terminationstatus(model)
     if termination_status in (
         TerminationStatusCode.DUAL_INFEASIBLE,
         TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED,
@@ -199,7 +216,7 @@ def get_dualstatus(model):
         and model.get_model_raw_attribute("QCPDual") != 1
     ):
         return ResultStatusCode.NO_SOLUTION
-    termination_status = get_solverversion(model)
+    termination_status = get_terminationstatus(model)
     if termination_status in (
         TerminationStatusCode.DUAL_INFEASIBLE,
         TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED,
@@ -229,17 +246,14 @@ def get_silent(model):
     return model.get_model_raw_parameter_int("OutputFlag") == 0
 
 
-get_solvername = lambda _: "Gurobi"
-get_solverversion = lambda model: model.version_string()
-
 model_attribute_get_func_map = {
     ModelAttribute.DualStatus: get_dualstatus,
     ModelAttribute.PrimalStatus: get_primalstatus,
     ModelAttribute.RawStatusString: get_rawstatusstring,
     ModelAttribute.TerminationStatus: get_terminationstatus,
     ModelAttribute.Silent: get_silent,
-    ModelAttribute.SolverName: get_solvername,
-    ModelAttribute.SolverVersion: get_solverversion,
+    ModelAttribute.SolverName: lambda _: "Gurobi",
+    ModelAttribute.SolverVersion: lambda model: model.version_string(),
 }
 
 
@@ -389,7 +403,13 @@ class Model(RawModel):
                 str: self.get_model_raw_attribute_string,
             }
             get_function = get_function_map[param_type]
-            return get_function(attr_name)
+            attr = get_function(attr_name)
+            if attribute == ModelAttribute.ObjectiveSense:
+                attr = {
+                    GRB.MINIMIZE: ObjectiveSense.Minimize,
+                    GRB.MAXIMIZE: ObjectiveSense.Maximize,
+                }[attr]
+            return attr
 
         param_name = model_attribute_parameter_name_map.get(attribute, None)
         if param_name:
@@ -418,6 +438,11 @@ class Model(RawModel):
                 str: self.set_model_raw_attribute_string,
             }
             set_function = set_function_map[param_type]
+            if attribute == ModelAttribute.ObjectiveSense:
+                value = {
+                    ObjectiveSense.Minimize: GRB.MINIMIZE,
+                    ObjectiveSense.Maximize: GRB.MAXIMIZE,
+                }[value]
             set_function(attr_name, value)
 
         param_name = model_attribute_parameter_name_map.get(attribute, None)
@@ -452,7 +477,7 @@ class Model(RawModel):
             return func(self, constraint, value)
         raise ValueError(f"Unknown constraint attribute: {attribute}")
 
-    def get_model_raw_parameter(model, param_name:str):
+    def get_model_raw_parameter(model, param_name: str):
         param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
         get_function_map = {
             int: model.get_model_raw_parameter_int,
@@ -461,8 +486,8 @@ class Model(RawModel):
         }
         get_function = get_function_map[param_type]
         return get_function(param_name)
-    
-    def set_model_raw_parameter(model, param_name:str, value):
+
+    def set_model_raw_parameter(model, param_name: str, value):
         param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
         set_function_map = {
             int: model.set_model_raw_parameter_int,

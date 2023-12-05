@@ -55,9 +55,9 @@ class MonotoneVector
 		m_data[index] = -1;
 		m_cardinality -= 1;
 	}
-	bool has_index(const IndexT &index) const
+	bool has_index(const IndexT &index)
 	{
-		return m_data[index] >= 0;
+		return get_index(index) >= 0;
 	}
 	T &get_index(const IndexT &index)
 	{

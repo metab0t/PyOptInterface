@@ -34,7 +34,7 @@ class GurobiModel
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous);
 	void delete_variable(const VariableIndex &variable);
-	bool is_variable_active(const VariableIndex &variable) const;
+	bool is_variable_active(const VariableIndex &variable);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction function,
 	                                      ConstraintSense sense, CoeffT rhs);
@@ -48,7 +48,7 @@ class GurobiModel
 	                                    const Vector<CoeffT> &weights, int sos_type);
 
 	void delete_constraint(const ConstraintIndex &constraint);
-	bool is_constraint_active(const ConstraintIndex &constraint) const;
+	bool is_constraint_active(const ConstraintIndex &constraint);
 
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
@@ -99,6 +99,7 @@ class GurobiModel
 	                                              const char *attr_name);
 
 	int _variable_index(const VariableIndex &variable);
+	int _checked_variable_index(const VariableIndex &variable);
 
 	// constraint attribute
 	void set_constraint_raw_attribute_int(const ConstraintIndex &constraint, const char *attr_name,
@@ -118,6 +119,7 @@ class GurobiModel
 	                                                const char *attr_name);
 
 	int _constraint_index(const ConstraintIndex &constraint);
+	int _checked_constraint_index(const ConstraintIndex &constraint);
 
 	// Non-exported functions
 	void check_error(int error);

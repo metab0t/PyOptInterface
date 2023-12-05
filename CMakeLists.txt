@@ -81,5 +81,34 @@ if(ENABLE_GUROBI)
   install(TARGETS gurobi_model_ext LIBRARY DESTINATION pyoptinterface_nb)
 endif()
 
+# COPT
+set(ENABLE_COPT ON CACHE BOOL "Enable COPT?")
+if(ENABLE_COPT)
+  find_package(COPT)
+
+  if(NOT COPT_FOUND)
+    message(FATAL_ERROR "COPT not found!")
+  endif()
+
+  add_library(copt_model STATIC)
+  target_sources(copt_model PRIVATE
+    include/pyoptinterface/copt_model.hpp
+    src/copt_model.cpp
+  )
+  target_link_libraries(copt_model PUBLIC pyoptinterface_core)
+  target_link_libraries(copt_model PUBLIC COPT::COPT_C)
+
+  nanobind_add_module(
+    copt_model_ext
+
+    STABLE_ABI NB_STATIC
+
+    src/copt_model_ext.cpp
+    src/copt_model_ext_constants.cpp
+  )
+  target_link_libraries(copt_model_ext PUBLIC copt_model)
+  install(TARGETS copt_model_ext LIBRARY DESTINATION pyoptinterface_nb)
+endif()
+
 add_executable(test_main src/main.cpp)
 target_link_libraries(test_main PUBLIC pyoptinterface_core gurobi_model)
