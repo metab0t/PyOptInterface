@@ -136,9 +136,13 @@ struct ExprBuilder
 	void clear();
 	void clean_nearzero_terms(CoeffT threshold = COEFTHRESHOLD);
 	void _add_quadratic_term(IndexT i, IndexT j, CoeffT coeff);
+	void _set_quadratic_coef(IndexT i, IndexT j, CoeffT coeff);
 	void add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff);
+	void set_quadratic_coef(const VariableIndex &i, const VariableIndex &j, CoeffT coeff);
 	void _add_affine_term(IndexT i, CoeffT coeff);
+	void _set_affine_coef(IndexT i, CoeffT coeff);
 	void add_affine_term(const VariableIndex &i, CoeffT coeff);
+	void set_affine_coef(const VariableIndex &i, CoeffT coeff);
 };
 
 auto operator+(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
