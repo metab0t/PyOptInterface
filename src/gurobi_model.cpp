@@ -1,3 +1,4 @@
+#include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/gurobi_model.hpp"
 #include <format>
 
@@ -117,14 +118,12 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction fu
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
 
 	// Create a new Gurobi linear constraint
-	int numnz = function.size();
-	std::vector<int> cind_v(numnz);
-	for (int i = 0; i < numnz; i++)
-	{
-		cind_v[i] = _variable_index(function.variables[i]);
-	}
-	int *cind = cind_v.data();
-	double *cval = (double *)function.coefficients.data();
+	AffineFunctionPtrForm ptr_form;
+	make_affine_ptr_form(this, function, ptr_form);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
 	char g_sense = gurobi_con_sense(sense);
 	double g_rhs = rhs - function.constant.value_or(0.0);
 
@@ -145,31 +144,22 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	int numlnz = 0;
 	int *lind = NULL;
 	double *lval = NULL;
-	std::vector<int> lind_v;
+	AffineFunctionPtrForm affine_ptr_form;
 	if (affine_part.has_value())
 	{
 		const auto &affine_function = affine_part.value();
-		numlnz = affine_function.coefficients.size();
-		lind_v.resize(numlnz);
-		for (int i = 0; i < numlnz; i++)
-		{
-			lind_v[i] = _variable_index(affine_function.variables[i]);
-		}
-		lind = lind_v.data();
-		lval = (double *)affine_function.coefficients.data();
+		make_affine_ptr_form(this, affine_function, affine_ptr_form);
+		numlnz = affine_ptr_form.numnz;
+		lind = affine_ptr_form.index;
+		lval = affine_ptr_form.value;
 	}
 
-	int numqnz = function.size();
-	std::vector<int> qrow_v(numqnz);
-	std::vector<int> qcol_v(numqnz);
-	for (int i = 0; i < numqnz; i++)
-	{
-		qrow_v[i] = _variable_index(function.variable_1s[i]);
-		qcol_v[i] = _variable_index(function.variable_2s[i]);
-	}
-	int *qrow = qrow_v.data();
-	int *qcol = qcol_v.data();
-	double *qval = (double *)function.coefficients.data();
+	QuadraticFunctionPtrForm ptr_form;
+	make_quadratic_ptr_form(this, function, ptr_form);
+	int numqnz = ptr_form.numnz;
+	int *qrow = ptr_form.row;
+	int *qcol = ptr_form.col;
+	double *qval = ptr_form.value;
 
 	char g_sense = gurobi_con_sense(sense);
 	double g_rhs = rhs;
@@ -206,14 +196,12 @@ ConstraintIndex GurobiModel::_add_sos_constraint(const Vector<VariableIndex> &va
 	int types = sos_type;
 	int beg[] = {0, nummembers};
 	std::vector<int> ind_v(nummembers);
-	std::vector<double> weight_v(nummembers);
 	for (int i = 0; i < nummembers; i++)
 	{
 		ind_v[i] = _variable_index(variables[i].index);
-		weight_v[i] = weights[i];
 	}
 	int *ind = ind_v.data();
-	double *weight = weight_v.data();
+	double *weight = (double *)weights.data();
 
 	int error = GRBaddsos(m_model.get(), numsos, nummembers, &types, beg, ind, weight);
 	check_error(error);
@@ -304,18 +292,12 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 	int numqnz = function.size();
 	if (numqnz > 0)
 	{
-		std::vector<int> qrow_v(numqnz);
-		std::vector<int> qcol_v(numqnz);
-		std::vector<double> qval_v(numqnz);
-		for (int i = 0; i < numqnz; i++)
-		{
-			qrow_v[i] = _variable_index(function.variable_1s[i]);
-			qcol_v[i] = _variable_index(function.variable_2s[i]);
-			qval_v[i] = function.coefficients[i];
-		}
-		int *qrow = qrow_v.data();
-		int *qcol = qcol_v.data();
-		double *qval = qval_v.data();
+		QuadraticFunctionPtrForm ptr_form;
+		make_quadratic_ptr_form(this, function, ptr_form);
+		int numqnz = ptr_form.numnz;
+		int *qrow = ptr_form.row;
+		int *qcol = ptr_form.col;
+		double *qval = ptr_form.value;
 
 		error = GRBaddqpterms(m_model.get(), numqnz, qrow, qcol, qval);
 		check_error(error);

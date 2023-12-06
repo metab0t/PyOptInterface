@@ -85,7 +85,7 @@ def bench_linopy(M, N):
     x_val = x.solution
 
 
-M = 200
+M = 300
 N = 500
 timer = TicTocTimer()
 
