@@ -83,7 +83,7 @@ class MonotoneVector
 	{
 		// we ensure that m_data[index] >= 0
 		T counter = m_update_start;
-		constexpr int NORMAL_STATE = 1;
+		constexpr int STEP_STATE = 1;
 		constexpr int JUMP_STATE = 2;
 		int state;
 		std::size_t jump_start_index;
@@ -94,7 +94,7 @@ class MonotoneVector
 		}
 		else
 		{
-			state = NORMAL_STATE;
+			state = STEP_STATE;
 			counter++;
 		}
 		for (IndexT i = m_last_correct_index + 1; i <= index;)
@@ -105,11 +105,10 @@ class MonotoneVector
 				if (m_data[i] >= 0)
 				{
 					m_data[jump_start_index] = -i;
-
-					state = NORMAL_STATE;
+					state = STEP_STATE;
 					m_data[i] = counter;
-					i++;
 					counter++;
+					i++;
 				}
 				else
 				{
@@ -124,7 +123,7 @@ class MonotoneVector
 					}
 				}
 				break;
-			case NORMAL_STATE:
+			case STEP_STATE:
 				if (m_data[i] < 0)
 				{
 					state = JUMP_STATE;
@@ -134,8 +133,8 @@ class MonotoneVector
 				{
 					m_data[i] = counter;
 					counter++;
+					i++;
 				}
-				i++;
 				break;
 			default:
 				throw std::runtime_error("Unknown state");
