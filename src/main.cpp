@@ -12,7 +12,23 @@ auto test_monotone() -> void
 	mv.delete_index(8);
 	mv.delete_index(2);
 
-	mv.update();
+	for (auto i = 0; i < 10; i++)
+	{
+		mv.add_index();
+	}
+	mv.delete_index(1);
+	mv.delete_index(0);
+
+	for (auto i = 0; i < 5; i++)
+	{
+		mv.add_index();
+	}
+	mv.delete_index(15);
+	mv.delete_index(20);
+	mv.delete_index(21);
+	mv.delete_index(22);
+
+	int x = mv.get_index(24);
 }
 
 auto test_gurobi() -> void
@@ -83,6 +99,6 @@ void bench()
 
 auto main() -> int
 {
-	bench();
+	test_monotone();
 	return 0;
 }
