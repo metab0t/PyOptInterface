@@ -27,8 +27,8 @@ class MonotoneVector
 
 	IndexT add_index()
 	{
+		IndexT index = m_data.size();
 		m_data.push_back(m_start);
-		IndexT index = m_data.size() - 1;
 		m_cardinality += 1;
 		return index;
 	}
@@ -106,12 +106,11 @@ class MonotoneVector
 				{
 					m_data[jump_start_index] = -i;
 					state = STEP_STATE;
-					m_data[i] = counter;
-					counter++;
-					i++;
+					goto CONTINUE_STEP;
 				}
 				else
 				{
+				CONTINUE_JUMP:
 					T new_i = -m_data[i];
 					if (new_i > index)
 					{
@@ -128,9 +127,11 @@ class MonotoneVector
 				{
 					state = JUMP_STATE;
 					jump_start_index = i;
+					goto CONTINUE_JUMP;
 				}
 				else
 				{
+				CONTINUE_STEP:
 					m_data[i] = counter;
 					counter++;
 					i++;
