@@ -36,10 +36,14 @@ class GurobiModel
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 
-	ConstraintIndex add_linear_constraint(const ScalarAffineFunction function,
+	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs);
-	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction function,
+	ConstraintIndex add_linear_constraint(const ExprBuilder &function, ConstraintSense sense,
+	                                      CoeffT rhs);
+	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
 	                                         ConstraintSense sense, CoeffT rhs);
+	ConstraintIndex add_quadratic_constraint(const ExprBuilder &function, ConstraintSense sense,
+	                                         CoeffT rhs);
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
@@ -52,6 +56,7 @@ class GurobiModel
 
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
+	void set_objective(const ExprBuilder &function, ObjectiveSense sense);
 
 	void optimize();
 	void update();

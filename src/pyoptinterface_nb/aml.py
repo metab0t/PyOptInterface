@@ -12,6 +12,7 @@ def make_variable_array(
     domain: VariableDomain = VariableDomain.Continuous,
 ):
     assert isinstance(coords, dict) or isinstance(coords, list)
+    axis_iter = coords
     if isinstance(coords, dict):
         axis_iter = coords.values()
     lengths = [len(axis) for axis in axis_iter]

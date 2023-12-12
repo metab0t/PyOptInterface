@@ -21,8 +21,18 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::arg("domain") = VariableDomain::Continuous)
 	    .def("delete_variable", &GurobiModel::delete_variable)
 	    .def("is_variable_active", &GurobiModel::is_variable_active)
-	    .def("add_linear_constraint", &GurobiModel::add_linear_constraint)
-	    .def("add_quadratic_constraint", &GurobiModel::add_quadratic_constraint)
+	    .def("add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &GurobiModel::add_linear_constraint))
+	    .def("add_linear_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &GurobiModel::add_linear_constraint))
+	    .def("add_quadratic_constraint",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
+	             &GurobiModel::add_quadratic_constraint))
+	    .def("add_quadratic_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &GurobiModel::add_quadratic_constraint))
 	    .def("add_sos1_constraint", &GurobiModel::add_sos1_constraint)
 	    .def("add_sos2_constraint", &GurobiModel::add_sos2_constraint)
 	    .def("delete_constraint", &GurobiModel::delete_constraint)
@@ -31,6 +41,8 @@ NB_MODULE(gurobi_model_ext, m)
 	                              &GurobiModel::set_objective))
 	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
 	                              &GurobiModel::set_objective))
+	    .def("set_objective",
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&GurobiModel::set_objective))
 	    .def("optimize", &GurobiModel::optimize)
 	    .def("update", &GurobiModel::update)
 	    .def("version_string", &GurobiModel::version_string)
@@ -43,6 +55,8 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("get_parameter_int", &GurobiModel::get_parameter_int)
 	    .def("get_parameter_double", &GurobiModel::get_parameter_double)
 	    .def("get_parameter_string", &GurobiModel::get_parameter_string)
+
+	    .def("raw_attribute_type", &GurobiModel::raw_attribute_type)
 
 	    .def("set_model_raw_attribute_int", &GurobiModel::set_model_raw_attribute_int)
 	    .def("set_model_raw_attribute_double", &GurobiModel::set_model_raw_attribute_double)

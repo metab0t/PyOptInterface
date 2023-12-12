@@ -111,7 +111,7 @@ bool GurobiModel::is_variable_active(const VariableIndex &variable)
 	return m_variable_index.has_index(variable.index);
 }
 
-ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction function,
+ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                    ConstraintSense sense, CoeffT rhs)
 {
 	IndexT index = m_linear_constraint_index.add_index();
@@ -131,8 +131,14 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction fu
 	check_error(error);
 	return constraint_index;
 }
+ConstraintIndex GurobiModel::add_linear_constraint(const ExprBuilder &function,
+                                                   ConstraintSense sense, CoeffT rhs)
+{
+	ScalarAffineFunction f(function);
+	return add_linear_constraint(f, sense, rhs);
+}
 
-ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunction function,
+ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
                                                       ConstraintSense sense, CoeffT rhs)
 {
 	IndexT index = m_quadratic_constraint_index.add_index();
@@ -170,6 +176,12 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	                          g_rhs, NULL);
 	check_error(error);
 	return constraint_index;
+}
+ConstraintIndex GurobiModel::add_quadratic_constraint(const ExprBuilder &function,
+                                                      ConstraintSense sense, CoeffT rhs)
+{
+	ScalarQuadraticFunction f(function);
+	return add_quadratic_constraint(f, sense, rhs);
 }
 
 ConstraintIndex GurobiModel::add_sos1_constraint(const Vector<VariableIndex> &variables,
@@ -314,6 +326,25 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 	{
 		ScalarAffineFunction zero;
 		set_objective(zero, sense);
+	}
+}
+
+void GurobiModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
+{
+	auto deg = function.degree();
+	if (deg <= 1)
+	{
+		ScalarAffineFunction f(function);
+		set_objective(f, sense);
+	}
+	else if (deg == 2)
+	{
+		ScalarQuadraticFunction f(function);
+		set_objective(f, sense);
+	}
+	else
+	{
+		throw std::runtime_error("Objective must be linear or quadratic");
 	}
 }
 

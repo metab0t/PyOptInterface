@@ -21,8 +21,18 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("domain") = VariableDomain::Continuous)
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
-	    .def("add_linear_constraint", &COPTModel::add_linear_constraint)
-	    .def("add_quadratic_constraint", &COPTModel::add_quadratic_constraint)
+	    .def("add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &COPTModel::add_linear_constraint))
+	    .def("add_linear_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &COPTModel::add_linear_constraint))
+	    .def("add_quadratic_constraint",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
+	             &COPTModel::add_quadratic_constraint))
+	    .def("add_quadratic_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &COPTModel::add_quadratic_constraint))
 	    .def("add_sos1_constraint", &COPTModel::add_sos1_constraint)
 	    .def("add_sos2_constraint", &COPTModel::add_sos2_constraint)
 	    .def("delete_constraint", &COPTModel::delete_constraint)
@@ -31,6 +41,8 @@ NB_MODULE(copt_model_ext, m)
 	                              &COPTModel::set_objective))
 	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
 	                              &COPTModel::set_objective))
+	    .def("set_objective",
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModel::set_objective))
 	    .def("optimize", &COPTModel::optimize)
 	    .def("version_string", &COPTModel::version_string)
 	    .def("get_raw_model", &COPTModel::get_raw_model)

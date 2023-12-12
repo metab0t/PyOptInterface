@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <algorithm>
 #include <concepts>
 
 #include "pyoptinterface/core.hpp"

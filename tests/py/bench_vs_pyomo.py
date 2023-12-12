@@ -13,6 +13,7 @@ import linopy
 poi_timer = TicTocTimer()
 poi_timer.stop()
 
+
 def bench_poi(M, N):
     model = gurobi.Model()
 
@@ -28,23 +29,23 @@ def bench_poi(M, N):
 
     expr = aml.quicksum(x)
     con = model.add_linear_constraint(
-        poi.ScalarAffineFunction(expr), poi.ConstraintSense.Equal, M * N / 2
+        expr, poi.ConstraintSense.Equal, M * N / 2
     )
     # poi_timer.toc("add_linear_constraint")
 
     obj = aml.quicksum_f(x, lambda v: v * v)
-    model.set_objective(poi.ScalarQuadraticFunction(obj), poi.ObjectiveSense.Minimize)
+    model.set_objective(obj, poi.ObjectiveSense.Minimize)
     # poi_timer.toc("set_objective")
 
     model.set_model_attribute(poi.ModelAttribute.Silent, True)
 
     model.optimize()
 
-    get_val = np.frompyfunc(
-        lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value), 1, 1
-    )
+    # get_val = np.frompyfunc(
+    #     lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value), 1, 1
+    # )
 
-    x_val = xr.apply_ufunc(get_val, x).astype(np.float_)
+    # x_val = xr.apply_ufunc(get_val, x).astype(np.float_)
 
 
 def bench_pyomo(M, N):
@@ -63,11 +64,11 @@ def bench_pyomo(M, N):
     model.o = pyo.Objective(expr=sum(v * v for v in model.x.values()))
 
     solver = pyo.SolverFactory("gurobi_direct")
-    solver.solve(model)
+    solver.solve(model, load_solutions=False)
 
-    x_val = xr.DataArray(
-        np.array([[model.x[i, j].value for j in J] for i in I]), dims=("i", "j")
-    )
+    # x_val = xr.DataArray(
+    #     np.array([[model.x[i, j].value for j in J] for i in I]), dims=("i", "j")
+    # )
 
 
 def bench_linopy(M, N):
@@ -75,14 +76,14 @@ def bench_linopy(M, N):
 
     I = range(M)
     J = range(N)
-    x = model.add_variables(lower = 0.0, coords=[I, J])
+    x = model.add_variables(lower=0.0, coords=[I, J])
 
     model.add_constraints(x.sum() == M * N / 2)
-    model.add_objective((x*x).sum())
+    model.add_objective((x * x).sum())
 
     model.solve("gurobi", io_api="direct", OutputFlag=0)
 
-    x_val = x.solution
+    # x_val = x.solution
 
 
 M = 300
