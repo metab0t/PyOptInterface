@@ -4,6 +4,7 @@
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
+#include "pyoptinterface/solver_common.hpp"
 
 class GurobiEnv
 {
@@ -25,7 +26,7 @@ struct GRBfreemodelT
 	};
 };
 
-class GurobiModel
+class GurobiModel : public CommercialSolverBase
 {
   public:
 	GurobiModel() = default;
@@ -37,13 +38,9 @@ class GurobiModel
 	bool is_variable_active(const VariableIndex &variable);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs);
-	ConstraintIndex add_linear_constraint(const ExprBuilder &function, ConstraintSense sense,
-	                                      CoeffT rhs);
+	                                      ConstraintSense sense, CoeffT rhs) override;
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs);
-	ConstraintIndex add_quadratic_constraint(const ExprBuilder &function, ConstraintSense sense,
-	                                         CoeffT rhs);
+	                                         ConstraintSense sense, CoeffT rhs) override;
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,

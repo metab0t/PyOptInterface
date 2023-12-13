@@ -26,13 +26,13 @@ NB_MODULE(copt_model_ext, m)
 	             &COPTModel::add_linear_constraint))
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModel::add_linear_constraint))
+	             &COPTModel::add_linear_constraint_from_expr))
 	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
 	             &COPTModel::add_quadratic_constraint))
 	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModel::add_quadratic_constraint))
+	             &COPTModel::add_quadratic_constraint_from_expr))
 	    .def("add_sos1_constraint", &COPTModel::add_sos1_constraint)
 	    .def("add_sos2_constraint", &COPTModel::add_sos2_constraint)
 	    .def("delete_constraint", &COPTModel::delete_constraint)

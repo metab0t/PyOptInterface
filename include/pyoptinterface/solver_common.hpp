@@ -2,6 +2,19 @@
 
 #include "pyoptinterface/core.hpp"
 
+class CommercialSolverBase
+{
+  public:
+	virtual ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
+	                                              ConstraintSense sense, CoeffT rhs) = 0;
+	ConstraintIndex add_linear_constraint_from_expr(const ExprBuilder &function,
+	                                                ConstraintSense sense, CoeffT rhs);
+	virtual ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
+	                                                 ConstraintSense sense, CoeffT rhs) = 0;
+	ConstraintIndex add_quadratic_constraint_from_expr(const ExprBuilder &function,
+	                                                   ConstraintSense sense, CoeffT rhs);
+};
+
 struct AffineFunctionPtrForm
 {
 	int numnz;

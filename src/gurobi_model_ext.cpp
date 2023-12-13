@@ -26,13 +26,13 @@ NB_MODULE(gurobi_model_ext, m)
 	             &GurobiModel::add_linear_constraint))
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModel::add_linear_constraint))
+	             &GurobiModel::add_linear_constraint_from_expr))
 	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
 	             &GurobiModel::add_quadratic_constraint))
 	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModel::add_quadratic_constraint))
+	             &GurobiModel::add_quadratic_constraint_from_expr))
 	    .def("add_sos1_constraint", &GurobiModel::add_sos1_constraint)
 	    .def("add_sos2_constraint", &GurobiModel::add_sos2_constraint)
 	    .def("delete_constraint", &GurobiModel::delete_constraint)

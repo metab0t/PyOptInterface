@@ -152,12 +152,6 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 	check_error(error);
 	return constraint_index;
 }
-ConstraintIndex COPTModel::add_linear_constraint(const ExprBuilder &function, ConstraintSense sense,
-                                                 CoeffT rhs)
-{
-	ScalarAffineFunction f(function);
-	return add_linear_constraint(f, sense, rhs);
-}
 
 ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
                                                     ConstraintSense sense, CoeffT rhs)
@@ -196,12 +190,6 @@ ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 	                            g_sense, g_rhs, NULL);
 	check_error(error);
 	return constraint_index;
-}
-ConstraintIndex COPTModel::add_quadratic_constraint(const ExprBuilder &function,
-                                                    ConstraintSense sense, CoeffT rhs)
-{
-	ScalarQuadraticFunction f(function);
-	return add_quadratic_constraint(f, sense, rhs);
 }
 
 ConstraintIndex COPTModel::add_sos1_constraint(const Vector<VariableIndex> &variables,

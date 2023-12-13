@@ -131,12 +131,6 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &f
 	check_error(error);
 	return constraint_index;
 }
-ConstraintIndex GurobiModel::add_linear_constraint(const ExprBuilder &function,
-                                                   ConstraintSense sense, CoeffT rhs)
-{
-	ScalarAffineFunction f(function);
-	return add_linear_constraint(f, sense, rhs);
-}
 
 ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
                                                       ConstraintSense sense, CoeffT rhs)
@@ -176,12 +170,6 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	                          g_rhs, NULL);
 	check_error(error);
 	return constraint_index;
-}
-ConstraintIndex GurobiModel::add_quadratic_constraint(const ExprBuilder &function,
-                                                      ConstraintSense sense, CoeffT rhs)
-{
-	ScalarQuadraticFunction f(function);
-	return add_quadratic_constraint(f, sense, rhs);
 }
 
 ConstraintIndex GurobiModel::add_sos1_constraint(const Vector<VariableIndex> &variables,
