@@ -63,8 +63,8 @@ else()
 endif()
 
 if (WIN32)
-    find_library(GUROBI_LIBRARY
-        NAMES "gurobi${GUROBI_LIBRARY_VERSION}"
+    find_file(GUROBI_LIBRARY
+        NAMES "gurobi${GUROBI_LIBRARY_VERSION}.dll"
         PATHS
         ${GUROBI_BIN_DIR}
     )

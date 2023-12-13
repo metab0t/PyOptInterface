@@ -22,8 +22,8 @@ set(COPT_BIN_DIR "${COPT_HOME}/bin")
 set(COPT_LIB_DIR "${COPT_HOME}/lib")
 
 if (WIN32)
-    find_library(COPT_LIBRARY
-        NAMES "copt"
+    find_file(COPT_LIBRARY
+        NAMES "copt.dll"
         PATHS
         ${COPT_BIN_DIR}
     )
@@ -33,8 +33,8 @@ if (WIN32)
         ${COPT_LIB_DIR}
     )
     mark_as_advanced(COPT_IMPLIB)
-    find_library(COPT_CXX_LIBRARY
-        NAMES "copt_cpp"
+    find_file(COPT_CXX_LIBRARY
+        NAMES "copt_cpp.dll"
         PATHS
         ${COPT_BIN_DIR}
     )
