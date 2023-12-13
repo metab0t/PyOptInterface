@@ -64,5 +64,7 @@ NB_MODULE(copt_model_ext, m)
 	    .def("set_constraint_name", &COPTModel::set_constraint_name)
 	    .def("get_constraint_name", &COPTModel::get_constraint_name)
 	    .def("get_variable_info", &COPTModel::get_variable_info)
-	    .def("get_constraint_info", &COPTModel::get_constraint_info);
+	    .def("get_constraint_info", &COPTModel::get_constraint_info)
+
+	    .def("add_mip_start", &COPTModel::add_mip_start);
 }

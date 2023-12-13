@@ -85,6 +85,9 @@ class COPTModel
 	std::string get_constraint_name(const ConstraintIndex &constraint);
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
 
+	// MIPStart
+	void add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
+
 	int _variable_index(const VariableIndex &variable);
 	int _checked_variable_index(const VariableIndex &variable);
 	int _constraint_index(const ConstraintIndex &constraint);

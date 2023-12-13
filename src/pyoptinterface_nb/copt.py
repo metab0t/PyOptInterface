@@ -313,6 +313,9 @@ class Model(RawModel):
 
     def optimize(self):
         if self._is_mip():
-            # TODO addMIPStart
-            pass
+            mip_start = self.mip_start_values
+            variables = list(mip_start.keys())
+            values = list(mip_start.values())
+            self.add_mip_start(variables, values)
+            mip_start.clear()
         super().optimize()
