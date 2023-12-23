@@ -545,6 +545,9 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values)
 {
 	int numnz = variables.size();
+	if (numnz == 0)
+		return;
+
 	std::vector<int> ind_v(numnz);
 	for (int i = 0; i < numnz; i++)
 	{

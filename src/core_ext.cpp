@@ -1,7 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/operators.h>
-#include <nanobind/stl/bind_vector.h>
-#include <nanobind/stl/bind_map.h>
+#include <nanobind/stl/vector.h>
 #include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/core.hpp"
@@ -10,9 +9,6 @@ namespace nb = nanobind;
 
 NB_MODULE(core_ext, m)
 {
-	nb::bind_vector<Vector<IndexT>>(m, "IndexVector");
-	nb::bind_vector<Vector<CoeffT>>(m, "CoefVector");
-
 	// VariableDomain
 	nb::enum_<VariableDomain>(m, "VariableDomain", nb::is_arithmetic())
 	    .value("Continuous", VariableDomain::Continuous)
