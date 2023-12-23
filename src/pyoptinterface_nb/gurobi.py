@@ -20,12 +20,16 @@ from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
     ModelAttribute,
-    var_attr_type_map,
-    default_variable_attribute_type,
     ResultStatusCode,
     TerminationStatusCode,
 )
 from .core_ext import VariableDomain, ConstraintType, ObjectiveSense
+from .solver_common import (
+    _get_model_attribute,
+    _set_model_attribute,
+    _get_entity_attribute,
+    _set_entity_attribute,
+)
 from .ctypes_helper import pycapsule_to_cvoidp
 
 DEFAULT_ENV = None
@@ -38,40 +42,64 @@ def init_default_env():
 
 
 # Variable Attribute
-
-variable_attribute_name_map = {
-    VariableAttribute.Value: "X",
-    VariableAttribute.LowerBound: "LB",
-    VariableAttribute.UpperBound: "UB",
-    VariableAttribute.PrimalStart: "Start",
-    VariableAttribute.Domain: "VType",
-    VariableAttribute.Name: "VarName",
+variable_attribute_get_func_map = {
+    VariableAttribute.Value: lambda model, v: model.get_variable_raw_attribute_double(
+        v, "X"
+    ),
+    VariableAttribute.LowerBound: lambda model, v: model.get_variable_raw_attribute_double(
+        v, "LB"
+    ),
+    VariableAttribute.UpperBound: lambda model, v: model.get_variable_raw_attribute_double(
+        v, "UB"
+    ),
+    VariableAttribute.PrimalStart: lambda model, v: model.get_variable_raw_attribute_double(
+        v, "Start"
+    ),
+    VariableAttribute.Domain: lambda model, v: model.get_variable_raw_attribute_char(
+        v, "VType"
+    ),
+    VariableAttribute.Name: lambda model, v: model.get_variable_raw_attribute_string(
+        v, "VarName"
+    ),
 }
 
-
-def translate_variable_attribute_name(attribute: VariableAttribute) -> str:
-    name = variable_attribute_name_map.get(attribute, None)
-    if not name:
-        raise ValueError(f"Unknown variable attribute: {attribute}")
-    return name
-
-
-variable_attribute_value_need_translate_type = {VariableDomain}
-
-variable_attribute_value_to_gurobi_map = {
-    VariableDomain.Binary: GRB.BINARY,
-    VariableDomain.Integer: GRB.INTEGER,
-    VariableDomain.Continuous: GRB.CONTINUOUS,
-    VariableDomain.SemiContinuous: GRB.SEMICONT,
+variable_attribute_get_translate_func_map = {
+    VariableAttribute.Domain: lambda v: {
+        GRB.BINARY: VariableDomain.Binary,
+        GRB.INTEGER: VariableDomain.Integer,
+        GRB.CONTINUOUS: VariableDomain.Continuous,
+        GRB.SEMICONT: VariableDomain.SemiContinuous,
+    }[v],
 }
 
-variable_attribute_gurobi_to_value_map = {
-    v: k for k, v in variable_attribute_value_to_gurobi_map.items()
+variable_attribute_set_translate_func_map = {
+    VariableAttribute.Domain: lambda v: {
+        VariableDomain.Binary: GRB.BINARY,
+        VariableDomain.Integer: GRB.INTEGER,
+        VariableDomain.Continuous: GRB.CONTINUOUS,
+        VariableDomain.SemiContinuous: GRB.SEMICONT,
+    }[v],
 }
 
-CHAR_TYPE = "char"
-variable_attribute_query_type_map = var_attr_type_map | {
-    VariableAttribute.Domain: CHAR_TYPE
+variable_attribute_set_func_map = {
+    VariableAttribute.Value: lambda model, v, x: model.set_variable_raw_attribute_double(
+        v, "X", x
+    ),
+    VariableAttribute.LowerBound: lambda model, v, x: model.set_variable_raw_attribute_double(
+        v, "LB", x
+    ),
+    VariableAttribute.UpperBound: lambda model, v, x: model.set_variable_raw_attribute_double(
+        v, "UB", x
+    ),
+    VariableAttribute.PrimalStart: lambda model, v, x: model.set_variable_raw_attribute_double(
+        v, "Start", x
+    ),
+    VariableAttribute.Domain: lambda model, v, x: model.set_variable_raw_attribute_char(
+        v, "VType", x
+    ),
+    VariableAttribute.Name: lambda model, v, x: model.set_variable_raw_attribute_string(
+        v, "VarName", x
+    ),
 }
 
 # Model Attribute
@@ -81,8 +109,7 @@ constraint_type_attribute_name_map = {
     ConstraintType.Quadratic: "NumQConstrs",
 }
 
-_RAW_STATUS_STRINGS = [
-    # TerminationStatus, RawStatusString
+_RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusString
     (
         TerminationStatusCode.OPTIMIZE_NOT_CALLED,
         "Model is loaded, but no solution information is available.",
@@ -146,36 +173,6 @@ _RAW_STATUS_STRINGS = [
         "Optimization terminated because the total amount of allocated memory exceeded the value specified in the SoftMemLimit parameter.",
     ),
 ]
-
-model_attribute_name_map = {
-    # ModelLike API
-    ModelAttribute.Name: "ModelName",
-    ModelAttribute.ObjectiveSense: "ModelSense",
-    # AbstractOptimizer API
-    # DualStatus
-    # PrimalStatus
-    # RawStatusString
-    # TerminationStatus
-    ModelAttribute.BarrierIterations: "BarIterCount",
-    ModelAttribute.DualObjectiveValue: "ObjBound",
-    ModelAttribute.NodeCount: "NodeCount",
-    # NumberOfThreads
-    ModelAttribute.ObjectiveBound: "ObjBound",
-    ModelAttribute.ObjectiveValue: "ObjVal",
-    # RelativeGap
-    # Silent
-    ModelAttribute.SimplexIterations: "IterCount",
-    # SolverName
-    # SolverVersion
-    ModelAttribute.SolveTimeSec: "RunTime",
-    # TimeLimitSec
-}
-
-model_attribute_parameter_name_map = {
-    ModelAttribute.NumberOfThreads: "Threads",
-    ModelAttribute.RelativeGap: "MIPGap",
-    ModelAttribute.TimeLimitSec: "TimeLimit",
-}
 
 gurobi_raw_type_map = {
     1: int,
@@ -247,6 +244,42 @@ def get_silent(model):
 
 
 model_attribute_get_func_map = {
+    ModelAttribute.Name: lambda model: model.get_model_raw_attribute_string(
+        "ModelName"
+    ),
+    ModelAttribute.ObjectiveSense: lambda model: model.get_model_raw_attribute_int(
+        "ModelSense"
+    ),
+    ModelAttribute.BarrierIterations: lambda model: model.get_model_raw_attribute_int(
+        "BarIterCount"
+    ),
+    ModelAttribute.DualObjectiveValue: lambda model: model.get_model_raw_attribute_double(
+        "ObjBound"
+    ),
+    ModelAttribute.NodeCount: lambda model: model.get_model_raw_attribute_int(
+        "NodeCount"
+    ),
+    ModelAttribute.ObjectiveBound: lambda model: model.get_model_raw_attribute_double(
+        "ObjBound"
+    ),
+    ModelAttribute.ObjectiveValue: lambda model: model.get_model_raw_attribute_double(
+        "ObjVal"
+    ),
+    ModelAttribute.SimplexIterations: lambda model: model.get_model_raw_attribute_int(
+        "IterCount"
+    ),
+    ModelAttribute.SolveTimeSec: lambda model: model.get_model_raw_attribute_double(
+        "RunTime"
+    ),
+    ModelAttribute.NumberOfThreads: lambda model: model.get_model_raw_parameter_int(
+        "Threads"
+    ),
+    ModelAttribute.RelativeGap: lambda model: model.get_model_raw_parameter_double(
+        "MIPGap"
+    ),
+    ModelAttribute.TimeLimitSec: lambda model: model.get_model_raw_parameter_double(
+        "TimeLimit"
+    ),
     ModelAttribute.DualStatus: get_dualstatus,
     ModelAttribute.PrimalStatus: get_primalstatus,
     ModelAttribute.RawStatusString: get_rawstatusstring,
@@ -254,6 +287,20 @@ model_attribute_get_func_map = {
     ModelAttribute.Silent: get_silent,
     ModelAttribute.SolverName: lambda _: "Gurobi",
     ModelAttribute.SolverVersion: lambda model: model.version_string(),
+}
+
+model_attribute_get_translate_func_map = {
+    ModelAttribute.ObjectiveSense: lambda v: {
+        GRB.MINIMIZE: ObjectiveSense.Minimize,
+        GRB.MAXIMIZE: ObjectiveSense.Maximize,
+    }[v],
+}
+
+model_attribute_set_translate_func_map = {
+    ModelAttribute.ObjectiveSense: lambda v: {
+        ObjectiveSense.Minimize: GRB.MINIMIZE,
+        ObjectiveSense.Maximize: GRB.MAXIMIZE,
+    }[v],
 }
 
 
@@ -265,8 +312,25 @@ def set_silent(model, value: bool):
 
 
 model_attribute_set_func_map = {
+    ModelAttribute.Name: lambda model, v: model.set_model_raw_attribute_string(
+        "ModelName", v
+    ),
+    ModelAttribute.ObjectiveSense: lambda model, v: model.set_model_raw_attribute_int(
+        "ModelSense", v
+    ),
+    ModelAttribute.NumberOfThreads: lambda model, v: model.set_model_raw_parameter_int(
+        "Threads", v
+    ),
+    ModelAttribute.RelativeGap: lambda model, v: model.set_model_raw_parameter_double(
+        "MIPGap", v
+    ),
+    ModelAttribute.TimeLimitSec: lambda model, v: model.set_model_raw_parameter_double(
+        "TimeLimit", v
+    ),
     ModelAttribute.Silent: set_silent,
 }
+
+# Constraint Attribute
 
 
 def get_constraint_name(model, constraint):
@@ -348,41 +412,32 @@ class Model(RawModel):
         return True
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
-        value_type = default_variable_attribute_type(attribute)
-        query_type = variable_attribute_query_type_map[attribute]
-        assert query_type in (int, float, str, CHAR_TYPE)
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to get: {attribute}")
 
-        query_name = translate_variable_attribute_name(attribute)
-        get_function_map = {
-            int: self.get_variable_raw_attribute_int,
-            float: self.get_variable_raw_attribute_double,
-            str: self.get_variable_raw_attribute_string,
-            CHAR_TYPE: self.get_variable_raw_attribute_char,
-        }
-        get_function = get_function_map[query_type]
-        value = get_function(variable, query_name)
-
-        if value_type in variable_attribute_value_need_translate_type:
-            value = variable_attribute_gurobi_to_value_map[value]
+        value = _get_entity_attribute(
+            self,
+            variable,
+            attribute,
+            variable_attribute_get_func_map,
+            variable_attribute_get_translate_func_map,
+            e,
+        )
         return value
 
     def set_variable_attribute(self, variable, attribute: VariableAttribute, value):
-        value_type = default_variable_attribute_type(attribute)
-        query_type = variable_attribute_query_type_map[attribute]
-        assert query_type in (int, float, str, CHAR_TYPE)
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to set: {attribute}")
 
-        query_name = translate_variable_attribute_name(attribute)
-        set_function_map = {
-            int: self.set_variable_raw_attribute_int,
-            float: self.set_variable_raw_attribute_double,
-            str: self.set_variable_raw_attribute_string,
-            CHAR_TYPE: self.set_variable_raw_attribute_char,
-        }
-        set_function = set_function_map[query_type]
-
-        if value_type in variable_attribute_value_need_translate_type:
-            value = variable_attribute_value_to_gurobi_map[value]
-        set_function(variable, query_name, value)
+        _set_entity_attribute(
+            self,
+            variable,
+            attribute,
+            value,
+            variable_attribute_set_func_map,
+            variable_attribute_set_translate_func_map,
+            e,
+        )
 
     def number_of_constraints(self, type: ConstraintType):
         attr_name = constraint_type_attribute_name_map.get(type, None)
@@ -394,108 +449,77 @@ class Model(RawModel):
         return self.get_model_raw_attribute_int("NumVars")
 
     def get_model_attribute(self, attribute: ModelAttribute):
-        attr_name = model_attribute_name_map.get(attribute, None)
-        if attr_name:
-            param_type = gurobi_raw_type_map[self.raw_attribute_type(attr_name)]
-            get_function_map = {
-                int: self.get_model_raw_attribute_int,
-                float: self.get_model_raw_attribute_double,
-                str: self.get_model_raw_attribute_string,
-            }
-            get_function = get_function_map[param_type]
-            attr = get_function(attr_name)
-            if attribute == ModelAttribute.ObjectiveSense:
-                attr = {
-                    GRB.MINIMIZE: ObjectiveSense.Minimize,
-                    GRB.MAXIMIZE: ObjectiveSense.Maximize,
-                }[attr]
-            return attr
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to get: {attribute}")
 
-        param_name = model_attribute_parameter_name_map.get(attribute, None)
-        if param_name:
-            param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
-            get_function_map = {
-                int: self.get_model_raw_parameter_int,
-                float: self.get_model_raw_parameter_double,
-                str: self.get_model_raw_parameter_string,
-            }
-            get_function = get_function_map[param_type]
-            return get_function(param_name)
-
-        func = model_attribute_get_func_map.get(attribute, None)
-        if func:
-            return func(self)
-
-        raise ValueError(f"Unknown model attribute: {attribute}")
+        value = _get_model_attribute(
+            self,
+            attribute,
+            model_attribute_get_func_map,
+            model_attribute_get_translate_func_map,
+            e,
+        )
+        return value
 
     def set_model_attribute(self, attribute: ModelAttribute, value):
-        attr_name = model_attribute_name_map.get(attribute, None)
-        if attr_name:
-            param_type = gurobi_raw_type_map[self.raw_attribute_type(attr_name)]
-            set_function_map = {
-                int: self.set_model_raw_attribute_int,
-                float: self.set_model_raw_attribute_double,
-                str: self.set_model_raw_attribute_string,
-            }
-            set_function = set_function_map[param_type]
-            if attribute == ModelAttribute.ObjectiveSense:
-                value = {
-                    ObjectiveSense.Minimize: GRB.MINIMIZE,
-                    ObjectiveSense.Maximize: GRB.MAXIMIZE,
-                }[value]
-            set_function(attr_name, value)
-            return
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to set: {attribute}")
 
-        param_name = model_attribute_parameter_name_map.get(attribute, None)
-        if param_name:
-            param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
-            set_function_map = {
-                int: self.set_model_raw_parameter_int,
-                float: self.set_model_raw_parameter_double,
-                str: self.set_model_raw_parameter_string,
-            }
-            set_function = set_function_map[param_type]
-            set_function(param_name, value)
-            return
-
-        func = model_attribute_set_func_map.get(attribute, None)
-        if func:
-            func(self, value)
-            return
-
-        raise ValueError(f"Unknown model attribute: {attribute}")
+        _set_model_attribute(
+            self,
+            attribute,
+            value,
+            model_attribute_set_func_map,
+            model_attribute_set_translate_func_map,
+            e,
+        )
 
     def get_constraint_attribute(self, constraint, attribute: ConstraintAttribute):
-        func = constraint_attribute_get_func_map.get(attribute, None)
-        if func:
-            return func(self, constraint)
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to get: {attribute}")
 
-        raise ValueError(f"Unknown constraint attribute: {attribute}")
+        value = _get_entity_attribute(
+            self,
+            constraint,
+            attribute,
+            constraint_attribute_get_func_map,
+            {},
+            e,
+        )
+        return value
 
     def set_constraint_attribute(
         self, constraint, attribute: ConstraintAttribute, value
     ):
-        func = constraint_attribute_set_func_map.get(attribute, None)
-        if func:
-            return func(self, constraint, value)
-        raise ValueError(f"Unknown constraint attribute: {attribute}")
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to set: {attribute}")
 
-    def get_model_raw_parameter(model, param_name: str):
-        param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
+        _set_entity_attribute(
+            self,
+            constraint,
+            attribute,
+            value,
+            constraint_attribute_set_func_map,
+            {},
+            e,
+        )
+
+    def get_raw_parameter(self, param_name: str):
+        param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
         get_function_map = {
-            int: model.get_model_raw_parameter_int,
-            float: model.get_model_raw_parameter_double,
-            str: model.get_model_raw_parameter_string,
+            int: self.get_raw_parameter_int,
+            float: self.get_raw_parameter_double,
+            str: self.get_raw_parameter_string,
         }
         get_function = get_function_map[param_type]
         return get_function(param_name)
 
-    def set_model_raw_parameter(model, param_name: str, value):
-        param_type = gurobi_raw_type_map[model.raw_parameter_type(param_name)]
+    def set_raw_parameter(self, param_name: str, value):
+        param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
         set_function_map = {
-            int: model.set_model_raw_parameter_int,
-            float: model.set_model_raw_parameter_double,
-            str: model.set_model_raw_parameter_string,
+            int: self.set_raw_parameter_int,
+            float: self.set_raw_parameter_double,
+            str: self.set_raw_parameter_string,
         }
         set_function = set_function_map[param_type]
         set_function(param_name, value)

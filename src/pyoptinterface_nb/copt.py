@@ -19,12 +19,16 @@ from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
     ModelAttribute,
-    var_attr_type_map,
-    default_variable_attribute_type,
     ResultStatusCode,
     TerminationStatusCode,
 )
 from .core_ext import VariableDomain, ConstraintType, VariableIndex
+from .solver_common import (
+    _get_model_attribute,
+    _set_model_attribute,
+    _get_entity_attribute,
+    _set_entity_attribute,
+)
 from .ctypes_helper import pycapsule_to_cvoidp
 
 DEFAULT_ENV = None
@@ -35,6 +39,29 @@ def init_default_env():
     if DEFAULT_ENV is None:
         DEFAULT_ENV = Env()
 
+
+variable_attribute_get_func_map = {
+    VariableAttribute.Value: lambda model, v: model.get_variable_info(v, "Value"),
+    VariableAttribute.LowerBound: lambda model, v: model.get_variable_info(v, "LB"),
+    VariableAttribute.UpperBound: lambda model, v: model.get_variable_info(v, "UB"),
+    VariableAttribute.PrimalStart: lambda model, v: model.mip_start_values.get(v, None),
+    VariableAttribute.Domain: lambda model, v: model.get_variable_type(v),
+    VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
+}
+
+variable_attribute_set_func_map = {
+    VariableAttribute.LowerBound: lambda model, v, val: model.set_variable_lower_bound(
+        v, val
+    ),
+    VariableAttribute.UpperBound: lambda model, v, val: model.set_variable_upper_bound(
+        v, val
+    ),
+    VariableAttribute.PrimalStart: lambda model, v, val: model.mip_start_values.__setitem__(
+        v, val
+    ),
+    VariableAttribute.Domain: lambda model, v, val: model.set_variable_type(v, val),
+    VariableAttribute.Name: lambda model, v, val: model.set_variable_name(v, val),
+}
 
 constraint_type_attribute_name_map = {
     ConstraintType.Linear: "Rows",
@@ -179,14 +206,17 @@ def get_rawstatusstring(model):
     return status_string_pair[1]
 
 
+def get_silent(model):
+    return model.get_raw_attribute_int("LogToConsole") == 0
+
+
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveSense: get_objsense,
     ModelAttribute.DualStatus: get_dualstatus,
     ModelAttribute.PrimalStatus: get_primalstatus,
     ModelAttribute.RawStatusString: get_rawstatusstring,
     ModelAttribute.TerminationStatus: get_terminationstatus,
-    ModelAttribute.Silent: lambda model: model.get_raw_attribute_int("LogToConsole")
-    == 0,
+    ModelAttribute.Silent: get_silent,
     ModelAttribute.SolverName: lambda _: "COPT",
     ModelAttribute.SolverVersion: lambda model: model.version_string(),
 }
@@ -239,37 +269,32 @@ class Model(RawModel):
         return True
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
-        get_function_map = {
-            VariableAttribute.Value: lambda v: self.get_variable_info(v, "Value"),
-            VariableAttribute.LowerBound: lambda v: self.get_variable_info(v, "LB"),
-            VariableAttribute.UpperBound: lambda v: self.get_variable_info(v, "UB"),
-            VariableAttribute.PrimalStart: lambda v: self.mip_start_values.get(v, None),
-            VariableAttribute.Domain: lambda v: self.get_variable_type(v),
-            VariableAttribute.Name: lambda v: self.get_variable_name(v),
-        }
-        get_function = get_function_map.get(attribute, None)
-        if not get_function:
-            raise ValueError(f"Unknown variable attribute: {attribute}")
-        return get_function(variable)
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to get: {attribute}")
+
+        value = _get_entity_attribute(
+            self,
+            variable,
+            attribute,
+            variable_attribute_get_func_map,
+            {},
+            e,
+        )
+        return value
 
     def set_variable_attribute(self, variable, attribute: VariableAttribute, value):
-        set_function_map = {
-            VariableAttribute.LowerBound: lambda v, val: self.set_variable_lower_bound(
-                v, val
-            ),
-            VariableAttribute.UpperBound: lambda v, val: self.set_variable_upper_bound(
-                v, val
-            ),
-            VariableAttribute.PrimalStart: lambda v, val: self.mip_start_values.__setitem__(
-                v, val
-            ),
-            VariableAttribute.Domain: lambda v, val: self.set_variable_type(v, val),
-            VariableAttribute.Name: lambda v, val: self.set_variable_name(v, val),
-        }
-        set_function = set_function_map.get(attribute, None)
-        if not set_function:
-            raise ValueError(f"Unknown variable attribute: {attribute}")
-        return set_function(variable, value)
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to set: {attribute}")
+
+        _set_entity_attribute(
+            self,
+            variable,
+            attribute,
+            value,
+            variable_attribute_set_func_map,
+            {},
+            e,
+        )
 
     def number_of_constraints(self, type: ConstraintType):
         attr_name = constraint_type_attribute_name_map.get(type, None)
@@ -285,31 +310,60 @@ class Model(RawModel):
         return ismip > 0
 
     def get_model_attribute(self, attribute: ModelAttribute):
-        get_function = model_attribute_get_func_map.get(attribute, None)
-        if not get_function:
-            raise ValueError(f"Unknown model attribute: {attribute}")
-        return get_function(self)
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to get: {attribute}")
+
+        value = _get_model_attribute(
+            self,
+            attribute,
+            model_attribute_get_func_map,
+            {},
+            e,
+        )
+        return value
 
     def set_model_attribute(self, attribute: ModelAttribute, value):
-        set_function = model_attribute_set_func_map.get(attribute, None)
-        if not set_function:
-            raise ValueError(f"Unknown model attribute: {attribute}")
-        return set_function(self, value)
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to set: {attribute}")
+
+        _set_model_attribute(
+            self,
+            attribute,
+            value,
+            model_attribute_set_func_map,
+            {},
+            e,
+        )
 
     def get_constraint_attribute(self, constraint, attribute: ConstraintAttribute):
-        func = constraint_attribute_get_func_map.get(attribute, None)
-        if func:
-            return func(self, constraint)
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to get: {attribute}")
 
-        raise ValueError(f"Unknown constraint attribute: {attribute}")
+        value = _get_entity_attribute(
+            self,
+            constraint,
+            attribute,
+            constraint_attribute_get_func_map,
+            {},
+            e,
+        )
+        return value
 
     def set_constraint_attribute(
         self, constraint, attribute: ConstraintAttribute, value
     ):
-        func = constraint_attribute_set_func_map.get(attribute, None)
-        if func:
-            return func(self, constraint, value)
-        raise ValueError(f"Unknown constraint attribute: {attribute}")
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to set: {attribute}")
+
+        _set_entity_attribute(
+            self,
+            constraint,
+            attribute,
+            value,
+            constraint_attribute_set_func_map,
+            {},
+            e,
+        )
 
     def optimize(self):
         if self._is_mip():

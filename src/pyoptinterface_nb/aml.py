@@ -24,13 +24,15 @@ def make_variable_array(
     array = xr.DataArray(data, coords=coords)
     return array
 
-def quicksum(variables : xr.DataArray):
+
+def quicksum(variables: xr.DataArray):
     expr = ExprBuilder()
     for v in variables.values.flat:
         expr.add_affine_term(v, 1.0)
     return expr
 
-def quicksum_f(variables : xr.DataArray, f):
+
+def quicksum_f(variables: xr.DataArray, f):
     expr = ExprBuilder()
     for v in variables.values.flat:
         expr.add(f(v))

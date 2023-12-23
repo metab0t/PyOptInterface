@@ -38,20 +38,6 @@ target_link_libraries(core_ext PUBLIC pyoptinterface_core)
 # Install directive for scikit-build
 install(TARGETS core_ext LIBRARY DESTINATION pyoptinterface_nb)
 
-# Use Catch2 to build c++ unit test
-set(ENABLE_CPP_TEST OFF CACHE BOOL "Enable C++ test with Catch2?")
-if(ENABLE_CPP_TEST)
-  find_package(Catch2 CONFIG REQUIRED)
-  include(CTest)
-  include(Catch)
-
-  add_executable(test_basic tests/cpp/basic.cpp)
-  target_link_libraries(test_basic PUBLIC pyoptinterface_core)
-  target_link_libraries(test_basic PRIVATE Catch2::Catch2WithMain)
-
-  catch_discover_tests(test_basic)
-endif()
-
 # Solvers
 
 # Gurobi

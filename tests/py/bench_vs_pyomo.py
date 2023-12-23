@@ -28,9 +28,7 @@ def bench_poi(M, N):
     # poi_timer.toc("set_variable_attribute")
 
     expr = aml.quicksum(x)
-    con = model.add_linear_constraint(
-        expr, poi.ConstraintSense.Equal, M * N / 2
-    )
+    con = model.add_linear_constraint(expr, poi.ConstraintSense.Equal, M * N / 2)
     # poi_timer.toc("add_linear_constraint")
 
     obj = aml.quicksum_f(x, lambda v: v * v)
