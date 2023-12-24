@@ -9,7 +9,7 @@ description = "Python interface to multiple optimization solvers"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
-    { name = "John", email = "john@gmail.com" },
+    { name = "Yue Yang", email = "metab0t@outlook.com" },
 ]
 classifiers = [
 ]
@@ -20,7 +20,7 @@ Homepage = "https://github.com/metab0t/pyoptinterface"
 [tool.scikit-build]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
-# cmake.build-type = "Debug"
+cmake.build-type = "Release"
 
 [tool.scikit-build.cmake.define]
 ENABLE_GUROBI_CXX = "OFF"

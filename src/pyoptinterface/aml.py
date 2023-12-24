@@ -1,39 +1,29 @@
 from .core_ext import VariableIndex, VariableDomain, ExprBuilder
-
-import xarray as xr
 import numpy as np
+
+from yds import tupledict, make_tupledict
 
 from typing import Iterable
 
 
 def make_variable_array(
     model,
-    coords: dict[str, Iterable] | list[Iterable],
+    *coords: Iterable,
     domain: VariableDomain = VariableDomain.Continuous,
 ):
-    assert isinstance(coords, dict) or isinstance(coords, list)
-    axis_iter = coords
-    if isinstance(coords, dict):
-        axis_iter = coords.values()
-    lengths = [len(axis) for axis in axis_iter]
-    L = np.prod(lengths)
-    data = np.full((L,), None)
-    for i in range(L):
-        data[i] = model.add_variable(domain=domain)
-    data = data.reshape(lengths)
-    array = xr.DataArray(data, coords=coords)
-    return array
+    f = lambda *args: model.add_variable(domain)
+    return make_tupledict(*coords, rule=f)
 
 
-def quicksum(variables: xr.DataArray):
+def quicksum(variables: tupledict):
     expr = ExprBuilder()
-    for v in variables.values.flat:
+    for v in variables.values():
         expr.add_affine_term(v, 1.0)
     return expr
 
 
-def quicksum_f(variables: xr.DataArray, f):
+def quicksum_f(variables: tupledict, f):
     expr = ExprBuilder()
-    for v in variables.values.flat:
+    for v in variables.values():
         expr.add(f(v))
     return expr

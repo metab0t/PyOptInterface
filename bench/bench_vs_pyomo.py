@@ -2,7 +2,6 @@ import pyoptinterface as poi
 from pyoptinterface import gurobi
 import pyoptinterface.aml as aml
 
-import xarray as xr
 import numpy as np
 
 import pyomo.environ as pyo
@@ -20,10 +19,10 @@ def bench_poi(M, N):
     I = range(M)
     J = range(N)
     poi_timer.tic("starts")
-    x = aml.make_variable_array(model, coords=dict(i=I, j=J))
+    x = aml.make_variable_array(model, I, J)
     # poi_timer.toc("make_variable_array")
 
-    for v in x.values.flat:
+    for v in x.values():
         model.set_variable_attribute(v, poi.VariableAttribute.LowerBound, 0.0)
     # poi_timer.toc("set_variable_attribute")
 
