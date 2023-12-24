@@ -19,7 +19,8 @@ NB_MODULE(copt_model_ext, m)
 	    .def(nb::init<const COPTEnv &>())
 	    .def("init", &COPTModel::init)
 	    .def("add_variable", &COPTModel::add_variable,
-	         nb::arg("domain") = VariableDomain::Continuous)
+	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -COPT_INFINITY,
+	         nb::arg("ub") = COPT_INFINITY)
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
 	    .def("get_value", nb::overload_cast<const VariableIndex &>(&COPTModel::get_variable_value))

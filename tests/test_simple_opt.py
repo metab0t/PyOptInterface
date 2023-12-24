@@ -5,13 +5,10 @@ from pytest import approx
 def test(model_interface):
     model = model_interface
 
-    x = model.add_variable()
-    y = model.add_variable()
+    x = model.add_variable(lb=0.0)
+    y = model.add_variable(lb=8.0)
 
-    model.set_variable_attribute(x, poi.VariableAttribute.LowerBound, 0.0)
     model.set_variable_attribute(x, poi.VariableAttribute.UpperBound, 20.0)
-
-    model.set_variable_attribute(y, poi.VariableAttribute.LowerBound, 8.0)
     model.set_variable_attribute(y, poi.VariableAttribute.UpperBound, 20.0)
 
     obj = x * x + y * y

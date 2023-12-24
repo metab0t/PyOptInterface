@@ -77,15 +77,14 @@ void GurobiModel::init(const GurobiEnv &env)
 	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model);
 }
 
-VariableIndex GurobiModel::add_variable(VariableDomain domain)
+VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double ub)
 {
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 
 	// Create a new Gurobi variable
 	char vtype = gurobi_vtype(domain);
-	int error =
-	    GRBaddvar(m_model.get(), 0, NULL, NULL, 0.0, -GRB_INFINITY, GRB_INFINITY, vtype, NULL);
+	int error = GRBaddvar(m_model.get(), 0, NULL, NULL, 0.0, lb, ub, vtype, NULL);
 	check_error(error);
 
 	return variable;

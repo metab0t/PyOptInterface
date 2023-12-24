@@ -33,7 +33,8 @@ class GurobiModel : public CommercialSolverBase
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
 
-	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous);
+	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
+	                           double lb = -GRB_INFINITY, double ub = GRB_INFINITY);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable) override;

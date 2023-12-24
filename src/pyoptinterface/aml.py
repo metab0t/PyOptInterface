@@ -10,8 +10,15 @@ def make_variable_array(
     model,
     *coords: Iterable,
     domain: VariableDomain = VariableDomain.Continuous,
+    lb=None,
+    ub=None,
 ):
-    f = lambda *args: model.add_variable(domain)
+    kw_args = dict(domain=domain)
+    if lb is not None:
+        kw_args["lb"] = lb
+    if ub is not None:
+        kw_args["ub"] = ub
+    f = lambda *args: model.add_variable(**kw_args)
     return make_tupledict(*coords, rule=f)
 
 

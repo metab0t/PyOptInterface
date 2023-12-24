@@ -33,7 +33,8 @@ class COPTModel : public CommercialSolverBase
 	COPTModel(const COPTEnv &env);
 	void init(const COPTEnv &env);
 
-	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous);
+	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
+	                           double lb = -COPT_INFINITY, double ub = COPT_INFINITY);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable) override;

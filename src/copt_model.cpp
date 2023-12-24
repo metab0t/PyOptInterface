@@ -101,14 +101,13 @@ void COPTModel::init(const COPTEnv &env)
 	m_model = std::unique_ptr<copt_prob, COPTfreemodelT>(model);
 }
 
-VariableIndex COPTModel::add_variable(VariableDomain domain)
+VariableIndex COPTModel::add_variable(VariableDomain domain, double lb, double ub)
 {
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 
 	char vtype = copt_vtype(domain);
-	int error =
-	    COPT_AddCol(m_model.get(), 0.0, 0, NULL, NULL, vtype, -COPT_INFINITY, COPT_INFINITY, NULL);
+	int error = COPT_AddCol(m_model.get(), 0.0, 0, NULL, NULL, vtype, lb, ub, NULL);
 	check_error(error);
 
 	return variable;

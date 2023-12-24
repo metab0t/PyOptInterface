@@ -19,7 +19,8 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<const GurobiEnv &>())
 	    .def("init", &GurobiModel::init)
 	    .def("add_variable", &GurobiModel::add_variable,
-	         nb::arg("domain") = VariableDomain::Continuous)
+	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
+	         nb::arg("ub") = GRB_INFINITY)
 	    .def("delete_variable", &GurobiModel::delete_variable)
 	    .def("is_variable_active", &GurobiModel::is_variable_active)
 	    .def("get_value",
