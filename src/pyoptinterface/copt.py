@@ -9,7 +9,7 @@ if platform.system() == "Windows":
     os.add_dll_directory(os.path.join(copt_home, "bin"))
 
 try:
-    from .copt_model_ext import RawModel, Env, Constants
+    from .copt_model_ext import RawModel, Env, COPT
 except Exception as e:
     raise ImportError(
         f"Failed to import copt_model_ext. Please check if COPT_HOME is set correctly. Error: {e}"
@@ -102,39 +102,39 @@ def get_dualstatus(model):
 # LP status codes. Descriptions taken from COPT user guide.
 # Code : (TerminationStatus, RawStatusString)
 _RAW_LPSTATUS_STRINGS = {
-    Constants.COPT_LPSTATUS_UNSTARTED: (
+    COPT.UNSTARTED: (
         TerminationStatusCode.OPTIMIZE_NOT_CALLED,
         "The LP optimization is not started yet.",
     ),
-    Constants.COPT_LPSTATUS_OPTIMAL: (
+    COPT.OPTIMAL: (
         TerminationStatusCode.OPTIMAL,
         "The LP problem is solved to optimality.",
     ),
-    Constants.COPT_LPSTATUS_INFEASIBLE: (
+    COPT.INFEASIBLE: (
         TerminationStatusCode.INFEASIBLE,
         "The LP problem is infeasible.",
     ),
-    Constants.COPT_LPSTATUS_UNBOUNDED: (
+    COPT.UNBOUNDED: (
         TerminationStatusCode.DUAL_INFEASIBLE,
         "The LP problem is unbounded.",
     ),
-    Constants.COPT_LPSTATUS_NUMERICAL: (
+    COPT.NUMERICAL: (
         TerminationStatusCode.NUMERICAL_ERROR,
         "Numerical trouble encountered.",
     ),
-    Constants.COPT_LPSTATUS_IMPRECISE: (
+    COPT.IMPRECISE: (
         TerminationStatusCode.ALMOST_OPTIMAL,
         "The LP problem is solved to optimality with relaxed tolerances.",
     ),
-    Constants.COPT_LPSTATUS_TIMEOUT: (
+    COPT.TIMEOUT: (
         TerminationStatusCode.TIME_LIMIT,
         "The LP optimization is stopped because of time limit.",
     ),
-    Constants.COPT_LPSTATUS_UNFINISHED: (
+    COPT.UNFINISHED: (
         TerminationStatusCode.NUMERICAL_ERROR,
         "The LP optimization is stopped but the solver cannot provide a solution because of numerical difficulties.",
     ),
-    Constants.COPT_LPSTATUS_INTERRUPTED: (
+    COPT.INTERRUPTED: (
         TerminationStatusCode.INTERRUPTED,
         "The LP optimization is stopped by user interrupt.",
     ),
@@ -143,39 +143,39 @@ _RAW_LPSTATUS_STRINGS = {
 # MIP status codes. Descriptions taken from COPT user guide.
 # Code : (TerminationStatus, RawStatusString)
 _RAW_MIPSTATUS_STRINGS = {
-    Constants.COPT_MIPSTATUS_UNSTARTED: (
+    COPT.UNSTARTED: (
         TerminationStatusCode.OPTIMIZE_NOT_CALLED,
         "The MIP optimization is not started yet.",
     ),
-    Constants.COPT_MIPSTATUS_OPTIMAL: (
+    COPT.OPTIMAL: (
         TerminationStatusCode.OPTIMAL,
         "The MIP problem is solved to optimality.",
     ),
-    Constants.COPT_MIPSTATUS_INFEASIBLE: (
+    COPT.INFEASIBLE: (
         TerminationStatusCode.INFEASIBLE,
         "The MIP problem is infeasible.",
     ),
-    Constants.COPT_MIPSTATUS_UNBOUNDED: (
+    COPT.UNBOUNDED: (
         TerminationStatusCode.DUAL_INFEASIBLE,
         "The MIP problem is unbounded.",
     ),
-    Constants.COPT_MIPSTATUS_INF_OR_UNB: (
+    COPT.INF_OR_UNB: (
         TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED,
         "The MIP problem is infeasible or unbounded.",
     ),
-    Constants.COPT_MIPSTATUS_NODELIMIT: (
+    COPT.NODELIMIT: (
         TerminationStatusCode.NODE_LIMIT,
         "The MIP optimization is stopped because of node limit.",
     ),
-    Constants.COPT_MIPSTATUS_TIMEOUT: (
+    COPT.TIMEOUT: (
         TerminationStatusCode.TIME_LIMIT,
         "The MIP optimization is stopped because of time limit.",
     ),
-    Constants.COPT_MIPSTATUS_UNFINISHED: (
+    COPT.UNFINISHED: (
         TerminationStatusCode.NUMERICAL_ERROR,
         "The MIP optimization is stopped but the solver cannot provide a solution because of numerical difficulties.",
     ),
-    Constants.COPT_MIPSTATUS_INTERRUPTED: (
+    COPT.INTERRUPTED: (
         TerminationStatusCode.INTERRUPTED,
         "The MIP optimization is stopped by user interrupt.",
     ),
