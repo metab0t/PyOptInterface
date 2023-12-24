@@ -1,12 +1,9 @@
 import pyoptinterface_nb as core
-from pyoptinterface_nb import copt
 from pytest import approx
 
-Model = copt.Model
 
-
-def test():
-    model = Model()
+def test(model_interface):
+    model = model_interface
 
     x = model.add_variable()
     y = model.add_variable()
@@ -57,6 +54,3 @@ def test():
     y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
     assert x_val == approx(10.0)
     assert y_val == approx(10.1)
-
-
-test()
