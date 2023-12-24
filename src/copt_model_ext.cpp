@@ -18,17 +18,30 @@ NB_MODULE(copt_model_ext, m)
 	    .def(nb::init<>())
 	    .def(nb::init<const COPTEnv &>())
 	    .def("init", &COPTModel::init)
+
 	    .def("add_variable", &COPTModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -COPT_INFINITY,
 	         nb::arg("ub") = COPT_INFINITY)
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
+
 	    .def("get_value", nb::overload_cast<const VariableIndex &>(&COPTModel::get_variable_value))
 	    .def("get_value",
 	         nb::overload_cast<const ScalarAffineFunction &>(&COPTModel::get_expression_value))
 	    .def("get_value",
 	         nb::overload_cast<const ScalarQuadraticFunction &>(&COPTModel::get_expression_value))
 	    .def("get_value", nb::overload_cast<const ExprBuilder &>(&COPTModel::get_expression_value))
+
+	    .def("pprint", &COPTModel::pprint_variable)
+	    .def("pprint",
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&COPTModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint",
+	         nb::overload_cast<const ScalarQuadraticFunction &, int>(&COPTModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&COPTModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &COPTModel::add_linear_constraint))
@@ -45,6 +58,7 @@ NB_MODULE(copt_model_ext, m)
 	    .def("add_sos2_constraint", &COPTModel::add_sos2_constraint)
 	    .def("delete_constraint", &COPTModel::delete_constraint)
 	    .def("is_constraint_active", &COPTModel::is_constraint_active)
+
 	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
 	                              &COPTModel::set_objective))
 	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(

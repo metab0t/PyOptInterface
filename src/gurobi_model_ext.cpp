@@ -18,11 +18,13 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
 	    .def("init", &GurobiModel::init)
+
 	    .def("add_variable", &GurobiModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
 	         nb::arg("ub") = GRB_INFINITY)
 	    .def("delete_variable", &GurobiModel::delete_variable)
 	    .def("is_variable_active", &GurobiModel::is_variable_active)
+
 	    .def("get_value",
 	         nb::overload_cast<const VariableIndex &>(&GurobiModel::get_variable_value))
 	    .def("get_value",
@@ -34,6 +36,18 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &GurobiModel::add_linear_constraint))
+
+	    .def("pprint", &GurobiModel::pprint_variable)
+	    .def("pprint",
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&GurobiModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint",
+	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
+	             &GurobiModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&GurobiModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
 	             &GurobiModel::add_linear_constraint_from_expr))
@@ -47,6 +61,7 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("add_sos2_constraint", &GurobiModel::add_sos2_constraint)
 	    .def("delete_constraint", &GurobiModel::delete_constraint)
 	    .def("is_constraint_active", &GurobiModel::is_constraint_active)
+
 	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
 	                              &GurobiModel::set_objective))
 	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(

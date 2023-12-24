@@ -1,6 +1,6 @@
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/gurobi_model.hpp"
-#include <format>
+#include <fmt/core.h>
 
 char gurobi_con_sense(ConstraintSense sense)
 {
@@ -113,6 +113,11 @@ bool GurobiModel::is_variable_active(const VariableIndex &variable)
 double GurobiModel::get_variable_value(const VariableIndex &variable)
 {
 	return get_variable_raw_attribute_double(variable, GRB_DBL_ATTR_X);
+}
+
+std::string GurobiModel::pprint_variable(const VariableIndex &variable)
+{
+	return get_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME);
 }
 
 ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,
@@ -669,7 +674,7 @@ void *GurobiModel::get_raw_model()
 std::string GurobiModel::version_string()
 {
 	std::string version =
-	    std::format("v{}.{}.{}", GRB_VERSION_MAJOR, GRB_VERSION_MINOR, GRB_VERSION_TECHNICAL);
+	    fmt::format("v{}.{}.{}", GRB_VERSION_MAJOR, GRB_VERSION_MINOR, GRB_VERSION_TECHNICAL);
 	return version;
 }
 

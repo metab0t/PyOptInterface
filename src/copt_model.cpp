@@ -1,6 +1,6 @@
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/copt_model.hpp"
-#include <format>
+#include "fmt/core.h"
 
 static void check_error(int error)
 {
@@ -135,6 +135,11 @@ bool COPTModel::is_variable_active(const VariableIndex &variable)
 double COPTModel::get_variable_value(const VariableIndex &variable)
 {
 	return get_variable_info(variable, COPT_DBLINFO_VALUE);
+}
+
+std::string COPTModel::pprint_variable(const VariableIndex &variable)
+{
+	return get_variable_name(variable);
 }
 
 ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &function,
@@ -430,7 +435,7 @@ std::string COPTModel::get_variable_name(const VariableIndex &variable)
 	int reqsize;
 	error = COPT_GetColName(m_model.get(), column, NULL, 0, &reqsize);
 	check_error(error);
-	std::string retval(reqsize, '\0');
+	std::string retval(reqsize - 1, '\0');
 	error = COPT_GetColName(m_model.get(), column, retval.data(), reqsize, &reqsize);
 	check_error(error);
 	return retval;
@@ -513,7 +518,7 @@ std::string COPTModel::get_constraint_name(const ConstraintIndex &constraint)
 		throw std::runtime_error("Unknown constraint type");
 	}
 	check_error(error);
-	std::string retval(reqsize, '\0');
+	std::string retval(reqsize - 1, '\0');
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
@@ -613,7 +618,7 @@ void *COPTModel::get_raw_model()
 std::string COPTModel::version_string()
 {
 	std::string version =
-	    std::format("v{}.{}.{}", COPT_VERSION_MAJOR, COPT_VERSION_MINOR, COPT_VERSION_TECHNICAL);
+	    fmt::format("v{}.{}.{}", COPT_VERSION_MAJOR, COPT_VERSION_MINOR, COPT_VERSION_TECHNICAL);
 	return version;
 }
 

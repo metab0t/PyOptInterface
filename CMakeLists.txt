@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+add_subdirectory(thirdparty/fmt)
+
 add_library(core STATIC)
 target_sources(core PRIVATE
   include/pyoptinterface/core.hpp
@@ -16,6 +18,7 @@ target_sources(core PRIVATE
   src/solver_common.cpp
 )
 target_include_directories(core PUBLIC include thirdparty)
+target_link_libraries(core PUBLIC fmt)
 
 # Build Python extensions
 find_package(Python 3.8

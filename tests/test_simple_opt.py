@@ -11,6 +11,9 @@ def test(model_interface):
     model.set_variable_attribute(x, poi.VariableAttribute.UpperBound, 20.0)
     model.set_variable_attribute(y, poi.VariableAttribute.UpperBound, 20.0)
 
+    model.set_variable_attribute(x, poi.VariableAttribute.Name, "x")
+    model.set_variable_attribute(y, poi.VariableAttribute.Name, "y")
+
     obj = x * x + y * y
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
@@ -30,6 +33,11 @@ def test(model_interface):
     assert obj_val == approx(68.0)
     conexpr_val = model.get_value(conexpr)
     assert conexpr_val == approx(10.0)
+
+    assert model.pprint(x) == "x"
+    assert model.pprint(y) == "y"
+    assert model.pprint(obj) == "1*x*x+1*y*y"
+    assert model.pprint(conexpr) == "1*x+1*y"
 
     model.delete_constraint(con1)
     con2 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.0)

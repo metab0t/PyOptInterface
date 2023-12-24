@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "pyoptinterface/core.hpp"
 
 class CommercialSolverBase
@@ -18,6 +19,11 @@ class CommercialSolverBase
 	double get_expression_value(const ScalarAffineFunction &function);
 	double get_expression_value(const ScalarQuadraticFunction &function);
 	double get_expression_value(const ExprBuilder &function);
+
+	virtual std::string pprint_variable(const VariableIndex &variable) = 0;
+	std::string pprint_expression(const ScalarAffineFunction &function, int precision = 4);
+	std::string pprint_expression(const ScalarQuadraticFunction &function, int precision = 4);
+	std::string pprint_expression(const ExprBuilder &function, int precision = 4);
 };
 
 struct AffineFunctionPtrForm
