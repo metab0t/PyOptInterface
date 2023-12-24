@@ -1,4 +1,4 @@
-import pyoptinterface as core
+import pyoptinterface as poi
 from pytest import approx
 
 
@@ -8,49 +8,55 @@ def test(model_interface):
     x = model.add_variable()
     y = model.add_variable()
 
-    model.set_variable_attribute(x, core.VariableAttribute.LowerBound, 0.0)
-    model.set_variable_attribute(x, core.VariableAttribute.UpperBound, 20.0)
+    model.set_variable_attribute(x, poi.VariableAttribute.LowerBound, 0.0)
+    model.set_variable_attribute(x, poi.VariableAttribute.UpperBound, 20.0)
 
-    model.set_variable_attribute(y, core.VariableAttribute.LowerBound, 8.0)
-    model.set_variable_attribute(y, core.VariableAttribute.UpperBound, 20.0)
+    model.set_variable_attribute(y, poi.VariableAttribute.LowerBound, 8.0)
+    model.set_variable_attribute(y, poi.VariableAttribute.UpperBound, 20.0)
 
-    model.set_objective(x * x + y * y, core.ObjectiveSense.Minimize)
+    obj = x * x + y * y
+    model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
-    con1 = model.add_linear_constraint(x + y, core.ConstraintSense.GreaterEqual, 10.0)
+    conexpr = x + y
+    con1 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0)
 
     model.optimize()
 
-    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
-    assert status == core.TerminationStatusCode.OPTIMAL
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
 
-    x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
-    y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
+    x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
+    y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(2.0)
     assert y_val == approx(8.0)
+    obj_val = model.get_value(obj)
+    assert obj_val == approx(68.0)
+    conexpr_val = model.get_value(conexpr)
+    assert conexpr_val == approx(10.0)
 
     model.delete_constraint(con1)
-    con2 = model.add_linear_constraint(x + y, core.ConstraintSense.GreaterEqual, 20.0)
+    con2 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.0)
     model.optimize()
 
-    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
-    assert status == core.TerminationStatusCode.OPTIMAL
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
 
-    x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
-    y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
+    x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
+    y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(10.0)
     assert y_val == approx(10.0)
 
     model.delete_constraint(con2)
-    con3 = model.add_linear_constraint(x + y, core.ConstraintSense.GreaterEqual, 20.1)
+    con3 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.1)
     model.set_variable_attribute(
-        x, core.VariableAttribute.Domain, core.VariableDomain.Integer
+        x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer
     )
     model.optimize()
 
-    status = model.get_model_attribute(core.ModelAttribute.TerminationStatus)
-    assert status == core.TerminationStatusCode.OPTIMAL
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
 
-    x_val = model.get_variable_attribute(x, core.VariableAttribute.Value)
-    y_val = model.get_variable_attribute(y, core.VariableAttribute.Value)
+    x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
+    y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(10.0)
     assert y_val == approx(10.1)

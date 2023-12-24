@@ -13,6 +13,11 @@ class CommercialSolverBase
 	                                                 ConstraintSense sense, CoeffT rhs) = 0;
 	ConstraintIndex add_quadratic_constraint_from_expr(const ExprBuilder &function,
 	                                                   ConstraintSense sense, CoeffT rhs);
+
+	virtual double get_variable_value(const VariableIndex &variable) = 0;
+	double get_expression_value(const ScalarAffineFunction &function);
+	double get_expression_value(const ScalarQuadraticFunction &function);
+	double get_expression_value(const ExprBuilder &function);
 };
 
 struct AffineFunctionPtrForm

@@ -99,7 +99,7 @@ void GurobiModel::delete_variable(const VariableIndex &variable)
 	}
 
 	// Delete the corresponding Gurobi variable
-	int variable_column = _variable_index(variable);
+	int variable_column = _checked_variable_index(variable);
 	int error = GRBdelvars(m_model.get(), 1, &variable_column);
 	check_error(error);
 
@@ -109,6 +109,11 @@ void GurobiModel::delete_variable(const VariableIndex &variable)
 bool GurobiModel::is_variable_active(const VariableIndex &variable)
 {
 	return m_variable_index.has_index(variable.index);
+}
+
+double GurobiModel::get_variable_value(const VariableIndex &variable)
+{
+	return get_variable_raw_attribute_double(variable, GRB_DBL_ATTR_X);
 }
 
 ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,

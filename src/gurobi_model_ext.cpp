@@ -14,7 +14,7 @@ NB_MODULE(gurobi_model_ext, m)
 
 	nb::class_<GurobiEnv>(m, "Env").def(nb::init<>());
 
-	nb::class_<GurobiModel>(m, "RawModel")
+	nb::class_<GurobiModel, CommercialSolverBase>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
 	    .def("init", &GurobiModel::init)
@@ -22,6 +22,14 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::arg("domain") = VariableDomain::Continuous)
 	    .def("delete_variable", &GurobiModel::delete_variable)
 	    .def("is_variable_active", &GurobiModel::is_variable_active)
+	    .def("get_value",
+	         nb::overload_cast<const VariableIndex &>(&GurobiModel::get_variable_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarAffineFunction &>(&GurobiModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&GurobiModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ExprBuilder &>(&GurobiModel::get_expression_value))
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &GurobiModel::add_linear_constraint))

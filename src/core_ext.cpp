@@ -4,6 +4,7 @@
 #include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/core.hpp"
+#include "pyoptinterface/solver_common.hpp"
 
 namespace nb = nanobind;
 
@@ -145,4 +146,6 @@ NB_MODULE(core_ext, m)
 	    .def("mul", nb::overload_cast<const ScalarAffineFunction &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ScalarQuadraticFunction &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ExprBuilder &>(&ExprBuilder::mul));
+
+	nb::class_<CommercialSolverBase>(m, "CommercialSolverBase");
 }

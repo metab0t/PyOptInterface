@@ -36,6 +36,7 @@ class COPTModel : public CommercialSolverBase
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
+	double get_variable_value(const VariableIndex &variable) override;
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs) override;

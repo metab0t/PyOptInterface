@@ -20,3 +20,7 @@ Homepage = "https://github.com/metab0t/pyoptinterface"
 [tool.scikit-build]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
+# cmake.build-type = "Debug"
+
+[tool.scikit-build.cmake.define]
+ENABLE_GUROBI_CXX = "OFF"

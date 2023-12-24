@@ -133,6 +133,11 @@ bool COPTModel::is_variable_active(const VariableIndex &variable)
 	return m_variable_index.has_index(variable.index);
 }
 
+double COPTModel::get_variable_value(const VariableIndex &variable)
+{
+	return get_variable_info(variable, COPT_DBLINFO_VALUE);
+}
+
 ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                  ConstraintSense sense, CoeffT rhs)
 {

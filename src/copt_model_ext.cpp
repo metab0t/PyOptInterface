@@ -14,7 +14,7 @@ NB_MODULE(copt_model_ext, m)
 
 	nb::class_<COPTEnv>(m, "Env").def(nb::init<>());
 
-	nb::class_<COPTModel>(m, "RawModel")
+	nb::class_<COPTModel, CommercialSolverBase>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const COPTEnv &>())
 	    .def("init", &COPTModel::init)
@@ -22,6 +22,12 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("domain") = VariableDomain::Continuous)
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
+	    .def("get_value", nb::overload_cast<const VariableIndex &>(&COPTModel::get_variable_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarAffineFunction &>(&COPTModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&COPTModel::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ExprBuilder &>(&COPTModel::get_expression_value))
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &COPTModel::add_linear_constraint))
