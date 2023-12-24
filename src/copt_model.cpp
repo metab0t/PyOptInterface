@@ -431,7 +431,7 @@ std::string COPTModel::get_variable_name(const VariableIndex &variable)
 	error = COPT_GetColName(m_model.get(), column, NULL, 0, &reqsize);
 	check_error(error);
 	std::string retval(reqsize, '\0');
-	error = COPT_GetRowName(m_model.get(), column, retval.data(), reqsize, &reqsize);
+	error = COPT_GetColName(m_model.get(), column, retval.data(), reqsize, &reqsize);
 	check_error(error);
 	return retval;
 }
