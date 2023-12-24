@@ -1,4 +1,4 @@
-from pyoptinterface_nb.core_ext import (
+from pyoptinterface.core_ext import (
     VariableIndex,
     ConstraintIndex,
     ExprBuilder,
@@ -10,7 +10,7 @@ from pyoptinterface_nb.core_ext import (
     ScalarQuadraticFunction,
 )
 
-from pyoptinterface_nb.attributes import (
+from pyoptinterface.attributes import (
     VariableAttribute,
     ModelAttribute,
     TerminationStatusCode,

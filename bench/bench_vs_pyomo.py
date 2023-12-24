@@ -1,6 +1,6 @@
-import pyoptinterface_nb as poi
-from pyoptinterface_nb import gurobi
-import pyoptinterface_nb.aml as aml
+import pyoptinterface as poi
+from pyoptinterface import gurobi
+import pyoptinterface.aml as aml
 
 import xarray as xr
 import numpy as np

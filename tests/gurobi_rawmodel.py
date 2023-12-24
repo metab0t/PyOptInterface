@@ -1,5 +1,4 @@
-import pyoptinterface_nb as core
-from pyoptinterface_nb import gurobi
+from pyoptinterface import gurobi
 import ctypes
 
 Model = gurobi.Model
@@ -10,7 +9,7 @@ def main():
 
     model_ptr = model.c_pointer
 
-    libgurobi = ctypes.CDLL("gurobi100.dll")
+    libgurobi = ctypes.CDLL("gurobi110.dll")
 
     libgurobi.GRBgetintattr.argtypes = [
         ctypes.c_void_p,

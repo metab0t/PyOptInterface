@@ -1,4 +1,4 @@
-from pyoptinterface_nb import pyoptinterface_nb_ext as ext
+from pyoptinterface import pyoptinterface_ext as ext
 import pyoptinterface as pyoi
 
 

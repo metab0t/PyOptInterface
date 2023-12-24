@@ -1,4 +1,4 @@
-import pyoptinterface_nb as core
+import pyoptinterface as core
 from pytest import approx
 
 

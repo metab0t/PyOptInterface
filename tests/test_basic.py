@@ -1,4 +1,4 @@
-import pyoptinterface_nb as poi
+import pyoptinterface as poi
 import numpy as np
 
 

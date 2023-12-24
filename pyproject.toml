@@ -3,9 +3,9 @@ requires = ["scikit-build-core", "nanobind"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "pyoptinterface_nb"
+name = "pyoptinterface"
 version = "0.0.1"
-description = "An example minimal project that compiles bindings using nanobind and scikit-build"
+description = "Python interface to multiple optimization solvers"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
@@ -15,11 +15,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/wjakob/nanobind_example"
+Homepage = "https://github.com/metab0t/pyoptinterface"
 
 [tool.scikit-build]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
-
-[tool.scikit-build.cmake.define]
-ENABLE_GUROBI_CXX = "OFF"
