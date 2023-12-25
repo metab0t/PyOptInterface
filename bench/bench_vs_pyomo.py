@@ -1,6 +1,5 @@
 import pyoptinterface as poi
 from pyoptinterface import gurobi
-import pyoptinterface.aml as aml
 
 import numpy as np
 
@@ -9,30 +8,19 @@ from pyomo.common.timing import TicTocTimer
 
 import linopy
 
-poi_timer = TicTocTimer()
-poi_timer.stop()
-
 
 def bench_poi(M, N):
     model = gurobi.Model()
 
     I = range(M)
     J = range(N)
-    poi_timer.tic("starts")
-    x = aml.make_variable_array(model, I, J)
-    # poi_timer.toc("make_variable_array")
+    x = poi.make_nd_variable(model, I, J, lb=0.0)
 
-    for v in x.values():
-        model.set_variable_attribute(v, poi.VariableAttribute.LowerBound, 0.0)
-    # poi_timer.toc("set_variable_attribute")
-
-    expr = aml.quicksum(x)
+    expr = poi.quicksum(x)
     con = model.add_linear_constraint(expr, poi.ConstraintSense.Equal, M * N / 2)
-    # poi_timer.toc("add_linear_constraint")
 
-    obj = aml.quicksum_f(x, lambda v: v * v)
+    obj = poi.quicksum_f(x, lambda v: v * v)
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
-    # poi_timer.toc("set_objective")
 
     model.set_model_attribute(poi.ModelAttribute.Silent, True)
 
@@ -83,7 +71,7 @@ def bench_linopy(M, N):
     # x_val = x.solution
 
 
-M = 300
+M = 400
 N = 500
 timer = TicTocTimer()
 

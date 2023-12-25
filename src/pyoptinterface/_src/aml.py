@@ -6,15 +6,17 @@ from yds import tupledict, make_tupledict
 from typing import Iterable
 
 
-def make_variable_array(
+def make_nd_variable(
     model,
     *coords: Iterable,
-    domain: VariableDomain = VariableDomain.Continuous,
+    domain=None,
     lb=None,
     ub=None,
     name=None,
 ):
-    kw_args = dict(domain=domain)
+    kw_args = dict()
+    if domain is not None:
+        kw_args["domain"] = domain
     if lb is not None:
         kw_args["lb"] = lb
     if ub is not None:

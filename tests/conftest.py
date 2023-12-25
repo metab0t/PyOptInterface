@@ -1,7 +1,5 @@
 import pytest
 
-import pyoptinterface as poi
-
 model_interface_dict = {}
 try:
     import pyoptinterface.gurobi as gurobi

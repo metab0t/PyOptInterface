@@ -69,7 +69,7 @@ auto test_gurobi() -> void
 		expr.clear();
 		expr.add_quadratic_term(x, x, 1.0);
 		expr.add_quadratic_term(y, y, 1.0);
-		model.set_objective(ScalarQuadraticFunction(expr), ObjectiveSense::Minimize);
+		model.set_objective(expr, ObjectiveSense::Minimize);
 
 		model.optimize();
 	}
@@ -99,6 +99,6 @@ void bench()
 
 auto main() -> int
 {
-	test_monotone();
+	test_gurobi();
 	return 0;
 }

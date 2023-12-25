@@ -8,14 +8,16 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 add_subdirectory(thirdparty/fmt)
 
+set(POI_INSTALL_DIR pyoptinterface/_src)
+
 add_library(core STATIC)
 target_sources(core PRIVATE
   include/pyoptinterface/core.hpp
   include/pyoptinterface/container.hpp
   include/pyoptinterface/solver_common.hpp
-  src/core.cpp
-  src/cache_model.cpp
-  src/solver_common.cpp
+  lib/core.cpp
+  lib/cache_model.cpp
+  lib/solver_common.cpp
 )
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)
@@ -33,10 +35,10 @@ nanobind_add_module(
 
   STABLE_ABI NB_STATIC
 
-  src/core_ext.cpp
+  lib/core_ext.cpp
 )
 target_link_libraries(core_ext PUBLIC core)
-install(TARGETS core_ext LIBRARY DESTINATION pyoptinterface)
+install(TARGETS core_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # Solvers
 
@@ -52,7 +54,7 @@ if(ENABLE_GUROBI)
   add_library(gurobi_model STATIC)
   target_sources(gurobi_model PRIVATE
     include/pyoptinterface/gurobi_model.hpp
-    src/gurobi_model.cpp
+    lib/gurobi_model.cpp
   )
   target_link_libraries(gurobi_model PUBLIC core)
   target_link_libraries(gurobi_model PUBLIC Gurobi::GurobiC)
@@ -62,11 +64,11 @@ if(ENABLE_GUROBI)
 
     STABLE_ABI NB_STATIC
 
-    src/gurobi_model_ext.cpp
-    src/gurobi_model_ext_constants.cpp
+    lib/gurobi_model_ext.cpp
+    lib/gurobi_model_ext_constants.cpp
   )
   target_link_libraries(gurobi_model_ext PUBLIC gurobi_model)
-  install(TARGETS gurobi_model_ext LIBRARY DESTINATION pyoptinterface)
+  install(TARGETS gurobi_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 endif()
 
 # COPT
@@ -81,7 +83,7 @@ if(ENABLE_COPT)
   add_library(copt_model STATIC)
   target_sources(copt_model PRIVATE
     include/pyoptinterface/copt_model.hpp
-    src/copt_model.cpp
+    lib/copt_model.cpp
   )
   target_link_libraries(copt_model PUBLIC core)
   target_link_libraries(copt_model PUBLIC COPT::COPT_C)
@@ -91,12 +93,12 @@ if(ENABLE_COPT)
 
     STABLE_ABI NB_STATIC
 
-    src/copt_model_ext.cpp
-    src/copt_model_ext_constants.cpp
+    lib/copt_model_ext.cpp
+    lib/copt_model_ext_constants.cpp
   )
   target_link_libraries(copt_model_ext PUBLIC copt_model)
-  install(TARGETS copt_model_ext LIBRARY DESTINATION pyoptinterface)
+  install(TARGETS copt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 endif()
 
-add_executable(test_main src/main.cpp)
+add_executable(test_main lib/main.cpp)
 target_link_libraries(test_main PUBLIC core gurobi_model)

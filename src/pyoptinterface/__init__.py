@@ -1,4 +1,4 @@
-from pyoptinterface.core_ext import (
+from pyoptinterface._src.core_ext import (
     VariableIndex,
     ConstraintIndex,
     ExprBuilder,
@@ -10,10 +10,21 @@ from pyoptinterface.core_ext import (
     ScalarQuadraticFunction,
 )
 
-from pyoptinterface.attributes import (
+from pyoptinterface._src.attributes import (
     VariableAttribute,
     ModelAttribute,
     TerminationStatusCode,
     ResultStatusCode,
     ConstraintAttribute,
+)
+
+from pyoptinterface._src.tupledict import (
+    tupledict,
+    make_tupledict,
+)
+
+from pyoptinterface._src.aml import (
+    make_nd_variable,
+    quicksum,
+    quicksum_f
 )
