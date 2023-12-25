@@ -7,12 +7,11 @@ name = "pyoptinterface"
 version = "0.0.1"
 description = "Python interface to multiple optimization solvers"
 readme = "README.md"
+license = { file = "LICENSE.md" }
 requires-python = ">=3.8"
-authors = [
-    { name = "Yue Yang", email = "metab0t@outlook.com" },
+authors = [{ name = "Yue Yang", email = "metab0t@outlook.com" },
 ]
-classifiers = [
-]
+classifiers = []
 
 [project.urls]
 Homepage = "https://github.com/metab0t/pyoptinterface"
