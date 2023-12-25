@@ -98,7 +98,7 @@ endif()
 # compiler version and flags.
 # (Note: doing this is motivated by actual sometimes-subtle ABI compatibility bugs)
 
-set(ENABLE_GUROBI_CXX ON CACHE BOOL "Enable gurobi c++ support")
+set(ENABLE_GUROBI_CXX OFF CACHE BOOL "Enable gurobi c++ support")
 
 if(ENABLE_GUROBI_CXX)
 	find_path(GUROBI_SRC_DIR NAMES "Model.h" PATHS "${GUROBI_HOME}/src/cpp/")
