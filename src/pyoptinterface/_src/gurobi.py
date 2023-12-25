@@ -30,7 +30,6 @@ from .solver_common import (
     _get_entity_attribute,
     _set_entity_attribute,
 )
-from .ctypes_helper import pycapsule_to_cvoidp
 
 DEFAULT_ENV = None
 
@@ -403,10 +402,6 @@ class Model(RawModel):
             init_default_env()
             env = DEFAULT_ENV
         super().__init__(env)
-
-    @property
-    def c_pointer(self):
-        return pycapsule_to_cvoidp(self.get_raw_model())
 
     def supports_variable_attribute(self, attribute: VariableAttribute):
         return True
