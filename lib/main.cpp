@@ -1,5 +1,61 @@
 #include "pyoptinterface/container.hpp"
+#include "fmt/core.h"
 #include "gurobi_model.cpp"
+
+template <typename T>
+void some_operations(T &t)
+{
+	auto N = 5e8;
+	for (auto i = 0; i < N; i++)
+	{
+		t.add_index();
+	}
+
+	for (int i = 0.25 * N; i < 0.25 * N * 7 / 6; i++)
+	{
+		t.delete_index(i);
+	}
+	for (auto i = 0; i < N; i++)
+	{
+		t.get_index(i);
+	}
+
+	for (int i = 0.65 * N; i < 0.75 * N; i++)
+	{
+		t.delete_index(i);
+	}
+	for (auto i = 0; i < N; i++)
+	{
+		t.get_index(i);
+	}
+}
+
+template <typename T>
+void some_easy_operations(T &t)
+{
+	auto N = 1e8;
+	for (auto i = 0; i < N; i++)
+	{
+		t.add_index();
+	}
+
+	for (auto i = 0; i < N; i++)
+	{
+		t.get_index(i);
+	}
+}
+
+void bench_container()
+{
+	{
+		MonotoneVector<int> mv;
+		some_operations(mv);
+	}
+	{
+		ChunkedBitVector<std::uint64_t, int> cbv;
+		some_operations(cbv);
+	}
+}
 
 auto test_monotone() -> void
 {
@@ -29,6 +85,26 @@ auto test_monotone() -> void
 	mv.delete_index(22);
 
 	int x = mv.get_index(24);
+}
+
+auto test_chunkedbv() -> void
+{
+	ChunkedBitVector<std::uint64_t, int> cbv;
+
+	for (int i = 0; i < 100; i++)
+	{
+		auto x = cbv.add_index();
+		fmt::print("{}\n", x);
+	}
+
+	cbv.delete_index(3);
+	cbv.delete_index(5);
+
+	for (int i = 0; i < 8; i++)
+	{
+		auto x = cbv.get_index(i);
+		fmt::print("get_index: {}->{}\n", i, x);
+	}
 }
 
 auto test_gurobi() -> void
@@ -99,6 +175,6 @@ void bench()
 
 auto main() -> int
 {
-	test_gurobi();
+	bench_container();
 	return 0;
 }
