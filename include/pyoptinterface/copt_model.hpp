@@ -63,10 +63,10 @@ class COPTModel : public CommercialSolverBase
 	std::string version_string();
 
 	// parameter
-	void set_parameter_int(const char *param_name, int value);
-	void set_parameter_double(const char *param_name, double value);
-	int get_parameter_int(const char *param_name);
-	double get_parameter_double(const char *param_name);
+	void set_raw_parameter_int(const char *param_name, int value);
+	void set_raw_parameter_double(const char *param_name, double value);
+	int get_raw_parameter_int(const char *param_name);
+	double get_raw_parameter_double(const char *param_name);
 
 	// attribute
 	int get_raw_attribute_int(const char *attr_name);
@@ -94,13 +94,13 @@ class COPTModel : public CommercialSolverBase
 	int _checked_constraint_index(const ConstraintIndex &constraint);
 
   private:
-	MonotoneVector<int> m_variable_index;
+	MonotoneIndexer<int> m_variable_index;
 
-	MonotoneVector<int> m_linear_constraint_index;
+	MonotoneIndexer<int> m_linear_constraint_index;
 
-	MonotoneVector<int> m_quadratic_constraint_index;
+	MonotoneIndexer<int> m_quadratic_constraint_index;
 
-	MonotoneVector<int> m_sos_constraint_index;
+	MonotoneIndexer<int> m_sos_constraint_index;
 
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;

@@ -284,7 +284,7 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
 	// Set Obj attribute of each variable
-	int n_variables = m_variable_index.num_active_indices();
+	int n_variables = get_raw_attribute_int(COPT_INTATTR_COLS);
 	std::vector<int> ind_v(n_variables);
 	for (int i = 0; i < n_variables; i++)
 	{
@@ -375,19 +375,19 @@ void COPTModel::optimize()
 	check_error(error);
 }
 
-void COPTModel::set_parameter_int(const char *param_name, int value)
+void COPTModel::set_raw_parameter_int(const char *param_name, int value)
 {
 	int error = COPT_SetIntParam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
-void COPTModel::set_parameter_double(const char *param_name, double value)
+void COPTModel::set_raw_parameter_double(const char *param_name, double value)
 {
 	int error = COPT_SetDblParam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
-int COPTModel::get_parameter_int(const char *param_name)
+int COPTModel::get_raw_parameter_int(const char *param_name)
 {
 	int retval;
 	int error = COPT_GetIntParam(m_model.get(), param_name, &retval);
@@ -395,7 +395,7 @@ int COPTModel::get_parameter_int(const char *param_name)
 	return retval;
 }
 
-double COPTModel::get_parameter_double(const char *param_name)
+double COPTModel::get_raw_parameter_double(const char *param_name)
 {
 	double retval;
 	int error = COPT_GetDblParam(m_model.get(), param_name, &retval);

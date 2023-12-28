@@ -65,12 +65,12 @@ class GurobiModel : public CommercialSolverBase
 
 	// parameter
 	int raw_parameter_type(const char *param_name);
-	void set_parameter_int(const char *param_name, int value);
-	void set_parameter_double(const char *param_name, double value);
-	void set_parameter_string(const char *param_name, const char *value);
-	int get_parameter_int(const char *param_name);
-	double get_parameter_double(const char *param_name);
-	std::string get_parameter_string(const char *param_name);
+	void set_raw_parameter_int(const char *param_name, int value);
+	void set_raw_parameter_double(const char *param_name, double value);
+	void set_raw_parameter_string(const char *param_name, const char *value);
+	int get_raw_parameter_int(const char *param_name);
+	double get_raw_parameter_double(const char *param_name);
+	std::string get_raw_parameter_string(const char *param_name);
 
 	// attribute
 	int raw_attribute_type(const char *attr_name);
@@ -130,13 +130,13 @@ class GurobiModel : public CommercialSolverBase
 	void check_error(int error);
 
   private:
-	MonotoneVector<int> m_variable_index;
+	MonotoneIndexer<int> m_variable_index;
 
-	MonotoneVector<int> m_linear_constraint_index;
+	MonotoneIndexer<int> m_linear_constraint_index;
 
-	MonotoneVector<int> m_quadratic_constraint_index;
+	MonotoneIndexer<int> m_quadratic_constraint_index;
 
-	MonotoneVector<int> m_sos_constraint_index;
+	MonotoneIndexer<int> m_sos_constraint_index;
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;

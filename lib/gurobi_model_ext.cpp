@@ -74,12 +74,12 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("get_raw_model", &GurobiModel::get_raw_model)
 
 	    .def("raw_parameter_type", &GurobiModel::raw_parameter_type)
-	    .def("set_parameter_int", &GurobiModel::set_parameter_int)
-	    .def("set_parameter_double", &GurobiModel::set_parameter_double)
-	    .def("set_parameter_string", &GurobiModel::set_parameter_string)
-	    .def("get_parameter_int", &GurobiModel::get_parameter_int)
-	    .def("get_parameter_double", &GurobiModel::get_parameter_double)
-	    .def("get_parameter_string", &GurobiModel::get_parameter_string)
+	    .def("set_raw_parameter_int", &GurobiModel::set_raw_parameter_int)
+	    .def("set_raw_parameter_double", &GurobiModel::set_raw_parameter_double)
+	    .def("set_raw_parameter_string", &GurobiModel::set_raw_parameter_string)
+	    .def("get_raw_parameter_int", &GurobiModel::get_raw_parameter_int)
+	    .def("get_raw_parameter_double", &GurobiModel::get_raw_parameter_double)
+	    .def("get_raw_parameter_string", &GurobiModel::get_raw_parameter_string)
 
 	    .def("raw_attribute_type", &GurobiModel::raw_attribute_type)
 

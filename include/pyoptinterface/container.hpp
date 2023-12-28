@@ -243,7 +243,8 @@ class ChunkedBitVector
 			update_to(chunk_index);
 		}
 		// count the 1 on the right of bit_index
-		std::uint8_t current_chunk_index = std::popcount(chunk & ((1 << bit_index) - 1));
+		ChunkT mask = (static_cast<ChunkT>(1) << bit_index) - 1;
+		std::uint8_t current_chunk_index = std::popcount(chunk & mask);
 		return m_cumulated_ranks[chunk_index] + current_chunk_index;
 	}
 
@@ -291,3 +292,6 @@ class ChunkedBitVector
 	std::size_t m_last_correct_chunk;
 	std::uint8_t m_last_bit;
 };
+
+template <typename ResultT>
+using MonotoneIndexer = ChunkedBitVector<std::uint64_t, ResultT>;

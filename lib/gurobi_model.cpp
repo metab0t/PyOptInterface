@@ -265,7 +265,7 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
 	// Set Obj attribute of each variable
-	int n_variables = m_variable_index.num_active_indices();
+	int n_variables = get_model_raw_attribute_int(GRB_INT_ATTR_NUMVARS);
 	std::vector<double> obj_v(n_variables, 0.0);
 
 	int numnz = function.size();
@@ -362,25 +362,25 @@ int GurobiModel::raw_parameter_type(const char *param_name)
 	return GRBgetparamtype(m_env, param_name);
 }
 
-void GurobiModel::set_parameter_int(const char *param_name, int value)
+void GurobiModel::set_raw_parameter_int(const char *param_name, int value)
 {
 	int error = GRBsetintparam(m_env, param_name, value);
 	check_error(error);
 }
 
-void GurobiModel::set_parameter_double(const char *param_name, double value)
+void GurobiModel::set_raw_parameter_double(const char *param_name, double value)
 {
 	int error = GRBsetdblparam(m_env, param_name, value);
 	check_error(error);
 }
 
-void GurobiModel::set_parameter_string(const char *param_name, const char *value)
+void GurobiModel::set_raw_parameter_string(const char *param_name, const char *value)
 {
 	int error = GRBsetstrparam(m_env, param_name, value);
 	check_error(error);
 }
 
-int GurobiModel::get_parameter_int(const char *param_name)
+int GurobiModel::get_raw_parameter_int(const char *param_name)
 {
 	int retval;
 	int error = GRBgetintparam(m_env, param_name, &retval);
@@ -388,7 +388,7 @@ int GurobiModel::get_parameter_int(const char *param_name)
 	return retval;
 }
 
-double GurobiModel::get_parameter_double(const char *param_name)
+double GurobiModel::get_raw_parameter_double(const char *param_name)
 {
 	double retval;
 	int error = GRBgetdblparam(m_env, param_name, &retval);
@@ -396,7 +396,7 @@ double GurobiModel::get_parameter_double(const char *param_name)
 	return retval;
 }
 
-std::string GurobiModel::get_parameter_string(const char *param_name)
+std::string GurobiModel::get_raw_parameter_string(const char *param_name)
 {
 	char retval[GRB_MAX_STRLEN];
 	int error = GRBgetstrparam(m_env, param_name, retval);

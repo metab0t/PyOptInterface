@@ -8,6 +8,8 @@ from pyomo.common.timing import TicTocTimer
 
 import linopy
 
+import gurobipy as gp
+
 
 def bench_poi(M, N):
     model = gurobi.Model()
@@ -23,14 +25,13 @@ def bench_poi(M, N):
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
     model.set_model_attribute(poi.ModelAttribute.Silent, True)
+    model.set_model_attribute(poi.ModelAttribute.TimeLimitSec, 0.0)
+    model.set_raw_parameter("Presolve", 0)
 
     model.optimize()
 
-    # get_val = np.frompyfunc(
-    #     lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value), 1, 1
-    # )
-
-    # x_val = xr.apply_ufunc(get_val, x).astype(np.float_)
+    # f = lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value)
+    # x_val = {k: f(v) for k, v in x.items()}
 
 
 def bench_pyomo(M, N):
@@ -49,6 +50,8 @@ def bench_pyomo(M, N):
     model.o = pyo.Objective(expr=sum(v * v for v in model.x.values()))
 
     solver = pyo.SolverFactory("gurobi_direct")
+    solver.options["timelimit"] = 0.0
+    solver.options["presolve"] = False
     solver.solve(model, load_solutions=False)
 
     # x_val = xr.DataArray(
@@ -66,17 +69,38 @@ def bench_linopy(M, N):
     model.add_constraints(x.sum() == M * N / 2)
     model.add_objective((x * x).sum())
 
-    model.solve("gurobi", io_api="direct", OutputFlag=0)
+    model.solve("gurobi", io_api="direct", OutputFlag=0, TimeLimit = 0.0, Presolve=0)
 
     # x_val = x.solution
 
+def bench_gp(M, N):
+    model = gp.Model()
 
-M = 400
-N = 500
+    I = range(M)
+    J = range(N)
+    x = model.addVars(I, J, lb=0.0)
+
+    expr = x.sum()
+    con = model.addConstr(expr == M * N / 2)
+
+    obj = gp.quicksum(v * v for v in x.values())
+    model.setObjective(obj)
+
+    model.setParam("OutputFlag", 0)
+    model.setParam("TimeLimit", 0.0)
+    model.setParam("Presolve", 0)
+
+    model.optimize()
+
+    # f = lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value)
+    # x_val = {k: f(v) for k, v in x.items()}
+
+M = 2000
+N = 2000
 timer = TicTocTimer()
 
 timer.tic("pyomo starts")
-bench_pyomo(M, N)
+# bench_pyomo(M, N)
 timer.toc("pyomo ends")
 
 timer.tic("poi starts")
@@ -86,3 +110,7 @@ timer.toc("poi ends")
 timer.tic("linopy starts")
 bench_linopy(M, N)
 timer.toc("linopy ends")
+
+timer.tic("gurobi starts")
+bench_gp(M, N)
+timer.toc("gurobi ends")

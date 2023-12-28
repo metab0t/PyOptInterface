@@ -270,13 +270,13 @@ model_attribute_get_func_map = {
     ModelAttribute.SolveTimeSec: lambda model: model.get_model_raw_attribute_double(
         "RunTime"
     ),
-    ModelAttribute.NumberOfThreads: lambda model: model.get_model_raw_parameter_int(
+    ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
         "Threads"
     ),
-    ModelAttribute.RelativeGap: lambda model: model.get_model_raw_parameter_double(
+    ModelAttribute.RelativeGap: lambda model: model.get_raw_parameter_double(
         "MIPGap"
     ),
-    ModelAttribute.TimeLimitSec: lambda model: model.get_model_raw_parameter_double(
+    ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter_double(
         "TimeLimit"
     ),
     ModelAttribute.DualStatus: get_dualstatus,
@@ -305,9 +305,9 @@ model_attribute_set_translate_func_map = {
 
 def set_silent(model, value: bool):
     if value:
-        model.set_parameter_int("OutputFlag", 0)
+        model.set_raw_parameter_int("OutputFlag", 0)
     else:
-        model.set_parameter_int("OutputFlag", 1)
+        model.set_raw_parameter_int("OutputFlag", 1)
 
 
 model_attribute_set_func_map = {
@@ -317,13 +317,13 @@ model_attribute_set_func_map = {
     ModelAttribute.ObjectiveSense: lambda model, v: model.set_model_raw_attribute_int(
         "ModelSense", v
     ),
-    ModelAttribute.NumberOfThreads: lambda model, v: model.set_model_raw_parameter_int(
+    ModelAttribute.NumberOfThreads: lambda model, v: model.set_raw_parameter_int(
         "Threads", v
     ),
-    ModelAttribute.RelativeGap: lambda model, v: model.set_model_raw_parameter_double(
+    ModelAttribute.RelativeGap: lambda model, v: model.set_raw_parameter_double(
         "MIPGap", v
     ),
-    ModelAttribute.TimeLimitSec: lambda model, v: model.set_model_raw_parameter_double(
+    ModelAttribute.TimeLimitSec: lambda model, v: model.set_raw_parameter_double(
         "TimeLimit", v
     ),
     ModelAttribute.Silent: set_silent,

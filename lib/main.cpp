@@ -100,7 +100,7 @@ auto test_chunkedbv() -> void
 	cbv.delete_index(3);
 	cbv.delete_index(5);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		auto x = cbv.get_index(i);
 		fmt::print("get_index: {}->{}\n", i, x);
@@ -175,6 +175,6 @@ void bench()
 
 auto main() -> int
 {
-	bench_container();
+	test_chunkedbv();
 	return 0;
 }
