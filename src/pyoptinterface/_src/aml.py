@@ -1,7 +1,7 @@
 from .core_ext import VariableDomain, ExprBuilder
 from .attributes import VariableAttribute
 
-from yds import tupledict, make_tupledict
+from .tupledict import tupledict, make_tupledict
 
 from typing import Iterable
 
@@ -29,15 +29,15 @@ def make_nd_variable(
     return td
 
 
-def quicksum(variables: tupledict):
+def quicksum(terms: tupledict):
     expr = ExprBuilder()
-    for v in variables.values():
-        expr.add_affine_term(v, 1.0)
+    for v in terms.values():
+        expr.add(v)
     return expr
 
 
-def quicksum_f(variables: tupledict, f):
+def quicksum_f(terms: tupledict, f):
     expr = ExprBuilder()
-    for v in variables.values():
+    for v in terms.values():
         expr.add(f(v))
     return expr
