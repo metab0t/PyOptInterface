@@ -21,7 +21,7 @@ NB_MODULE(copt_model_ext, m)
 
 	    .def("add_variable", &COPTModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -COPT_INFINITY,
-	         nb::arg("ub") = COPT_INFINITY)
+	         nb::arg("ub") = COPT_INFINITY, nb::arg("name") = nullptr)
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
 
@@ -41,6 +41,8 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&COPTModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
+
+	    .def("set_variable_name", &COPTModel::set_variable_name)
 
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(

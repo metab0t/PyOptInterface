@@ -77,14 +77,15 @@ void GurobiModel::init(const GurobiEnv &env)
 	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model);
 }
 
-VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double ub)
+VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double ub,
+                                        const char *name)
 {
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 
 	// Create a new Gurobi variable
 	char vtype = gurobi_vtype(domain);
-	int error = GRBaddvar(m_model.get(), 0, NULL, NULL, 0.0, lb, ub, vtype, NULL);
+	int error = GRBaddvar(m_model.get(), 0, NULL, NULL, 0.0, lb, ub, vtype, name);
 	check_error(error);
 
 	return variable;
@@ -118,6 +119,11 @@ double GurobiModel::get_variable_value(const VariableIndex &variable)
 std::string GurobiModel::pprint_variable(const VariableIndex &variable)
 {
 	return get_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME);
+}
+
+void GurobiModel::set_variable_name(const VariableIndex &variable, const std::string &name)
+{
+	set_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME, name.c_str());
 }
 
 ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,

@@ -207,9 +207,9 @@ class ChunkedBitVector
 			if (m_last_correct_chunk > chunk_index)
 			{
 				m_last_correct_chunk = chunk_index;
+				// rank of this chunk should be recalculated
+				m_chunk_ranks[chunk_index] = -1;
 			}
-			// rank of this chunk should be recalculated
-			m_chunk_ranks[chunk_index] = -1;
 		}
 	}
 

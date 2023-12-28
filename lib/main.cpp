@@ -175,6 +175,6 @@ void bench()
 
 auto main() -> int
 {
-	test_chunkedbv();
+	bench_container();
 	return 0;
 }

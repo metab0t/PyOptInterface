@@ -34,11 +34,14 @@ class GurobiModel : public CommercialSolverBase
 	void init(const GurobiEnv &env);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
-	                           double lb = -GRB_INFINITY, double ub = GRB_INFINITY);
+	                           double lb = -GRB_INFINITY, double ub = GRB_INFINITY,
+	                           const char *name = nullptr);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable) override;
 	std::string pprint_variable(const VariableIndex &variable) override;
+
+	void set_variable_name(const VariableIndex &variable, const std::string &name);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs) override;

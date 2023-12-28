@@ -21,7 +21,7 @@ NB_MODULE(gurobi_model_ext, m)
 
 	    .def("add_variable", &GurobiModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
-	         nb::arg("ub") = GRB_INFINITY)
+	         nb::arg("ub") = GRB_INFINITY, nb::arg("name") = nullptr)
 	    .def("delete_variable", &GurobiModel::delete_variable)
 	    .def("is_variable_active", &GurobiModel::is_variable_active)
 
@@ -47,6 +47,8 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&GurobiModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
+
+	    .def("set_variable_name", &GurobiModel::set_variable_name)
 
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(

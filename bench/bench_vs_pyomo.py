@@ -16,7 +16,7 @@ def bench_poi(M, N):
 
     I = range(M)
     J = range(N)
-    x = poi.make_nd_variable(model, I, J, lb=0.0)
+    x = poi.make_nd_variable(model, I, J, lb=0.0, name="x")
 
     expr = poi.quicksum(x)
     con = model.add_linear_constraint(expr, poi.ConstraintSense.Equal, M * N / 2)
@@ -64,7 +64,7 @@ def bench_linopy(M, N):
 
     I = range(M)
     J = range(N)
-    x = model.add_variables(lower=0.0, coords=[I, J])
+    x = model.add_variables(lower=0.0, coords=[I, J], name="x")
 
     model.add_constraints(x.sum() == M * N / 2)
     model.add_objective((x * x).sum())
@@ -78,7 +78,7 @@ def bench_gp(M, N):
 
     I = range(M)
     J = range(N)
-    x = model.addVars(I, J, lb=0.0)
+    x = model.addVars(I, J, lb=0.0, name="x")
 
     expr = x.sum()
     con = model.addConstr(expr == M * N / 2)
@@ -95,8 +95,8 @@ def bench_gp(M, N):
     # f = lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value)
     # x_val = {k: f(v) for k, v in x.items()}
 
-M = 2000
-N = 2000
+M = 1000
+N = 1000
 timer = TicTocTimer()
 
 timer.tic("pyomo starts")

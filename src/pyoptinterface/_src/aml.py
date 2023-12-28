@@ -21,11 +21,14 @@ def make_nd_variable(
         kw_args["lb"] = lb
     if ub is not None:
         kw_args["ub"] = ub
-    f = lambda *args: model.add_variable(**kw_args)
+
+    def f(*args):
+        suffix = str(args)
+        if name is not None:
+            kw_args["name"] = name + suffix
+        return model.add_variable(**kw_args)
+
     td = make_tupledict(*coords, rule=f)
-    if name is not None:
-        for k, v in td.items():
-            model.set_variable_attribute(v, VariableAttribute.Name, name + str(k))
     return td
 
 
