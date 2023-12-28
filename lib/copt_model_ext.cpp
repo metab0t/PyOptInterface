@@ -21,7 +21,7 @@ NB_MODULE(copt_model_ext, m)
 
 	    .def("add_variable", &COPTModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -COPT_INFINITY,
-	         nb::arg("ub") = COPT_INFINITY, nb::arg("name") = nullptr)
+	         nb::arg("ub") = COPT_INFINITY, nb::arg("name") = "")
 	    .def("delete_variable", &COPTModel::delete_variable)
 	    .def("is_variable_active", &COPTModel::is_variable_active)
 

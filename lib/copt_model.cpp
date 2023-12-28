@@ -103,6 +103,10 @@ void COPTModel::init(const COPTEnv &env)
 
 VariableIndex COPTModel::add_variable(VariableDomain domain, double lb, double ub, const char *name)
 {
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 

@@ -273,9 +273,7 @@ model_attribute_get_func_map = {
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
         "Threads"
     ),
-    ModelAttribute.RelativeGap: lambda model: model.get_raw_parameter_double(
-        "MIPGap"
-    ),
+    ModelAttribute.RelativeGap: lambda model: model.get_raw_parameter_double("MIPGap"),
     ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter_double(
         "TimeLimit"
     ),
@@ -378,21 +376,10 @@ constraint_attribute_get_func_map = {
     ConstraintAttribute.Dual: get_constraint_dual,
 }
 
-
-def set_constraint_name(model, constraint, value):
-    type = constraint.type
-    attr_name_dict = {
-        ConstraintType.Linear: "ConstrName",
-        ConstraintType.Quadratric: "QConstrName",
-    }
-    attr_name = attr_name_dict.get(type, None)
-    if not attr_name:
-        raise ValueError(f"Unknown constraint type: {type}")
-    model.set_constraint_raw_attribute_string(constraint, attr_name, value)
-
-
 constraint_attribute_set_func_map = {
-    ConstraintAttribute.Name: set_constraint_name,
+    ConstraintAttribute.Name: lambda model, constraint, value: model.set_constraint_name(
+        constraint, value
+    ),
 }
 
 

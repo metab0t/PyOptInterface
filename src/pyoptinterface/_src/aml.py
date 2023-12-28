@@ -25,7 +25,7 @@ def make_nd_variable(
     def f(*args):
         suffix = str(args)
         if name is not None:
-            kw_args["name"] = name + suffix
+            kw_args["name"] = f"{name}{suffix}"
         return model.add_variable(**kw_args)
 
     td = make_tupledict(*coords, rule=f)

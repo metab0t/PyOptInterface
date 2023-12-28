@@ -80,6 +80,10 @@ void GurobiModel::init(const GurobiEnv &env)
 VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double ub,
                                         const char *name)
 {
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 
@@ -121,9 +125,26 @@ std::string GurobiModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME);
 }
 
-void GurobiModel::set_variable_name(const VariableIndex &variable, const std::string &name)
+void GurobiModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
-	set_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME, name.c_str());
+	set_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME, name);
+}
+
+void GurobiModel::set_constraint_name(const ConstraintIndex &constraint, const char *name)
+{
+	const char *attr_name;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+		attr_name = GRB_STR_ATTR_CONSTRNAME;
+		break;
+	case ConstraintType::Quadratic:
+		attr_name = GRB_STR_ATTR_QCNAME;
+		break;
+	default:
+		throw std::runtime_error("Unknown constraint type to set name!");
+	}
+	set_constraint_raw_attribute_string(constraint, attr_name, name);
 }
 
 ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,

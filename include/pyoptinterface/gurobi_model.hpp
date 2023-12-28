@@ -41,7 +41,8 @@ class GurobiModel : public CommercialSolverBase
 	double get_variable_value(const VariableIndex &variable) override;
 	std::string pprint_variable(const VariableIndex &variable) override;
 
-	void set_variable_name(const VariableIndex &variable, const std::string &name);
+	void set_variable_name(const VariableIndex &variable, const char *name);
+	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs) override;
