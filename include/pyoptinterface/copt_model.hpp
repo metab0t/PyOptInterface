@@ -6,10 +6,25 @@
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
 
+class COPTEnvConfig
+{
+  public:
+	COPTEnvConfig();
+	~COPTEnvConfig();
+
+	void config(const char *param_name, const char *value);
+
+  private:
+	copt_env_config *m_config;
+
+	friend class COPTEnv;
+};
+
 class COPTEnv
 {
   public:
 	COPTEnv();
+	COPTEnv(COPTEnvConfig& config);
 	~COPTEnv();
 
   private:
@@ -26,7 +41,7 @@ struct COPTfreemodelT
 	};
 };
 
-class COPTModel : public CommercialSolverBase
+class COPTModel
 {
   public:
 	COPTModel() = default;
@@ -38,13 +53,13 @@ class COPTModel : public CommercialSolverBase
 	                           const char *name = nullptr);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
-	double get_variable_value(const VariableIndex &variable) override;
-	std::string pprint_variable(const VariableIndex &variable) override;
+	double get_variable_value(const VariableIndex &variable);
+	std::string pprint_variable(const VariableIndex &variable);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs) override;
+	                                      ConstraintSense sense, CoeffT rhs);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs) override;
+	                                         ConstraintSense sense, CoeffT rhs);
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
@@ -106,3 +121,5 @@ class COPTModel : public CommercialSolverBase
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;
 };
+
+using COPTModelMixin = CommercialSolverMixin<COPTModel>;

@@ -9,8 +9,18 @@
 class GurobiEnv
 {
   public:
-	GurobiEnv();
+	GurobiEnv(bool empty=false);
 	~GurobiEnv();
+
+	// parameter
+	int raw_parameter_type(const char *param_name);
+	void set_raw_parameter_int(const char *param_name, int value);
+	void set_raw_parameter_double(const char *param_name, double value);
+	void set_raw_parameter_string(const char *param_name, const char *value);
+
+	void start();
+
+	void check_error(int error);
 
   private:
 	GRBenv *m_env;
@@ -26,7 +36,7 @@ struct GRBfreemodelT
 	};
 };
 
-class GurobiModel : public CommercialSolverBase
+class GurobiModel
 {
   public:
 	GurobiModel() = default;
@@ -38,16 +48,16 @@ class GurobiModel : public CommercialSolverBase
 	                           const char *name = nullptr);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
-	double get_variable_value(const VariableIndex &variable) override;
-	std::string pprint_variable(const VariableIndex &variable) override;
+	double get_variable_value(const VariableIndex &variable);
+	std::string pprint_variable(const VariableIndex &variable);
 
 	void set_variable_name(const VariableIndex &variable, const char *name);
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs) override;
+	                                      ConstraintSense sense, CoeffT rhs);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs) override;
+	                                         ConstraintSense sense, CoeffT rhs);
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
@@ -146,3 +156,5 @@ class GurobiModel : public CommercialSolverBase
 	GRBenv *m_env = nullptr;
 	std::unique_ptr<GRBmodel, GRBfreemodelT> m_model;
 };
+
+using GurobiModelMixin = CommercialSolverMixin<GurobiModel>;

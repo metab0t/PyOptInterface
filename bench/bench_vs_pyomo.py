@@ -95,7 +95,7 @@ def bench_gp(M, N):
     # f = lambda v: model.get_variable_attribute(v, poi.VariableAttribute.Value)
     # x_val = {k: f(v) for k, v in x.items()}
 
-M = 1000
+M = 2000
 N = 1000
 timer = TicTocTimer()
 

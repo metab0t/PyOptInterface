@@ -632,7 +632,32 @@ COPTEnv::COPTEnv()
 	check_error(error);
 }
 
+COPTEnv::COPTEnv(COPTEnvConfig &config)
+{
+	int error = COPT_CreateEnvWithConfig(config.m_config, &m_env);
+	check_error(error);
+}
+
 COPTEnv::~COPTEnv()
 {
-	COPT_DeleteEnv(&m_env);
+	int error = COPT_DeleteEnv(&m_env);
+	check_error(error);
+}
+
+COPTEnvConfig::COPTEnvConfig()
+{
+	int error = COPT_CreateEnvConfig(&m_config);
+	check_error(error);
+}
+
+COPTEnvConfig::~COPTEnvConfig()
+{
+	int error = COPT_DeleteEnvConfig(&m_config);
+	check_error(error);
+}
+
+void COPTEnvConfig::config(const char *param_name, const char *value)
+{
+	int error = COPT_SetEnvConfig(m_config, param_name, value);
+	check_error(error);
 }

@@ -22,7 +22,6 @@ target_sources(core PRIVATE
   include/pyoptinterface/solver_common.hpp
   lib/core.cpp
   lib/cache_model.cpp
-  lib/solver_common.cpp
 )
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)

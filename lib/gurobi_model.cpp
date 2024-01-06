@@ -705,16 +705,58 @@ std::string GurobiModel::version_string()
 	return version;
 }
 
-GurobiEnv::GurobiEnv()
+GurobiEnv::GurobiEnv(bool empty)
 {
-	int error = GRBloadenv(&m_env, NULL);
-	if (error)
+	int error = 0;
+	if (empty)
 	{
-		throw std::runtime_error(GRBgeterrormsg(m_env));
+		error = GRBemptyenv(&m_env);
 	}
+	else
+	{
+		error = GRBloadenv(&m_env, NULL);
+	}
+	check_error(error);
 }
 
 GurobiEnv::~GurobiEnv()
 {
 	GRBfreeenv(m_env);
+}
+
+int GurobiEnv::raw_parameter_type(const char *param_name)
+{
+	return GRBgetparamtype(m_env, param_name);
+}
+
+void GurobiEnv::set_raw_parameter_int(const char *param_name, int value)
+{
+	int error = GRBsetintparam(m_env, param_name, value);
+	check_error(error);
+}
+
+void GurobiEnv::set_raw_parameter_double(const char *param_name, double value)
+{
+	int error = GRBsetdblparam(m_env, param_name, value);
+	check_error(error);
+}
+
+void GurobiEnv::set_raw_parameter_string(const char *param_name, const char *value)
+{
+	int error = GRBsetstrparam(m_env, param_name, value);
+	check_error(error);
+}
+
+void GurobiEnv::start()
+{
+	int error = GRBstartenv(m_env);
+	check_error(error);
+}
+
+void GurobiEnv::check_error(int error)
+{
+	if (error)
+	{
+		throw std::runtime_error(GRBgeterrormsg(m_env));
+	}
 }
