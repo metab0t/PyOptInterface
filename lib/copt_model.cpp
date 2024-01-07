@@ -379,6 +379,15 @@ void COPTModel::optimize()
 	check_error(error);
 }
 
+//extern int COPT_SearchParamAttr(copt_prob *prob, const char *name, int *p_type);
+//int COPTModel::raw_parameter_attribute_type(const char *name)
+//{
+//	int retval;
+//	int error = COPT_SearchParamAttr(m_model.get(), name, &retval);
+//	check_error(error);
+//	return retval;
+//}
+
 void COPTModel::set_raw_parameter_int(const char *param_name, int value)
 {
 	int error = COPT_SetIntParam(m_model.get(), param_name, value);
@@ -555,6 +564,13 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 	check_error(error);
 }
 
+void COPTModel::set_obj_sense(ObjectiveSense sense)
+{
+	int obj_sense = copt_obj_sense(sense);
+	int error = COPT_SetObjSense(m_model.get(), obj_sense);
+	check_error(error);
+}
+
 void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values)
 {
 	int numnz = variables.size();
@@ -656,7 +672,7 @@ COPTEnvConfig::~COPTEnvConfig()
 	check_error(error);
 }
 
-void COPTEnvConfig::config(const char *param_name, const char *value)
+void COPTEnvConfig::set(const char *param_name, const char *value)
 {
 	int error = COPT_SetEnvConfig(m_config, param_name, value);
 	check_error(error);

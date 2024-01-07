@@ -22,7 +22,7 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType, VariableIndex
+from .core_ext import VariableDomain, ConstraintType, VariableIndex, ObjectiveSense
 from .solver_common import (
     _get_model_attribute,
     _set_model_attribute,
@@ -67,12 +67,22 @@ constraint_type_attribute_name_map = {
     ConstraintType.Quadratic: "QConstrs",
 }
 
+copt_parameter_raw_type_map = {
+    0: float,
+    1: int,
+}
+
+copt_attribute_raw_type_map = {
+    2: float,
+    3: int,
+}
+
 
 def get_objsense(model):
     raw_sense = model.get_raw_attribute_int("ObjSense")
-    if raw_sense == Constants.COPT_MINIMIZE:
+    if raw_sense == COPT.MINIMIZE:
         return ObjectiveSense.Minimize
-    elif raw_sense == Constants.COPT_MAXIMIZE:
+    elif raw_sense == COPT.MAXIMIZE:
         return ObjectiveSense.Maximize
     else:
         raise ValueError(f"Unknown objective sense: {raw_sense}")
@@ -206,11 +216,18 @@ def get_rawstatusstring(model):
 
 
 def get_silent(model):
-    return model.get_raw_attribute_int("LogToConsole") == 0
+    return model.get_raw_parameter_int("LogToConsole") == 0
 
 
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveSense: get_objsense,
+    ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
+        "Threads"
+    ),
+    ModelAttribute.RelativeGap: lambda model: model.set_raw_parameter_double("RelGap"),
+    ModelAttribute.TimeLimitSec: lambda model: model.set_raw_parameter_double(
+        "TimeLimit"
+    ),
     ModelAttribute.DualStatus: get_dualstatus,
     ModelAttribute.PrimalStatus: get_primalstatus,
     ModelAttribute.RawStatusString: get_rawstatusstring,
@@ -223,12 +240,22 @@ model_attribute_get_func_map = {
 
 def set_silent(model, value: bool):
     if value:
-        model.set_raw_attribute_int("LogToConsole", 0)
+        model.set_raw_parameter_int("LogToConsole", 0)
     else:
-        model.set_raw_attribute_int("LogToConsole", 1)
+        model.set_raw_parameter_int("LogToConsole", 1)
 
 
 model_attribute_set_func_map = {
+    ModelAttribute.ObjectiveSense: lambda model, v: model.set_obj_sense(v),
+    ModelAttribute.NumberOfThreads: lambda model, v: model.set_raw_parameter_int(
+        "Threads", v
+    ),
+    ModelAttribute.RelativeGap: lambda model, v: model.set_raw_parameter_double(
+        "RelGap", v
+    ),
+    ModelAttribute.TimeLimitSec: lambda model, v: model.set_raw_parameter_double(
+        "TimeLimit", v
+    ),
     ModelAttribute.Silent: set_silent,
 }
 
@@ -359,6 +386,42 @@ class Model(RawModel):
             {},
             e,
         )
+
+    # def get_raw_parameter(self, param_name: str):
+    #     param_type = copt_parameter_raw_type_map[self.raw_parameter_attribute_type(param_name)]
+    #     get_function_map = {
+    #         int: self.get_raw_parameter_int,
+    #         float: self.get_raw_parameter_double,
+    #     }
+    #     get_function = get_function_map[param_type]
+    #     return get_function(param_name)
+    #
+    # def set_raw_parameter(self, param_name: str, value):
+    #     param_type = copt_parameter_raw_type_map[self.raw_parameter_attribute_type(param_name)]
+    #     set_function_map = {
+    #         int: self.set_raw_parameter_int,
+    #         float: self.set_raw_parameter_double,
+    #     }
+    #     set_function = set_function_map[param_type]
+    #     set_function(param_name, value)
+    #
+    # def get_raw_attribute(self, param_name: str):
+    #     param_type = copt_attribute_raw_type_map[self.raw_parameter_attribute_type(param_name)]
+    #     get_function_map = {
+    #         int: self.get_raw_attribute_int,
+    #         float: self.get_raw_attribute_double,
+    #     }
+    #     get_function = get_function_map[param_type]
+    #     return get_function(param_name)
+    #
+    # def set_raw_attribute(self, param_name: str, value):
+    #     param_type = copt_attribute_raw_type_map[self.raw_parameter_attribute_type(param_name)]
+    #     set_function_map = {
+    #         int: self.set_raw_attribute_int,
+    #         float: self.set_raw_attribute_double,
+    #     }
+    #     set_function = set_function_map[param_type]
+    #     set_function(param_name, value)
 
     def optimize(self):
         if self._is_mip():

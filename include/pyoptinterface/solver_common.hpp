@@ -126,7 +126,17 @@ double CommercialSolverMixin<T>::get_expression_value(const ExprBuilder &functio
 	{
 		auto var1 = varpair.var_1;
 		auto var2 = varpair.var_2;
-		value += coef * model->get_variable_value(var1) * model->get_variable_value(var2);
+
+		auto v1 = model->get_variable_value(var1);
+		if (var1 == var2)
+		{
+			value += coef * v1 * v1;
+		}
+		else
+		{
+			auto v2 = model->get_variable_value(var2);
+			value += coef * v1 * v2;
+		}
 	}
 	for (const auto &[var, coef] : function.affine_terms)
 	{

@@ -12,7 +12,7 @@ class COPTEnvConfig
 	COPTEnvConfig();
 	~COPTEnvConfig();
 
-	void config(const char *param_name, const char *value);
+	void set(const char *param_name, const char *value);
 
   private:
 	copt_env_config *m_config;
@@ -24,7 +24,7 @@ class COPTEnv
 {
   public:
 	COPTEnv();
-	COPTEnv(COPTEnvConfig& config);
+	COPTEnv(COPTEnvConfig &config);
 	~COPTEnv();
 
   private:
@@ -78,6 +78,21 @@ class COPTModel
 	void *get_raw_model();
 	std::string version_string();
 
+	/*
+	 * Returns the type of a COPT parameter or attribute, given its name.
+	 * -1: unknown
+	 *  0: double parameter
+	 *  1: int parameter
+	 *  2: double attribute
+	 *  3: int attribute
+	 *
+	 * Use undocumented COPT function
+	 * int COPT_SearchParamAttr(copt_prob* prob, const char* name, int* p_type)
+	 * 
+	 * But this function currently is not exported in copt.lib so we cannot link it
+	 */
+	// int raw_parameter_attribute_type(const char *name);
+
 	// parameter
 	void set_raw_parameter_int(const char *param_name, int value);
 	void set_raw_parameter_double(const char *param_name, double value);
@@ -100,6 +115,8 @@ class COPTModel
 	double get_constraint_info(const ConstraintIndex &constraint, const char *info_name);
 	std::string get_constraint_name(const ConstraintIndex &constraint);
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
+
+	void set_obj_sense(ObjectiveSense sense);
 
 	// MIPStart
 	void add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
