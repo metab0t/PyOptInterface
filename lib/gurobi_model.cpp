@@ -91,6 +91,7 @@ VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double
 	char vtype = gurobi_vtype(domain);
 	int error = GRBaddvar(m_model.get(), 0, NULL, NULL, 0.0, lb, ub, vtype, name);
 	check_error(error);
+	_require_update();
 
 	return variable;
 }
@@ -106,6 +107,7 @@ void GurobiModel::delete_variable(const VariableIndex &variable)
 	int variable_column = _checked_variable_index(variable);
 	int error = GRBdelvars(m_model.get(), 1, &variable_column);
 	check_error(error);
+	_require_update();
 
 	m_variable_index.delete_index(variable.index);
 }
@@ -165,6 +167,7 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &f
 
 	int error = GRBaddconstr(m_model.get(), numnz, cind, cval, g_sense, g_rhs, NULL);
 	check_error(error);
+	_require_update();
 	return constraint_index;
 }
 
@@ -205,6 +208,7 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	int error = GRBaddqconstr(m_model.get(), numlnz, lind, lval, numqnz, qrow, qcol, qval, g_sense,
 	                          g_rhs, NULL);
 	check_error(error);
+	_require_update();
 	return constraint_index;
 }
 
@@ -241,6 +245,7 @@ ConstraintIndex GurobiModel::_add_sos_constraint(const Vector<VariableIndex> &va
 
 	int error = GRBaddsos(m_model.get(), numsos, nummembers, &types, beg, ind, weight);
 	check_error(error);
+	_require_update();
 	return constraint_index;
 }
 
@@ -271,6 +276,7 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 		}
 	}
 	check_error(error);
+	_require_update();
 }
 
 bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
@@ -319,6 +325,7 @@ void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveS
 	int obj_sense = gurobi_obj_sense(sense);
 	error = GRBsetintattr(m_model.get(), "ModelSense", obj_sense);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
@@ -355,6 +362,7 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 		ScalarAffineFunction zero;
 		set_objective(zero, sense);
 	}
+	_require_update();
 }
 
 void GurobiModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
@@ -379,6 +387,7 @@ void GurobiModel::set_objective(const ExprBuilder &function, ObjectiveSense sens
 void GurobiModel::optimize()
 {
 	int error = GRBoptimize(m_model.get());
+	m_needs_update = false;
 	check_error(error);
 }
 
@@ -397,22 +406,26 @@ void GurobiModel::set_raw_parameter_int(const char *param_name, int value)
 {
 	int error = GRBsetintparam(m_env, param_name, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_raw_parameter_double(const char *param_name, double value)
 {
 	int error = GRBsetdblparam(m_env, param_name, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_raw_parameter_string(const char *param_name, const char *value)
 {
 	int error = GRBsetstrparam(m_env, param_name, value);
 	check_error(error);
+	_require_update();
 }
 
 int GurobiModel::get_raw_parameter_int(const char *param_name)
 {
+	_update_if_necessary();
 	int retval;
 	int error = GRBgetintparam(m_env, param_name, &retval);
 	check_error(error);
@@ -421,6 +434,7 @@ int GurobiModel::get_raw_parameter_int(const char *param_name)
 
 double GurobiModel::get_raw_parameter_double(const char *param_name)
 {
+	_update_if_necessary();
 	double retval;
 	int error = GRBgetdblparam(m_env, param_name, &retval);
 	check_error(error);
@@ -429,6 +443,7 @@ double GurobiModel::get_raw_parameter_double(const char *param_name)
 
 std::string GurobiModel::get_raw_parameter_string(const char *param_name)
 {
+	_update_if_necessary();
 	char retval[GRB_MAX_STRLEN];
 	int error = GRBgetstrparam(m_env, param_name, retval);
 	check_error(error);
@@ -447,22 +462,26 @@ void GurobiModel::set_model_raw_attribute_int(const char *attr_name, int value)
 {
 	int error = GRBsetintattr(m_model.get(), attr_name, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_model_raw_attribute_double(const char *attr_name, double value)
 {
 	int error = GRBsetdblattr(m_model.get(), attr_name, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_model_raw_attribute_string(const char *attr_name, const char *value)
 {
 	int error = GRBsetstrattr(m_model.get(), attr_name, value);
 	check_error(error);
+	_require_update();
 }
 
 int GurobiModel::get_model_raw_attribute_int(const char *attr_name)
 {
+	_update_if_necessary();
 	int retval;
 	int error = GRBgetintattr(m_model.get(), attr_name, &retval);
 	check_error(error);
@@ -471,6 +490,7 @@ int GurobiModel::get_model_raw_attribute_int(const char *attr_name)
 
 double GurobiModel::get_model_raw_attribute_double(const char *attr_name)
 {
+	_update_if_necessary();
 	double retval;
 	int error = GRBgetdblattr(m_model.get(), attr_name, &retval);
 	check_error(error);
@@ -479,6 +499,7 @@ double GurobiModel::get_model_raw_attribute_double(const char *attr_name)
 
 std::string GurobiModel::get_model_raw_attribute_string(const char *attr_name)
 {
+	_update_if_necessary();
 	char *retval;
 	int error = GRBgetstrattr(m_model.get(), attr_name, &retval);
 	check_error(error);
@@ -488,6 +509,7 @@ std::string GurobiModel::get_model_raw_attribute_string(const char *attr_name)
 std::vector<double> GurobiModel::get_model_raw_attribute_vector_double(const char *attr_name,
                                                                        int start, int len)
 {
+	_update_if_necessary();
 	std::vector<double> retval(len);
 	int error = GRBgetdblattrarray(m_model.get(), attr_name, start, len, retval.data());
 	check_error(error);
@@ -497,6 +519,7 @@ std::vector<double> GurobiModel::get_model_raw_attribute_vector_double(const cha
 std::vector<double> GurobiModel::get_model_raw_attribute_list_double(const char *attr_name,
                                                                      const std::vector<int> &ind)
 {
+	_update_if_necessary();
 	std::vector<double> retval(ind.size());
 	int error =
 	    GRBgetdblattrlist(m_model.get(), attr_name, ind.size(), (int *)ind.data(), retval.data());
@@ -510,6 +533,7 @@ void GurobiModel::set_variable_raw_attribute_int(const VariableIndex &variable,
 	auto column = _checked_variable_index(variable);
 	int error = GRBsetintattrelement(m_model.get(), attr_name, column, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_variable_raw_attribute_char(const VariableIndex &variable,
@@ -518,6 +542,7 @@ void GurobiModel::set_variable_raw_attribute_char(const VariableIndex &variable,
 	auto column = _checked_variable_index(variable);
 	int error = GRBsetcharattrelement(m_model.get(), attr_name, column, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_variable_raw_attribute_double(const VariableIndex &variable,
@@ -526,6 +551,7 @@ void GurobiModel::set_variable_raw_attribute_double(const VariableIndex &variabl
 	auto column = _checked_variable_index(variable);
 	int error = GRBsetdblattrelement(m_model.get(), attr_name, column, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_variable_raw_attribute_string(const VariableIndex &variable,
@@ -534,6 +560,7 @@ void GurobiModel::set_variable_raw_attribute_string(const VariableIndex &variabl
 	auto column = _checked_variable_index(variable);
 	int error = GRBsetstrattrelement(m_model.get(), attr_name, column, value);
 	check_error(error);
+	_require_update();
 }
 
 int GurobiModel::get_variable_raw_attribute_int(const VariableIndex &variable,
@@ -578,6 +605,7 @@ std::string GurobiModel::get_variable_raw_attribute_string(const VariableIndex &
 
 int GurobiModel::_variable_index(const VariableIndex &variable)
 {
+	_update_if_necessary();
 	return m_variable_index.get_index(variable.index);
 }
 
@@ -597,6 +625,7 @@ void GurobiModel::set_constraint_raw_attribute_int(const ConstraintIndex &constr
 	int row = _checked_constraint_index(constraint);
 	int error = GRBsetintattrelement(m_model.get(), attr_name, row, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_constraint_raw_attribute_char(const ConstraintIndex &constraint,
@@ -605,6 +634,7 @@ void GurobiModel::set_constraint_raw_attribute_char(const ConstraintIndex &const
 	int row = _checked_constraint_index(constraint);
 	int error = GRBsetcharattrelement(m_model.get(), attr_name, row, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_constraint_raw_attribute_double(const ConstraintIndex &constraint,
@@ -613,6 +643,7 @@ void GurobiModel::set_constraint_raw_attribute_double(const ConstraintIndex &con
 	int row = _checked_constraint_index(constraint);
 	int error = GRBsetdblattrelement(m_model.get(), attr_name, row, value);
 	check_error(error);
+	_require_update();
 }
 
 void GurobiModel::set_constraint_raw_attribute_string(const ConstraintIndex &constraint,
@@ -621,6 +652,7 @@ void GurobiModel::set_constraint_raw_attribute_string(const ConstraintIndex &con
 	int row = _checked_constraint_index(constraint);
 	int error = GRBsetstrattrelement(m_model.get(), attr_name, row, value);
 	check_error(error);
+	_require_update();
 }
 
 int GurobiModel::get_constraint_raw_attribute_int(const ConstraintIndex &constraint,
@@ -665,6 +697,7 @@ std::string GurobiModel::get_constraint_raw_attribute_string(const ConstraintInd
 
 int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 {
+	_update_if_necessary();
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
@@ -694,6 +727,20 @@ void GurobiModel::check_error(int error)
 	if (error)
 	{
 		throw std::runtime_error(GRBgeterrormsg(m_env));
+	}
+}
+
+void GurobiModel::_require_update()
+{
+	m_needs_update = true;
+}
+
+void GurobiModel::_update_if_necessary()
+{
+	if (m_needs_update)
+	{
+		update();
+		m_needs_update = false;
 	}
 }
 

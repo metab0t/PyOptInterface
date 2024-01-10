@@ -152,6 +152,11 @@ class GurobiModel
 
 	MonotoneIndexer<int> m_sos_constraint_index;
 
+	/* flag to indicate whether the model needs update */
+	bool m_needs_update = false;
+	void _require_update();
+	void _update_if_necessary();
+
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;
 	std::unique_ptr<GRBmodel, GRBfreemodelT> m_model;

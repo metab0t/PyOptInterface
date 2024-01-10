@@ -124,30 +124,20 @@ auto test_gurobi() -> void
 
 	{
 		GurobiEnv env;
-		GurobiModel model;
+		GurobiModelMixin model;
 		model.init(env);
 
-		VariableIndex x = model.add_variable(VariableDomain::Continuous);
-		VariableIndex y = model.add_variable(VariableDomain::Continuous);
+		VariableIndex x = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
+		VariableIndex y = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
 
 		ExprBuilder expr;
-		expr.add(x);
-		expr.add(y);
-		ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
+		//expr.add(x);
+		//expr.add(y);
+		//ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
 
 		expr.clear();
 		expr.add(x);
-		ConstraintIndex con2 =
-		    model.add_linear_constraint(expr, ConstraintSense::GreaterEqual, 2.0);
-
-		expr.clear();
 		expr.add(y);
-		ConstraintIndex con3 =
-		    model.add_linear_constraint(expr, ConstraintSense::GreaterEqual, 2.0);
-
-		expr.clear();
-		expr.add_quadratic_term(x, x, 1.0);
-		expr.add_quadratic_term(y, y, 1.0);
 		model.set_objective(expr, ObjectiveSense::Minimize);
 
 		model.optimize();
@@ -212,6 +202,6 @@ auto test_copt() -> void
 
 auto main() -> int
 {
-	test_copt();
+	test_gurobi();
 	return 0;
 }
