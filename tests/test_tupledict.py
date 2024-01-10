@@ -1,4 +1,9 @@
-from pyoptinterface._src.tupledict import flatten_tuple, make_tupledict, tupledict, WILDCARD
+from pyoptinterface._src.tupledict import (
+    flatten_tuple,
+    make_tupledict,
+    tupledict,
+    WILDCARD,
+)
 
 
 def test_flatten_tuple():

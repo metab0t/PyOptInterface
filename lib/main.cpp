@@ -1,6 +1,7 @@
 #include "pyoptinterface/container.hpp"
 #include "fmt/core.h"
-#include "gurobi_model.cpp"
+#include "pyoptinterface/gurobi_model.hpp"
+#include "pyoptinterface/copt_model.hpp"
 
 template <typename T>
 void some_operations(T &t)
@@ -91,19 +92,21 @@ auto test_chunkedbv() -> void
 {
 	ChunkedBitVector<std::uint64_t, int> cbv;
 
-	for (int i = 0; i < 100; i++)
+	auto N = 10000;
+	for (int i = 0; i < N; i++)
 	{
 		auto x = cbv.add_index();
-		fmt::print("{}\n", x);
+		fmt::print("added={}\n", x);
 	}
 
-	cbv.delete_index(3);
-	cbv.delete_index(5);
-
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < N - 1; i++)
 	{
-		auto x = cbv.get_index(i);
-		fmt::print("get_index: {}->{}\n", i, x);
+		cbv.delete_index(i);
+		auto x = cbv.get_index(i + 1);
+		if (x != 0)
+		{
+			fmt::print("get_index: {}->{}\n", i + 1, x);
+		}
 	}
 }
 
@@ -173,8 +176,42 @@ void bench()
 	int k = 0;
 }
 
+auto test_copt() -> void
+{
+	COPTEnv env;
+	COPTModelMixin model(env);
+
+	auto N = 10000;
+	std::vector<VariableIndex> x;
+	for (auto i = 0; i < N; i++)
+	{
+		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
+	}
+
+	ExprBuilder obj;
+	for (const auto &v : x)
+	{
+		obj.add(v * v);
+	}
+	model.set_objective(obj, ObjectiveSense::Minimize);
+	model.set_raw_parameter_int("Logging", 0);
+	model.set_raw_parameter_int("Presolve", 0);
+	model.set_raw_parameter_double("TimeLimit", 0.0);
+
+	model.optimize();
+
+	obj = ExprBuilder();
+	model.set_objective(obj, ObjectiveSense::Minimize);
+	for (int i = 0; i < N - 1; i++)
+	{
+		model.delete_variable(x[i]);
+		model.optimize();
+		fmt::print("deleted {}\n", i);
+	}
+}
+
 auto main() -> int
 {
-	bench_container();
+	test_copt();
 	return 0;
 }

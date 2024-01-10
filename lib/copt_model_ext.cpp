@@ -80,7 +80,7 @@ NB_MODULE(copt_model_ext, m)
 	    .def("version_string", &COPTModelMixin::version_string)
 	    .def("get_raw_model", &COPTModelMixin::get_raw_model)
 
-		// .def("raw_parameter_attribute_type", &COPTModelMixin::raw_parameter_attribute_type)
+	    .def("raw_parameter_attribute_type", &COPTModelMixin::raw_parameter_attribute_type)
 
 	    .def("set_raw_parameter_int", &COPTModelMixin::set_raw_parameter_int)
 	    .def("set_raw_parameter_double", &COPTModelMixin::set_raw_parameter_double)

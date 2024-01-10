@@ -88,10 +88,8 @@ class COPTModel
 	 *
 	 * Use undocumented COPT function
 	 * int COPT_SearchParamAttr(copt_prob* prob, const char* name, int* p_type)
-	 * 
-	 * But this function currently is not exported in copt.lib so we cannot link it
 	 */
-	// int raw_parameter_attribute_type(const char *name);
+	int raw_parameter_attribute_type(const char *name);
 
 	// parameter
 	void set_raw_parameter_int(const char *param_name, int value);

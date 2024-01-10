@@ -291,6 +291,11 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 
 void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
+	int error = 0;
+	// First delete all quadratic terms
+	error = GRBdelq(m_model.get());
+	check_error(error);
+
 	// Set Obj attribute of each variable
 	int n_variables = get_model_raw_attribute_int(GRB_INT_ATTR_NUMVARS);
 	std::vector<double> obj_v(n_variables, 0.0);
@@ -306,7 +311,6 @@ void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveS
 		obj_v[column] = function.coefficients[i];
 	}
 
-	int error;
 	error = GRBsetdblattrarray(m_model.get(), "Obj", 0, n_variables, obj_v.data());
 	check_error(error);
 	error = GRBsetdblattr(m_model.get(), "ObjCon", function.constant.value_or(0.0));

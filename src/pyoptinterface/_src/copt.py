@@ -387,47 +387,56 @@ class Model(RawModel):
             e,
         )
 
-    # def get_raw_parameter(self, param_name: str):
-    #     param_type = copt_parameter_raw_type_map[self.raw_parameter_attribute_type(param_name)]
-    #     get_function_map = {
-    #         int: self.get_raw_parameter_int,
-    #         float: self.get_raw_parameter_double,
-    #     }
-    #     get_function = get_function_map[param_type]
-    #     return get_function(param_name)
-    #
-    # def set_raw_parameter(self, param_name: str, value):
-    #     param_type = copt_parameter_raw_type_map[self.raw_parameter_attribute_type(param_name)]
-    #     set_function_map = {
-    #         int: self.set_raw_parameter_int,
-    #         float: self.set_raw_parameter_double,
-    #     }
-    #     set_function = set_function_map[param_type]
-    #     set_function(param_name, value)
-    #
-    # def get_raw_attribute(self, param_name: str):
-    #     param_type = copt_attribute_raw_type_map[self.raw_parameter_attribute_type(param_name)]
-    #     get_function_map = {
-    #         int: self.get_raw_attribute_int,
-    #         float: self.get_raw_attribute_double,
-    #     }
-    #     get_function = get_function_map[param_type]
-    #     return get_function(param_name)
-    #
-    # def set_raw_attribute(self, param_name: str, value):
-    #     param_type = copt_attribute_raw_type_map[self.raw_parameter_attribute_type(param_name)]
-    #     set_function_map = {
-    #         int: self.set_raw_attribute_int,
-    #         float: self.set_raw_attribute_double,
-    #     }
-    #     set_function = set_function_map[param_type]
-    #     set_function(param_name, value)
+    def get_raw_parameter(self, param_name: str):
+        param_type = copt_parameter_raw_type_map[
+            self.raw_parameter_attribute_type(param_name)
+        ]
+        get_function_map = {
+            int: self.get_raw_parameter_int,
+            float: self.get_raw_parameter_double,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(param_name)
+
+    def set_raw_parameter(self, param_name: str, value):
+        param_type = copt_parameter_raw_type_map[
+            self.raw_parameter_attribute_type(param_name)
+        ]
+        set_function_map = {
+            int: self.set_raw_parameter_int,
+            float: self.set_raw_parameter_double,
+        }
+        set_function = set_function_map[param_type]
+        set_function(param_name, value)
+
+    def get_raw_attribute(self, param_name: str):
+        param_type = copt_attribute_raw_type_map[
+            self.raw_parameter_attribute_type(param_name)
+        ]
+        get_function_map = {
+            int: self.get_raw_attribute_int,
+            float: self.get_raw_attribute_double,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(param_name)
+
+    def set_raw_attribute(self, param_name: str, value):
+        param_type = copt_attribute_raw_type_map[
+            self.raw_parameter_attribute_type(param_name)
+        ]
+        set_function_map = {
+            int: self.set_raw_attribute_int,
+            float: self.set_raw_attribute_double,
+        }
+        set_function = set_function_map[param_type]
+        set_function(param_name, value)
 
     def optimize(self):
         if self._is_mip():
             mip_start = self.mip_start_values
-            variables = list(mip_start.keys())
-            values = list(mip_start.values())
-            self.add_mip_start(variables, values)
-            mip_start.clear()
+            if len(mip_start) != 0:
+                variables = list(mip_start.keys())
+                values = list(mip_start.values())
+                self.add_mip_start(variables, values)
+                mip_start.clear()
         super().optimize()

@@ -66,13 +66,6 @@ ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_expr(
 	return get_base()->add_quadratic_constraint(f, sense, rhs);
 }
 
-template <typename T>
-concept VarValueModel = requires(T *model, const VariableIndex &variable) {
-	{
-		model->get_variable_value(variable)
-	} -> std::convertible_to<double>;
-};
-
 template <CommercialSolverConstraint T>
 double CommercialSolverMixin<T>::get_expression_value(const ScalarAffineFunction &function)
 {

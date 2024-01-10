@@ -105,4 +105,4 @@ if(ENABLE_COPT)
 endif()
 
 add_executable(test_main lib/main.cpp)
-target_link_libraries(test_main PUBLIC core gurobi_model)
+target_link_libraries(test_main PUBLIC core gurobi_model copt_model)

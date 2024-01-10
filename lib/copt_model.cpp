@@ -287,6 +287,11 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 
 void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
+	int error = 0;
+	// First delete all quadratic terms
+	error = COPT_DelQuadObj(m_model.get());
+	check_error(error);
+
 	// Set Obj attribute of each variable
 	int n_variables = get_raw_attribute_int(COPT_INTATTR_COLS);
 	std::vector<int> ind_v(n_variables);
@@ -307,7 +312,6 @@ void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSen
 		obj_v[column] = function.coefficients[i];
 	}
 
-	int error;
 	error = COPT_ReplaceColObj(m_model.get(), n_variables, ind_v.data(), obj_v.data());
 	check_error(error);
 	error = COPT_SetObjConst(m_model.get(), function.constant.value_or(0.0));
@@ -379,14 +383,17 @@ void COPTModel::optimize()
 	check_error(error);
 }
 
-//extern int COPT_SearchParamAttr(copt_prob *prob, const char *name, int *p_type);
-//int COPTModel::raw_parameter_attribute_type(const char *name)
-//{
-//	int retval;
-//	int error = COPT_SearchParamAttr(m_model.get(), name, &retval);
-//	check_error(error);
-//	return retval;
-//}
+extern "C"
+{
+	int COPT_SearchParamAttr(copt_prob *prob, const char *name, int *p_type);
+}
+int COPTModel::raw_parameter_attribute_type(const char *name)
+{
+	int retval;
+	int error = COPT_SearchParamAttr(m_model.get(), name, &retval);
+	check_error(error);
+	return retval;
+}
 
 void COPTModel::set_raw_parameter_int(const char *param_name, int value)
 {

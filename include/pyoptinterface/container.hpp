@@ -183,7 +183,7 @@ class ChunkedBitVector
 			IndexT result = last_chunk_end + m_last_bit;
 			ChunkT &last_chunk = m_data.back();
 			// set m_last_bit to 1
-			last_chunk |= (1 << m_last_bit);
+			last_chunk |= (ChunkT{1} << m_last_bit);
 			m_last_bit++;
 
 			return result;
@@ -200,16 +200,21 @@ class ChunkedBitVector
 		std::uint8_t bit_index;
 		locate_index(index, chunk_index, bit_index);
 		ChunkT &chunk = m_data[chunk_index];
-		if (chunk & (1 << bit_index))
+		ChunkT mask = ChunkT{1} << bit_index;
+		if (chunk & mask)
 		{
 			// set bit_index to 0
-			chunk &= ~(1 << bit_index);
+			chunk &= ~(mask);
+			// m_last_correct_chunk ensures m_cumulated_ranks[0, m_last_correct_chunk]
+			// and m_chunk_ranks[0, m_last_correct_chunk) are all correct
+			// m_last_correct_chunk > chunk_index means that m_cumulated_ranks(chunk_index, +inf)
+			// should be recalculated
 			if (m_last_correct_chunk > chunk_index)
 			{
 				m_last_correct_chunk = chunk_index;
-				// rank of this chunk should be recalculated
-				m_chunk_ranks[chunk_index] = -1;
 			}
+			// rank of this chunk should also be recalculated
+			m_chunk_ranks[chunk_index] = -1;
 		}
 	}
 
@@ -219,7 +224,7 @@ class ChunkedBitVector
 		std::uint8_t bit_index;
 		locate_index(index, chunk_index, bit_index);
 		const ChunkT &chunk = m_data[chunk_index];
-		return chunk & (1 << bit_index);
+		return chunk & (ChunkT{1} << bit_index);
 	}
 
 	ResultT get_index(const IndexT &index)
@@ -232,7 +237,7 @@ class ChunkedBitVector
 		std::uint8_t bit_index;
 		locate_index(index, chunk_index, bit_index);
 		ChunkT &chunk = m_data[chunk_index];
-		bool bit = chunk & (1 << bit_index);
+		bool bit = chunk & (ChunkT{1} << bit_index);
 
 		if (!bit)
 		{
@@ -243,7 +248,7 @@ class ChunkedBitVector
 			update_to(chunk_index);
 		}
 		// count the 1 on the right of bit_index
-		ChunkT mask = (static_cast<ChunkT>(1) << bit_index) - 1;
+		ChunkT mask = (ChunkT{1} << bit_index) - 1;
 		std::uint8_t current_chunk_index = std::popcount(chunk & mask);
 		return m_cumulated_ranks[chunk_index] + current_chunk_index;
 	}
