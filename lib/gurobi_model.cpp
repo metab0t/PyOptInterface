@@ -295,12 +295,16 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 	}
 }
 
-void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
+void GurobiModel::_set_affine_objective(const ScalarAffineFunction &function, ObjectiveSense sense,
+                                        bool clear_quadratic)
 {
 	int error = 0;
-	// First delete all quadratic terms
-	error = GRBdelq(m_model.get());
-	check_error(error);
+	if (clear_quadratic)
+	{
+		// First delete all quadratic terms
+		error = GRBdelq(m_model.get());
+		check_error(error);
+	}
 
 	// Set Obj attribute of each variable
 	int n_variables = get_model_raw_attribute_int(GRB_INT_ATTR_NUMVARS);
@@ -326,6 +330,11 @@ void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveS
 	error = GRBsetintattr(m_model.get(), "ModelSense", obj_sense);
 	check_error(error);
 	_require_update();
+}
+
+void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
+{
+	_set_affine_objective(function, sense, true);
 }
 
 void GurobiModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
@@ -355,12 +364,12 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 	if (affine_part)
 	{
 		const auto &affine_function = affine_part.value();
-		set_objective(affine_function, sense);
+		_set_affine_objective(affine_function, sense, false);
 	}
 	else
 	{
 		ScalarAffineFunction zero;
-		set_objective(zero, sense);
+		_set_affine_objective(zero, sense, false);
 	}
 	_require_update();
 }

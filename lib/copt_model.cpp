@@ -285,12 +285,16 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 	}
 }
 
-void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
+void COPTModel::_set_affine_objective(const ScalarAffineFunction &function, ObjectiveSense sense,
+                                      bool clear_quadratic)
 {
 	int error = 0;
-	// First delete all quadratic terms
-	error = COPT_DelQuadObj(m_model.get());
-	check_error(error);
+	if (clear_quadratic)
+	{
+		// First delete all quadratic terms
+		error = COPT_DelQuadObj(m_model.get());
+		check_error(error);
+	}
 
 	// Set Obj attribute of each variable
 	int n_variables = get_raw_attribute_int(COPT_INTATTR_COLS);
@@ -322,6 +326,11 @@ void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSen
 	check_error(error);
 }
 
+void COPTModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
+{
+	_set_affine_objective(function, sense, true);
+}
+
 void COPTModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
 {
 	int error = 0;
@@ -349,12 +358,12 @@ void COPTModel::set_objective(const ScalarQuadraticFunction &function, Objective
 	if (affine_part)
 	{
 		const auto &affine_function = affine_part.value();
-		set_objective(affine_function, sense);
+		_set_affine_objective(affine_function, sense, false);
 	}
 	else
 	{
 		ScalarAffineFunction zero;
-		set_objective(zero, sense);
+		_set_affine_objective(zero, sense, false);
 	}
 }
 

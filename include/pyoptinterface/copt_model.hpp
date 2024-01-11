@@ -70,6 +70,8 @@ class COPTModel
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
 
+	void _set_affine_objective(const ScalarAffineFunction &function, ObjectiveSense sense,
+	                           bool clear_quadratic);
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &function, ObjectiveSense sense);

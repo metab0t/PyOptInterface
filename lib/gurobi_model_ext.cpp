@@ -35,10 +35,10 @@ NB_MODULE(gurobi_model_ext, m)
 
 	    .def("get_value",
 	         nb::overload_cast<const VariableIndex &>(&GurobiModelMixin::get_variable_value))
-	    .def("get_value",
-	         nb::overload_cast<const ScalarAffineFunction &>(&GurobiModelMixin::get_expression_value))
-	    .def("get_value",
-	         nb::overload_cast<const ScalarQuadraticFunction &>(&GurobiModelMixin::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ScalarAffineFunction &>(
+	                          &GurobiModelMixin::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ScalarQuadraticFunction &>(
+	                          &GurobiModelMixin::get_expression_value))
 	    .def("get_value",
 	         nb::overload_cast<const ExprBuilder &>(&GurobiModelMixin::get_expression_value))
 	    .def("add_linear_constraint",
@@ -47,13 +47,15 @@ NB_MODULE(gurobi_model_ext, m)
 
 	    .def("pprint", &GurobiModelMixin::pprint_variable)
 	    .def("pprint",
-	         nb::overload_cast<const ScalarAffineFunction &, int>(&GurobiModelMixin::pprint_expression),
+	         nb::overload_cast<const ScalarAffineFunction &, int>(
+	             &GurobiModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
 	             &GurobiModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&GurobiModelMixin::pprint_expression),
+	    .def("pprint",
+	         nb::overload_cast<const ExprBuilder &, int>(&GurobiModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    .def("set_variable_name", &GurobiModelMixin::set_variable_name)
@@ -77,8 +79,8 @@ NB_MODULE(gurobi_model_ext, m)
 	                              &GurobiModelMixin::set_objective))
 	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
 	                              &GurobiModelMixin::set_objective))
-	    .def("set_objective",
-	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&GurobiModelMixin::set_objective))
+	    .def("set_objective", nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
+	                              &GurobiModelMixin::set_objective))
 	    .def("optimize", &GurobiModelMixin::optimize)
 	    .def("update", &GurobiModelMixin::update)
 	    .def("version_string", &GurobiModelMixin::version_string)
@@ -107,21 +109,29 @@ NB_MODULE(gurobi_model_ext, m)
 
 	    .def("set_variable_raw_attribute_int", &GurobiModelMixin::set_variable_raw_attribute_int)
 	    .def("set_variable_raw_attribute_char", &GurobiModelMixin::set_variable_raw_attribute_char)
-	    .def("set_variable_raw_attribute_double", &GurobiModelMixin::set_variable_raw_attribute_double)
-	    .def("set_variable_raw_attribute_string", &GurobiModelMixin::set_variable_raw_attribute_string)
+	    .def("set_variable_raw_attribute_double",
+	         &GurobiModelMixin::set_variable_raw_attribute_double)
+	    .def("set_variable_raw_attribute_string",
+	         &GurobiModelMixin::set_variable_raw_attribute_string)
 	    .def("get_variable_raw_attribute_int", &GurobiModelMixin::get_variable_raw_attribute_int)
 	    .def("get_variable_raw_attribute_char", &GurobiModelMixin::get_variable_raw_attribute_char)
-	    .def("get_variable_raw_attribute_double", &GurobiModelMixin::get_variable_raw_attribute_double)
-	    .def("get_variable_raw_attribute_string", &GurobiModelMixin::get_variable_raw_attribute_string)
+	    .def("get_variable_raw_attribute_double",
+	         &GurobiModelMixin::get_variable_raw_attribute_double)
+	    .def("get_variable_raw_attribute_string",
+	         &GurobiModelMixin::get_variable_raw_attribute_string)
 
-	    .def("set_constraint_raw_attribute_int", &GurobiModelMixin::set_constraint_raw_attribute_int)
-	    .def("set_constraint_raw_attribute_char", &GurobiModelMixin::set_constraint_raw_attribute_char)
+	    .def("set_constraint_raw_attribute_int",
+	         &GurobiModelMixin::set_constraint_raw_attribute_int)
+	    .def("set_constraint_raw_attribute_char",
+	         &GurobiModelMixin::set_constraint_raw_attribute_char)
 	    .def("set_constraint_raw_attribute_double",
 	         &GurobiModelMixin::set_constraint_raw_attribute_double)
 	    .def("set_constraint_raw_attribute_string",
 	         &GurobiModelMixin::set_constraint_raw_attribute_string)
-	    .def("get_constraint_raw_attribute_int", &GurobiModelMixin::get_constraint_raw_attribute_int)
-	    .def("get_constraint_raw_attribute_char", &GurobiModelMixin::get_constraint_raw_attribute_char)
+	    .def("get_constraint_raw_attribute_int",
+	         &GurobiModelMixin::get_constraint_raw_attribute_int)
+	    .def("get_constraint_raw_attribute_char",
+	         &GurobiModelMixin::get_constraint_raw_attribute_char)
 	    .def("get_constraint_raw_attribute_double",
 	         &GurobiModelMixin::get_constraint_raw_attribute_double)
 	    .def("get_constraint_raw_attribute_string",

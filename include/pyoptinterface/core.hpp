@@ -5,7 +5,7 @@
 #include <optional>
 #include "ankerl/unordered_dense.h"
 
-using IndexT = int32_t;
+using IndexT = std::int32_t;
 using CoeffT = double;
 
 constexpr CoeffT COEFTHRESHOLD = 1e-12;
