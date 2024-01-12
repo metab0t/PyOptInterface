@@ -11,8 +11,6 @@ import linopy
 import gurobipy as gp
 import coptpy as cp
 
-import time
-
 
 def bench_poi_base(model, M, N):
     I = range(M)
@@ -125,17 +123,17 @@ M = 1000
 N = 1000
 timer = TicTocTimer()
 
-# timer.tic("pyomo starts")
-# # bench_pyomo(M, N)
-# timer.toc("pyomo ends")
+timer.tic("pyomo starts")
+bench_pyomo_gurobi(M, N)
+timer.toc("pyomo ends")
 
 timer.tic("poi_gurobi starts")
 bench_poi_gurobi(M, N)
 timer.toc("poi_gurobi ends")
 
-timer.tic("linopy_gurobi starts")
-bench_linopy_gurobi(M, N)
-timer.toc("linopy_gurobi ends")
+# timer.tic("linopy_gurobi starts")
+# bench_linopy_gurobi(M, N)
+# timer.toc("linopy_gurobi ends")
 
 timer.tic("gurobi starts")
 bench_gp(M, N)

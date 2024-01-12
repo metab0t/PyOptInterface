@@ -1,0 +1,20 @@
+param t0;
+let t0 := time();
+
+model bench_modify.mod;
+
+let N := 10000;
+
+option solver_msg 0;
+option presolve 0;
+option solver 'gurobi';
+option gurobi_options 'outlev=0 timelim=2 presolve=0';
+
+solve >NUL;
+
+for {j in (N div 2 + 1)..N} {
+    let x[j] := 0;
+    solve >NUL;
+}
+
+printf "%d\n", time()-t0

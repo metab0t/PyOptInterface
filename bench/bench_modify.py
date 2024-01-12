@@ -107,7 +107,7 @@ def bench_cp(N):
     print(f"coptpy: get_after_delete_time: {get_after_delete_time}")
 
 
-N = 30000
+N = 10000
 timer = TicTocTimer()
 
 timer.tic("poi_gurobi starts")
