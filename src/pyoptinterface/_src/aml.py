@@ -1,7 +1,5 @@
-from .core_ext import VariableDomain, ExprBuilder
-from .attributes import VariableAttribute
-
-from .tupledict import tupledict, make_tupledict
+from .core_ext import ExprBuilder
+from .tupledict import make_tupledict
 
 from typing import Iterable
 

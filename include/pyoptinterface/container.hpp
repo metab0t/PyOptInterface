@@ -159,8 +159,6 @@ class ChunkedBitVector
   public:
 	ChunkedBitVector(ResultT start = 0) : m_start(start)
 	{
-		CHUNK_WIDTH = sizeof(ChunkT) * 8;
-		LOG2_CHUNK_WIDTH = std::bit_width(CHUNK_WIDTH) - 1;
 		clear();
 	}
 
@@ -286,8 +284,11 @@ class ChunkedBitVector
 	}
 
   private:
-	std::uint8_t CHUNK_WIDTH;
-	std::uint8_t LOG2_CHUNK_WIDTH;
+	enum : std::uint8_t
+	{
+		CHUNK_WIDTH = sizeof(ChunkT) * 8,
+		LOG2_CHUNK_WIDTH = std::countr_zero(CHUNK_WIDTH)
+	};
 
 	ResultT m_start;
 

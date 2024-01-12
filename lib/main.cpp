@@ -112,39 +112,24 @@ auto test_chunkedbv() -> void
 
 auto test_gurobi() -> void
 {
-	GRBenv *env;
-	int error;
+	GurobiEnv env;
+	GurobiModelMixin model;
+	model.init(env);
 
-	error = GRBloadenv(&env, NULL);
-	if (error)
-	{
-		printf("%s\n", GRBgeterrormsg(env));
-		goto end;
-	}
+	VariableIndex x = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
+	VariableIndex y = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
 
-	{
-		GurobiEnv env;
-		GurobiModelMixin model;
-		model.init(env);
+	ExprBuilder expr;
+	// expr.add(x);
+	// expr.add(y);
+	// ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
 
-		VariableIndex x = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
-		VariableIndex y = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
+	expr.clear();
+	expr.add(x);
+	expr.add(y);
+	model.set_objective(expr, ObjectiveSense::Minimize);
 
-		ExprBuilder expr;
-		//expr.add(x);
-		//expr.add(y);
-		//ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
-
-		expr.clear();
-		expr.add(x);
-		expr.add(y);
-		model.set_objective(expr, ObjectiveSense::Minimize);
-
-		model.optimize();
-	}
-
-end:
-	GRBfreeenv(env);
+	model.optimize();
 }
 
 void bench()
@@ -202,6 +187,6 @@ auto test_copt() -> void
 
 auto main() -> int
 {
-	test_gurobi();
+	bench_container();
 	return 0;
 }
