@@ -152,8 +152,8 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 	IndexT index = m_linear_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
 
-	AffineFunctionPtrForm ptr_form;
-	make_affine_ptr_form(this, function, ptr_form);
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
 
 	int numnz = ptr_form.numnz;
 	int *cind = ptr_form.index;
@@ -177,18 +177,18 @@ ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 	int numlnz = 0;
 	int *lind = NULL;
 	double *lval = NULL;
-	AffineFunctionPtrForm affine_ptr_form;
+	AffineFunctionPtrForm<int, int, double> affine_ptr_form;
 	if (affine_part.has_value())
 	{
 		const auto &affine_function = affine_part.value();
-		make_affine_ptr_form(this, affine_function, affine_ptr_form);
+		affine_ptr_form.make(this, affine_function);
 		numlnz = affine_ptr_form.numnz;
 		lind = affine_ptr_form.index;
 		lval = affine_ptr_form.value;
 	}
 
-	QuadraticFunctionPtrForm ptr_form;
-	make_quadratic_ptr_form(this, function, ptr_form);
+	QuadraticFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
 	int numqnz = ptr_form.numnz;
 	int *qrow = ptr_form.row;
 	int *qcol = ptr_form.col;
@@ -342,8 +342,8 @@ void COPTModel::set_objective(const ScalarQuadraticFunction &function, Objective
 	int numqnz = function.size();
 	if (numqnz > 0)
 	{
-		QuadraticFunctionPtrForm ptr_form;
-		make_quadratic_ptr_form(this, function, ptr_form);
+		QuadraticFunctionPtrForm<int, int, double> ptr_form;
+		ptr_form.make(this, function);
 		int numqnz = ptr_form.numnz;
 		int *qrow = ptr_form.row;
 		int *qcol = ptr_form.col;

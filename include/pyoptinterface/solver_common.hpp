@@ -245,24 +245,6 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &funct
 	return fmt::format("{}", fmt::join(terms, "+"));
 }
 
-struct AffineFunctionPtrForm
-{
-	int numnz;
-	int *index;
-	double *value;
-	std::vector<int> index_storage;
-};
-
-struct QuadraticFunctionPtrForm
-{
-	int numnz;
-	int *row;
-	int *col;
-	double *value;
-	std::vector<int> row_storage;
-	std::vector<int> col_storage;
-};
-
 template <typename T>
 concept VarIndexModel = requires(T *model, const VariableIndex &v) {
 	{
@@ -270,35 +252,77 @@ concept VarIndexModel = requires(T *model, const VariableIndex &v) {
 	} -> std::convertible_to<IndexT>;
 };
 
-template <VarIndexModel T>
-void make_affine_ptr_form(T *model, const ScalarAffineFunction &function,
-                          AffineFunctionPtrForm &ptr_form)
+template <std::integral NZT, std::integral IDXT, std::floating_point VALT>
+struct AffineFunctionPtrForm
 {
-	int numnz = function.size();
-	ptr_form.numnz = numnz;
-	ptr_form.index_storage.resize(numnz);
-	for (int i = 0; i < numnz; ++i)
-	{
-		ptr_form.index_storage[i] = model->_variable_index(function.variables[i]);
-	}
-	ptr_form.index = ptr_form.index_storage.data();
-	ptr_form.value = (double *)function.coefficients.data();
-}
+	NZT numnz;
+	IDXT *index;
+	VALT *value;
+	std::vector<IDXT> index_storage;
+	std::vector<VALT> value_storage;
 
-template <VarIndexModel T>
-void make_quadratic_ptr_form(T *model, const ScalarQuadraticFunction &function,
-                             QuadraticFunctionPtrForm &ptr_form)
-{
-	int numnz = function.size();
-	ptr_form.numnz = numnz;
-	ptr_form.row_storage.resize(numnz);
-	ptr_form.col_storage.resize(numnz);
-	for (int i = 0; i < numnz; ++i)
+	template <VarIndexModel T>
+	void make(T *model, const ScalarAffineFunction &function)
 	{
-		ptr_form.row_storage[i] = model->_variable_index(function.variable_1s[i]);
-		ptr_form.col_storage[i] = model->_variable_index(function.variable_2s[i]);
+		auto f_numnz = function.size();
+		numnz = f_numnz;
+		index_storage.resize(numnz);
+		for (int i = 0; i < numnz; ++i)
+		{
+			index_storage[i] = model->_variable_index(function.variables[i]);
+		}
+		index = index_storage.data();
+		if constexpr (std::is_same_v<VALT, CoeffT>)
+		{
+			value = (VALT *)function.coefficients.data();
+		}
+		else
+		{
+			value_storage.resize(numnz);
+			for (int i = 0; i < numnz; ++i)
+			{
+				value_storage[i] = function.coefficients[i];
+			}
+		}
 	}
-	ptr_form.row = ptr_form.row_storage.data();
-	ptr_form.col = ptr_form.col_storage.data();
-	ptr_form.value = (double *)function.coefficients.data();
-}
+};
+
+template <std::integral NZT, std::integral IDXT, std::floating_point VALT>
+struct QuadraticFunctionPtrForm
+{
+	NZT numnz;
+	IDXT *row;
+	IDXT *col;
+	VALT *value;
+	std::vector<IDXT> row_storage;
+	std::vector<IDXT> col_storage;
+	std::vector<VALT> value_storage;
+
+	template <VarIndexModel T>
+	void make(T *model, const ScalarQuadraticFunction &function)
+	{
+		auto f_numnz = function.size();
+		numnz = f_numnz;
+		row_storage.resize(numnz);
+		col_storage.resize(numnz);
+		for (int i = 0; i < numnz; ++i)
+		{
+			row_storage[i] = model->_variable_index(function.variable_1s[i]);
+			col_storage[i] = model->_variable_index(function.variable_2s[i]);
+		}
+		row = row_storage.data();
+		col = col_storage.data();
+		if constexpr (std::is_same_v<VALT, CoeffT>)
+		{
+			value = (VALT *)function.coefficients.data();
+		}
+		else
+		{
+			value_storage.resize(numnz);
+			for (int i = 0; i < numnz; ++i)
+			{
+				value_storage[i] = function.coefficients[i];
+			}
+		}
+	}
+};

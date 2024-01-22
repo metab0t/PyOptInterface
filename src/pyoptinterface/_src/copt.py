@@ -1,4 +1,6 @@
 import os, platform
+import time
+from typing import Optional
 
 if platform.system() == "Windows":
     copt_home = os.environ.get("COPT_HOME", None)
@@ -86,6 +88,15 @@ def get_objsense(model):
         return ObjectiveSense.Maximize
     else:
         raise ValueError(f"Unknown objective sense: {raw_sense}")
+
+
+def get_objval(model):
+    if model._is_mip():
+        attr_name = "BestBnd"
+    else:
+        attr_name = "LpObjval"
+    obj = model.get_raw_attribute_double(attr_name)
+    return obj
 
 
 def get_primalstatus(model):
@@ -221,11 +232,24 @@ def get_silent(model):
 
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveSense: get_objsense,
+    ModelAttribute.BarrierIterations: lambda model: model.get_model_raw_attribute_int(
+        "BarrierIter"
+    ),
+    ModelAttribute.DualObjectiveValue: get_objval,
+    ModelAttribute.NodeCount: lambda model: model.get_model_raw_attribute_int(
+        "NodeCnt"
+    ),
+    ModelAttribute.ObjectiveBound: get_objval,
+    ModelAttribute.ObjectiveValue: get_objval,
+    ModelAttribute.SimplexIterations: lambda model: model.get_model_raw_attribute_int(
+        "SimplexIter"
+    ),
+    ModelAttribute.SolveTimeSec: lambda model: model.solve_time,
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
         "Threads"
     ),
-    ModelAttribute.RelativeGap: lambda model: model.set_raw_parameter_double("RelGap"),
-    ModelAttribute.TimeLimitSec: lambda model: model.set_raw_parameter_double(
+    ModelAttribute.RelativeGap: lambda model: model.get_raw_parameter_double("RelGap"),
+    ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter_double(
         "TimeLimit"
     ),
     ModelAttribute.DualStatus: get_dualstatus,
@@ -285,6 +309,7 @@ class Model(RawModel):
             env = DEFAULT_ENV
         super().__init__(env)
 
+        self.solve_time: Optional[float] = None
         self.mip_start_values: dict[VariableIndex, float] = dict()
 
     def supports_variable_attribute(self, attribute: VariableAttribute):
@@ -420,17 +445,6 @@ class Model(RawModel):
         get_function = get_function_map[param_type]
         return get_function(param_name)
 
-    def set_raw_attribute(self, param_name: str, value):
-        param_type = copt_attribute_raw_type_map[
-            self.raw_parameter_attribute_type(param_name)
-        ]
-        set_function_map = {
-            int: self.set_raw_attribute_int,
-            float: self.set_raw_attribute_double,
-        }
-        set_function = set_function_map[param_type]
-        set_function(param_name, value)
-
     def optimize(self):
         if self._is_mip():
             mip_start = self.mip_start_values
@@ -439,4 +453,6 @@ class Model(RawModel):
                 values = list(mip_start.values())
                 self.add_mip_start(variables, values)
                 mip_start.clear()
+        start_time = time.time()
         super().optimize()
+        self.solve_time = time.time() - start_time

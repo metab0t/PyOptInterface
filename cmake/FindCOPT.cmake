@@ -1,5 +1,5 @@
 # Once done this will define
-#  CPOT_FOUND - System has COPT
+#  COPT_FOUND - System has COPT
 #  Targets:
 #       COPT::COPT_C   - only the C interface
 #       COPT::COPT_CXX - C and C++ interface

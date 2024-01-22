@@ -12,26 +12,34 @@ NB_MODULE(gurobi_model_ext, m)
 {
 	bind_gurobi_constants(m);
 
-	nb::class_<GurobiEnv>(m, "Env")
-	    .def(nb::init<bool>(), nb::arg("empty") = false)
-	    .def("start", &GurobiEnv::start)
-	    .def("raw_parameter_type", &GurobiEnv::raw_parameter_type)
-	    .def("set_raw_parameter_int", &GurobiEnv::set_raw_parameter_int)
-	    .def("set_raw_parameter_double", &GurobiEnv::set_raw_parameter_double)
-	    .def("set_raw_parameter_string", &GurobiEnv::set_raw_parameter_string);
+#define BIND_F(f) .def(#f, &GurobiEnv::f)
+	nb::class_<GurobiEnv>(m, "Env").def(nb::init<bool>(), nb::arg("empty") = false)
+	    // clang-format off
+		BIND_F(start)
+		BIND_F(raw_parameter_type)
+		BIND_F(set_raw_parameter_int)
+		BIND_F(set_raw_parameter_double)
+		BIND_F(set_raw_parameter_string)
+	    // clang-format on
+	    ;
 
 	nb::class_<GurobiModel>(m, "_RawModelBase");
 
+#define BIND_F(f) .def(#f, &GurobiModelMixin::f)
 	nb::class_<GurobiModelMixin, GurobiModel>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
-	    .def("init", &GurobiModelMixin::init)
+	    // clang-format off
+	    BIND_F(init)
+	    // clang-format on
 
 	    .def("add_variable", &GurobiModelMixin::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
 	         nb::arg("ub") = GRB_INFINITY, nb::arg("name") = "")
-	    .def("delete_variable", &GurobiModelMixin::delete_variable)
-	    .def("is_variable_active", &GurobiModelMixin::is_variable_active)
+	    // clang-format off
+	    BIND_F(delete_variable)
+	    BIND_F(is_variable_active)
+	    // clang-format on
 
 	    .def("get_value",
 	         nb::overload_cast<const VariableIndex &>(&GurobiModelMixin::get_variable_value))
@@ -58,8 +66,10 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, int>(&GurobiModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("set_variable_name", &GurobiModelMixin::set_variable_name)
-	    .def("set_constraint_name", &GurobiModelMixin::set_constraint_name)
+	    // clang-format off
+		BIND_F(set_variable_name)
+		BIND_F(set_constraint_name)
+	    // clang-format on
 
 	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
@@ -70,10 +80,12 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
 	             &GurobiModelMixin::add_quadratic_constraint_from_expr))
-	    .def("add_sos1_constraint", &GurobiModelMixin::add_sos1_constraint)
-	    .def("add_sos2_constraint", &GurobiModelMixin::add_sos2_constraint)
-	    .def("delete_constraint", &GurobiModelMixin::delete_constraint)
-	    .def("is_constraint_active", &GurobiModelMixin::is_constraint_active)
+	    // clang-format off
+		BIND_F(add_sos1_constraint)
+		BIND_F(add_sos2_constraint)
+		BIND_F(delete_constraint)
+		BIND_F(is_constraint_active)
+	    // clang-format on
 
 	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
 	                              &GurobiModelMixin::set_objective))
@@ -81,59 +93,49 @@ NB_MODULE(gurobi_model_ext, m)
 	                              &GurobiModelMixin::set_objective))
 	    .def("set_objective", nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
 	                              &GurobiModelMixin::set_objective))
-	    .def("optimize", &GurobiModelMixin::optimize)
-	    .def("update", &GurobiModelMixin::update)
-	    .def("version_string", &GurobiModelMixin::version_string)
-	    .def("get_raw_model", &GurobiModelMixin::get_raw_model)
 
-	    .def("raw_parameter_type", &GurobiModelMixin::raw_parameter_type)
-	    .def("set_raw_parameter_int", &GurobiModelMixin::set_raw_parameter_int)
-	    .def("set_raw_parameter_double", &GurobiModelMixin::set_raw_parameter_double)
-	    .def("set_raw_parameter_string", &GurobiModelMixin::set_raw_parameter_string)
-	    .def("get_raw_parameter_int", &GurobiModelMixin::get_raw_parameter_int)
-	    .def("get_raw_parameter_double", &GurobiModelMixin::get_raw_parameter_double)
-	    .def("get_raw_parameter_string", &GurobiModelMixin::get_raw_parameter_string)
+	    // clang-format off
+	    BIND_F(optimize)
+	    BIND_F(update)
+	    BIND_F(version_string)
+	    BIND_F(get_raw_model)
 
-	    .def("raw_attribute_type", &GurobiModelMixin::raw_attribute_type)
+	    BIND_F(raw_parameter_type)
+	    BIND_F(set_raw_parameter_int)
+	    BIND_F(set_raw_parameter_double)
+	    BIND_F(set_raw_parameter_string)
+	    BIND_F(get_raw_parameter_int)
+	    BIND_F(get_raw_parameter_double)
+	    BIND_F(get_raw_parameter_string)
 
-	    .def("set_model_raw_attribute_int", &GurobiModelMixin::set_model_raw_attribute_int)
-	    .def("set_model_raw_attribute_double", &GurobiModelMixin::set_model_raw_attribute_double)
-	    .def("set_model_raw_attribute_string", &GurobiModelMixin::set_model_raw_attribute_string)
-	    .def("get_model_raw_attribute_int", &GurobiModelMixin::get_model_raw_attribute_int)
-	    .def("get_model_raw_attribute_double", &GurobiModelMixin::get_model_raw_attribute_double)
-	    .def("get_model_raw_attribute_string", &GurobiModelMixin::get_model_raw_attribute_string)
-	    .def("get_model_raw_attribute_vector_double",
-	         &GurobiModelMixin::get_model_raw_attribute_vector_double)
-	    .def("get_model_raw_attribute_list_double",
-	         &GurobiModelMixin::get_model_raw_attribute_list_double)
+	    BIND_F(raw_attribute_type)
 
-	    .def("set_variable_raw_attribute_int", &GurobiModelMixin::set_variable_raw_attribute_int)
-	    .def("set_variable_raw_attribute_char", &GurobiModelMixin::set_variable_raw_attribute_char)
-	    .def("set_variable_raw_attribute_double",
-	         &GurobiModelMixin::set_variable_raw_attribute_double)
-	    .def("set_variable_raw_attribute_string",
-	         &GurobiModelMixin::set_variable_raw_attribute_string)
-	    .def("get_variable_raw_attribute_int", &GurobiModelMixin::get_variable_raw_attribute_int)
-	    .def("get_variable_raw_attribute_char", &GurobiModelMixin::get_variable_raw_attribute_char)
-	    .def("get_variable_raw_attribute_double",
-	         &GurobiModelMixin::get_variable_raw_attribute_double)
-	    .def("get_variable_raw_attribute_string",
-	         &GurobiModelMixin::get_variable_raw_attribute_string)
+	    BIND_F(set_model_raw_attribute_int)
+	    BIND_F(set_model_raw_attribute_double)
+	    BIND_F(set_model_raw_attribute_string)
+	    BIND_F(get_model_raw_attribute_int)
+	    BIND_F(get_model_raw_attribute_double)
+	    BIND_F(get_model_raw_attribute_string)
+	    BIND_F(get_model_raw_attribute_vector_double)
+	    BIND_F(get_model_raw_attribute_list_double)
 
-	    .def("set_constraint_raw_attribute_int",
-	         &GurobiModelMixin::set_constraint_raw_attribute_int)
-	    .def("set_constraint_raw_attribute_char",
-	         &GurobiModelMixin::set_constraint_raw_attribute_char)
-	    .def("set_constraint_raw_attribute_double",
-	         &GurobiModelMixin::set_constraint_raw_attribute_double)
-	    .def("set_constraint_raw_attribute_string",
-	         &GurobiModelMixin::set_constraint_raw_attribute_string)
-	    .def("get_constraint_raw_attribute_int",
-	         &GurobiModelMixin::get_constraint_raw_attribute_int)
-	    .def("get_constraint_raw_attribute_char",
-	         &GurobiModelMixin::get_constraint_raw_attribute_char)
-	    .def("get_constraint_raw_attribute_double",
-	         &GurobiModelMixin::get_constraint_raw_attribute_double)
-	    .def("get_constraint_raw_attribute_string",
-	         &GurobiModelMixin::get_constraint_raw_attribute_string);
+	    BIND_F(set_variable_raw_attribute_int)
+	    BIND_F(set_variable_raw_attribute_char)
+	    BIND_F(set_variable_raw_attribute_double)
+	    BIND_F(set_variable_raw_attribute_string)
+	    BIND_F(get_variable_raw_attribute_int)
+	    BIND_F(get_variable_raw_attribute_char)
+	    BIND_F(get_variable_raw_attribute_double)
+	    BIND_F(get_variable_raw_attribute_string)
+
+	    BIND_F(set_constraint_raw_attribute_int)
+	    BIND_F(set_constraint_raw_attribute_char)
+	    BIND_F(set_constraint_raw_attribute_double)
+	    BIND_F(set_constraint_raw_attribute_string)
+	    BIND_F(get_constraint_raw_attribute_int)
+	    BIND_F(get_constraint_raw_attribute_char)
+	    BIND_F(get_constraint_raw_attribute_double)
+	    BIND_F(get_constraint_raw_attribute_string)
+	    // clang-format on
+	    ;
 }

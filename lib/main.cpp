@@ -2,6 +2,50 @@
 #include "fmt/core.h"
 #include "pyoptinterface/gurobi_model.hpp"
 #include "pyoptinterface/copt_model.hpp"
+#include "pyoptinterface/mosek_model.hpp"
+
+struct MapIndexer
+{
+	Hashmap<IndexT, int> map;
+
+	IndexT add_index()
+	{
+		auto y = map.size();
+		map.emplace(y, y);
+		return y;
+	}
+
+	int get_index(const IndexT &x)
+	{
+		auto it = map.find(x);
+		if (it == map.end())
+		{
+			return -1;
+		}
+		return it->second;
+	}
+};
+
+struct VecIndexer
+{
+	Vector<int> vec;
+
+	IndexT add_index()
+	{
+		auto y = vec.size();
+		vec.emplace_back(y);
+		return y;
+	}
+
+	int get_index(const IndexT &x)
+	{
+		if (x >= vec.size())
+		{
+			return -1;
+		}
+		return vec[x];
+	}
+};
 
 template <typename T>
 void some_operations(T &t)
@@ -50,11 +94,19 @@ void bench_container()
 {
 	{
 		MonotoneVector<int> mv;
-		some_operations(mv);
+		some_easy_operations(mv);
 	}
 	{
 		ChunkedBitVector<std::uint64_t, int> cbv;
-		some_operations(cbv);
+		some_easy_operations(cbv);
+	}
+	{
+		MapIndexer mi;
+		some_easy_operations(mi);
+	}
+	{
+		VecIndexer vi;
+		some_easy_operations(vi);
 	}
 }
 
@@ -185,8 +237,40 @@ auto test_copt() -> void
 	}
 }
 
+auto test_mosek() -> void
+{
+	MOSEKEnv env;
+	MOSEKModelMixin model(env);
+
+	auto N = 10;
+	std::vector<VariableIndex> x;
+	for (auto i = 0; i < N; i++)
+	{
+		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
+	}
+
+	ExprBuilder obj;
+	for (const auto &v : x)
+	{
+		obj.add(v * v);
+	}
+	model.set_objective(obj, ObjectiveSense::Minimize);
+	model.enable_log();
+
+	model.optimize();
+
+	obj = ExprBuilder();
+	model.set_objective(obj, ObjectiveSense::Minimize);
+	for (int i = 0; i < N - 1; i++)
+	{
+		model.delete_variable(x[i]);
+		model.optimize();
+		fmt::print("deleted {}\n", i);
+	}
+}
+
 auto main() -> int
 {
-	bench_container();
+	test_mosek();
 	return 0;
 }

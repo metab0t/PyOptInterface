@@ -1,9 +1,8 @@
 #include "pyoptinterface/core.hpp"
-#include <ranges>
 #include <algorithm>
 #include <stdexcept>
-#include <format>
-#include <assert.h>
+
+#include "fmt/core.h"
 
 VariableIndex::VariableIndex(IndexT v) : index(v)
 {
@@ -57,9 +56,24 @@ void ScalarAffineFunction::canonicalize(CoeffT threshold)
 	ExprBuilder t(*this);
 	t.clean_nearzero_terms(threshold);
 
-	*this = ScalarAffineFunction(t);
+	// *this = ScalarAffineFunction(t);
 	// sort coefficients and variable lock by lock with std::views::zip
-	std::ranges::sort(std::views::zip(variables, coefficients));
+	// std::ranges::sort(std::views::zip(variables, coefficients));
+
+	variables.clear();
+	variables.reserve(t.affine_terms.size());
+	for (const auto &it : t.affine_terms)
+	{
+		variables.push_back(it.first);
+	}
+	std::sort(variables.begin(), variables.end());
+	coefficients.clear();
+	coefficients.reserve(variables.size());
+	for (const auto &it : variables)
+	{
+		coefficients.push_back(t.affine_terms[it]);
+	}
+	constant = t.constant_term;
 }
 
 ScalarQuadraticFunction::ScalarQuadraticFunction(const Vector<CoeffT> &c, const Vector<IndexT> &v1,
@@ -102,8 +116,35 @@ void ScalarQuadraticFunction::canonicalize(CoeffT threshold)
 	ExprBuilder t(*this);
 	t.clean_nearzero_terms(threshold);
 
-	*this = ScalarQuadraticFunction(t);
-	std::ranges::sort(std::views::zip(variable_1s, variable_2s, coefficients));
+	// *this = ScalarQuadraticFunction(t);
+	// std::ranges::sort(std::views::zip(variable_1s, variable_2s, coefficients));
+
+	auto N = t.quadratic_terms.size();
+	std::vector<VariablePair> varpairs;
+	varpairs.reserve(N);
+	for (const auto &it : t.quadratic_terms)
+	{
+		varpairs.emplace_back(it.first);
+	}
+	std::sort(varpairs.begin(), varpairs.end());
+	variable_1s.clear();
+	variable_1s.reserve(N);
+	variable_2s.clear();
+	variable_2s.reserve(N);
+	coefficients.clear();
+	coefficients.reserve(N);
+	for (const auto &it : varpairs)
+	{
+		variable_1s.push_back(it.var_1);
+		variable_2s.push_back(it.var_2);
+		coefficients.push_back(t.quadratic_terms[it]);
+	}
+
+	if (affine_part)
+	{
+		auto &affine_function = affine_part.value();
+		affine_function.canonicalize(threshold);
+	}
 }
 
 bool VariablePair::operator==(const VariablePair &x) const
@@ -115,7 +156,7 @@ bool VariablePair::operator<(const VariablePair &x) const
 	if (var_1 != x.var_1)
 		return var_1 < x.var_1;
 	else
-		return var_1 < var_2;
+		return var_2 < x.var_2;
 }
 
 ExprBuilder::ExprBuilder(const VariableIndex &v)
@@ -386,7 +427,7 @@ void ExprBuilder::mul(const VariableIndex &v)
 	if (deg > 1)
 	{
 		throw std::logic_error(
-		    std::format("ExprBuilder with degree {} cannot multiply with VariableIndex", deg));
+		    fmt::format("ExprBuilder with degree {} cannot multiply with VariableIndex", deg));
 	}
 
 	auto N = affine_terms.size();
@@ -411,7 +452,7 @@ void ExprBuilder::mul(const ScalarAffineFunction &a)
 	auto deg = degree();
 	if (deg > 1)
 	{
-		throw std::logic_error(std::format(
+		throw std::logic_error(fmt::format(
 		    "ExprBuilder with degree {} cannot multiply with ScalarAffineFunction", deg));
 	}
 
@@ -458,7 +499,7 @@ void ExprBuilder::mul(const ScalarQuadraticFunction &q)
 	auto deg = degree();
 	if (deg > 0)
 	{
-		throw std::logic_error(std::format(
+		throw std::logic_error(fmt::format(
 		    "ExprBuilder with degree {} cannot multiply with ScalarQuadraticFunction", deg));
 	}
 
@@ -479,7 +520,7 @@ void ExprBuilder::mul(const ExprBuilder &t)
 	auto deg2 = t.degree();
 	if (deg1 + deg2 > 2)
 	{
-		throw std::logic_error(std::format(
+		throw std::logic_error(fmt::format(
 		    "ExprBuilder with degree {} cannot multiply with ExprBuilder with degree {}", deg1,
 		    deg2));
 	}

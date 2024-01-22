@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15...3.27)
 
 project(pyoptinterface)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -104,5 +104,34 @@ if(ENABLE_COPT)
   install(TARGETS copt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 endif()
 
+# MOSEK
+set(ENABLE_MOSEK ON CACHE BOOL "Enable MOSEK?")
+if(ENABLE_MOSEK)
+  find_package(MOSEK)
+
+  if(NOT MOSEK_FOUND)
+    message(FATAL_ERROR "MOSEK not found!")
+  endif()
+
+  add_library(mosek_model STATIC)
+  target_sources(mosek_model PRIVATE
+    include/pyoptinterface/mosek_model.hpp
+    lib/mosek_model.cpp
+  )
+  target_link_libraries(mosek_model PUBLIC core)
+  target_link_libraries(mosek_model PUBLIC MOSEK::MOSEK_C)
+
+  nanobind_add_module(
+    mosek_model_ext
+
+    STABLE_ABI NB_STATIC
+
+    lib/mosek_model_ext.cpp
+    lib/mosek_model_ext_constants.cpp
+  )
+  target_link_libraries(mosek_model_ext PUBLIC mosek_model)
+  install(TARGETS mosek_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+endif()
+
 add_executable(test_main lib/main.cpp)
-target_link_libraries(test_main PUBLIC core gurobi_model copt_model)
+target_link_libraries(test_main PUBLIC core gurobi_model copt_model mosek_model)
