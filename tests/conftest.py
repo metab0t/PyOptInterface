@@ -15,6 +15,13 @@ try:
 except Exception:
     pass
 
+try:
+    import pyoptinterface.copt as mosek
+
+    model_interface_dict["mosek"] = mosek.Model
+except Exception:
+    pass
+
 
 @pytest.fixture(params=model_interface_dict.keys())
 def model_interface(request):

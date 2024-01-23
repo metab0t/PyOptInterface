@@ -289,9 +289,6 @@ class Model(RawModel):
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
 
-    def supports_batch_add_variables(self):
-        return True
-
     def supports_variable_attribute(self, attribute: VariableAttribute):
         return True
 
