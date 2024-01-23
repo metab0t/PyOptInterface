@@ -56,11 +56,11 @@ MSKboundkeye mosek_con_sense(ConstraintSense sense)
 	switch (sense)
 	{
 	case LessEqual:
-		return MSK_BK_LO;
+		return MSK_BK_UP;
 	case Equal:
 		return MSK_BK_FX;
 	case GreaterEqual:
-		return MSK_BK_UP;
+		return MSK_BK_LO;
 	default:
 		throw std::runtime_error("Unknown constraint sense");
 	}
@@ -992,7 +992,11 @@ std::string MOSEKModel::version_string()
 
 MSKsoltypee MOSEKModel::select_available_solution()
 {
-	for (auto soltype : {MSK_SOL_ITR, MSK_SOL_BAS, MSK_SOL_ITG})
+	for (auto soltype : {
+	         MSK_SOL_ITG,
+	         MSK_SOL_ITR,
+	         MSK_SOL_BAS,
+	     })
 	{
 		MSKbooleant available;
 		auto error = MSK_solutiondef(m_model.get(), soltype, &available);

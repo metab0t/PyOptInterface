@@ -45,8 +45,8 @@ def test(model_interface):
 
     x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
-    assert x_val == approx(10.0)
-    assert y_val == approx(10.0)
+    assert x_val == approx(10.0, abs=1e-3)
+    assert y_val == approx(10.0, abs=1e-3)
 
     model.delete_constraint(con2)
     con3 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.1)

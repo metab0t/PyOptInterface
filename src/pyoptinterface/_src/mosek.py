@@ -42,7 +42,7 @@ def init_default_env():
 
 
 variable_attribute_get_func_map = {
-    VariableAttribute.Value: lambda model, v: model.get_variable_value(v),
+    VariableAttribute.Value: lambda model, v: model.get_value(v),
     VariableAttribute.LowerBound: lambda model, v: model.get_variable_lower_bound(v),
     VariableAttribute.UpperBound: lambda model, v: model.get_variable_upper_bound(v),
     # VariableAttribute.PrimalStart: lambda model, v: model.mip_start_values.get(v, None),
@@ -172,7 +172,7 @@ def get_terminationstatus(model):
             return TerminationStatusCode.DUAL_INFEASIBLE
         elif prosta == Enum.MSK_PRO_STA_PRIM_INFEAS_OR_UNBOUNDED:
             return TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED
-        elif solsta in (Enum.MSK_SOL_STA_OPTIMAL, Enum.MSK_SOL_STA_INTEGER_OPTIMALs):
+        elif solsta in (Enum.MSK_SOL_STA_OPTIMAL, Enum.MSK_SOL_STA_INTEGER_OPTIMAL):
             return TerminationStatusCode.OPTIMAL
         else:
             return TerminationStatusCode.OTHER_ERROR  # ??

@@ -16,7 +16,7 @@ except Exception:
     pass
 
 try:
-    import pyoptinterface.copt as mosek
+    import pyoptinterface.mosek as mosek
 
     model_interface_dict["mosek"] = mosek.Model
 except Exception:
