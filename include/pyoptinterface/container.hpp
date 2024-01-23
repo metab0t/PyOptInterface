@@ -3,6 +3,7 @@
 #include <bit>
 #include <vector>
 #include <concepts>
+#include <assert.h>
 
 #include "pyoptinterface/core.hpp"
 
@@ -164,39 +165,99 @@ class ChunkedBitVector
 
 	IndexT add_index()
 	{
+		IndexT result;
 		if (m_last_bit == CHUNK_WIDTH)
 		{
-			IndexT result = m_data.size() << LOG2_CHUNK_WIDTH;
+			result = m_data.size() << LOG2_CHUNK_WIDTH;
 
 			m_data.push_back(1);
 			m_cumulated_ranks.push_back(m_cumulated_ranks.back());
 			m_chunk_ranks.push_back(-1);
 			m_last_bit = 1;
-
-			return result;
 		}
 		else
 		{
 			auto last_chunk_end = (m_data.size() - 1) << LOG2_CHUNK_WIDTH;
-			IndexT result = last_chunk_end + m_last_bit;
+			result = last_chunk_end + m_last_bit;
 			ChunkT &last_chunk = m_data.back();
 			// set m_last_bit to 1
 			last_chunk |= (ChunkT{1} << m_last_bit);
 			m_last_bit++;
+		}
+		return result;
+	}
 
+	// Add N new indices, return the start of index
+	IndexT add_indices(int N)
+	{
+		assert(N >= 0);
+		if (N == 1)
+		{
+			return add_index();
+		}
+
+		auto current_size = m_data.size();
+		auto last_chunk_end = (current_size - 1) << LOG2_CHUNK_WIDTH;
+		IndexT result = last_chunk_end + m_last_bit;
+
+		// all bits set to 1
+		ChunkT newelement = ~0;
+
+		// The current chunk needs to be filled as 1
+		int extra_bits_in_current_chunk = CHUNK_WIDTH - m_last_bit;
+		extra_bits_in_current_chunk = std::min(extra_bits_in_current_chunk, N);
+		if (extra_bits_in_current_chunk > 0)
+		{
+			ChunkT &last_chunk = m_data.back();
+			// set the bits in [m_last_bit, m_last_bit + extra_bits_in_current_chunk) to 1
+			ChunkT mask = (newelement << (m_last_bit)) &
+			              (newelement >> (CHUNK_WIDTH - m_last_bit - extra_bits_in_current_chunk));
+			last_chunk |= mask;
+		}
+
+		N -= extra_bits_in_current_chunk;
+		if (N <= 0)
+		{
+			m_last_bit += extra_bits_in_current_chunk;
 			return result;
 		}
+
+		auto N_full_elements = N >> LOG2_CHUNK_WIDTH;
+		auto N_remaining_bits = N & (CHUNK_WIDTH - 1);
+
+		if (N_full_elements > 0)
+		{
+			auto new_size = current_size + N_full_elements;
+			m_data.resize(new_size, newelement);
+			m_cumulated_ranks.resize(new_size, m_cumulated_ranks.back());
+			m_chunk_ranks.resize(new_size, CHUNK_WIDTH);
+		}
+		if (N_remaining_bits > 0)
+		{
+			// set the bits in [0, N_remaining_bits) to 1
+			ChunkT remaining_chunk = (ChunkT{1} << N_remaining_bits) - 1;
+			m_data.push_back(remaining_chunk);
+			m_cumulated_ranks.push_back(m_cumulated_ranks.back());
+			m_chunk_ranks.push_back(N_remaining_bits);
+
+			m_last_bit = N_remaining_bits;
+		}
+		else
+		{
+			m_last_bit = CHUNK_WIDTH;
+		}
+		return result;
 	}
 
 	void delete_index(const IndexT &index)
 	{
-		if (index >= m_data.size() * CHUNK_WIDTH)
-		{
-			return;
-		}
 		std::size_t chunk_index;
 		std::uint8_t bit_index;
 		locate_index(index, chunk_index, bit_index);
+		if (chunk_index >= m_data.size())
+		{
+			return;
+		}
 		ChunkT &chunk = m_data[chunk_index];
 		ChunkT mask = ChunkT{1} << bit_index;
 		if (chunk & mask)

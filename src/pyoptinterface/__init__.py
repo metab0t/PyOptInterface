@@ -23,4 +23,8 @@ from pyoptinterface._src.tupledict import (
     make_tupledict,
 )
 
-from pyoptinterface._src.aml import make_nd_variable, quicksum, quicksum_f
+from pyoptinterface._src.aml import (
+    make_nd_variable,
+    quicksum,
+    quicksum_f,
+)

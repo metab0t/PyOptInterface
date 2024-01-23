@@ -13,6 +13,8 @@ set(POI_INSTALL_DIR pyoptinterface/_src)
 if(MSVC)
     # Add /MP flag for multi-processor compilation
     add_compile_options(/MP)
+    # use AVX2
+    add_compile_options(/arch:AVX2)
 endif()
 
 add_library(core STATIC)

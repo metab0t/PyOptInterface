@@ -245,7 +245,7 @@ model_attribute_set_func_map = {
         "MSK_DPAR_MIO_REL_GAP_CONST", v
     ),
     ModelAttribute.TimeLimitSec: lambda model, v: model.set_raw_parameter_double(
-        "MSK_DPAR_MIO_MAX_TIME", v
+        "MSK_DPAR_OPTIMIZER_MAX_TIME", v
     ),
     ModelAttribute.Silent: set_silent,
 }
@@ -288,6 +288,9 @@ class Model(RawModel):
         super().__init__(env)
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
+
+    def supports_batch_add_variables(self):
+        return True
 
     def supports_variable_attribute(self, attribute: VariableAttribute):
         return True

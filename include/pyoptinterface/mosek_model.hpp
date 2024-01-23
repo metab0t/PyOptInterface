@@ -12,7 +12,7 @@ class MOSEKEnv
 	MOSEKEnv();
 	~MOSEKEnv();
 
-	void putlicensecode(const std::vector<MSKint32t>& code);
+	void putlicensecode(const std::vector<MSKint32t> &code);
 
   private:
 	MSKenv_t m_env;
@@ -38,6 +38,8 @@ class MOSEKModel
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -MSK_INFINITY, double ub = MSK_INFINITY,
 	                           const char *name = nullptr);
+	VariableIndex add_variables(int N, VariableDomain domain = VariableDomain::Continuous,
+	                            double lb = -MSK_INFINITY, double ub = MSK_INFINITY);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);

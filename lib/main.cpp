@@ -144,20 +144,24 @@ auto test_chunkedbv() -> void
 {
 	ChunkedBitVector<std::uint64_t, int> cbv;
 
-	auto N = 10000;
+	auto N = 127;
 	for (int i = 0; i < N; i++)
 	{
 		auto x = cbv.add_index();
 		fmt::print("added={}\n", x);
 	}
 
-	for (int i = 0; i < N - 1; i++)
+	auto M = 2;
+	auto x = cbv.add_indices(M);
+	fmt::print("added={}\n", x);
+
+	for (int i = 0; i < M + N - 1; i++)
 	{
 		cbv.delete_index(i);
 		auto x = cbv.get_index(i + 1);
 		if (x != 0)
 		{
-			fmt::print("get_index: {}->{}\n", i + 1, x);
+			fmt::print("wrong get_index: {}->{}\n", i + 1, x);
 		}
 	}
 }
@@ -271,6 +275,6 @@ auto test_mosek() -> void
 
 auto main() -> int
 {
-	test_mosek();
+	test_chunkedbv();
 	return 0;
 }

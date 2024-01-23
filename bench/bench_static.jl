@@ -1,6 +1,7 @@
 using JuMP
 using Gurobi
 using COPT
+using MosekTools
 
 function bench_jump(model, M, N)
     @variable(model, x[1:M, 1:N] >= 0)
@@ -26,6 +27,11 @@ function bench_copt(M::Int, N::Int)
     bench_jump(model, M, N)
 end
 
+function bench_mosek(M::Int, N::Int)
+    model = direct_model(Mosek.Optimizer())
+    bench_jump(model, M, N)
+end
+
 function main(M::Int, N::Int)
     println("Gurobi starts")
     t1 = time()
@@ -38,4 +44,10 @@ function main(M::Int, N::Int)
     bench_copt(M, N)
     t2 = time()
     println("COPT ends and takes ", t2 - t1, " seconds")
+
+    println("Mosek starts")
+    t1 = time()
+    bench_mosek(M, N)
+    t2 = time()
+    println("Mosek ends and takes ", t2 - t1, " seconds")
 end

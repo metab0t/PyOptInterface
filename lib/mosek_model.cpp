@@ -145,13 +145,28 @@ VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double 
 	error = MSK_putvartype(m_model.get(), column, vtype);
 	check_error(error);
 
+	MSKboundkeye bk;
 	if (domain == VariableDomain::Binary)
 	{
+		bk = MSK_BK_RA;
 		lb = 0.0;
 		ub = 1.0;
 		binary_variables.insert(index);
 	}
-	error = MSK_putvarbound(m_model.get(), column, MSK_BK_RA, lb, ub);
+	else
+	{
+		bool lb_inf = lb < 1.0 - MSK_INFINITY;
+		bool ub_inf = ub > MSK_INFINITY - 1.0;
+		if (lb_inf && ub_inf)
+			bk = MSK_BK_FR;
+		else if (lb_inf)
+			bk = MSK_BK_UP;
+		else if (ub_inf)
+			bk = MSK_BK_LO;
+		else
+			bk = MSK_BK_RA;
+	}
+	error = MSK_putvarbound(m_model.get(), column, bk, lb, ub);
 	check_error(error);
 
 	if (name)
@@ -159,6 +174,64 @@ VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double 
 		error = MSK_putvarname(m_model.get(), column, name);
 		check_error(error);
 	}
+
+	return variable;
+}
+
+VariableIndex MOSEKModel::add_variables(int N, VariableDomain domain, double lb, double ub)
+{
+	IndexT index = m_variable_index.add_indices(N);
+	VariableIndex variable(index);
+
+	auto error = MSK_appendvars(m_model.get(), N);
+	check_error(error);
+
+	MSKint32t column;
+	error = MSK_getnumvar(m_model.get(), &column);
+	check_error(error);
+	// 0-based indexing
+	column -= N;
+	std::vector<MSKint32t> columns(N);
+	for (int i = 0; i < N; i++)
+	{
+		columns[i] = column + i;
+	}
+
+	MSKvariabletypee vtype = mosek_vtype(domain);
+	std::vector<MSKvariabletypee> vtypes(N, vtype);
+	error = MSK_putvartypelist(m_model.get(), N, columns.data(), vtypes.data());
+	check_error(error);
+
+	MSKboundkeye bk;
+	if (domain == VariableDomain::Binary)
+	{
+		bk = MSK_BK_RA;
+		lb = 0.0;
+		ub = 1.0;
+		for (int i = 0; i < N; i++)
+		{
+			binary_variables.insert(index + i);
+		}
+	}
+	else
+	{
+		bool lb_inf = lb < 1.0 - MSK_INFINITY;
+		bool ub_inf = ub > MSK_INFINITY - 1.0;
+		if (lb_inf && ub_inf)
+			bk = MSK_BK_FR;
+		else if (lb_inf)
+			bk = MSK_BK_UP;
+		else if (ub_inf)
+			bk = MSK_BK_LO;
+		else
+			bk = MSK_BK_RA;
+	}
+	std::vector<MSKboundkeye> bks(N, bk);
+	std::vector<MSKrealt> lbs(N, lb);
+	std::vector<MSKrealt> ubs(N, ub);
+	error =
+	    MSK_putvarboundlist(m_model.get(), N, columns.data(), bks.data(), lbs.data(), ubs.data());
+	check_error(error);
 
 	return variable;
 }
@@ -359,9 +432,6 @@ void MOSEKModel::set_objective(const ScalarAffineFunction &function, ObjectiveSe
 void MOSEKModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
 {
 	MSKrescodee error;
-	// First delete all quadratic terms
-	error = MSK_putqobj(m_model.get(), 0, nullptr, nullptr, nullptr);
-	check_error(error);
 
 	// Add quadratic term
 	int numqnz = function.size();
@@ -375,6 +445,12 @@ void MOSEKModel::set_objective(const ScalarQuadraticFunction &function, Objectiv
 		MSKrealt *qval = ptr_form.value;
 
 		error = MSK_putqobj(m_model.get(), numqnz, qrow, qcol, qval);
+		check_error(error);
+	}
+	else
+	{
+		// delete all quadratic terms
+		error = MSK_putqobj(m_model.get(), 0, nullptr, nullptr, nullptr);
 		check_error(error);
 	}
 
