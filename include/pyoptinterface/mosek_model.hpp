@@ -64,7 +64,8 @@ class MOSEKModel
 	std::string version_string();
 
 	// solution
-	MSKsoltypee select_available_solution();
+	MSKsoltypee get_current_solution();
+	std::optional<MSKsoltypee> select_available_solution_after_optimization();
 
 	// parameter
 	int raw_parameter_type(const char *name);
@@ -135,6 +136,9 @@ class MOSEKModel
 	// Mosek does not discriminate between integer variable and binary variable
 	// So we need to keep track of binary variables
 	Hashset<IndexT> binary_variables;
+
+	// Cache current available solution after optimization
+	std::optional<MSKsoltypee> m_soltype;
 
 	/* MOSEK part */
 	std::unique_ptr<MSKtask, MOSEKfreemodelT> m_model;

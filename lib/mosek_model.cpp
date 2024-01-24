@@ -259,7 +259,7 @@ double MOSEKModel::get_variable_value(const VariableIndex &variable)
 {
 	auto column = _checked_variable_index(variable);
 	MSKrealt retval;
-	auto soltype = select_available_solution();
+	auto soltype = get_current_solution();
 	auto error = MSK_getxxslice(m_model.get(), soltype, column, column + 1, &retval);
 	check_error(error);
 	return retval;
@@ -490,6 +490,7 @@ void MOSEKModel::set_objective(const ExprBuilder &function, ObjectiveSense sense
 int MOSEKModel::optimize()
 {
 	auto error = MSK_optimize(m_model.get());
+	m_soltype = select_available_solution_after_optimization();
 	return error;
 }
 
@@ -580,7 +581,7 @@ MSKint32t MOSEKModel::getnumcon()
 int MOSEKModel::getprosta()
 {
 	MSKprostae retval;
-	auto error = MSK_getprosta(m_model.get(), select_available_solution(), &retval);
+	auto error = MSK_getprosta(m_model.get(), get_current_solution(), &retval);
 	check_error(error);
 	return retval;
 }
@@ -588,7 +589,7 @@ int MOSEKModel::getprosta()
 int MOSEKModel::getsolsta()
 {
 	MSKsolstae retval;
-	auto error = MSK_getsolsta(m_model.get(), select_available_solution(), &retval);
+	auto error = MSK_getsolsta(m_model.get(), get_current_solution(), &retval);
 	check_error(error);
 	return retval;
 }
@@ -596,7 +597,7 @@ int MOSEKModel::getsolsta()
 double MOSEKModel::getprimalobj()
 {
 	MSKrealt retval;
-	auto error = MSK_getprimalobj(m_model.get(), select_available_solution(), &retval);
+	auto error = MSK_getprimalobj(m_model.get(), get_current_solution(), &retval);
 	check_error(error);
 	return retval;
 }
@@ -604,7 +605,7 @@ double MOSEKModel::getprimalobj()
 double MOSEKModel::getdualobj()
 {
 	MSKrealt retval;
-	auto error = MSK_getdualobj(m_model.get(), select_available_solution(), &retval);
+	auto error = MSK_getdualobj(m_model.get(), get_current_solution(), &retval);
 	check_error(error);
 	return retval;
 }
@@ -843,7 +844,7 @@ void MOSEKModel::set_variable_primal(const VariableIndex &variable, double prima
 double MOSEKModel::get_constraint_primal(const ConstraintIndex &constraint)
 {
 	int row = _checked_constraint_index(constraint);
-	auto soltype = select_available_solution();
+	auto soltype = get_current_solution();
 	MSKrealt retval;
 	int num = 1;
 	MSKrescodee error;
@@ -863,7 +864,7 @@ double MOSEKModel::get_constraint_primal(const ConstraintIndex &constraint)
 double MOSEKModel::get_constraint_dual(const ConstraintIndex &constraint)
 {
 	int row = _checked_constraint_index(constraint);
-	auto soltype = select_available_solution();
+	auto soltype = get_current_solution();
 	MSKrealt retval;
 	int num = 1;
 	MSKrescodee error;
@@ -1122,7 +1123,16 @@ std::string MOSEKModel::version_string()
 	return version;
 }
 
-MSKsoltypee MOSEKModel::select_available_solution()
+MSKsoltypee MOSEKModel::get_current_solution()
+{
+	if (m_soltype)
+	{
+		return m_soltype.value();
+	}
+	throw std::runtime_error("No solution type is available");
+}
+
+std::optional<MSKsoltypee> MOSEKModel::select_available_solution_after_optimization()
 {
 	std::vector<MSKsoltypee> soltypes{
 	    MSK_SOL_ITR,
@@ -1155,11 +1165,11 @@ MSKsoltypee MOSEKModel::select_available_solution()
 	{
 		return optimal_soltypes[0];
 	}
-	else if (!available_soltypes.empty())
+	if (!available_soltypes.empty())
 	{
 		return available_soltypes[0];
 	}
-	throw std::runtime_error("No solution available");
+	return std::nullopt;
 }
 
 MOSEKEnv::MOSEKEnv()
