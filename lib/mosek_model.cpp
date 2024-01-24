@@ -740,7 +740,7 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 		needs_reset = true;
 		break;
 	case MSK_BK_LO:
-		if (lb_old > lb)
+		if (lb_old < lb)
 		{
 			needs_reset = false;
 		}
@@ -755,7 +755,7 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 		needs_reset = true;
 		break;
 	case MSK_BK_RA:
-		if (lb_old > lb)
+		if (lb_old < lb)
 		{
 			needs_reset = false;
 		}
@@ -794,7 +794,7 @@ void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double 
 		needs_reset = true;
 		break;
 	case MSK_BK_UP:
-		if (ub_old < ub)
+		if (ub_old > ub)
 		{
 			needs_reset = false;
 		}
@@ -809,7 +809,7 @@ void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double 
 		needs_reset = true;
 		break;
 	case MSK_BK_RA:
-		if (ub_old < ub)
+		if (ub_old > ub)
 		{
 			needs_reset = false;
 		}
@@ -940,6 +940,138 @@ void MOSEKModel::set_obj_sense(ObjectiveSense sense)
 	check_error(error);
 }
 
+double MOSEKModel::get_normalized_rhs(const ConstraintIndex &constraint)
+{
+	auto row = _checked_constraint_index(constraint);
+	MSKrescodee error;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+	case ConstraintType::Quadratic: {
+		MSKboundkeye bk;
+		MSKrealt lb, ub;
+		error = MSK_getconbound(m_model.get(), row, &bk, &lb, &ub);
+		check_error(error);
+
+		double rhs;
+		switch (bk)
+		{
+		case MSK_BK_UP:
+			rhs = ub;
+			break;
+		case MSK_BK_LO:
+			rhs = lb;
+			break;
+		case MSK_BK_FX:
+			rhs = lb;
+			break;
+		case MSK_BK_FR:
+			throw std::runtime_error("Constraint has no finite bound");
+			break;
+		case MSK_BK_RA:
+			throw std::runtime_error("Constraint has two finite bounds");
+			break;
+		default:
+			throw std::runtime_error("Unknown bound type");
+		}
+
+		return rhs;
+	}
+	default:
+		throw std::runtime_error("Unknown constraint type to get_normalized_rhs");
+	}
+}
+
+void MOSEKModel::set_normalized_rhs(const ConstraintIndex &constraint, double value)
+{
+	auto row = _checked_constraint_index(constraint);
+	MSKrescodee error;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+	case ConstraintType::Quadratic: {
+		MSKboundkeye bk;
+		MSKrealt lb, ub;
+		error = MSK_getconbound(m_model.get(), row, &bk, &lb, &ub);
+		check_error(error);
+
+		switch (bk)
+		{
+		case MSK_BK_UP:
+			ub = value;
+			break;
+		case MSK_BK_LO:
+			lb = value;
+			break;
+		case MSK_BK_FX:
+			ub = value;
+			lb = value;
+			break;
+		case MSK_BK_FR:
+			throw std::runtime_error("Constraint has no finite bound");
+			break;
+		case MSK_BK_RA:
+			throw std::runtime_error("Constraint has two finite bounds");
+			break;
+		default:
+			throw std::runtime_error("Unknown bound type");
+		}
+
+		error = MSK_putconbound(m_model.get(), row, bk, lb, ub);
+		check_error(error);
+	}
+	break;
+	default:
+		throw std::runtime_error("Unknown constraint type to set_normalized_rhs");
+	}
+}
+
+double MOSEKModel::get_normalized_coefficient(const ConstraintIndex &constraint,
+                                              const VariableIndex &variable)
+{
+	if (constraint.type != ConstraintType::Linear && constraint.type != ConstraintType::Quadratic)
+	{
+		throw std::runtime_error(
+		    "Only linear and quadratic constraint supports get_normalized_coefficient");
+	}
+	auto row = _checked_constraint_index(constraint);
+	auto col = _checked_variable_index(variable);
+	MSKrealt retval;
+	auto error = MSK_getaij(m_model.get(), row, col, &retval);
+	check_error(error);
+	return retval;
+}
+
+void MOSEKModel::set_normalized_coefficient(const ConstraintIndex &constraint,
+                                            const VariableIndex &variable, double value)
+{
+	if (constraint.type != ConstraintType::Linear && constraint.type != ConstraintType::Quadratic)
+	{
+		throw std::runtime_error(
+		    "Only linear and quadratic constraint supports set_normalized_coefficient");
+	}
+	auto row = _checked_constraint_index(constraint);
+	auto col = _checked_variable_index(variable);
+	auto error = MSK_putaij(m_model.get(), row, col, value);
+	check_error(error);
+}
+
+double MOSEKModel::get_objective_coefficient(const VariableIndex &variable)
+{
+	auto column = _checked_variable_index(variable);
+	MSKrealt retval;
+	auto error = MSK_getcj(m_model.get(), column, &retval);
+	check_error(error);
+	return retval;
+}
+
+void MOSEKModel::set_objective_coefficient(const VariableIndex &variable, double value)
+{
+	auto column = _checked_variable_index(variable);
+	auto error = MSK_putcj(m_model.get(), column, value);
+	check_error(error);
+}
+
 MSKint32t MOSEKModel::_variable_index(const VariableIndex &variable)
 {
 	return m_variable_index.get_index(variable.index);
@@ -992,19 +1124,40 @@ std::string MOSEKModel::version_string()
 
 MSKsoltypee MOSEKModel::select_available_solution()
 {
-	for (auto soltype : {
-	         MSK_SOL_ITG,
-	         MSK_SOL_ITR,
-	         MSK_SOL_BAS,
-	     })
+	std::vector<MSKsoltypee> soltypes{
+	    MSK_SOL_ITR,
+	    MSK_SOL_ITG,
+	    MSK_SOL_BAS,
+	};
+	std::vector<MSKsoltypee> available_soltypes;
+	std::vector<MSKsoltypee> optimal_soltypes;
+	for (auto soltype : soltypes)
 	{
 		MSKbooleant available;
 		auto error = MSK_solutiondef(m_model.get(), soltype, &available);
 		check_error(error);
 		if (available)
 		{
-			return soltype;
+			available_soltypes.push_back(soltype);
+
+			MSKsolstae solsta;
+			auto error = MSK_getsolsta(m_model.get(), soltype, &solsta);
+			check_error(error);
+
+			if (solsta == MSK_SOL_STA_OPTIMAL || solsta == MSK_SOL_STA_INTEGER_OPTIMAL)
+			{
+				optimal_soltypes.push_back(soltype);
+			}
 		}
+	}
+
+	if (!optimal_soltypes.empty())
+	{
+		return optimal_soltypes[0];
+	}
+	else if (!available_soltypes.empty())
+	{
+		return available_soltypes[0];
 	}
 	throw std::runtime_error("No solution available");
 }

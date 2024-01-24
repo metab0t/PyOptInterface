@@ -136,6 +136,13 @@ NB_MODULE(gurobi_model_ext, m)
 	    BIND_F(get_constraint_raw_attribute_char)
 	    BIND_F(get_constraint_raw_attribute_double)
 	    BIND_F(get_constraint_raw_attribute_string)
+
+		BIND_F(get_normalized_rhs)
+		BIND_F(set_normalized_rhs)
+		BIND_F(get_normalized_coefficient)
+		BIND_F(set_normalized_coefficient)
+		BIND_F(get_objective_coefficient)
+		BIND_F(set_objective_coefficient)
 	    // clang-format on
 	    ;
 }

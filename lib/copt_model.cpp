@@ -605,6 +605,128 @@ void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vect
 	check_error(error);
 }
 
+double COPTModel::get_normalized_rhs(const ConstraintIndex &constraint)
+{
+	int row = _checked_constraint_index(constraint);
+	int num = 1;
+	int error;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear: {
+		double lb, ub;
+		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
+		check_error(error);
+		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
+		check_error(error);
+
+		bool lb_inf = lb < -COPT_INFINITY + 1.0;
+		bool ub_inf = ub > COPT_INFINITY - 1.0;
+
+		if (!lb_inf)
+			return lb;
+		if (!ub_inf)
+			return ub;
+
+		throw std::runtime_error("Constraint has no finite bound");
+	}
+	break;
+	case ConstraintType::Quadratic: {
+		double rhs;
+		error = COPT_GetQConstrRhs(m_model.get(), num, &row, &rhs);
+		check_error(error);
+		return rhs;
+	}
+	break;
+	default:
+		throw std::runtime_error("Unknown constraint type to get_normalized_rhs");
+	}
+}
+
+void COPTModel::set_normalized_rhs(const ConstraintIndex &constraint, double value)
+{
+	int row = _checked_constraint_index(constraint);
+	int num = 1;
+	int error;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear: {
+		double lb, ub;
+
+		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
+		check_error(error);
+		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
+		check_error(error);
+
+		bool lb_inf = lb < -COPT_INFINITY + 1.0;
+		bool ub_inf = ub > COPT_INFINITY - 1.0;
+
+		if (!lb_inf)
+		{
+			error = COPT_SetRowLower(m_model.get(), num, &row, &value);
+			check_error(error);
+		}
+		if (!ub_inf)
+		{
+			error = COPT_SetRowUpper(m_model.get(), num, &row, &value);
+			check_error(error);
+		}
+
+		if (lb_inf && ub_inf)
+		{
+			throw std::runtime_error("Constraint has no finite bound");
+		}
+	}
+	break;
+	case ConstraintType::Quadratic: {
+		error = COPT_SetQConstrRhs(m_model.get(), num, &row, &value);
+		check_error(error);
+	}
+	break;
+	default:
+		throw std::runtime_error("Unknown constraint type to set_normalized_rhs");
+	}
+}
+
+double COPTModel::get_normalized_coefficient(const ConstraintIndex &constraint,
+                                             const VariableIndex &variable)
+{
+	if (constraint.type != ConstraintType::Linear)
+	{
+		throw std::runtime_error("Only linear constraint supports get_normalized_coefficient");
+	}
+	int row = _checked_constraint_index(constraint);
+	int col = _checked_variable_index(variable);
+	double retval;
+	int error = COPT_GetElem(m_model.get(), col, row, &retval);
+	check_error(error);
+	return retval;
+}
+
+void COPTModel::set_normalized_coefficient(const ConstraintIndex &constraint,
+                                           const VariableIndex &variable, double value)
+{
+	if (constraint.type != ConstraintType::Linear)
+	{
+		throw std::runtime_error("Only linear constraint supports set_normalized_coefficient");
+	}
+	int row = _checked_constraint_index(constraint);
+	int col = _checked_variable_index(variable);
+	int error = COPT_SetElem(m_model.get(), col, row, value);
+	check_error(error);
+}
+
+double COPTModel::get_objective_coefficient(const VariableIndex &variable)
+{
+	return get_variable_info(variable, COPT_DBLINFO_OBJ);
+}
+
+void COPTModel::set_objective_coefficient(const VariableIndex &variable, double value)
+{
+	auto column = _checked_variable_index(variable);
+	int error = COPT_SetColObj(m_model.get(), 1, &column, &value);
+	check_error(error);
+}
+
 int COPTModel::_variable_index(const VariableIndex &variable)
 {
 	return m_variable_index.get_index(variable.index);

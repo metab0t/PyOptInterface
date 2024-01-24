@@ -18,10 +18,8 @@ def test(model_interface):
     con1 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0)
 
     model.optimize()
-
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
-
     x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(2.0)
@@ -39,10 +37,8 @@ def test(model_interface):
     model.delete_constraint(con1)
     con2 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.0)
     model.optimize()
-
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
-
     x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(10.0, abs=1e-3)
@@ -54,11 +50,32 @@ def test(model_interface):
         x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer
     )
     model.optimize()
-
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
-
     x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(10.0)
     assert y_val == approx(10.1)
+
+    model.delete_constraint(con3)
+    con4 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0)
+    model.set_variable_attribute(
+        x, poi.VariableAttribute.Domain, poi.VariableDomain.Continuous
+    )
+    model.set_variable_attribute(y, poi.VariableAttribute.LowerBound, 0.0)
+    model.optimize()
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
+    x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
+    y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
+    assert x_val == approx(5.0)
+    assert y_val == approx(5.0)
+
+    model.set_normalized_rhs(con4, 16.0)
+    model.optimize()
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
+    x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
+    y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
+    assert x_val == approx(8.0)
+    assert y_val == approx(8.0)

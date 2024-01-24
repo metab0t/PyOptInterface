@@ -704,6 +704,78 @@ std::string GurobiModel::get_constraint_raw_attribute_string(const ConstraintInd
 	return std::string(retval);
 }
 
+double GurobiModel::get_normalized_rhs(const ConstraintIndex &constraint)
+{
+	const char *name;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+		name = GRB_DBL_ATTR_RHS;
+		break;
+	case ConstraintType::Quadratic:
+		name = GRB_DBL_ATTR_QCRHS;
+		break;
+	default:
+		throw std::runtime_error("Unknown constraint type to get_normalized_rhs");
+	}
+	return get_constraint_raw_attribute_double(constraint, name);
+}
+
+void GurobiModel::set_normalized_rhs(const ConstraintIndex &constraint, double value)
+{
+	const char *name;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear:
+		name = GRB_DBL_ATTR_RHS;
+		break;
+	case ConstraintType::Quadratic:
+		name = GRB_DBL_ATTR_QCRHS;
+		break;
+	default:
+		throw std::runtime_error("Unknown constraint type to set_normalized_rhs");
+	}
+	set_constraint_raw_attribute_double(constraint, name, value);
+}
+
+double GurobiModel::get_normalized_coefficient(const ConstraintIndex &constraint,
+                                               const VariableIndex &variable)
+{
+	if (constraint.type != ConstraintType::Linear)
+	{
+		throw std::runtime_error("Only linear constraint supports get_normalized_coefficient");
+	}
+	int row = _checked_constraint_index(constraint);
+	int col = _checked_variable_index(variable);
+	double retval;
+	int error = GRBgetcoeff(m_model.get(), row, col, &retval);
+	check_error(error);
+	return retval;
+}
+
+void GurobiModel::set_normalized_coefficient(const ConstraintIndex &constraint,
+                                             const VariableIndex &variable, double value)
+{
+	if (constraint.type != ConstraintType::Linear)
+	{
+		throw std::runtime_error("Only linear constraint supports set_normalized_coefficient");
+	}
+	int row = _checked_constraint_index(constraint);
+	int col = _checked_variable_index(variable);
+	int error = GRBchgcoeffs(m_model.get(), 1, &row, &col, &value);
+	check_error(error);
+}
+
+double GurobiModel::get_objective_coefficient(const VariableIndex &variable)
+{
+	return get_variable_raw_attribute_double(variable, GRB_DBL_ATTR_OBJ);
+}
+
+void GurobiModel::set_objective_coefficient(const VariableIndex &variable, double value)
+{
+	set_variable_raw_attribute_double(variable, GRB_DBL_ATTR_OBJ, value);
+}
+
 int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 {
 	_update_if_necessary();

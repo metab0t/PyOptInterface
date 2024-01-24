@@ -97,20 +97,28 @@ NB_MODULE(copt_model_ext, m)
 	    BIND_F(get_raw_attribute_int)
 	    BIND_F(get_raw_attribute_double)
 
+		BIND_F(get_variable_info)
 	    BIND_F(set_variable_name)
 	    BIND_F(get_variable_name)
 	    BIND_F(set_variable_type)
 	    BIND_F(get_variable_type)
 	    BIND_F(set_variable_lower_bound)
 	    BIND_F(set_variable_upper_bound)
+
+		BIND_F(get_constraint_info)
 	    BIND_F(set_constraint_name)
 	    BIND_F(get_constraint_name)
-	    BIND_F(get_variable_info)
-	    BIND_F(get_constraint_info)
 
 	    BIND_F(set_obj_sense)
 
 	    BIND_F(add_mip_start)
+
+		BIND_F(get_normalized_rhs)
+		BIND_F(set_normalized_rhs)
+		BIND_F(get_normalized_coefficient)
+		BIND_F(set_normalized_coefficient)
+		BIND_F(get_objective_coefficient)
+		BIND_F(set_objective_coefficient)
 	    // clang-format on
 	    ;
 }

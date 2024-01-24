@@ -9,7 +9,7 @@
 class GurobiEnv
 {
   public:
-	GurobiEnv(bool empty=false);
+	GurobiEnv(bool empty = false);
 	~GurobiEnv();
 
 	// parameter
@@ -68,7 +68,8 @@ class GurobiModel
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
 
-	void _set_affine_objective(const ScalarAffineFunction &function, ObjectiveSense sense, bool clear_quadratic);
+	void _set_affine_objective(const ScalarAffineFunction &function, ObjectiveSense sense,
+	                           bool clear_quadratic);
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &function, ObjectiveSense sense);
@@ -137,6 +138,19 @@ class GurobiModel
 	                                           const char *attr_name);
 	std::string get_constraint_raw_attribute_string(const ConstraintIndex &constraint,
 	                                                const char *attr_name);
+
+	// Modifications of model
+	// 1. set/get RHS of a constraint
+	double get_normalized_rhs(const ConstraintIndex &constraint);
+	void set_normalized_rhs(const ConstraintIndex &constraint, double value);
+	// 2. set/get coefficient of variable in constraint
+	double get_normalized_coefficient(const ConstraintIndex &constraint, const VariableIndex &variable);
+	void set_normalized_coefficient(const ConstraintIndex &constraint,
+	                                const VariableIndex &variable,
+	                        double value);
+	// 3. set/get linear coefficient of variable in objective
+	double get_objective_coefficient(const VariableIndex &variable);
+	void set_objective_coefficient(const VariableIndex &variable, double value);
 
 	int _constraint_index(const ConstraintIndex &constraint);
 	int _checked_constraint_index(const ConstraintIndex &constraint);

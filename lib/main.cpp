@@ -212,12 +212,19 @@ auto test_copt() -> void
 	COPTEnv env;
 	COPTModelMixin model(env);
 
-	auto N = 10000;
+	auto N = 100;
 	std::vector<VariableIndex> x;
 	for (auto i = 0; i < N; i++)
 	{
 		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
 	}
+
+	ExprBuilder expr;
+	for (const auto &v : x)
+	{
+		expr.add(v);
+	}
+	auto con = model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N);
 
 	ExprBuilder obj;
 	for (const auto &v : x)
@@ -227,18 +234,21 @@ auto test_copt() -> void
 	model.set_objective(obj, ObjectiveSense::Minimize);
 	model.set_raw_parameter_int("Logging", 0);
 	model.set_raw_parameter_int("Presolve", 0);
-	model.set_raw_parameter_double("TimeLimit", 0.0);
+	model.set_raw_parameter_double("TimeLimit", 1.0);
 
 	model.optimize();
 
-	obj = ExprBuilder();
+	double lb = model.get_constraint_info(con, COPT_DBLINFO_LB);
+	double ub = model.get_constraint_info(con, COPT_DBLINFO_UB);
+
+	/*obj = ExprBuilder();
 	model.set_objective(obj, ObjectiveSense::Minimize);
 	for (int i = 0; i < N - 1; i++)
 	{
 		model.delete_variable(x[i]);
 		model.optimize();
 		fmt::print("deleted {}\n", i);
-	}
+	}*/
 }
 
 auto test_mosek() -> void
@@ -275,6 +285,6 @@ auto test_mosek() -> void
 
 auto main() -> int
 {
-	test_chunkedbv();
+	test_copt();
 	return 0;
 }

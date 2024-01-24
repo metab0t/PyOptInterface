@@ -109,6 +109,19 @@ class MOSEKModel
 	ObjectiveSense get_obj_sense();
 	void set_obj_sense(ObjectiveSense sense);
 
+	// Modifications of model
+	// 1. set/get RHS of a constraint
+	double get_normalized_rhs(const ConstraintIndex &constraint);
+	void set_normalized_rhs(const ConstraintIndex &constraint, double value);
+	// 2. set/get coefficient of variable in constraint
+	double get_normalized_coefficient(const ConstraintIndex &constraint,
+	                                  const VariableIndex &variable);
+	void set_normalized_coefficient(const ConstraintIndex &constraint,
+	                                const VariableIndex &variable, double value);
+	// 3. set/get linear coefficient of variable in objective
+	double get_objective_coefficient(const VariableIndex &variable);
+	void set_objective_coefficient(const VariableIndex &variable, double value);
+
 	MSKint32t _variable_index(const VariableIndex &variable);
 	MSKint32t _checked_variable_index(const VariableIndex &variable);
 	MSKint32t _constraint_index(const ConstraintIndex &constraint);

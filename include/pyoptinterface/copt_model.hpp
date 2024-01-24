@@ -121,6 +121,19 @@ class COPTModel
 	// MIPStart
 	void add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
 
+	// Modifications of model
+	// 1. set/get RHS of a constraint
+	double get_normalized_rhs(const ConstraintIndex &constraint);
+	void set_normalized_rhs(const ConstraintIndex &constraint, double value);
+	// 2. set/get coefficient of variable in constraint
+	double get_normalized_coefficient(const ConstraintIndex &constraint,
+	                                  const VariableIndex &variable);
+	void set_normalized_coefficient(const ConstraintIndex &constraint,
+	                                const VariableIndex &variable, double value);
+	// 3. set/get linear coefficient of variable in objective
+	double get_objective_coefficient(const VariableIndex &variable);
+	void set_objective_coefficient(const VariableIndex &variable, double value);
+
 	int _variable_index(const VariableIndex &variable);
 	int _checked_variable_index(const VariableIndex &variable);
 	int _constraint_index(const ConstraintIndex &constraint);
