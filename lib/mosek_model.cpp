@@ -15,12 +15,17 @@ void QuadraticFunctionPtrForm<MSKint32t, MSKint32t, MSKrealt>::make(
 	for (int i = 0; i < numnz; ++i)
 	{
 		auto v1 = model->_variable_index(function.variable_1s[i]);
-		auto v2 = model->_variable_index(function.variable_2s[i]);
-		// MOSEK only accepts the lower triangle (i >= j)
-		if (v1 < v2)
+		auto v2 = v1;
+		if (function.variable_1s[i] != function.variable_2s[i])
 		{
-			std::swap(v1, v2);
+			v2 = model->_variable_index(function.variable_2s[i]);
+			// MOSEK only accepts the lower triangle (i >= j)
+			if (v1 < v2)
+			{
+				std::swap(v1, v2);
+			}
 		}
+
 		row_storage[i] = v1;
 		col_storage[i] = v2;
 	}
