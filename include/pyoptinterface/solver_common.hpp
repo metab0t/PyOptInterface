@@ -183,7 +183,15 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ScalarQuadraticFun
 	{
 		auto &coef = function.coefficients[i];
 		std::string var1_str = model->pprint_variable(function.variable_1s[i]);
-		std::string var2_str = model->pprint_variable(function.variable_2s[i]);
+		std::string var2_str;
+		if (function.variable_1s[i] == function.variable_2s[i])
+		{
+			var2_str = var1_str;
+		}
+		else
+		{
+			var2_str = model->pprint_variable(function.variable_2s[i]);
+		}
 		std::string term;
 		if (coef > 0)
 		{
@@ -212,7 +220,15 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &funct
 	for (const auto &[varpair, coef] : function.quadratic_terms)
 	{
 		std::string var1_str = model->pprint_variable(varpair.var_1);
-		std::string var2_str = model->pprint_variable(varpair.var_2);
+		std::string var2_str;
+		if (varpair.var_1 == varpair.var_2)
+		{
+			var2_str = var1_str;
+		}
+		else
+		{
+			var2_str = model->pprint_variable(varpair.var_2);
+		}
 		std::string term;
 		if (coef > 0)
 		{
@@ -308,7 +324,14 @@ struct QuadraticFunctionPtrForm
 		for (int i = 0; i < numnz; ++i)
 		{
 			row_storage[i] = model->_variable_index(function.variable_1s[i]);
-			col_storage[i] = model->_variable_index(function.variable_2s[i]);
+			if (function.variable_1s[i] == function.variable_2s[i])
+			{
+				col_storage[i] = row_storage[i];
+			}
+			else
+			{
+				col_storage[i] = model->_variable_index(function.variable_2s[i]);
+			}
 		}
 		row = row_storage.data();
 		col = col_storage.data();
