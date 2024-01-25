@@ -29,7 +29,7 @@ target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)
 
 # Build Python extensions
-find_package(Python 3.8
+find_package(Python ${PYTHON_VERSION}
   REQUIRED COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
