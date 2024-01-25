@@ -35,21 +35,23 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "D:\installers"
 
-      - name: Cache Gurobi Installer
-        id: cache-gurobi-windows
+      - name: Cache Installers
+        id: cache-installers-windows
         uses: actions/cache@v3
         env:
-          cache-name: cache-gurobi-windows
+          cache-name: cache-installers-windows
         with:
           path: D:\installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('gurobi.msi') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.msi', '**/*.zip') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
-      - if: ${{ steps.cache-gurobi-windows.outputs.cache-hit != 'true' }}
-        name: Download Gurobi Installer
+      - if: ${{ steps.cache-installers-windows.outputs.cache-hit != 'true' }}
+        name: Download Installers
         run: |
           curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
+          curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.0.6/win64/CardinalOptimizer-7.0.6-win64.zip
+          curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.1.22/moseksetupwin64x86.msi
 
       - name: Setup Gurobi Installation
         run: |
@@ -62,22 +64,6 @@ jobs:
           echo "PATH=$env:PATH;D:\SourceDir\gurobi1100\win64\bin" >> $env:GITHUB_ENV
           echo $env:GUROBI_HOME
 
-      - name: Cache COPT Installer
-        id: cache-copt-windows
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-copt-windows
-        with:
-          path: D:\installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('copt.zip') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-  
-      - if: ${{ steps.cache-copt-windows.outputs.cache-hit != 'true' }}
-        name: Download COPT Installer
-        run: |
-          curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.0.6/win64/CardinalOptimizer-7.0.6-win64.zip
-
       - name: Setup COPT Installation
         run: |
           # unzip with 7zip
@@ -87,22 +73,6 @@ jobs:
           echo "COPT_HOME=D:\copt70" >> $env:GITHUB_ENV
           echo "PATH=$env:PATH;D:\copt70\bin" >> $env:GITHUB_ENV
           echo $env:COPT_HOME
-
-      - name: Cache MOSEK Installer
-        id: cache-mosek-windows
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mosek-windows
-        with:
-          path: D:\installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('mosek.msi') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-
-      - if: ${{ steps.cache-mosek-windows.outputs.cache-hit != 'true' }}
-        name: Download MOSEK Installer
-        run: |
-          curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.1.22/moseksetupwin64x86.msi
 
       - name: Setup MOSEK Installation
         run: |
