@@ -1,0 +1,46 @@
+name: build
+
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+        tags:
+          - '*'
+
+jobs:
+
+  windows_build:
+    runs-on: windows-2022
+
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.11"]
+
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Gurobi
+        run: |
+          curl -L -o gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
+          choco install lessmsi
+          lessmsi x gurobi.msi "D:\"
+          ls D:\SourceDir
+          # set environment variables
+          echo "GUROBI_HOME=D:\SourceDir\gurobi1100\win64" >> $env:GITHUB_ENV
+          echo "PATH=$env:PATH;D:\SourceDir\gurobi1100\win64\bin" >> $env:GITHUB_ENV
+          # echo "GRB_LICENSE_FILE=C:\gurobi1100\win64\gurobi.lic" >> $env:GITHUB_ENV
+          echo $env:GUROBI_HOME
+
+      - name: Install
+        run: |
+          python -m pip install build pytest
+
+      - name: Test
+        run: |
+          python -m pip list
+          python -m pip install -v .
+          python -c "import pyoptinterface as poi; print(dir(poi))"
