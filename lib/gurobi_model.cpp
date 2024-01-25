@@ -2,7 +2,7 @@
 #include "pyoptinterface/gurobi_model.hpp"
 #include <fmt/core.h>
 
-char gurobi_con_sense(ConstraintSense sense)
+static char gurobi_con_sense(ConstraintSense sense)
 {
 	using enum ConstraintSense;
 	switch (sense)
@@ -18,7 +18,7 @@ char gurobi_con_sense(ConstraintSense sense)
 	}
 }
 
-int gurobi_obj_sense(ObjectiveSense sense)
+static int gurobi_obj_sense(ObjectiveSense sense)
 {
 	using enum ObjectiveSense;
 	switch (sense)
@@ -32,7 +32,7 @@ int gurobi_obj_sense(ObjectiveSense sense)
 	}
 }
 
-char gurobi_vtype(VariableDomain domain)
+static char gurobi_vtype(VariableDomain domain)
 {
 	using enum VariableDomain;
 	switch (domain)
@@ -50,7 +50,7 @@ char gurobi_vtype(VariableDomain domain)
 	}
 }
 
-ConstraintType gurobi_sostype(int type)
+static ConstraintType gurobi_sostype(int type)
 {
 	switch (type)
 	{

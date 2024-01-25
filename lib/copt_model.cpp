@@ -13,7 +13,7 @@ static void check_error(int error)
 	}
 }
 
-char copt_con_sense(ConstraintSense sense)
+static char copt_con_sense(ConstraintSense sense)
 {
 	using enum ConstraintSense;
 	switch (sense)
@@ -29,7 +29,7 @@ char copt_con_sense(ConstraintSense sense)
 	}
 }
 
-int copt_obj_sense(ObjectiveSense sense)
+static int copt_obj_sense(ObjectiveSense sense)
 {
 	using enum ObjectiveSense;
 	switch (sense)
@@ -43,7 +43,7 @@ int copt_obj_sense(ObjectiveSense sense)
 	}
 }
 
-char copt_vtype(VariableDomain domain)
+static char copt_vtype(VariableDomain domain)
 {
 	using enum VariableDomain;
 	switch (domain)
@@ -59,7 +59,7 @@ char copt_vtype(VariableDomain domain)
 	}
 }
 
-VariableDomain copt_vtype_to_domain(char vtype)
+static VariableDomain copt_vtype_to_domain(char vtype)
 {
 	using enum VariableDomain;
 	switch (vtype)
@@ -75,7 +75,7 @@ VariableDomain copt_vtype_to_domain(char vtype)
 	}
 }
 
-ConstraintType copt_sostype(int type)
+static ConstraintType copt_sostype(int type)
 {
 	switch (type)
 	{

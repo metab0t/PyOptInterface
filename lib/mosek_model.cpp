@@ -55,7 +55,7 @@ static void check_error(MSKrescodee error)
 	}
 }
 
-MSKboundkeye mosek_con_sense(ConstraintSense sense)
+static MSKboundkeye mosek_con_sense(ConstraintSense sense)
 {
 	using enum ConstraintSense;
 	switch (sense)
@@ -71,7 +71,7 @@ MSKboundkeye mosek_con_sense(ConstraintSense sense)
 	}
 }
 
-MSKobjsensee mosek_obj_sense(ObjectiveSense sense)
+static MSKobjsensee mosek_obj_sense(ObjectiveSense sense)
 {
 	using enum ObjectiveSense;
 	switch (sense)
@@ -85,7 +85,7 @@ MSKobjsensee mosek_obj_sense(ObjectiveSense sense)
 	}
 }
 
-auto mosek_vtype(VariableDomain domain)
+static MSKvariabletypee mosek_vtype(VariableDomain domain)
 {
 	using enum VariableDomain;
 	switch (domain)
@@ -100,7 +100,7 @@ auto mosek_vtype(VariableDomain domain)
 	}
 }
 
-VariableDomain mosek_vtype_to_domain(MSKvariabletypee vtype)
+static VariableDomain mosek_vtype_to_domain(MSKvariabletypee vtype)
 {
 	using enum VariableDomain;
 	switch (vtype)
