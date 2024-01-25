@@ -256,7 +256,7 @@ auto test_mosek() -> void
 	MOSEKEnv env;
 	MOSEKModelMixin model(env);
 
-	auto N = 10;
+	auto N = 1000;
 	std::vector<VariableIndex> x;
 	for (auto i = 0; i < N; i++)
 	{
@@ -285,6 +285,6 @@ auto test_mosek() -> void
 
 auto main() -> int
 {
-	test_copt();
+	test_mosek();
 	return 0;
 }
