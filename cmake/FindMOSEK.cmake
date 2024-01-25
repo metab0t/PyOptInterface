@@ -34,7 +34,7 @@ if (WIN32)
     mark_as_advanced(MOSEK_IMPLIB)
 else ()
     find_library(MOSEK_LIBRARY
-        NAMES "mosek64_10_1"
+        NAMES "mosek64"
         PATHS
         ${MOSEK_LIB_DIR}
     )
