@@ -1,4 +1,4 @@
-name: build
+name: windows-build
 
 on:
     pull_request:
@@ -22,7 +22,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
