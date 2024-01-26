@@ -46,9 +46,11 @@ class MOSEKModel
 	std::string pprint_variable(const VariableIndex &variable);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs);
+	                                      ConstraintSense sense,
+	                                      CoeffT rhs, const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs);
+	                                         ConstraintSense sense, CoeffT rhs,
+	                                         const char *name = nullptr);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

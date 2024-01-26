@@ -60,17 +60,21 @@ NB_MODULE(mosek_model_ext, m)
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &MOSEKModelMixin::add_linear_constraint))
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &MOSEKModelMixin::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &MOSEKModelMixin::add_linear_constraint_from_expr))
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &MOSEKModelMixin::add_linear_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
-	             &MOSEKModelMixin::add_quadratic_constraint))
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
+	                           const char *>(&MOSEKModelMixin::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &MOSEKModelMixin::add_quadratic_constraint_from_expr))
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &MOSEKModelMixin::add_quadratic_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("delete_constraint", &MOSEKModelMixin::delete_constraint)
 	    .def("is_constraint_active", &MOSEKModelMixin::is_constraint_active)
 

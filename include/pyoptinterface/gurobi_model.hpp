@@ -55,9 +55,11 @@ class GurobiModel
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs);
+	                                      ConstraintSense sense, CoeffT rhs,
+	                                      const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs);
+	                                         ConstraintSense sense, CoeffT rhs,
+	                                         const char *name = nullptr);
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
@@ -144,10 +146,10 @@ class GurobiModel
 	double get_normalized_rhs(const ConstraintIndex &constraint);
 	void set_normalized_rhs(const ConstraintIndex &constraint, double value);
 	// 2. set/get coefficient of variable in constraint
-	double get_normalized_coefficient(const ConstraintIndex &constraint, const VariableIndex &variable);
+	double get_normalized_coefficient(const ConstraintIndex &constraint,
+	                                  const VariableIndex &variable);
 	void set_normalized_coefficient(const ConstraintIndex &constraint,
-	                                const VariableIndex &variable,
-	                        double value);
+	                                const VariableIndex &variable, double value);
 	// 3. set/get linear coefficient of variable in objective
 	double get_objective_coefficient(const VariableIndex &variable);
 	void set_objective_coefficient(const VariableIndex &variable, double value);

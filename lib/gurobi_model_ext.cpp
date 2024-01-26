@@ -49,9 +49,6 @@ NB_MODULE(gurobi_model_ext, m)
 	                          &GurobiModelMixin::get_expression_value))
 	    .def("get_value",
 	         nb::overload_cast<const ExprBuilder &>(&GurobiModelMixin::get_expression_value))
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::add_linear_constraint))
 
 	    .def("pprint", &GurobiModelMixin::pprint_variable)
 	    .def("pprint",
@@ -72,14 +69,21 @@ NB_MODULE(gurobi_model_ext, m)
 	    // clang-format on
 
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::add_linear_constraint_from_expr))
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &GurobiModelMixin::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_linear_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &GurobiModelMixin::add_linear_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::add_quadratic_constraint))
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
+	                           const char *>(&GurobiModelMixin::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::add_quadratic_constraint_from_expr))
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &GurobiModelMixin::add_quadratic_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    // clang-format off
 		BIND_F(add_sos1_constraint)
 		BIND_F(add_sos2_constraint)

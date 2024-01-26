@@ -57,17 +57,21 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::add_linear_constraint))
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &COPTModelMixin::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::add_linear_constraint_from_expr))
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &COPTModelMixin::add_linear_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::add_quadratic_constraint))
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
+	                           const char *>(&COPTModelMixin::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::add_quadratic_constraint_from_expr))
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
+	             &COPTModelMixin::add_quadratic_constraint_from_expr),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    // clang-format off
 		BIND_F(add_sos1_constraint)
 		BIND_F(add_sos2_constraint)

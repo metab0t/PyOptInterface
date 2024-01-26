@@ -147,7 +147,8 @@ std::string COPTModel::pprint_variable(const VariableIndex &variable)
 }
 
 ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &function,
-                                                 ConstraintSense sense, CoeffT rhs)
+                                                 ConstraintSense sense, CoeffT rhs,
+                                                 const char *name)
 {
 	IndexT index = m_linear_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
@@ -161,13 +162,19 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 	char g_sense = copt_con_sense(sense);
 	double g_rhs = rhs - function.constant.value_or(0.0);
 
-	int error = COPT_AddRow(m_model.get(), numnz, cind, cval, g_sense, g_rhs, g_rhs, NULL);
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
+	int error = COPT_AddRow(m_model.get(), numnz, cind, cval, g_sense, g_rhs, g_rhs, name);
 	check_error(error);
 	return constraint_index;
 }
 
 ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
-                                                    ConstraintSense sense, CoeffT rhs)
+                                                    ConstraintSense sense, CoeffT rhs,
+                                                    const char *name)
 {
 	IndexT index = m_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Quadratic, index);
@@ -199,8 +206,13 @@ ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 	if (affine_part)
 		g_rhs -= affine_part->constant.value_or(0.0);
 
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
 	int error = COPT_AddQConstr(m_model.get(), numlnz, lind, lval, numqnz, qrow, qcol, qval,
-	                            g_sense, g_rhs, NULL);
+	                            g_sense, g_rhs, name);
 	check_error(error);
 	return constraint_index;
 }

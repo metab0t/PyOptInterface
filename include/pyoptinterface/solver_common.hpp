@@ -6,14 +6,14 @@
 #include "pyoptinterface/core.hpp"
 
 template <typename CommercialSolverT>
-concept CommercialSolverConstraint = requires(CommercialSolverT *model) {
+concept CommercialSolverConstraint = requires(CommercialSolverT *model, const char *name) {
 	{
 		model->add_linear_constraint(std::declval<const ScalarAffineFunction &>(),
-		                             ConstraintSense{}, CoeffT{})
+		                             ConstraintSense{}, CoeffT{}, name)
 	} -> std::same_as<ConstraintIndex>;
 	{
 		model->add_quadratic_constraint(std::declval<const ScalarQuadraticFunction &>(),
-		                                ConstraintSense{}, CoeffT{})
+		                                ConstraintSense{}, CoeffT{}, name)
 	} -> std::same_as<ConstraintIndex>;
 	{
 		model->get_variable_value(std::declval<const VariableIndex &>())
@@ -31,9 +31,11 @@ class CommercialSolverMixin : public T
 
   public:
 	ConstraintIndex add_linear_constraint_from_expr(const ExprBuilder &function,
-	                                                ConstraintSense sense, CoeffT rhs);
+	                                                ConstraintSense sense, CoeffT rhs,
+	                                                const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint_from_expr(const ExprBuilder &function,
-	                                                   ConstraintSense sense, CoeffT rhs);
+	                                                   ConstraintSense sense, CoeffT rhs,
+	                                                   const char *name = nullptr);
 
 	double get_expression_value(const ScalarAffineFunction &function);
 	double get_expression_value(const ScalarQuadraticFunction &function);
@@ -52,18 +54,18 @@ T *CommercialSolverMixin<T>::get_base()
 
 template <CommercialSolverConstraint T>
 ConstraintIndex CommercialSolverMixin<T>::add_linear_constraint_from_expr(
-    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs)
+    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs, const char *name)
 {
 	ScalarAffineFunction f(function);
-	return get_base()->add_linear_constraint(f, sense, rhs);
+	return get_base()->add_linear_constraint(f, sense, rhs, name);
 }
 
 template <CommercialSolverConstraint T>
 ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_expr(
-    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs)
+    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs, const char *name)
 {
 	ScalarQuadraticFunction f(function);
-	return get_base()->add_quadratic_constraint(f, sense, rhs);
+	return get_base()->add_quadratic_constraint(f, sense, rhs, name);
 }
 
 template <CommercialSolverConstraint T>

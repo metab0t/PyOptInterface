@@ -150,7 +150,8 @@ void GurobiModel::set_constraint_name(const ConstraintIndex &constraint, const c
 }
 
 ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &function,
-                                                   ConstraintSense sense, CoeffT rhs)
+                                                   ConstraintSense sense, CoeffT rhs,
+                                                   const char *name)
 {
 	IndexT index = m_linear_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
@@ -165,14 +166,20 @@ ConstraintIndex GurobiModel::add_linear_constraint(const ScalarAffineFunction &f
 	char g_sense = gurobi_con_sense(sense);
 	double g_rhs = rhs - function.constant.value_or(0.0);
 
-	int error = GRBaddconstr(m_model.get(), numnz, cind, cval, g_sense, g_rhs, NULL);
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
+	int error = GRBaddconstr(m_model.get(), numnz, cind, cval, g_sense, g_rhs, name);
 	check_error(error);
 	_require_update();
 	return constraint_index;
 }
 
 ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
-                                                      ConstraintSense sense, CoeffT rhs)
+                                                      ConstraintSense sense, CoeffT rhs,
+                                                      const char *name)
 {
 	IndexT index = m_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Quadratic, index);
@@ -205,8 +212,13 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	if (affine_part)
 		g_rhs -= affine_part->constant.value_or(0.0);
 
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
 	int error = GRBaddqconstr(m_model.get(), numlnz, lind, lval, numqnz, qrow, qcol, qval, g_sense,
-	                          g_rhs, NULL);
+	                          g_rhs, name);
 	check_error(error);
 	_require_update();
 	return constraint_index;

@@ -15,7 +15,7 @@ def test(model_interface):
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
     conexpr = x + y
-    con1 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0)
+    con1 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0, name="con1")
 
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)

@@ -276,7 +276,8 @@ std::string MOSEKModel::pprint_variable(const VariableIndex &variable)
 }
 
 ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &function,
-                                                  ConstraintSense sense, CoeffT rhs)
+                                                  ConstraintSense sense, CoeffT rhs,
+                                                  const char *name)
 {
 	IndexT index = m_linear_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
@@ -304,11 +305,22 @@ ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &fu
 	error = MSK_putconbound(m_model.get(), row, g_sense, g_rhs, g_rhs);
 	check_error(error);
 
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+	if (name)
+	{
+		error = MSK_putconname(m_model.get(), row, name);
+		check_error(error);
+	}
+
 	return constraint_index;
 }
 
 ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
-                                                     ConstraintSense sense, CoeffT rhs)
+                                                     ConstraintSense sense, CoeffT rhs,
+                                                     const char *name)
 {
 	IndexT index = m_linear_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Quadratic, index);
@@ -355,6 +367,16 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	check_error(error);
 	error = MSK_putconbound(m_model.get(), row, g_sense, g_rhs, g_rhs);
 	check_error(error);
+
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+	if (name)
+	{
+		error = MSK_putconname(m_model.get(), row, name);
+		check_error(error);
+	}
 
 	return constraint_index;
 }

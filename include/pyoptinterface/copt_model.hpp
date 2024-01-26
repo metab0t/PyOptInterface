@@ -57,9 +57,11 @@ class COPTModel
 	std::string pprint_variable(const VariableIndex &variable);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
-	                                      ConstraintSense sense, CoeffT rhs);
+	                                      ConstraintSense sense, CoeffT rhs,
+	                                      const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
-	                                         ConstraintSense sense, CoeffT rhs);
+	                                         ConstraintSense sense, CoeffT rhs,
+	                                         const char *name = nullptr);
 	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights);
 	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
