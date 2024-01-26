@@ -65,7 +65,6 @@ jobs:
           
           # setup license using secrets
           echo "$GUROBI_WLS" > ~/gurobi.lic
-          cat ~/gurobi.lic
           echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
       - name: Test Gurobi
         run: |
