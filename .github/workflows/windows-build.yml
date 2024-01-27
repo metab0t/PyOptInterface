@@ -48,7 +48,7 @@ jobs:
           cache-name: cache-installers-windows
         with:
           path: D:\installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.msi', '**/*.zip') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
 

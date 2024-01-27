@@ -39,7 +39,7 @@ jobs:
           cache-name: cache-installers-linux
         with:
           path: ~/installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.tar.gz', '**/*.tar.bz2') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
