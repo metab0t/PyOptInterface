@@ -16,6 +16,9 @@ classifiers = []
 [project.urls]
 Homepage = "https://github.com/metab0t/pyoptinterface"
 
+[project.optional-dependencies]
+doc = ["sphinx", "myst-parser", "sphinx-copybutton", "furo"]
+
 [tool.scikit-build]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
