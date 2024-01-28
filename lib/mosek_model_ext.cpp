@@ -29,9 +29,6 @@ NB_MODULE(mosek_model_ext, m)
 	    .def("add_variable", &MOSEKModelMixin::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -MSK_INFINITY,
 	         nb::arg("ub") = MSK_INFINITY, nb::arg("name") = "")
-	    /*.def("add_variables", &MOSEKModelMixin::add_variables, nb::arg("N"),
-	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -MSK_INFINITY,
-	         nb::arg("ub") = MSK_INFINITY)*/
 	    // clang-format off
 	    BIND_F(delete_variable)
 	    BIND_F(is_variable_active)
