@@ -44,15 +44,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
-      - name: Cache CMake build
-        id: cache-cmake-linux
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-cmake-linux
-        with:
-          path: build
-          key: ${{ runner.os }}-cmake-build-${{ env.cache-name }}-${{ hashFiles('CMakeLists.txt') }}
-
       - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }}
         name: Download Installers
         run: |
