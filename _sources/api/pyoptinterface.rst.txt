@@ -13,3 +13,5 @@ Submodules
    :maxdepth: 2
 
    pyoptinterface.gurobi.rst
+   pyoptinterface.copt.rst
+   pyoptinterface.mosek.rst

@@ -165,6 +165,8 @@
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
 </ul>
 </li>
 </ul>
@@ -213,20 +215,48 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.add_affine_term">add_affine_term (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_linear_constraint">add_linear_constraint (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_linear_constraint">add_linear_constraint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_linear_constraint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_quadratic_constraint">add_quadratic_constraint (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.add_linear_constraint">(pyoptinterface.mosek.Model attribute)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_mip_start">add_mip_start (pyoptinterface.copt.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_quadratic_constraint">add_quadratic_constraint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_quadratic_constraint">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.add_quadratic_constraint">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.add_quadratic_term">add_quadratic_term (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos1_constraint">add_sos1_constraint (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_sos1_constraint">add_sos1_constraint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos1_constraint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos2_constraint">add_sos2_constraint (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_sos2_constraint">add_sos2_constraint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos2_constraint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_variable">add_variable (pyoptinterface.gurobi.Model attribute)</a>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_variable">add_variable (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_variable">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.add_variable">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ScalarQuadraticFunction.affine_part">affine_part (pyoptinterface.ScalarQuadraticFunction property)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.ALMOST_DUAL_INFEASIBLE">ALMOST_DUAL_INFEASIBLE (pyoptinterface.TerminationStatusCode attribute)</a>
@@ -301,14 +331,28 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.degree">degree (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.delete_constraint">delete_constraint (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.delete_constraint">delete_constraint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.delete_constraint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.delete_variable">delete_variable (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.delete_constraint">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.delete_variable">delete_variable (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.delete_variable">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.delete_variable">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.disable_log">disable_log (pyoptinterface.mosek.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableAttribute.Domain">Domain (pyoptinterface.VariableAttribute attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute.Dual">Dual (pyoptinterface.ConstraintAttribute attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.DUAL_INFEASIBLE">DUAL_INFEASIBLE (pyoptinterface.TerminationStatusCode attribute)</a>
@@ -327,10 +371,20 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.empty">empty (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env">Env (class in pyoptinterface.gurobi)</a>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.enable_log">enable_log (pyoptinterface.mosek.Model attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Env">Env (class in pyoptinterface.copt)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env">(class in pyoptinterface.gurobi)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Env">(class in pyoptinterface.mosek)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.EnvConfig">EnvConfig (class in pyoptinterface.copt)</a>
+</li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintSense.Equal">Equal (pyoptinterface.ConstraintSense attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder">ExprBuilder (class in pyoptinterface)</a>
@@ -353,7 +407,25 @@
   <h2>G</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_constraint_attribute">get_constraint_attribute() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_constraint_attribute">get_constraint_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_constraint_attribute">(pyoptinterface.gurobi.Model method)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_constraint_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_constraint_dual">get_constraint_dual (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_constraint_info">get_constraint_info (pyoptinterface.copt.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_constraint_name">get_constraint_name (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_constraint_name">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_constraint_primal">get_constraint_primal (pyoptinterface.mosek.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_char">get_constraint_raw_attribute_char (pyoptinterface.gurobi.Model attribute)</a>
 </li>
@@ -363,8 +435,14 @@
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_string">get_constraint_raw_attribute_string (pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_model_attribute">get_model_attribute() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_model_attribute">get_model_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_model_attribute">(pyoptinterface.gurobi.Model method)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_model_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_model_raw_attribute_double">get_model_raw_attribute_double (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_model_raw_attribute_int">get_model_raw_attribute_int (pyoptinterface.gurobi.Model attribute)</a>
@@ -375,28 +453,110 @@
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_model_raw_attribute_vector_double">get_model_raw_attribute_vector_double (pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_normalized_coefficient">get_normalized_coefficient (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_normalized_coefficient">get_normalized_coefficient (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_normalized_coefficient">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_normalized_rhs">get_normalized_rhs (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_normalized_coefficient">(pyoptinterface.mosek.Model attribute)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_normalized_rhs">get_normalized_rhs (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_normalized_rhs">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_normalized_rhs">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_obj_sense">get_obj_sense (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_objective_coefficient">get_objective_coefficient (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_objective_coefficient">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_objective_coefficient">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_attribute">get_raw_attribute() (pyoptinterface.copt.Model method)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_attribute_double">get_raw_attribute_double (pyoptinterface.copt.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_attribute_int">get_raw_attribute_int (pyoptinterface.copt.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_information">get_raw_information() (pyoptinterface.mosek.Model method)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_information_double">get_raw_information_double (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_information_int">get_raw_information_int (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_model">get_raw_model (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_model">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_model">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_objective_coefficient">get_objective_coefficient (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_parameter">get_raw_parameter() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter">(pyoptinterface.gurobi.Model method)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_model">get_raw_model (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_parameter">(pyoptinterface.mosek.Model method)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter">get_raw_parameter() (pyoptinterface.gurobi.Model method)</a>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_parameter_double">get_raw_parameter_double (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter_double">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter_double">get_raw_parameter_double (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_parameter_double">(pyoptinterface.mosek.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter_int">get_raw_parameter_int (pyoptinterface.gurobi.Model attribute)</a>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_raw_parameter_int">get_raw_parameter_int (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter_int">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_parameter_int">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_raw_parameter_string">get_raw_parameter_string (pyoptinterface.gurobi.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_raw_parameter_string">(pyoptinterface.mosek.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_value">get_value (pyoptinterface.gurobi.Model attribute)</a>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_value">get_value (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_value">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_attribute">get_variable_attribute() (pyoptinterface.gurobi.Model method)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_value">(pyoptinterface.mosek.Model attribute)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_variable_attribute">get_variable_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_attribute">(pyoptinterface.gurobi.Model method)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_variable_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_variable_info">get_variable_info (pyoptinterface.copt.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_variable_lower_bound">get_variable_lower_bound (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_variable_name">get_variable_name (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_variable_name">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_raw_attribute_char">get_variable_raw_attribute_char (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_raw_attribute_double">get_variable_raw_attribute_double (pyoptinterface.gurobi.Model attribute)</a>
@@ -404,6 +564,26 @@
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_raw_attribute_int">get_variable_raw_attribute_int (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.get_variable_raw_attribute_string">get_variable_raw_attribute_string (pyoptinterface.gurobi.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.get_variable_type">get_variable_type (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_variable_type">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.get_variable_upper_bound">get_variable_upper_bound (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getdualobj">getdualobj (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getnumcon">getnumcon (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getnumvar">getnumvar (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getprimalobj">getprimalobj (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getprosta">getprosta (pyoptinterface.mosek.Model attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.getsolsta">getsolsta (pyoptinterface.mosek.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintSense.GreaterEqual">GreaterEqual (pyoptinterface.ConstraintSense attribute)</a>
 </li>
@@ -429,22 +609,40 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode.INFEASIBLE_POINT">INFEASIBLE_POINT (pyoptinterface.ResultStatusCode attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.init">init (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.init">init (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.init">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.init">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Integer">Integer (pyoptinterface.VariableDomain attribute)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Integer">Integer (pyoptinterface.VariableDomain attribute)</a>
-</li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.INTERRUPTED">INTERRUPTED (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.INVALID_MODEL">INVALID_MODEL (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.INVALID_OPTION">INVALID_OPTION (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.is_constraint_active">is_constraint_active (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.is_constraint_active">is_constraint_active (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.is_constraint_active">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.is_variable_active">is_variable_active (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.is_constraint_active">(pyoptinterface.mosek.Model attribute)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.is_variable_active">is_variable_active (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.is_variable_active">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.is_variable_active">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.ITERATION_LIMIT">ITERATION_LIMIT (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
     </ul></td>
@@ -485,10 +683,16 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ObjectiveSense.Minimize">Minimize (pyoptinterface.ObjectiveSense attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model">Model (class in pyoptinterface.copt)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model">(class in pyoptinterface.gurobi)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model">(class in pyoptinterface.mosek)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model">Model (class in pyoptinterface.gurobi)</a>
-</li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute">ModelAttribute (class in pyoptinterface)</a>
 </li>
         <li>
@@ -497,7 +701,11 @@
         <ul>
           <li><a href="api/pyoptinterface.html#module-pyoptinterface">pyoptinterface</a>
 </li>
+          <li><a href="api/pyoptinterface.copt.html#module-pyoptinterface.copt">pyoptinterface.copt</a>
+</li>
           <li><a href="api/pyoptinterface.gurobi.html#module-pyoptinterface.gurobi">pyoptinterface.gurobi</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#module-pyoptinterface.mosek">pyoptinterface.mosek</a>
 </li>
         </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.mul">mul (pyoptinterface.ExprBuilder attribute)</a>
@@ -526,18 +734,30 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode.NO_SOLUTION">NO_SOLUTION (pyoptinterface.ResultStatusCode attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.NODE_LIMIT">NODE_LIMIT (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.NodeCount">NodeCount (pyoptinterface.ModelAttribute attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.NORM_LIMIT">NORM_LIMIT (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.number_of_constraints">number_of_constraints() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.number_of_constraints">number_of_constraints() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.number_of_constraints">(pyoptinterface.gurobi.Model method)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.number_of_variables">number_of_variables() (pyoptinterface.gurobi.Model method)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.number_of_constraints">(pyoptinterface.mosek.Model method)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.number_of_variables">number_of_variables() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.number_of_variables">(pyoptinterface.gurobi.Model method)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.number_of_variables">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.NumberOfThreads">NumberOfThreads (pyoptinterface.ModelAttribute attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.NUMERICAL_ERROR">NUMERICAL_ERROR (pyoptinterface.TerminationStatusCode attribute)</a>
@@ -562,12 +782,18 @@
         </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.ObjectiveValue">ObjectiveValue (pyoptinterface.ModelAttribute attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.OPTIMAL">OPTIMAL (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.optimize">optimize (pyoptinterface.gurobi.Model attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.optimize">optimize() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.optimize">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.OPTIMIZE_NOT_CALLED">OPTIMIZE_NOT_CALLED (pyoptinterface.TerminationStatusCode attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode.OTHER_ERROR">OTHER_ERROR (pyoptinterface.TerminationStatusCode attribute)</a>
@@ -584,13 +810,21 @@
   <h2>P</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.pprint">pprint (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.pprint">pprint (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.pprint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.pprint">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute.Primal">Primal (pyoptinterface.ConstraintAttribute attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableAttribute.PrimalStart">PrimalStart (pyoptinterface.VariableAttribute attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.PrimalStatus">PrimalStatus (pyoptinterface.ModelAttribute attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Env.putlicensecode">putlicensecode (pyoptinterface.mosek.Env attribute)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
@@ -602,10 +836,24 @@
 </li>
         </ul></li>
         <li>
+    pyoptinterface.copt
+
+        <ul>
+          <li><a href="api/pyoptinterface.copt.html#module-pyoptinterface.copt">module</a>
+</li>
+        </ul></li>
+        <li>
     pyoptinterface.gurobi
 
         <ul>
           <li><a href="api/pyoptinterface.gurobi.html#module-pyoptinterface.gurobi">module</a>
+</li>
+        </ul></li>
+        <li>
+    pyoptinterface.mosek
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#module-pyoptinterface.mosek">module</a>
 </li>
         </ul></li>
     </ul></td>
@@ -634,10 +882,14 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.raw_attribute_type">raw_attribute_type (pyoptinterface.gurobi.Model attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.raw_parameter_attribute_type">raw_parameter_attribute_type (pyoptinterface.copt.Model attribute)</a>
+</li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.raw_parameter_type">raw_parameter_type (pyoptinterface.gurobi.Env attribute)</a>
 
         <ul>
           <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.raw_parameter_type">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.raw_parameter_type">(pyoptinterface.mosek.Model attribute)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -666,12 +918,26 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableDomain.SemiContinuous">SemiContinuous (pyoptinterface.VariableDomain attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.EnvConfig.set">set (pyoptinterface.copt.EnvConfig attribute)</a>
+</li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.set_affine_coef">set_affine_coef (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_attribute">set_constraint_attribute() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_constraint_attribute">set_constraint_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_attribute">(pyoptinterface.gurobi.Model method)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_name">set_constraint_name (pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_constraint_attribute">(pyoptinterface.mosek.Model method)</a>
 </li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_constraint_name">set_constraint_name (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_name">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_constraint_name">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_char">set_constraint_raw_attribute_char (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_double">set_constraint_raw_attribute_double (pyoptinterface.gurobi.Model attribute)</a>
@@ -680,38 +946,88 @@
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_string">set_constraint_raw_attribute_string (pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_model_attribute">set_model_attribute() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_model_attribute">set_model_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_model_attribute">(pyoptinterface.gurobi.Model method)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_model_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_model_raw_attribute_double">set_model_raw_attribute_double (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_model_raw_attribute_int">set_model_raw_attribute_int (pyoptinterface.gurobi.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_model_raw_attribute_string">set_model_raw_attribute_string (pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_normalized_coefficient">set_normalized_coefficient (pyoptinterface.gurobi.Model attribute)</a>
-</li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_normalized_rhs">set_normalized_rhs (pyoptinterface.gurobi.Model attribute)</a>
-</li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_objective">set_objective (pyoptinterface.gurobi.Model attribute)</a>
-</li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_objective_coefficient">set_objective_coefficient (pyoptinterface.gurobi.Model attribute)</a>
-</li>
-        <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.set_quadratic_coef">set_quadratic_coef (pyoptinterface.ExprBuilder attribute)</a>
-</li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_raw_parameter">set_raw_parameter() (pyoptinterface.gurobi.Model method)</a>
-</li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.set_raw_parameter_double">set_raw_parameter_double (pyoptinterface.gurobi.Env attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_normalized_coefficient">set_normalized_coefficient (pyoptinterface.copt.Model attribute)</a>
 
         <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_normalized_coefficient">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_normalized_coefficient">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_normalized_rhs">set_normalized_rhs (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_normalized_rhs">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_normalized_rhs">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_obj_sense">set_obj_sense (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_obj_sense">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_objective">set_objective (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_objective">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_objective">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_objective_coefficient">set_objective_coefficient (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_objective_coefficient">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_objective_coefficient">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.set_quadratic_coef">set_quadratic_coef (pyoptinterface.ExprBuilder attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_raw_parameter">set_raw_parameter() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_raw_parameter">(pyoptinterface.gurobi.Model method)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_raw_parameter">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_raw_parameter_double">set_raw_parameter_double (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.set_raw_parameter_double">(pyoptinterface.gurobi.Env attribute)</a>
+</li>
           <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_raw_parameter_double">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_raw_parameter_double">(pyoptinterface.mosek.Model attribute)</a>
 </li>
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.set_raw_parameter_int">set_raw_parameter_int (pyoptinterface.gurobi.Env attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_raw_parameter_int">set_raw_parameter_int (pyoptinterface.copt.Model attribute)</a>
 
         <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.set_raw_parameter_int">(pyoptinterface.gurobi.Env attribute)</a>
+</li>
           <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_raw_parameter_int">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_raw_parameter_int">(pyoptinterface.mosek.Model attribute)</a>
 </li>
         </ul></li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.set_raw_parameter_string">set_raw_parameter_string (pyoptinterface.gurobi.Env attribute)</a>
@@ -719,10 +1035,32 @@
         <ul>
           <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_raw_parameter_string">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
-        </ul></li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_attribute">set_variable_attribute() (pyoptinterface.gurobi.Model method)</a>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_raw_parameter_string">(pyoptinterface.mosek.Model attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_name">set_variable_name (pyoptinterface.gurobi.Model attribute)</a>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_variable_attribute">set_variable_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_attribute">(pyoptinterface.gurobi.Model method)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_variable_lower_bound">set_variable_lower_bound (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_lower_bound">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_variable_name">set_variable_name (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_name">(pyoptinterface.gurobi.Model attribute)</a>
+</li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_name">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_primal">set_variable_primal (pyoptinterface.mosek.Model attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_raw_attribute_char">set_variable_raw_attribute_char (pyoptinterface.gurobi.Model attribute)</a>
 </li>
@@ -732,6 +1070,18 @@
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.set_variable_raw_attribute_string">set_variable_raw_attribute_string (pyoptinterface.gurobi.Model attribute)</a>
 </li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_variable_type">set_variable_type (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_type">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.set_variable_upper_bound">set_variable_upper_bound (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.set_variable_upper_bound">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.Silent">Silent (pyoptinterface.ModelAttribute attribute)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.SimplexIterations">SimplexIterations (pyoptinterface.ModelAttribute attribute)</a>
@@ -754,8 +1104,14 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ExprBuilder.sub">sub (pyoptinterface.ExprBuilder attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.supports_variable_attribute">supports_variable_attribute() (pyoptinterface.gurobi.Model method)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.supports_variable_attribute">supports_variable_attribute() (pyoptinterface.copt.Model method)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.supports_variable_attribute">(pyoptinterface.gurobi.Model method)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.supports_variable_attribute">(pyoptinterface.mosek.Model method)</a>
+</li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -810,16 +1166,22 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableAttribute">VariableAttribute (class in pyoptinterface)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableDomain">VariableDomain (class in pyoptinterface)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableIndex">VariableIndex (class in pyoptinterface)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ScalarAffineFunction.variables">variables (pyoptinterface.ScalarAffineFunction property)</a>
 </li>
-        <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.version_string">version_string (pyoptinterface.gurobi.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.version_string">version_string (pyoptinterface.copt.Model attribute)</a>
+
+        <ul>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.version_string">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
+          <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.version_string">(pyoptinterface.mosek.Model attribute)</a>
+</li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
