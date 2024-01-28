@@ -44,6 +44,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
+      - name: Cache CMake build
+        id: cache-cmake-linux
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-cmake-linux
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-build-${{ env.cache-name }}-${{ hashFiles('CMakeLists.txt') }}
+
       - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }}
         name: Download Installers
         run: |
@@ -114,7 +123,8 @@ jobs:
       - name: Build
         run: |
           python -m pip list
-          python -m pip install -v .
+          python -m pip install nanobind scikit-build-core[pyproject]
+          python -m pip install --no-build-isolation -v .
           python -c "import pyoptinterface as poi; print(dir(poi))"
 
       - name: Build documentation

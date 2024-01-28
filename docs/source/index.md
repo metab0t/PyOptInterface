@@ -16,7 +16,7 @@ The key features of PyOptInterface include:
 - Unified API to cover common usages, write once and the code works for all optimizers
 - You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendored Python binding of optimizer
 
-### What kind of problems can PyOptInterface solve? 
+### What kind of problems can PyOptInterface solve?
 It currently supports the following problem types:
 - Linear Programming (LP)
 - Mixed-Integer Linear Programming (MILP)
