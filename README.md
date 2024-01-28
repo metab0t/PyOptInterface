@@ -35,7 +35,7 @@ y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
 ```
 
 ## Documentation
-Find the documentation [here](https://pyoptinterface.readthedocs.io/en/latest/).
+Find the documentation [here](https://metab0t.github.io/PyOptInterface/).
 
 ## License
 PyOptInterface is licensed under MPL-2.0 License.
