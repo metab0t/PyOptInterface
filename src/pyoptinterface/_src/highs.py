@@ -3,18 +3,18 @@ import time
 from typing import Optional
 
 if platform.system() == "Windows":
-    highs_home = os.environ.get("HIGHS_HOME", None)
+    highs_home = os.environ.get("HiGHS_HOME", None)
     if not highs_home:
-        raise ValueError("HIGHS_HOME is not set in environment")
+        raise ValueError("HiGHS_HOME is not set in environment")
     if not os.path.exists(highs_home):
-        raise ValueError(f"HIGHS_HOME does not exist: {highs_home}")
+        raise ValueError(f"HiGHS_HOME does not exist: {highs_home}")
     os.add_dll_directory(os.path.join(highs_home, "bin"))
 
 try:
     from .highs_model_ext import RawModel, HighsSolutionStatus, Enum
 except Exception as e:
     raise ImportError(
-        f"Failed to import highs_model_ext. Please check if HIGHS_HOME is set correctly. Error: {e}"
+        f"Failed to import highs_model_ext. Please check if HiGHS_HOME is set correctly. Error: {e}"
     )
 
 from .attributes import (
