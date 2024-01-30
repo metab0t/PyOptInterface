@@ -119,18 +119,19 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: build.yml
           repo: metab0t/highs_autobuild
-          path: ~/highs
+          path: /home/runner/highs
           name: highs-artifact-ubuntu-latest
 
       - name: Setup HiGHS Installation
         run: |
           ls ~/highs
+          chmod -R +xr ~/highs
           # set environment variables
-          export HIGHS_HOME="${HOME}/highs"
-          echo "HIGHS_HOME=${HIGHS_HOME}" >> $GITHUB_ENV
-          echo "PATH=${PATH}:${HIGHS_HOME}/bin" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HIGHS_HOME}/lib" >> $GITHUB_ENV
-          echo $HIGHS_HOME
+          export HiGHS_HOME="${HOME}/highs"
+          echo "HiGHS_HOME=${HiGHS_HOME}" >> $GITHUB_ENV
+          echo "PATH=${PATH}:${HiGHS_HOME}/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HiGHS_HOME}/lib" >> $GITHUB_ENV
+          echo $HiGHS_HOME
       - name: Test HiGHS
         run: |
           highs --version

@@ -133,9 +133,9 @@ jobs:
         run: |
           ls D:\highs
           # set environment variables
-          echo "HIGHS_HOME=D:\highs" >> $env:GITHUB_ENV
+          echo "HiGHS_HOME=D:\highs" >> $env:GITHUB_ENV
           echo "PATH=$env:PATH;D:\highs\bin" >> $env:GITHUB_ENV
-          echo $env:HIGHS_HOME
+          echo $env:HiGHS_HOME
       - name: Test HiGHS
         run: |
           highs --version
