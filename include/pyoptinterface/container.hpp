@@ -290,7 +290,7 @@ class ChunkedBitVector
 	{
 		if (index >= m_data.size() * CHUNK_WIDTH)
 		{
-			throw std::runtime_error("Index out of range");
+			return -1;
 		}
 		std::size_t chunk_index;
 		std::uint8_t bit_index;

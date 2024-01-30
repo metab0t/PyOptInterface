@@ -31,6 +31,7 @@ jobs:
       - name: Create directory to store installers
         run: |
           mkdir -p ~/installers
+          mkdir -p ~/highs
 
       - name: Cache Installers
         id: cache-installers-linux
@@ -109,6 +110,29 @@ jobs:
       - name: Test MOSEK
         run: |
           msktestlic
+
+      - name: Download HiGHS artifact from my own build
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          # GitHub token, a Personal Access Token with `public_repo` scope
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          repo: metab0t/highs_autobuild
+          path: ~/highs
+          name: highs-artifact-ubuntu-latest
+
+      - name: Setup HiGHS Installation
+        run: |
+          ls ~/highs
+          # set environment variables
+          export HIGHS_HOME="${HOME}/highs"
+          echo "HIGHS_HOME=${HIGHS_HOME}" >> $GITHUB_ENV
+          echo "PATH=${PATH}:${HIGHS_HOME}/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HIGHS_HOME}/lib" >> $GITHUB_ENV
+          echo $HIGHS_HOME
+      - name: Test HiGHS
+        run: |
+          highs --version
 
       - name: Install python deps
         run: |

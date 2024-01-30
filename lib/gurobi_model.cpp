@@ -104,7 +104,7 @@ void GurobiModel::delete_variable(const VariableIndex &variable)
 	}
 
 	// Delete the corresponding Gurobi variable
-	int variable_column = _checked_variable_index(variable);
+	int variable_column = _variable_index(variable);
 	int error = GRBdelvars(m_model.get(), 1, &variable_column);
 	check_error(error);
 	_require_update();

@@ -47,17 +47,18 @@ def test(model_interface):
     assert y_val == approx(10.0, abs=1e-3)
 
     model.delete_constraint(con2)
-    con3 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.1)
+    con3 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.05)
     model.set_variable_attribute(
         x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer
     )
+    model.set_objective(x + 2 * y, poi.ObjectiveSense.Minimize)
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
     x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
-    assert x_val == approx(10.0)
-    assert y_val == approx(10.1)
+    assert x_val == approx(12.0)
+    assert y_val == approx(8.05)
 
     model.delete_constraint(con3)
     con4 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0)
@@ -65,6 +66,7 @@ def test(model_interface):
         x, poi.VariableAttribute.Domain, poi.VariableDomain.Continuous
     )
     model.set_variable_attribute(y, poi.VariableAttribute.LowerBound, 0.0)
+    model.set_objective(obj, poi.ObjectiveSense.Minimize)
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL

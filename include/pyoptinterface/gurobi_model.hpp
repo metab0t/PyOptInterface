@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 
 #include "gurobi_c.h"
@@ -141,6 +143,9 @@ class GurobiModel
 	std::string get_constraint_raw_attribute_string(const ConstraintIndex &constraint,
 	                                                const char *attr_name);
 
+	int _constraint_index(const ConstraintIndex &constraint);
+	int _checked_constraint_index(const ConstraintIndex &constraint);
+
 	// Modifications of model
 	// 1. set/get RHS of a constraint
 	double get_normalized_rhs(const ConstraintIndex &constraint);
@@ -153,9 +158,6 @@ class GurobiModel
 	// 3. set/get linear coefficient of variable in objective
 	double get_objective_coefficient(const VariableIndex &variable);
 	void set_objective_coefficient(const VariableIndex &variable, double value);
-
-	int _constraint_index(const ConstraintIndex &constraint);
-	int _checked_constraint_index(const ConstraintIndex &constraint);
 
 	// Non-exported functions
 	void check_error(int error);

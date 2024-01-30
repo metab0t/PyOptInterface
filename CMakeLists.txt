@@ -137,5 +137,34 @@ if(ENABLE_MOSEK)
   install(TARGETS mosek_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 endif()
 
+# HiGHS
+set(ENABLE_HiGHS ON CACHE BOOL "Enable HiGHS?")
+if(ENABLE_HiGHS)
+  find_package(HiGHS)
+
+  if(NOT HiGHS_FOUND)
+    message(FATAL_ERROR "HiGHS not found!")
+  endif()
+  
+  add_library(highs_model STATIC)
+  target_sources(highs_model PRIVATE
+    include/pyoptinterface/highs_model.hpp
+    lib/highs_model.cpp
+  )
+  target_link_libraries(highs_model PUBLIC core)
+  target_link_libraries(highs_model PUBLIC HiGHS::HiGHS)
+
+  nanobind_add_module(
+    highs_model_ext
+
+    STABLE_ABI NB_STATIC
+
+    lib/highs_model_ext.cpp
+    lib/highs_model_ext_constants.cpp
+  )
+  target_link_libraries(highs_model_ext PUBLIC highs_model)
+  install(TARGETS highs_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+endif()
+
 add_executable(test_main lib/main.cpp)
-target_link_libraries(test_main PUBLIC core gurobi_model copt_model mosek_model)
+target_link_libraries(test_main PUBLIC core gurobi_model copt_model mosek_model highs_model)

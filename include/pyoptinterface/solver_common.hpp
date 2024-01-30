@@ -1,7 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <concepts>
+#include <numeric>
+#include <span>
 #include "fmt/format.h"
 #include "pyoptinterface/core.hpp"
 
@@ -30,6 +33,9 @@ class CommercialSolverMixin : public T
 	T *get_base();
 
   public:
+	ConstraintIndex add_linear_constraint_from_var(const VariableIndex &variable,
+	                                               ConstraintSense sense, CoeffT rhs,
+	                                               const char *name = nullptr);
 	ConstraintIndex add_linear_constraint_from_expr(const ExprBuilder &function,
 	                                                ConstraintSense sense, CoeffT rhs,
 	                                                const char *name = nullptr);
@@ -50,6 +56,14 @@ template <CommercialSolverConstraint T>
 T *CommercialSolverMixin<T>::get_base()
 {
 	return static_cast<T *>(this);
+}
+
+template <CommercialSolverConstraint T>
+ConstraintIndex CommercialSolverMixin<T>::add_linear_constraint_from_var(
+    const VariableIndex &variable, ConstraintSense sense, CoeffT rhs, const char *name)
+{
+	ScalarAffineFunction f(variable);
+	return get_base()->add_linear_constraint(f, sense, rhs, name);
 }
 
 template <CommercialSolverConstraint T>
@@ -349,5 +363,105 @@ struct QuadraticFunctionPtrForm
 				value_storage[i] = function.coefficients[i];
 			}
 		}
+	}
+};
+
+enum class HessianTriangular
+{
+	Upper,
+	Lower,
+};
+
+template <std::integral NZT, std::integral IDXT, std::floating_point VALT>
+struct CSCMatrix
+{
+	NZT numnz;
+	NZT numcol;
+	std::vector<VALT> values_CSC;
+	std::vector<IDXT> rows_CSC;
+	std::vector<IDXT> colStarts_CSC;
+
+	template <VarIndexModel T>
+	void make(T *model, const ScalarQuadraticFunction &function, int i_numcol,
+	          HessianTriangular triangular_format)
+	{
+		auto f_numnz = function.size();
+		numnz = f_numnz;
+		numcol = i_numcol;
+
+		std::vector<IDXT> rows(numnz); // Row indices
+		std::vector<IDXT> cols(numnz); // Column indices
+		for (int i = 0; i < numnz; ++i)
+		{
+			auto v1 = model->_variable_index(function.variable_1s[i]);
+			auto v2 = v1;
+			if (function.variable_1s[i] != function.variable_2s[i])
+			{
+				v2 = model->_variable_index(function.variable_2s[i]);
+			}
+
+			if (triangular_format == HessianTriangular::Upper)
+			{
+				if (v1 > v2)
+				{
+					std::swap(v1, v2);
+				}
+			}
+			else
+			{
+				if (v1 < v2)
+				{
+					std::swap(v1, v2);
+				}
+			}
+
+			if (v1 < 0 || v2 < 0)
+			{
+				throw std::runtime_error(
+				    "Variable index in quadratic function cannot be negative!");
+			}
+
+			rows[i] = v1;
+			cols[i] = v2;
+		}
+		std::span<const VALT> values;
+		std::vector<VALT> values_storage;
+		if constexpr (std::is_same_v<VALT, CoeffT>)
+		{
+			values = function.coefficients;
+		}
+		else
+		{
+			values_storage.resize(numnz);
+			for (int i = 0; i < numnz; ++i)
+			{
+				values_storage[i] = function.coefficients[i];
+			}
+		}
+
+		// Sorting based on column indices
+		std::vector<IDXT> idx(numnz);
+		std::iota(idx.begin(), idx.end(), 0);
+		std::sort(idx.begin(), idx.end(), [&](int i, int j) { return cols[i] < cols[j]; });
+
+		// Creating CSC arrays
+		values_CSC.reserve(numnz);
+		rows_CSC.reserve(numnz);
+		colStarts_CSC.resize(numcol + 1, 0);
+
+		int currentCol = 0;
+		for (auto i : idx)
+		{
+			while (currentCol < cols[i])
+			{
+				colStarts_CSC[currentCol + 1] = values_CSC.size();
+				currentCol++;
+			}
+			values_CSC.push_back(values[i]);
+			rows_CSC.push_back(rows[i]);
+		}
+
+		// Filling up remaining columns in colStarts_CSC
+		std::fill(colStarts_CSC.begin() + currentCol + 1, colStarts_CSC.end(), numnz);
 	}
 };

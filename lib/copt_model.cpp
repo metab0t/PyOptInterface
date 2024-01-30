@@ -601,6 +601,10 @@ void COPTModel::set_obj_sense(ObjectiveSense sense)
 
 void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values)
 {
+	if (variables.size() != values.size())
+	{
+		throw std::runtime_error("Number of variables and values do not match");
+	}
 	int numnz = variables.size();
 	if (numnz == 0)
 		return;

@@ -2,46 +2,55 @@
 
 #include <memory>
 
-#include "mosek.h"
+#include "interfaces/highs_c_api.h"
+#include "lp_data/HConst.h"
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
 
-class MOSEKEnv
+struct HighsfreemodelT
 {
-  public:
-	MOSEKEnv();
-	~MOSEKEnv();
-
-	void putlicensecode(const std::vector<MSKint32t> &code);
-
-  private:
-	MSKenv_t m_env;
-
-	friend class MOSEKModel;
-};
-
-struct MOSEKfreemodelT
-{
-	void operator()(MSKtask *model) const
+	void operator()(void *model) const
 	{
-		MSK_deletetask(&model);
+		Highs_destroy(model);
 	};
 };
 
-class MOSEKModel
+enum class HighsSolutionStatus
+{
+	OPTIMIZE_NOT_CALLED,
+	OPTIMIZE_OK,
+	OPTIMIZE_ERROR,
+};
+
+struct POIHighsSolution
+{
+	HighsSolutionStatus status = HighsSolutionStatus::OPTIMIZE_NOT_CALLED;
+	HighsInt model_status;
+	std::vector<double> colvalue;
+	std::vector<double> coldual;
+	std::vector<HighsInt> colstatus;
+	std::vector<double> rowvalue;
+	std::vector<double> rowdual;
+	std::vector<HighsInt> rowstatus;
+	HighsInt primal_solution_status;
+	HighsInt dual_solution_status;
+	bool has_primal_ray;
+	bool has_dual_ray;
+	std::vector<double> primal_ray;
+	std::vector<double> dual_ray;
+};
+
+class POIHighsModel
 {
   public:
-	MOSEKModel() = default;
-	MOSEKModel(const MOSEKEnv &env);
-	void init(const MOSEKEnv &env);
+	POIHighsModel();
+	void init();
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
-	                           double lb = -MSK_INFINITY, double ub = MSK_INFINITY,
+	                           double lb = -kHighsInf, double ub = kHighsInf,
 	                           const char *name = nullptr);
-	VariableIndex add_variables(int N, VariableDomain domain = VariableDomain::Continuous,
-	                            double lb = -MSK_INFINITY, double ub = MSK_INFINITY);
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
@@ -63,37 +72,30 @@ class MOSEKModel
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &function, ObjectiveSense sense);
 
-	int optimize();
+	void optimize();
 	void *get_raw_model();
 	std::string version_string();
 
-	// solution
-	MSKsoltypee get_current_solution();
-	std::optional<MSKsoltypee> select_available_solution_after_optimization();
+	double getruntime();
+	int getnumrow();
+	int getnumcol();
 
-	// parameter
-	int raw_parameter_type(const char *name);
-
-	void set_raw_parameter_int(const char *param_name, int value);
-	void set_raw_parameter_double(const char *param_name, double value);
-	void set_raw_parameter_string(const char *param_name, const char *value);
-	int get_raw_parameter_int(const char *param_name);
-	double get_raw_parameter_double(const char *param_name);
-	std::string get_raw_parameter_string(const char *param_name);
+	// option
+	int raw_option_type(const char *param_name);
+	void set_raw_option_bool(const char *param_name, bool value);
+	void set_raw_option_int(const char *param_name, int value);
+	void set_raw_option_double(const char *param_name, double value);
+	void set_raw_option_string(const char *param_name, const char *value);
+	bool get_raw_option_bool(const char *param_name);
+	int get_raw_option_int(const char *param_name);
+	double get_raw_option_double(const char *param_name);
+	std::string get_raw_option_string(const char *param_name);
 
 	// information
-	int get_raw_information_int(const char *attr_name);
-	double get_raw_information_double(const char *attr_name);
-
-	MSKint32t getnumvar();
-	MSKint32t getnumcon();
-	int getprosta();
-	int getsolsta();
-	double getprimalobj();
-	double getdualobj();
-
-	void enable_log();
-	void disable_log();
+	int raw_info_type(const char *info_name);
+	int get_raw_info_int(const char *info_name);
+	std::int64_t get_raw_info_int64(const char *info_name);
+	double get_raw_info_double(const char *info_name);
 
 	// Accessing information of problem
 	std::string get_variable_name(const VariableIndex &variable);
@@ -104,15 +106,23 @@ class MOSEKModel
 	double get_variable_upper_bound(const VariableIndex &variable);
 	void set_variable_lower_bound(const VariableIndex &variable, double lb);
 	void set_variable_upper_bound(const VariableIndex &variable, double ub);
-	void set_variable_primal(const VariableIndex &variable, double primal);
 
-	double get_constraint_primal(const ConstraintIndex &constraint);
-	double get_constraint_dual(const ConstraintIndex &constraint);
 	std::string get_constraint_name(const ConstraintIndex &constraint);
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);
+	double get_constraint_primal(const ConstraintIndex &constraint);
+	double get_constraint_dual(const ConstraintIndex &constraint);
 
 	ObjectiveSense get_obj_sense();
 	void set_obj_sense(ObjectiveSense sense);
+	double get_obj_value();
+
+	HighsInt _variable_index(const VariableIndex &variable);
+	HighsInt _checked_variable_index(const VariableIndex &variable);
+	HighsInt _constraint_index(const ConstraintIndex &constraint);
+	HighsInt _checked_constraint_index(const ConstraintIndex &constraint);
+
+	// Primal start
+	void set_primal_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
 
 	// Modifications of model
 	// 1. set/get RHS of a constraint
@@ -127,25 +137,21 @@ class MOSEKModel
 	double get_objective_coefficient(const VariableIndex &variable);
 	void set_objective_coefficient(const VariableIndex &variable, double value);
 
-	MSKint32t _variable_index(const VariableIndex &variable);
-	MSKint32t _checked_variable_index(const VariableIndex &variable);
-	MSKint32t _constraint_index(const ConstraintIndex &constraint);
-	MSKint32t _checked_constraint_index(const ConstraintIndex &constraint);
-
   private:
-	MonotoneIndexer<MSKint32t> m_variable_index;
+	MonotoneIndexer<HighsInt> m_variable_index;
 
-	MonotoneIndexer<MSKint32t> m_linear_quadratic_constraint_index;
+	MonotoneIndexer<HighsInt> m_linear_constraint_index;
 
-	// Mosek does not discriminate between integer variable and binary variable
+	// Highs does not discriminate between integer variable and binary variable
 	// So we need to keep track of binary variables
 	Hashset<IndexT> binary_variables;
 
-	// Cache current available solution after optimization
-	std::optional<MSKsoltypee> m_soltype;
+	/* Highs part */
+	std::unique_ptr<void, HighsfreemodelT> m_model;
 
-	/* MOSEK part */
-	std::unique_ptr<MSKtask, MOSEKfreemodelT> m_model;
+  public:
+	// cache the solution
+	POIHighsSolution m_solution;
 };
 
-using MOSEKModelMixin = CommercialSolverMixin<MOSEKModel>;
+using HighsModelMixin = CommercialSolverMixin<POIHighsModel>;

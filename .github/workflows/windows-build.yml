@@ -11,7 +11,7 @@ on:
 jobs:
 
   windows_build:
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     strategy:
       fail-fast: true
@@ -40,6 +40,7 @@ jobs:
       - name: Create directory to store installers
         run: |
           New-Item -ItemType Directory -Force -Path "D:\installers"
+          New-Item -ItemType Directory -Force -Path "D:\highs"
 
       - name: Cache Installers
         id: cache-installers-windows
@@ -117,6 +118,27 @@ jobs:
       - name: Test MOSEK
         run: |
           msktestlic
+
+      - name: Download HiGHS artifact from my own build
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          # GitHub token, a Personal Access Token with `public_repo` scope
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          repo: metab0t/highs_autobuild
+          path: D:\highs
+          name: highs-artifact-windows-latest
+
+      - name: Setup HiGHS Installation
+        run: |
+          ls D:\highs
+          # set environment variables
+          echo "HIGHS_HOME=D:\highs" >> $env:GITHUB_ENV
+          echo "PATH=$env:PATH;D:\highs\bin" >> $env:GITHUB_ENV
+          echo $env:HIGHS_HOME
+      - name: Test HiGHS
+        run: |
+          highs --version
 
       - name: Install python deps
         run: |

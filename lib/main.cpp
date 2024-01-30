@@ -3,6 +3,7 @@
 #include "pyoptinterface/gurobi_model.hpp"
 #include "pyoptinterface/copt_model.hpp"
 #include "pyoptinterface/mosek_model.hpp"
+#include "pyoptinterface/highs_model.hpp"
 
 struct MapIndexer
 {
@@ -245,9 +246,9 @@ auto test_copt() -> void
 	model.set_objective(obj, ObjectiveSense::Minimize);
 	for (int i = 0; i < N - 1; i++)
 	{
-		model.delete_variable(x[i]);
-		model.optimize();
-		fmt::print("deleted {}\n", i);
+	    model.delete_variable(x[i]);
+	    model.optimize();
+	    fmt::print("deleted {}\n", i);
 	}*/
 }
 
@@ -283,8 +284,55 @@ auto test_mosek() -> void
 	}
 }
 
+auto test_highs() -> void
+{
+	HighsModelMixin model;
+
+	auto N = 3;
+	std::vector<VariableIndex> x;
+	for (auto i = 0; i < N; i++)
+	{
+		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
+	}
+
+	ExprBuilder obj;
+	for (const auto &v : x)
+	{
+		obj.add(v * v);
+	}
+	model.set_objective(obj, ObjectiveSense::Minimize);
+
+	ExprBuilder expr;
+	for (const auto &v : x)
+	{
+		expr.add(v);
+	}
+	auto con =
+	    model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N / 2.0, "con1");
+
+	model.optimize();
+
+	model.set_objective(x[1] + 2 * x[2], ObjectiveSense::Minimize);
+	model.optimize();
+}
+
+auto test_highs_capi() -> void
+{
+	void *highs = Highs_create();
+
+	double c[] = {0.0, 1.0, 0.0};
+	double lower[] = {0, 0, 0};
+	double upper[] = {1.0, 1.0, 1.0};
+
+	Highs_addCols(highs, 3, c, lower, upper, 0, nullptr, nullptr, nullptr);
+
+	auto hessian_nz = Highs_getHessianNumNz(highs);
+	Highs_run(highs);
+	hessian_nz = Highs_getHessianNumNz(highs);
+}
+
 auto main() -> int
 {
-	test_mosek();
+	test_highs_capi();
 	return 0;
 }

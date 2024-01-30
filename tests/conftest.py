@@ -22,6 +22,13 @@ try:
 except Exception:
     pass
 
+try:
+    import pyoptinterface.highs as highs
+
+    model_interface_dict["highs"] = highs.Model
+except Exception:
+    pass
+
 
 @pytest.fixture(params=model_interface_dict.keys())
 def model_interface(request):

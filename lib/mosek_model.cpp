@@ -253,6 +253,7 @@ void MOSEKModel::delete_variable(const VariableIndex &variable)
 	check_error(error);
 
 	m_variable_index.delete_index(variable.index);
+	binary_variables.erase(variable.index);
 }
 
 bool MOSEKModel::is_variable_active(const VariableIndex &variable)

@@ -61,6 +61,10 @@ NB_MODULE(copt_model_ext, m)
 	             &COPTModelMixin::add_linear_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
+	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, const char *>(
+	             &COPTModelMixin::add_linear_constraint_from_var),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &COPTModelMixin::add_linear_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
