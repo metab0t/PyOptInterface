@@ -31,6 +31,7 @@ It currently supports the following optimizers:
 - [Gurobi](https://www.gurobi.com/)
 - [COPT](https://shanshu.ai/copt)
 - [MOSEK](https://www.mosek.com/)
+- [HiGHS](https://www.highs.dev/)
 
 ## Contents
 ```{toctree}
