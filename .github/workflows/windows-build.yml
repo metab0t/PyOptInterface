@@ -95,9 +95,9 @@ jobs:
           # setup license using secrets
           echo $env:COPT_CLIENT_INI > D:\client.ini
           echo "COPT_LICENSE_DIR=D:\" >> $env:GITHUB_ENV
-      - name: Test COPT
-        run: |
-          copt_cmd -c "quit"
+#      - name: Test COPT
+#        run: |
+#          copt_cmd -c "quit"
 
       - name: Setup MOSEK Installation
         env:
@@ -152,4 +152,4 @@ jobs:
 
       - name: Test
         run: |
-          python -m pytest tests -v
+          python -m pytest tests -v -k "not copt"

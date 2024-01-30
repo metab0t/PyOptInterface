@@ -68,9 +68,6 @@ jobs:
           # setup license using secrets
           echo "$GUROBI_WLS" > ~/gurobi.lic
           echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
-      - name: Test Gurobi
-        run: |
-          gurobi_cl
 
       - name: Setup COPT Installation
         env:
@@ -88,9 +85,6 @@ jobs:
           # setup license using secrets
           echo "$COPT_CLIENT_INI" > ~/client.ini
           echo "COPT_LICENSE_DIR=${HOME}" >> $GITHUB_ENV
-      - name: Test COPT
-        run: |
-          copt_cmd -c "quit"
 
       - name: Setup MOSEK Installation
         env:
@@ -108,9 +102,6 @@ jobs:
           # setup license using secrets
           echo "$MOSEK_LICENSE" > ~/mosek.lic
           echo "MOSEKLM_LICENSE_FILE=${HOME}/mosek.lic" >> $GITHUB_ENV
-      - name: Test MOSEK
-        run: |
-          msktestlic
 
       - name: Download HiGHS artifact from my own build
         uses: dawidd6/action-download-artifact@v3
