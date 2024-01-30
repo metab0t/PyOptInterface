@@ -23,18 +23,10 @@ The key features of PyOptInterface include:
 
 | Model | GRB C++ | PyOptInterface | JuMP.jl(direct) | JuMP.jl(default) | Pyomo |
 | --- | --- | --- | --- | --- | --- |
-| fac-25  | 0 | 0  | 1  | 1  | 5   |
-| fac-50  | 1 | 1  | 3  | 5  | 34  |
-| fac-75  | 2 | 4  | 9  | 12 | 115 |
-| fac-100 | 4 | 12 | 26 | 32 | 284 |
-:::
-
-:::{table}
-:widths: grid
-:align: center
-
-| Model | GRB C++ | PyOptInterface | JuMP.jl(direct) | JuMP.jl(default) | Pyomo |
-| --- | --- | --- | --- | --- | --- |
+| fac-25    | 0 | 0  | 1  | 1  | 5   |
+| fac-50    | 1 | 1  | 3  | 5  | 34  |
+| fac-75    | 2 | 4  | 9  | 12 | 115 |
+| fac-100   | 4 | 12 | 26 | 32 | 284 |
 | lqcp-500  | 1 | 0  | 2  | 5  | 24  |
 | lqcp-1000 | 2 | 2  | 6  | 9  | 100 |
 | lqcp-1500 | 4 | 5  | 18 | 23 | 232 |
