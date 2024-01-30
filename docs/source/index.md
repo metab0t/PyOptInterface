@@ -16,6 +16,36 @@ The key features of PyOptInterface include:
 - Unified API to cover common usages, write once and the code works for all optimizers
 - You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendored Python binding of optimizer
 
+### Benchmark result of time to construct optimization model
+:::{table}
+:widths: grid
+:align: center
+
+| Model | GRB C++ | PyOptInterface | JuMP.jl(direct) | JuMP.jl(default) | Pyomo |
+| --- | --- | --- | --- | --- | --- |
+| fac-25  | 0 | 0  | 1  | 1  | 5   |
+| fac-50  | 1 | 1  | 3  | 5  | 34  |
+| fac-75  | 2 | 4  | 9  | 12 | 115 |
+| fac-100 | 4 | 12 | 26 | 32 | 284 |
+:::
+
+:::{table}
+:widths: grid
+:align: center
+
+| Model | GRB C++ | PyOptInterface | JuMP.jl(direct) | JuMP.jl(default) | Pyomo |
+| --- | --- | --- | --- | --- | --- |
+| lqcp-500  | 1 | 0  | 2  | 5  | 24  |
+| lqcp-1000 | 2 | 2  | 6  | 9  | 100 |
+| lqcp-1500 | 4 | 5  | 18 | 23 | 232 |
+| lqcp-2000 | 8 | 10 | 40 | 49 | 403 |
+:::
+
+:::{note}
+
+Time measured in seconds, smaller is better
+:::
+
 ### What kind of problems can PyOptInterface solve?
 It currently supports the following problem types:
 - Linear Programming (LP)

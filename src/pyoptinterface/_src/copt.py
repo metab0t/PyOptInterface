@@ -4,11 +4,8 @@ from typing import Optional
 
 if platform.system() == "Windows":
     copt_home = os.environ.get("COPT_HOME", None)
-    if not copt_home:
-        raise ValueError("COPT_HOME is not set in environment")
-    if not os.path.exists(copt_home):
-        raise ValueError(f"COPT_HOME does not exist: {copt_home}")
-    os.add_dll_directory(os.path.join(copt_home, "bin"))
+    if copt_home and os.path.exists(copt_home):
+        os.add_dll_directory(os.path.join(copt_home, "bin"))
 
 try:
     from .copt_model_ext import RawModel, Env, COPT

@@ -1,14 +1,11 @@
-# try to load DLL of gurobi in${GUUROBI_HOME}/bin
+# try to load DLL of gurobi in${GUROBI_HOME}/bin
 # only on windows
 import os, platform
 
 if platform.system() == "Windows":
     gurobi_home = os.environ.get("GUROBI_HOME", None)
-    if not gurobi_home:
-        raise ValueError("GUROBI_HOME is not set in environment")
-    if not os.path.exists(gurobi_home):
-        raise ValueError(f"GUROBI_HOME does not exist: {gurobi_home}")
-    os.add_dll_directory(os.path.join(gurobi_home, "bin"))
+    if gurobi_home and os.path.exists(gurobi_home):
+        os.add_dll_directory(os.path.join(gurobi_home, "bin"))
 
 try:
     from .gurobi_model_ext import RawModel, Env, GRB

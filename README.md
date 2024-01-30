@@ -1,5 +1,7 @@
-PyOptInterface
+PyOptInterface (Python Optimization Interface)
 =======
+
+PyOptInterface is an open-source Python library to provide a unified API to construct and solve optimization models with various optimizers.
 
 ## Installation
 ```console

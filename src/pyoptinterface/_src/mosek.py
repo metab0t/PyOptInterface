@@ -3,11 +3,8 @@ from typing import Optional
 
 if platform.system() == "Windows":
     bindir = os.environ.get("MOSEK_10_1_BINDIR", None)
-    if not bindir:
-        raise ValueError("MOSEK_10_1_BINDIR is not set in environment")
-    if not os.path.exists(bindir):
-        raise ValueError(f"MOSEK_10_1_BINDIR does not exist: {bindir}")
-    os.add_dll_directory(bindir)
+    if bindir and os.path.exists(bindir):
+        os.add_dll_directory(bindir)
 
 
 try:

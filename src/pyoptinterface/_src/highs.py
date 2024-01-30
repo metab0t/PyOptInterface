@@ -4,11 +4,8 @@ from typing import Optional
 
 if platform.system() == "Windows":
     highs_home = os.environ.get("HiGHS_HOME", None)
-    if not highs_home:
-        raise ValueError("HiGHS_HOME is not set in environment")
-    if not os.path.exists(highs_home):
-        raise ValueError(f"HiGHS_HOME does not exist: {highs_home}")
-    os.add_dll_directory(os.path.join(highs_home, "bin"))
+    if highs_home and os.path.exists(highs_home):
+        os.add_dll_directory(os.path.join(highs_home, "bin"))
 
 try:
     from .highs_model_ext import RawModel, HighsSolutionStatus, Enum
