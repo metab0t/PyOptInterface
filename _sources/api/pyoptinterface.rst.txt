@@ -15,3 +15,4 @@ Submodules
    pyoptinterface.gurobi.rst
    pyoptinterface.copt.rst
    pyoptinterface.mosek.rst
+   pyoptinterface.highs.rst
