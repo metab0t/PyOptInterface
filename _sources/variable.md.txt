@@ -22,6 +22,7 @@ After a variable is created, we can query or modify its attributes. The followin
 
 :::{list-table} **Standard [variable attributes](#pyoptinterface.VariableAttribute)**
 :header-rows: 1
+:widths: 20 20
 
 *   - Attribute name
     - Type
@@ -32,7 +33,7 @@ After a variable is created, we can query or modify its attributes. The followin
 *   - UpperBound
     - float
 *   - Domain
-    - <project:#pyoptinterface.VariableDomain>
+    - [VariableDomain](project:#pyoptinterface.VariableDomain)
 *   - PrimalStart
     - float
 *   - Value

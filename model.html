@@ -231,9 +231,13 @@
 <p>We can query and modify the parameters of the model to manipulate the behavior of underlying solver.</p>
 <p>Like the design in <code class="docutils literal notranslate"><span class="pre">JuMP.jl</span></code>, we define a small subset of parameters that are common to all solvers. They are defined as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">pyoptinterface.ModelAttribute</span></a> enum class.
 The meanings of these standard attributes are the same as <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Model-attributes">Model attributes</a> and <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Optimizer-attributes">Optimizer attributes</a> in MathOptInterface.jl.</p>
-<div class="table-wrapper docutils container" id="id1">
+<div class="table-wrapper colwidths-given docutils container" id="id1">
 <table class="docutils align-default" id="id1">
 <caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Attribute name</p></th>
 <th class="head"><p>Type</p></th>
@@ -244,19 +248,19 @@ The meanings of these standard attributes are the same as <a class="reference ex
 <td><p>str</p></td>
 </tr>
 <tr class="row-odd"><td><p>ObjectiveSense</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ObjectiveSense" title="pyoptinterface.ObjectiveSense"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.ObjectiveSense</span></code></a></p></td>
+<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ObjectiveSense" title="pyoptinterface.ObjectiveSense"><span class="xref myst py py-class">ObjectiveSense</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>DualStatus</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode" title="pyoptinterface.ResultStatusCode"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.ResultStatusCode</span></code></a></p></td>
+<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode" title="pyoptinterface.ResultStatusCode"><span class="xref myst py py-class">ResultStatusCode</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>PrimalStatus</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode" title="pyoptinterface.ResultStatusCode"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.ResultStatusCode</span></code></a></p></td>
+<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ResultStatusCode" title="pyoptinterface.ResultStatusCode"><span class="xref myst py py-class">ResultStatusCode</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>RawStatusString</p></td>
 <td><p>str</p></td>
 </tr>
 <tr class="row-odd"><td><p>TerminationStatus</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode" title="pyoptinterface.TerminationStatusCode"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.TerminationStatusCode</span></code></a></p></td>
+<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode" title="pyoptinterface.TerminationStatusCode"><span class="xref myst py py-class">TerminationStatusCode</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>BarrierIterations</p></td>
 <td><p>int</p></td>

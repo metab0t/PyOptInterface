@@ -339,6 +339,16 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ExprBuilder.reserve_affine">
+<span class="sig-name descname"><span class="pre">reserve_affine</span></span><a class="headerlink" href="#pyoptinterface.ExprBuilder.reserve_affine" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ExprBuilder.reserve_quadratic">
+<span class="sig-name descname"><span class="pre">reserve_quadratic</span></span><a class="headerlink" href="#pyoptinterface.ExprBuilder.reserve_quadratic" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ExprBuilder.set_affine_coef">
 <span class="sig-name descname"><span class="pre">set_affine_coef</span></span><a class="headerlink" href="#pyoptinterface.ExprBuilder.set_affine_coef" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -533,6 +543,16 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ScalarAffineFunction</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.add_constant">
+<span class="sig-name descname"><span class="pre">add_constant</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.add_constant" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.add_term">
+<span class="sig-name descname"><span class="pre">add_term</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.add_term" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.canonicalize">
 <span class="sig-name descname"><span class="pre">canonicalize</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.canonicalize" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -549,6 +569,16 @@
 <dd><p>(self) -&gt; Optional[float]</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.reserve">
+<span class="sig-name descname"><span class="pre">reserve</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.reserve" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.size">
+<span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.size" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.variables">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variables</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.variables" title="Link to this definition">#</a></dt>
@@ -561,6 +591,21 @@
 <dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ScalarQuadraticFunction</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.add_affine_term">
+<span class="sig-name descname"><span class="pre">add_affine_term</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.add_affine_term" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.add_constant">
+<span class="sig-name descname"><span class="pre">add_constant</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.add_constant" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.add_quadratic_term">
+<span class="sig-name descname"><span class="pre">add_quadratic_term</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.add_quadratic_term" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.affine_part">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">affine_part</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.affine_part" title="Link to this definition">#</a></dt>
@@ -577,6 +622,21 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.coefficients" title="Link to this definition">#</a></dt>
 <dd><p>(self) -&gt; list[float]</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.reserve_affine">
+<span class="sig-name descname"><span class="pre">reserve_affine</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.reserve_affine" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.reserve_quadratic">
+<span class="sig-name descname"><span class="pre">reserve_quadratic</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.reserve_quadratic" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.size">
+<span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.size" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.variable_1s">
@@ -951,6 +1011,8 @@
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.degree"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.degree</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.empty"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.empty</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.mul"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.mul</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ExprBuilder.reserve_affine"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.reserve_affine</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ExprBuilder.reserve_quadratic"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.reserve_quadratic</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.set_affine_coef"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.set_affine_coef</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.set_quadratic_coef"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.set_quadratic_coef</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder.sub"><code class="docutils literal notranslate"><span class="pre">ExprBuilder.sub</span></code></a></li>
@@ -997,16 +1059,26 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction</span></code></a><ul>
+<li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.add_constant"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.add_constant</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.add_term"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.add_term</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.canonicalize"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.canonicalize</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.coefficients"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.coefficients</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.constant"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.constant</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.reserve"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.reserve</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.size"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.size</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction.variables"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction.variables</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction</span></code></a><ul>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.add_affine_term"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.add_affine_term</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.add_constant"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.add_constant</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.add_quadratic_term"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.add_quadratic_term</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.affine_part"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.affine_part</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.canonicalize"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.canonicalize</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.coefficients"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.coefficients</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.reserve_affine"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.reserve_affine</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.reserve_quadratic"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.reserve_quadratic</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.size"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.size</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.variable_1s"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.variable_1s</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarQuadraticFunction.variable_2s"><code class="docutils literal notranslate"><span class="pre">ScalarQuadraticFunction.variable_2s</span></code></a></li>
 </ul>

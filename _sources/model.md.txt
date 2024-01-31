@@ -31,21 +31,22 @@ The meanings of these standard attributes are the same as [Model attributes](htt
 
 :::{list-table} **Standard [model attributes](#pyoptinterface.ModelAttribute)**
 :header-rows: 1
+:widths: 20 20
 
 *   - Attribute name
     - Type
 *   - Name
     - str
 *   - ObjectiveSense
-    - <project:#pyoptinterface.ObjectiveSense>
+    - [ObjectiveSense](project:#pyoptinterface.ObjectiveSense)
 *   - DualStatus
-    - <project:#pyoptinterface.ResultStatusCode>
+    - [ResultStatusCode](project:#pyoptinterface.ResultStatusCode)
 *   - PrimalStatus
-    - <project:#pyoptinterface.ResultStatusCode>
+    - [ResultStatusCode](project:#pyoptinterface.ResultStatusCode)
 *   - RawStatusString
     - str
 *   - TerminationStatus
-    - <project:#pyoptinterface.TerminationStatusCode>
+    - [TerminationStatusCode](project:#pyoptinterface.TerminationStatusCode)
 *   - BarrierIterations
     - int
 *   - DualObjectiveValue
