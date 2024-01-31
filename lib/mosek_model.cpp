@@ -382,6 +382,61 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	return constraint_index;
 }
 
+ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables)
+{
+	auto N = variables.size();
+
+	ACCInfo acc_info;
+	MSKint64t numacc;
+	auto error = MSK_getaccntot(m_model.get(), &numacc);
+	check_error(error);
+	acc_info.first_acc_row = numacc;
+	acc_info.last_acc_row = numacc + N;
+
+	// afe part
+	MSKint64t numafe;
+	error = MSK_getnumafe(m_model.get(), &numafe);
+	check_error(error);
+	acc_info.first_afe_row = numafe;
+	acc_info.last_afe_row = numafe + N;
+
+	std::vector<MSKint64t> afe_index(N);
+	for (int i = 0; i < N; i++)
+	{
+		afe_index[i] = numafe + i;
+	}
+
+	std::vector<MSKint32t> var_index(N);
+	for (int i = 0; i < N; i++)
+	{
+		var_index[i] = _checked_variable_index(variables[i]);
+	}
+
+	std::vector<MSKrealt> vals(N, 1.0);
+
+	error = MSK_appendafes(m_model.get(), N);
+	check_error(error);
+
+	error = MSK_putafefentrylist(m_model.get(), N, afe_index.data(), var_index.data(), vals.data());
+	check_error(error);
+
+	// domain part
+	MSKint64t domain_index;
+	error = MSK_appendquadraticconedomain(m_model.get(), N, &domain_index);
+	check_error(error);
+	acc_info.domain_index = domain_index;
+
+	// add acc
+	error = MSK_appendacc(m_model.get(), domain_index, N, afe_index.data(), nullptr);
+	check_error(error);
+
+	IndexT index = m_acc_index.size();
+	m_acc_index.push_back(acc_info);
+	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+
+	return constraint_index;
+}
+
 void MOSEKModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	MSKrescodee error;

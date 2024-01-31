@@ -79,6 +79,7 @@ NB_MODULE(copt_model_ext, m)
 	    // clang-format off
 		BIND_F(add_sos1_constraint)
 		BIND_F(add_sos2_constraint)
+		BIND_F(add_second_order_cone_constraint)
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
 	    // clang-format on

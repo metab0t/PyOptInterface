@@ -2,7 +2,7 @@ import pyoptinterface as poi
 from pytest import approx
 
 
-def test(model_interface):
+def test_simple_opt(model_interface):
     model = model_interface
 
     x = model.add_variable(lb=0.0, ub=20.0)

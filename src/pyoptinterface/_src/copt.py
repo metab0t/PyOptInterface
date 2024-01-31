@@ -23,10 +23,10 @@ from .attributes import (
 )
 from .core_ext import VariableDomain, ConstraintType, VariableIndex, ObjectiveSense
 from .solver_common import (
-    _get_model_attribute,
-    _set_model_attribute,
-    _get_entity_attribute,
-    _set_entity_attribute,
+    _direct_get_model_attribute,
+    _direct_set_model_attribute,
+    _direct_get_entity_attribute,
+    _direct_set_entity_attribute,
 )
 
 DEFAULT_ENV = None
@@ -309,19 +309,36 @@ class Model(RawModel):
         self.solve_time: Optional[float] = None
         self.mip_start_values: dict[VariableIndex, float] = dict()
 
+    @staticmethod
     def supports_variable_attribute(self, attribute: VariableAttribute):
-        return True
+        return (
+            attribute in variable_attribute_get_func_map
+            or attribute in variable_attribute_set_func_map
+        )
+
+    @staticmethod
+    def supports_model_attribute(self, attribute: ModelAttribute):
+        return (
+            attribute in model_attribute_get_func_map
+            or attribute in model_attribute_set_func_map
+        )
+
+    @staticmethod
+    def supports_constraint_attribute(self, attribute: ConstraintAttribute):
+        return (
+            attribute in constraint_attribute_get_func_map
+            or attribute in constraint_attribute_set_func_map
+        )
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):
             raise ValueError(f"Unknown variable attribute to get: {attribute}")
 
-        value = _get_entity_attribute(
+        value = _direct_get_entity_attribute(
             self,
             variable,
             attribute,
             variable_attribute_get_func_map,
-            {},
             e,
         )
         return value
@@ -330,13 +347,12 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown variable attribute to set: {attribute}")
 
-        _set_entity_attribute(
+        _direct_set_entity_attribute(
             self,
             variable,
             attribute,
             value,
             variable_attribute_set_func_map,
-            {},
             e,
         )
 
@@ -357,11 +373,10 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown model attribute to get: {attribute}")
 
-        value = _get_model_attribute(
+        value = _direct_get_model_attribute(
             self,
             attribute,
             model_attribute_get_func_map,
-            {},
             e,
         )
         return value
@@ -370,12 +385,11 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown model attribute to set: {attribute}")
 
-        _set_model_attribute(
+        _direct_set_model_attribute(
             self,
             attribute,
             value,
             model_attribute_set_func_map,
-            {},
             e,
         )
 
@@ -383,12 +397,11 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown constraint attribute to get: {attribute}")
 
-        value = _get_entity_attribute(
+        value = _direct_get_entity_attribute(
             self,
             constraint,
             attribute,
             constraint_attribute_get_func_map,
-            {},
             e,
         )
         return value
@@ -399,13 +412,12 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown constraint attribute to set: {attribute}")
 
-        _set_entity_attribute(
+        _direct_set_entity_attribute(
             self,
             constraint,
             attribute,
             value,
             constraint_attribute_set_func_map,
-            {},
             e,
         )
 

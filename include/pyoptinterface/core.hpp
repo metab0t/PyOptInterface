@@ -61,6 +61,10 @@ struct ScalarAffineFunction
 
 	size_t size() const;
 	void canonicalize(CoeffT threshold = COEFTHRESHOLD);
+
+	void reserve(size_t n);
+	void add_term(const VariableIndex &v, CoeffT c);
+	void add_constant(CoeffT c);
 };
 
 struct ScalarQuadraticFunction
@@ -78,6 +82,12 @@ struct ScalarQuadraticFunction
 
 	size_t size() const;
 	void canonicalize(CoeffT threshold = COEFTHRESHOLD);
+
+	void reserve_quadratic(size_t n);
+	void reserve_affine(size_t n);
+	void add_quadratic_term(const VariableIndex &v1, const VariableIndex &v2, CoeffT c);
+	void add_affine_term(const VariableIndex &v, CoeffT c);
+	void add_constant(CoeffT c);
 };
 
 struct VariablePair
@@ -132,6 +142,9 @@ struct ExprBuilder
 
 	bool empty() const;
 	int degree() const;
+
+	void reserve_quadratic(size_t n);
+	void reserve_affine(size_t n);
 
 	void clear();
 	void clean_nearzero_terms(CoeffT threshold = COEFTHRESHOLD);
@@ -202,7 +215,8 @@ enum class ConstraintType
 	Linear,
 	Quadratic,
 	SOS1,
-	SOS2
+	SOS2,
+	Cone,
 };
 
 enum class ConstraintSense

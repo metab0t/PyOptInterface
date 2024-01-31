@@ -76,8 +76,11 @@ NB_MODULE(mosek_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &MOSEKModelMixin::add_quadratic_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("delete_constraint", &MOSEKModelMixin::delete_constraint)
-	    .def("is_constraint_active", &MOSEKModelMixin::is_constraint_active)
+	    // clang-format off
+		BIND_F(add_second_order_cone_constraint)
+		BIND_F(delete_constraint)
+		BIND_F(is_constraint_active)
+	    // clang-format on
 
 	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
 	                              &MOSEKModelMixin::set_objective))

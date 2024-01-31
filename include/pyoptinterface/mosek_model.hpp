@@ -30,6 +30,16 @@ struct MOSEKfreemodelT
 	};
 };
 
+struct ACCInfo
+{
+	MSKint64t first_acc_row;
+	MSKint64t last_acc_row;
+
+	MSKint64t first_afe_row;
+	MSKint64t last_afe_row;
+	MSKint64t domain_index;
+};
+
 class MOSEKModel
 {
   public:
@@ -53,6 +63,8 @@ class MOSEKModel
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
 	                                         ConstraintSense sense, CoeffT rhs,
 	                                         const char *name = nullptr);
+
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
@@ -136,6 +148,8 @@ class MOSEKModel
 	MonotoneIndexer<MSKint32t> m_variable_index;
 
 	MonotoneIndexer<MSKint32t> m_linear_quadratic_constraint_index;
+
+	std::vector<ACCInfo> m_acc_index;
 
 	// Mosek does not discriminate between integer variable and binary variable
 	// So we need to keep track of binary variables

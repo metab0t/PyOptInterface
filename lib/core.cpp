@@ -76,6 +76,23 @@ void ScalarAffineFunction::canonicalize(CoeffT threshold)
 	constant = t.constant_term;
 }
 
+void ScalarAffineFunction::reserve(size_t n)
+{
+	coefficients.reserve(n);
+	variables.reserve(n);
+}
+
+void ScalarAffineFunction::add_term(const VariableIndex &v, CoeffT c)
+{
+	coefficients.push_back(c);
+	variables.push_back(v.index);
+}
+
+void ScalarAffineFunction::add_constant(CoeffT c)
+{
+	constant = constant.value_or(0.0) + c;
+}
+
 ScalarQuadraticFunction::ScalarQuadraticFunction(const Vector<CoeffT> &c, const Vector<IndexT> &v1,
                                                  const Vector<IndexT> &v2)
     : coefficients(c), variable_1s(v1), variable_2s(v2)
@@ -147,6 +164,54 @@ void ScalarQuadraticFunction::canonicalize(CoeffT threshold)
 	}
 }
 
+void ScalarQuadraticFunction::reserve_quadratic(size_t n)
+{
+	coefficients.reserve(n);
+	variable_1s.reserve(n);
+	variable_2s.reserve(n);
+}
+
+void ScalarQuadraticFunction::reserve_affine(size_t n)
+{
+	if (n > 0)
+	{
+		if (!affine_part)
+		{
+			affine_part = ScalarAffineFunction();
+		}
+		affine_part.value().reserve(n);
+	}
+}
+
+void ScalarQuadraticFunction::add_quadratic_term(const VariableIndex &v1, const VariableIndex &v2,
+                                                 CoeffT c)
+{
+	coefficients.push_back(c);
+	variable_1s.push_back(v1.index);
+	variable_2s.push_back(v2.index);
+}
+
+void ScalarQuadraticFunction::add_affine_term(const VariableIndex &v, CoeffT c)
+{
+	if (!affine_part)
+	{
+		affine_part = ScalarAffineFunction();
+	}
+	affine_part.value().add_term(v, c);
+}
+
+void ScalarQuadraticFunction::add_constant(CoeffT c)
+{
+	if (!affine_part)
+	{
+		affine_part = ScalarAffineFunction(c);
+	}
+	else
+	{
+		affine_part.value().add_constant(c);
+	}
+}
+
 bool VariablePair::operator==(const VariablePair &x) const
 {
 	return var_1 == x.var_1 && var_2 == x.var_2;
@@ -200,6 +265,16 @@ int ExprBuilder::degree() const
 		return 1;
 	}
 	return 0;
+}
+
+void ExprBuilder::reserve_quadratic(size_t n)
+{
+	quadratic_terms.reserve(n);
+}
+
+void ExprBuilder::reserve_affine(size_t n)
+{
+	affine_terms.reserve(n);
 }
 
 void ExprBuilder::clear()

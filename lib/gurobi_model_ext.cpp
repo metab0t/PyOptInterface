@@ -25,6 +25,7 @@ NB_MODULE(gurobi_model_ext, m)
 
 	nb::class_<GurobiModel>(m, "_RawModelBase");
 
+#undef BIND_F
 #define BIND_F(f) .def(#f, &GurobiModelMixin::f)
 	nb::class_<GurobiModelMixin, GurobiModel>(m, "RawModel")
 	    .def(nb::init<>())

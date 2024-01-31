@@ -253,6 +253,29 @@ ConstraintIndex COPTModel::_add_sos_constraint(const Vector<VariableIndex> &vari
 	return constraint_index;
 }
 
+ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables)
+{
+	IndexT index = m_cone_constraint_index.add_index();
+	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+
+	int N = variables.size();
+	std::vector<int> ind_v(N);
+	for (int i = 0; i < N; i++)
+	{
+		ind_v[i] = _checked_variable_index(variables[i]);
+	}
+
+	int coneType[] = {COPT_CONE_QUAD};
+	int coneBeg[] = {0};
+	int coneCnt[] = {N};
+	int *coneIdx = ind_v.data();
+
+	int error = COPT_AddCones(m_model.get(), 1, coneType, coneBeg, coneCnt, coneIdx);
+	check_error(error);
+
+	return constraint_index;
+}
+
 void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	int error = 0;
@@ -274,6 +297,10 @@ void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 			m_sos_constraint_index.delete_index(constraint.index);
 			error = COPT_DelSOSs(m_model.get(), 1, &constraint_row);
 			break;
+		case ConstraintType::Cone:
+			m_cone_constraint_index.delete_index(constraint.index);
+			error = COPT_DelCones(m_model.get(), 1, &constraint_row);
+			break;
 		default:
 			throw std::runtime_error("Unknown constraint type");
 		}
@@ -292,6 +319,8 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 	case ConstraintType::SOS1:
 	case ConstraintType::SOS2:
 		return m_sos_constraint_index.has_index(constraint.index);
+	case ConstraintType::Cone:
+		return m_cone_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}
@@ -769,6 +798,8 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 	case ConstraintType::SOS1:
 	case ConstraintType::SOS2:
 		return m_sos_constraint_index.get_index(constraint.index);
+	case ConstraintType::Cone:
+		return m_cone_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}

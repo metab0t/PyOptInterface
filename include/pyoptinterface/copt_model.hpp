@@ -71,6 +71,9 @@ class COPTModel
 	ConstraintIndex _add_sos_constraint(const Vector<VariableIndex> &variables,
 	                                    const Vector<CoeffT> &weights, int sos_type);
 
+	// x[0]^2 >= x[1]^2 + x[2]^2 + ... + x[n-1]^2
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables);
+
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
 
@@ -151,6 +154,8 @@ class COPTModel
 	MonotoneIndexer<int> m_quadratic_constraint_index;
 
 	MonotoneIndexer<int> m_sos_constraint_index;
+
+	MonotoneIndexer<int> m_cone_constraint_index;
 
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;

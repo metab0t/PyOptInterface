@@ -17,7 +17,7 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx_copybutton",
-    "sphinx.ext.githubpages"
+    "sphinx.ext.githubpages",
 ]
 
 myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath"]
