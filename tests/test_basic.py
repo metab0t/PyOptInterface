@@ -1,6 +1,8 @@
 import pyoptinterface as poi
 import numpy as np
 
+from pyoptinterface._src.core_ext import IntMonotoneIndexer
+
 
 def test_basic():
     vars = [poi.VariableIndex(i) for i in range(10)]
@@ -24,3 +26,21 @@ def test_basic():
     saf.canonicalize()
     assert list(saf.variables) == [0, 1, 2, 3]
     assert np.allclose(saf.coefficients, [1.0, 2.0, 3.0, -4.0])
+
+
+def test_monotoneindexer():
+    indexer = IntMonotoneIndexer()
+
+    N = 200
+    for i in range(N):
+        index = indexer.add_index()
+        assert index == i
+
+    for i in range(N - 1):
+        indexer.delete_index(i)
+        x = indexer.get_index(i + 1)
+        assert x == 0
+        x = indexer.get_index(N - 1)
+        assert x == N - 1 - (i + 1)
+        x = indexer.get_index(0)
+        assert x == -1

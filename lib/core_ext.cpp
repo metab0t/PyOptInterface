@@ -27,8 +27,10 @@ NB_MODULE(core_ext, m)
 	nb::enum_<ConstraintType>(m, "ConstraintType")
 	    .value("Linear", ConstraintType::Linear)
 	    .value("Quadratic", ConstraintType::Quadratic)
-	    .value("SOS1", ConstraintType::SOS1)
-	    .value("SOS2", ConstraintType::SOS2);
+	    .value("SOS", ConstraintType::SOS)
+	    .value("Cone", ConstraintType::Cone);
+
+	nb::enum_<SOSType>(m, "SOSType").value("SOS1", SOSType::SOS1).value("SOS2", SOSType::SOS2);
 
 	// ObjectiveSense
 	nb::enum_<ObjectiveSense>(m, "ObjectiveSense")

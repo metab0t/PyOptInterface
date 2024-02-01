@@ -20,7 +20,7 @@ extensions = [
     "sphinx.ext.githubpages",
 ]
 
-myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath"]
+myst_enable_extensions = ["colon_fence", "amsmath", "dollarmath", "fieldlist"]
 
 templates_path = ["_templates"]
 exclude_patterns = []

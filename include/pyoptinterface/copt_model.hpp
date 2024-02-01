@@ -64,15 +64,13 @@ class COPTModel
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
 	                                         ConstraintSense sense, CoeffT rhs,
 	                                         const char *name = nullptr);
-	ConstraintIndex add_sos1_constraint(const Vector<VariableIndex> &variables,
-	                                    const Vector<CoeffT> &weights);
-	ConstraintIndex add_sos2_constraint(const Vector<VariableIndex> &variables,
-	                                    const Vector<CoeffT> &weights);
-	ConstraintIndex _add_sos_constraint(const Vector<VariableIndex> &variables,
-	                                    const Vector<CoeffT> &weights, int sos_type);
+	ConstraintIndex add_sos_constraint(const Vector<VariableIndex> &variables, SOSType sos_type);
+	ConstraintIndex add_sos_constraint(const Vector<VariableIndex> &variables, SOSType sos_type,
+	                                   const Vector<CoeffT> &weights);
 
 	// x[0]^2 >= x[1]^2 + x[2]^2 + ... + x[n-1]^2
-	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables, const char *name);
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+	                                                 const char *name);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

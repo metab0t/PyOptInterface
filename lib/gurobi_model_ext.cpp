@@ -89,9 +89,12 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &GurobiModelMixin::add_quadratic_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
+	                                   &GurobiModelMixin::add_sos_constraint))
+	    .def("add_sos_constraint",
+	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
+	             &GurobiModelMixin::add_sos_constraint))
 	    // clang-format off
-		BIND_F(add_sos1_constraint)
-		BIND_F(add_sos2_constraint)
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
 	    // clang-format on

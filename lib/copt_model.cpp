@@ -75,14 +75,14 @@ static VariableDomain copt_vtype_to_domain(char vtype)
 	}
 }
 
-static ConstraintType copt_sostype(int type)
+static int copt_sostype(SOSType type)
 {
 	switch (type)
 	{
-	case COPT_SOS_TYPE1:
-		return ConstraintType::SOS1;
-	case COPT_SOS_TYPE2:
-		return ConstraintType::SOS2;
+	case SOSType::SOS1:
+		return COPT_SOS_TYPE1;
+	case SOSType::SOS2:
+		return COPT_SOS_TYPE2;
 	default:
 		throw std::runtime_error("Unknown SOS type");
 	}
@@ -217,27 +217,22 @@ ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 	return constraint_index;
 }
 
-ConstraintIndex COPTModel::add_sos1_constraint(const Vector<VariableIndex> &variables,
-                                               const Vector<CoeffT> &weights)
+ConstraintIndex COPTModel::add_sos_constraint(const Vector<VariableIndex> &variables,
+                                              SOSType sos_type)
 {
-	return _add_sos_constraint(variables, weights, COPT_SOS_TYPE1);
+	Vector<CoeffT> weights(variables.size(), 1.0);
+	return add_sos_constraint(variables, sos_type, weights);
 }
 
-ConstraintIndex COPTModel::add_sos2_constraint(const Vector<VariableIndex> &variables,
-                                               const Vector<CoeffT> &weights)
-{
-	return _add_sos_constraint(variables, weights, COPT_SOS_TYPE2);
-}
-
-ConstraintIndex COPTModel::_add_sos_constraint(const Vector<VariableIndex> &variables,
-                                               const Vector<CoeffT> &weights, int sos_type)
+ConstraintIndex COPTModel::add_sos_constraint(const Vector<VariableIndex> &variables,
+                                              SOSType sos_type, const Vector<CoeffT> &weights)
 {
 	IndexT index = m_sos_constraint_index.add_index();
-	ConstraintIndex constraint_index(copt_sostype(sos_type), index);
+	ConstraintIndex constraint_index(ConstraintType::SOS, index);
 
 	int numsos = 1;
 	int nummembers = variables.size();
-	int types = sos_type;
+	int types = copt_sostype(sos_type);
 	int beg[] = {0};
 	int cnt[] = {nummembers};
 	std::vector<int> ind_v(nummembers);
@@ -295,8 +290,7 @@ void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 			m_quadratic_constraint_index.delete_index(constraint.index);
 			error = COPT_DelQConstrs(m_model.get(), 1, &constraint_row);
 			break;
-		case ConstraintType::SOS1:
-		case ConstraintType::SOS2:
+		case ConstraintType::SOS:
 			m_sos_constraint_index.delete_index(constraint.index);
 			error = COPT_DelSOSs(m_model.get(), 1, &constraint_row);
 			break;
@@ -319,8 +313,7 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_linear_constraint_index.has_index(constraint.index);
 	case ConstraintType::Quadratic:
 		return m_quadratic_constraint_index.has_index(constraint.index);
-	case ConstraintType::SOS1:
-	case ConstraintType::SOS2:
+	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
 	case ConstraintType::Cone:
 		return m_cone_constraint_index.has_index(constraint.index);
@@ -798,8 +791,7 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_linear_constraint_index.get_index(constraint.index);
 	case ConstraintType::Quadratic:
 		return m_quadratic_constraint_index.get_index(constraint.index);
-	case ConstraintType::SOS1:
-	case ConstraintType::SOS2:
+	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);
 	case ConstraintType::Cone:
 		return m_cone_constraint_index.get_index(constraint.index);

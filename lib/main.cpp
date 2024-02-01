@@ -152,11 +152,11 @@ auto test_chunkedbv() -> void
 		fmt::print("added={}\n", x);
 	}
 
-	auto M = 2;
-	auto x = cbv.add_indices(M);
-	fmt::print("added={}\n", x);
+	//auto M = 2;
+	//auto x = cbv.add_indices(M);
+	//fmt::print("added={}\n", x);
 
-	for (int i = 0; i < M + N - 1; i++)
+	for (int i = 0; i < N - 1; i++)
 	{
 		cbv.delete_index(i);
 		auto x = cbv.get_index(i + 1);

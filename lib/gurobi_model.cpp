@@ -50,14 +50,14 @@ static char gurobi_vtype(VariableDomain domain)
 	}
 }
 
-static ConstraintType gurobi_sostype(int type)
+static int gurobi_sostype(SOSType type)
 {
 	switch (type)
 	{
-	case GRB_SOS_TYPE1:
-		return ConstraintType::SOS1;
-	case GRB_SOS_TYPE2:
-		return ConstraintType::SOS2;
+	case SOSType::SOS1:
+		return GRB_SOS_TYPE1;
+	case SOSType::SOS2:
+		return GRB_SOS_TYPE2;
 	default:
 		throw std::runtime_error("Unknown SOS type");
 	}
@@ -224,28 +224,23 @@ ConstraintIndex GurobiModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	return constraint_index;
 }
 
-ConstraintIndex GurobiModel::add_sos1_constraint(const Vector<VariableIndex> &variables,
-                                                 const Vector<CoeffT> &weights)
+ConstraintIndex GurobiModel::add_sos_constraint(const Vector<VariableIndex> &variables,
+                                                SOSType sos_type)
 {
-	return _add_sos_constraint(variables, weights, GRB_SOS_TYPE1);
+	Vector<CoeffT> weights(variables.size(), 1.0);
+	return add_sos_constraint(variables, sos_type, weights);
 }
 
-ConstraintIndex GurobiModel::add_sos2_constraint(const Vector<VariableIndex> &variables,
-                                                 const Vector<CoeffT> &weights)
-{
-	return _add_sos_constraint(variables, weights, GRB_SOS_TYPE2);
-}
-
-ConstraintIndex GurobiModel::_add_sos_constraint(const Vector<VariableIndex> &variables,
-                                                 const Vector<CoeffT> &weights, int sos_type)
+ConstraintIndex GurobiModel::add_sos_constraint(const Vector<VariableIndex> &variables,
+                                                SOSType sos_type, const Vector<CoeffT> &weights)
 {
 	IndexT index = m_sos_constraint_index.add_index();
-	ConstraintIndex constraint_index(gurobi_sostype(sos_type), index);
+	ConstraintIndex constraint_index(ConstraintType::SOS, index);
 
 	// Create a new Gurobi SOS constraint
 	int numsos = 1;
 	int nummembers = variables.size();
-	int types = sos_type;
+	int types = gurobi_sostype(sos_type);
 	int beg[] = {0, nummembers};
 	std::vector<int> ind_v(nummembers);
 	for (int i = 0; i < nummembers; i++)
@@ -278,8 +273,7 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 			m_quadratic_constraint_index.delete_index(constraint.index);
 			error = GRBdelqconstrs(m_model.get(), 1, &constraint_row);
 			break;
-		case ConstraintType::SOS1:
-		case ConstraintType::SOS2:
+		case ConstraintType::SOS:
 			m_sos_constraint_index.delete_index(constraint.index);
 			error = GRBdelsos(m_model.get(), 1, &constraint_row);
 			break;
@@ -299,8 +293,7 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_linear_constraint_index.has_index(constraint.index);
 	case ConstraintType::Quadratic:
 		return m_quadratic_constraint_index.has_index(constraint.index);
-	case ConstraintType::SOS1:
-	case ConstraintType::SOS2:
+	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -797,8 +790,7 @@ int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_linear_constraint_index.get_index(constraint.index);
 	case ConstraintType::Quadratic:
 		return m_quadratic_constraint_index.get_index(constraint.index);
-	case ConstraintType::SOS1:
-	case ConstraintType::SOS2:
+	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");

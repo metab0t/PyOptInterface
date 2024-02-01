@@ -214,9 +214,14 @@ enum class ConstraintType
 {
 	Linear,
 	Quadratic,
+	SOS,
+	Cone,
+};
+
+enum class SOSType
+{
 	SOS1,
 	SOS2,
-	Cone,
 };
 
 enum class ConstraintSense

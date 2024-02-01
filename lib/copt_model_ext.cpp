@@ -76,12 +76,14 @@ NB_MODULE(copt_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &COPTModelMixin::add_quadratic_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_second_order_cone_constraint",
-	         &COPTModelMixin::add_second_order_cone_constraint, nb::arg("variables"),
-	         nb::arg("name") = "")
+	    .def("add_second_order_cone_constraint", &COPTModelMixin::add_second_order_cone_constraint,
+	         nb::arg("variables"), nb::arg("name") = "")
+	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
+	                                   &COPTModelMixin::add_sos_constraint))
+	    .def("add_sos_constraint",
+	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
+	             &COPTModelMixin::add_sos_constraint))
 	    // clang-format off
-		BIND_F(add_sos1_constraint)
-		BIND_F(add_sos2_constraint)
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
 	    // clang-format on
