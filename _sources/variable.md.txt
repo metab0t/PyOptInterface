@@ -11,12 +11,6 @@ model = gurobi.Model()
 x = model.add_variable(lb=0, ub=1.0, domain=poi.VariableDomain.Continuous, name="x")
 ```
 
-When creating a variable, the following arguments can be specified:
-- `lb`: the lower bound of the variable. It is optional and defaults to $-\infty$.
-- `ub`: the upper bound of the variable. It is optional and defaults to $+\infty$.
-- `domain`: the domain of the variable. It can be [Continuous](#pyoptinterface.VariableDomain.Continuous), [Integer](#pyoptinterface.VariableDomain.Integer), [Binary](#pyoptinterface.VariableDomain.Binary). It is optional and defaults to `Continuous`.
-- `name`: the name of the variable. It is optional and defaults to `None`.
-
 ## Variable Attributes
 After a variable is created, we can query or modify its attributes. The following table lists the standard [variable attributes](#pyoptinterface.VariableAttribute):
 

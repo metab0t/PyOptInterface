@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pyoptinterface.gurobi package" href="pyoptinterface.gurobi.html" /><link rel="prev" title="Constraint" href="../constraint.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pyoptinterface.gurobi package" href="pyoptinterface.gurobi.html" /><link rel="prev" title="Common Model Interface" href="../common_model_interface.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>pyoptinterface package - PyOptInterface documentation</title>
@@ -162,6 +162,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common_model_interface.html">Common Model Interface</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul class="current">
@@ -273,6 +274,11 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintType</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Cone">
+<span class="sig-name descname"><span class="pre">Cone</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.Cone</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Cone" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Linear">
 <span class="sig-name descname"><span class="pre">Linear</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.Linear</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Linear" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -283,13 +289,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SOS1">
-<span class="sig-name descname"><span class="pre">SOS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.SOS1</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS1" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SOS2">
-<span class="sig-name descname"><span class="pre">SOS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.SOS2</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS2" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SOS">
+<span class="sig-name descname"><span class="pre">SOS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.SOS</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -534,6 +535,22 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ResultStatusCode.UNKNOWN_RESULT_STATUS">
 <span class="sig-name descname"><span class="pre">UNKNOWN_RESULT_STATUS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#pyoptinterface.ResultStatusCode.UNKNOWN_RESULT_STATUS" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyoptinterface.SOSType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">SOSType</span></span><a class="headerlink" href="#pyoptinterface.SOSType" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.SOSType.SOS1">
+<span class="sig-name descname"><span class="pre">SOS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.SOSType.SOS1</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.SOSType.SOS2">
+<span class="sig-name descname"><span class="pre">SOS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.SOSType.SOS2</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS2" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -936,14 +953,14 @@
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../constraint.html">
+          <a class="prev-page" href="../common_model_interface.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Constraint</div>
+                <div class="title">Common Model Interface</div>
                 
               </div>
             </a>
@@ -996,10 +1013,10 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType"><code class="docutils literal notranslate"><span class="pre">ConstraintType</span></code></a><ul>
+<li><a class="reference internal" href="#pyoptinterface.ConstraintType.Cone"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Cone</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType.Linear"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Linear</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType.Quadratic"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Quadratic</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.ConstraintType.SOS1"><code class="docutils literal notranslate"><span class="pre">ConstraintType.SOS1</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.ConstraintType.SOS2"><code class="docutils literal notranslate"><span class="pre">ConstraintType.SOS2</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ConstraintType.SOS"><code class="docutils literal notranslate"><span class="pre">ConstraintType.SOS</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ExprBuilder"><code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code></a><ul>
@@ -1056,6 +1073,11 @@
 <li><a class="reference internal" href="#pyoptinterface.ResultStatusCode.OTHER_RESULT_STATUS"><code class="docutils literal notranslate"><span class="pre">ResultStatusCode.OTHER_RESULT_STATUS</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ResultStatusCode.REDUCTION_CERTIFICATE"><code class="docutils literal notranslate"><span class="pre">ResultStatusCode.REDUCTION_CERTIFICATE</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ResultStatusCode.UNKNOWN_RESULT_STATUS"><code class="docutils literal notranslate"><span class="pre">ResultStatusCode.UNKNOWN_RESULT_STATUS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyoptinterface.SOSType"><code class="docutils literal notranslate"><span class="pre">SOSType</span></code></a><ul>
+<li><a class="reference internal" href="#pyoptinterface.SOSType.SOS1"><code class="docutils literal notranslate"><span class="pre">SOSType.SOS1</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.SOSType.SOS2"><code class="docutils literal notranslate"><span class="pre">SOSType.SOS2</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ScalarAffineFunction"><code class="docutils literal notranslate"><span class="pre">ScalarAffineFunction</span></code></a><ul>

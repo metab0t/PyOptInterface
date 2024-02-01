@@ -162,6 +162,7 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul>
@@ -217,13 +218,6 @@
 <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Continuous</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>When creating a variable, the following arguments can be specified:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: the lower bound of the variable. It is optional and defaults to <span class="math notranslate nohighlight">\(-\infty\)</span>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: the upper bound of the variable. It is optional and defaults to <span class="math notranslate nohighlight">\(+\infty\)</span>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">domain</span></code>: the domain of the variable. It can be <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Continuous" title="pyoptinterface.VariableDomain.Continuous"><span class="xref myst py py-attr">Continuous</span></a>, <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Integer" title="pyoptinterface.VariableDomain.Integer"><span class="xref myst py py-attr">Integer</span></a>, <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Binary" title="pyoptinterface.VariableDomain.Binary"><span class="xref myst py py-attr">Binary</span></a>. It is optional and defaults to <code class="docutils literal notranslate"><span class="pre">Continuous</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of the variable. It is optional and defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-</ul>
 <section id="variable-attributes">
 <h2>Variable Attributes<a class="headerlink" href="#variable-attributes" title="Link to this heading">#</a></h2>
 <p>After a variable is created, we can query or modify its attributes. The following table lists the standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attributes</span></a>:</p>
@@ -363,7 +357,5 @@
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

@@ -160,6 +160,7 @@
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul>
@@ -252,26 +253,20 @@
           <li><a href="api/pyoptinterface.html#pyoptinterface.ScalarQuadraticFunction.add_quadratic_term">(pyoptinterface.ScalarQuadraticFunction attribute)</a>
 </li>
         </ul></li>
-        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_second_order_cone_constraint">add_second_order_cone_constraint (pyoptinterface.copt.Model attribute)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_second_order_cone_constraint">add_second_order_cone_constraint (pyoptinterface.copt.Model attribute)</a>
+</li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_second_order_cone_constraint">add_second_order_cone_constraint() (pyoptinterface.gurobi.Model method)</a>
 
         <ul>
           <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model.add_second_order_cone_constraint">(pyoptinterface.mosek.Model method)</a>
 </li>
         </ul></li>
-        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_sos1_constraint">add_sos1_constraint (pyoptinterface.copt.Model attribute)</a>
+        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_sos_constraint">add_sos_constraint (pyoptinterface.copt.Model attribute)</a>
 
         <ul>
-          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos1_constraint">(pyoptinterface.gurobi.Model attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="api/pyoptinterface.copt.html#pyoptinterface.copt.Model.add_sos2_constraint">add_sos2_constraint (pyoptinterface.copt.Model attribute)</a>
-
-        <ul>
-          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos2_constraint">(pyoptinterface.gurobi.Model attribute)</a>
+          <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Model.add_sos_constraint">(pyoptinterface.gurobi.Model attribute)</a>
 </li>
         </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ScalarAffineFunction.add_term">add_term (pyoptinterface.ScalarAffineFunction attribute)</a>
@@ -306,10 +301,53 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.BarrierIterations">BarrierIterations (pyoptinterface.ModelAttribute attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.VariableDomain.Binary">Binary (pyoptinterface.VariableDomain attribute)</a>
 </li>
+        <li>
+    built-in function
+
+        <ul>
+          <li><a href="constraint.html#model.add_linear_constraint">model.add_linear_constraint()</a>
+</li>
+          <li><a href="constraint.html#model.add_quadratic_constraint">model.add_quadratic_constraint()</a>
+</li>
+          <li><a href="constraint.html#model.add_second_order_cone_constraint">model.add_second_order_cone_constraint()</a>
+</li>
+          <li><a href="constraint.html#model.add_sos_constraint">model.add_sos_constraint()</a>
+</li>
+          <li><a href="common_model_interface.html#model.add_variable">model.add_variable()</a>
+</li>
+          <li><a href="common_model_interface.html#model.delete_constraint">model.delete_constraint()</a>
+</li>
+          <li><a href="common_model_interface.html#model.delete_variable">model.delete_variable()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_constraint_attribute">model.get_constraint_attribute()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_model_attribute">model.get_model_attribute()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_value">model.get_value()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_variable_attribute">model.get_variable_attribute()</a>
+</li>
+          <li><a href="common_model_interface.html#model.is_constraint_active">model.is_constraint_active()</a>
+</li>
+          <li><a href="common_model_interface.html#model.is_variable_active">model.is_variable_active()</a>
+</li>
+          <li><a href="common_model_interface.html#model.pprint">model.pprint()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_constraint_attribute">model.set_constraint_attribute()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_model_attribute">model.set_model_attribute()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_normalized_coefficient">model.set_normalized_coefficient()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_normalized_rhs">model.set_normalized_rhs()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_objective">model.set_objective()</a>
+</li>
+          <li><a href="common_model_interface.html#model.set_variable_attribute">model.set_variable_attribute()</a>
+</li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -338,6 +376,8 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintType.Cone">Cone (pyoptinterface.ConstraintType attribute)</a>
+</li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ScalarAffineFunction.constant">constant (pyoptinterface.ScalarAffineFunction property)</a>
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute">ConstraintAttribute (class in pyoptinterface)</a>
@@ -802,8 +842,148 @@
           <li><a href="api/pyoptinterface.mosek.html#pyoptinterface.mosek.Model">(class in pyoptinterface.mosek)</a>
 </li>
         </ul></li>
+        <li>
+    model.add_linear_constraint()
+
+        <ul>
+          <li><a href="constraint.html#model.add_linear_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_quadratic_constraint()
+
+        <ul>
+          <li><a href="constraint.html#model.add_quadratic_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_second_order_cone_constraint()
+
+        <ul>
+          <li><a href="constraint.html#model.add_second_order_cone_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_sos_constraint()
+
+        <ul>
+          <li><a href="constraint.html#model.add_sos_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_variable()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.add_variable">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.delete_constraint()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.delete_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.delete_variable()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.delete_variable">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.get_constraint_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_constraint_attribute">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.get_model_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_model_attribute">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.get_value()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_value">built-in function</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    model.get_variable_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_variable_attribute">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.is_constraint_active()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.is_constraint_active">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.is_variable_active()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.is_variable_active">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.pprint()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.pprint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_constraint_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_constraint_attribute">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_model_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_model_attribute">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_normalized_coefficient()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_normalized_coefficient">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_normalized_rhs()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_normalized_rhs">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_objective()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_objective">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_variable_attribute()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_variable_attribute">built-in function</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute">ModelAttribute (class in pyoptinterface)</a>
 </li>
         <li>
@@ -1288,9 +1468,13 @@
 </li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ModelAttribute.SolveTimeSec">SolveTimeSec (pyoptinterface.ModelAttribute attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintType.SOS1">SOS1 (pyoptinterface.ConstraintType attribute)</a>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintType.SOS">SOS (pyoptinterface.ConstraintType attribute)</a>
 </li>
-        <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintType.SOS2">SOS2 (pyoptinterface.ConstraintType attribute)</a>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.SOSType.SOS1">SOS1 (pyoptinterface.SOSType attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.SOSType.SOS2">SOS2 (pyoptinterface.SOSType attribute)</a>
+</li>
+        <li><a href="api/pyoptinterface.html#pyoptinterface.SOSType">SOSType (class in pyoptinterface)</a>
 </li>
         <li><a href="api/pyoptinterface.gurobi.html#pyoptinterface.gurobi.Env.start">start (pyoptinterface.gurobi.Env attribute)</a>
 </li>
