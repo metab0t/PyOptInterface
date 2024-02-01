@@ -72,7 +72,7 @@ class COPTModel
 	                                    const Vector<CoeffT> &weights, int sos_type);
 
 	// x[0]^2 >= x[1]^2 + x[2]^2 + ... + x[n-1]^2
-	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables);
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables, const char *name);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

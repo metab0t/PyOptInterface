@@ -287,11 +287,13 @@ class Model(RawModel):
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
 
-    def add_second_order_cone_constraint(self, cone_variables, use_bridge=False):
+    def add_second_order_cone_constraint(
+        self, cone_variables, name="", use_bridge=False
+    ):
         if use_bridge:
-            con = bridge_soc_quadratic_constraint(self, cone_variables)
+            con = bridge_soc_quadratic_constraint(self, cone_variables, name)
         else:
-            con = super().add_second_order_cone_constraint(cone_variables)
+            con = super().add_second_order_cone_constraint(cone_variables, name)
         return con
 
     @staticmethod

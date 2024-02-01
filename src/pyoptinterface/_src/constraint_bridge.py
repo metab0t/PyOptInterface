@@ -1,7 +1,7 @@
 from .core_ext import ScalarQuadraticFunction, ConstraintSense
 
 
-def bridge_soc_quadratic_constraint(model, cone_variables):
+def bridge_soc_quadratic_constraint(model, cone_variables, name=""):
     """
     Convert a second order cone constraint to a quadratic constraint.
     x[0] >= sqrt(x[1]^2 + ... + x[n]^2)
@@ -24,6 +24,6 @@ def bridge_soc_quadratic_constraint(model, cone_variables):
         xi = cone_variables[i]
         expr.add_quadratic_term(xi, xi, -1.0)
 
-    con = model.add_quadratic_constraint(expr, ConstraintSense.GreaterEqual, 0.0)
+    con = model.add_quadratic_constraint(expr, ConstraintSense.GreaterEqual, 0.0, name)
 
     return con

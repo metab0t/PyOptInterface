@@ -382,17 +382,18 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	return constraint_index;
 }
 
-ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables)
+ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+                                                             const char *name)
 {
 	auto N = variables.size();
 
-	MSKint64t numacc;
-	auto error = MSK_getaccntot(m_model.get(), &numacc);
-	check_error(error);
+	IndexT index = m_acc_index.size();
+	m_acc_index.push_back(true);
+	ConstraintIndex constraint_index(ConstraintType::Cone, index);
 
 	// afe part
 	MSKint64t numafe;
-	error = MSK_getnumafe(m_model.get(), &numafe);
+	auto error = MSK_getnumafe(m_model.get(), &numafe);
 	check_error(error);
 
 	std::vector<MSKint64t> afe_index(N);
@@ -424,9 +425,16 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 	error = MSK_appendacc(m_model.get(), domain_index, N, afe_index.data(), nullptr);
 	check_error(error);
 
-	IndexT index = m_acc_index.size();
-	m_acc_index.push_back(true);
-	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+	// set name
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+	if (name)
+	{
+		error = MSK_putaccname(m_model.get(), index, name);
+		check_error(error);
+	}
 
 	return constraint_index;
 }

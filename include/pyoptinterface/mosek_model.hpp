@@ -54,7 +54,7 @@ class MOSEKModel
 	                                         ConstraintSense sense, CoeffT rhs,
 	                                         const char *name = nullptr);
 
-	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables);
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables, const char* name);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

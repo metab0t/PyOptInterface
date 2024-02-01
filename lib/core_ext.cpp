@@ -4,7 +4,7 @@
 #include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/core.hpp"
-#include "pyoptinterface/solver_common.hpp"
+#include "pyoptinterface/container.hpp"
 
 namespace nb = nanobind;
 
@@ -157,4 +157,12 @@ NB_MODULE(core_ext, m)
 	    .def("mul", nb::overload_cast<const ScalarAffineFunction &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ScalarQuadraticFunction &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ExprBuilder &>(&ExprBuilder::mul));
+
+	// We need to test the functionality of MonotoneIndexer
+	using IntMonotoneIndexer = MonotoneIndexer<int>;
+	nb::class_<IntMonotoneIndexer>(m, "IntMonotoneIndexer")
+	    .def(nb::init<>())
+	    .def("add_index", &IntMonotoneIndexer::add_index)
+	    .def("get_index", &IntMonotoneIndexer::get_index)
+	    .def("delete_index", &IntMonotoneIndexer::delete_index);
 }

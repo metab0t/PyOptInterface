@@ -253,7 +253,8 @@ ConstraintIndex COPTModel::_add_sos_constraint(const Vector<VariableIndex> &vari
 	return constraint_index;
 }
 
-ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables)
+ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+                                                            const char *name)
 {
 	IndexT index = m_cone_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Cone, index);
@@ -272,6 +273,8 @@ ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<Variabl
 
 	int error = COPT_AddCones(m_model.get(), 1, coneType, coneBeg, coneCnt, coneIdx);
 	check_error(error);
+
+	// COPT does not support name for cone constraints
 
 	return constraint_index;
 }

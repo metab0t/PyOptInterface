@@ -390,8 +390,8 @@ class Model(RawModel):
             env = DEFAULT_ENV
         super().__init__(env)
 
-    def add_second_order_cone_constraint(self, cone_variables):
-        return bridge_soc_quadratic_constraint(self, cone_variables)
+    def add_second_order_cone_constraint(self, cone_variables, name=""):
+        return bridge_soc_quadratic_constraint(self, cone_variables, name)
 
     @staticmethod
     def supports_variable_attribute(self, attribute: VariableAttribute):
