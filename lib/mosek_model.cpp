@@ -386,19 +386,14 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 {
 	auto N = variables.size();
 
-	ACCInfo acc_info;
 	MSKint64t numacc;
 	auto error = MSK_getaccntot(m_model.get(), &numacc);
 	check_error(error);
-	acc_info.first_acc_row = numacc;
-	acc_info.last_acc_row = numacc + N;
 
 	// afe part
 	MSKint64t numafe;
 	error = MSK_getnumafe(m_model.get(), &numafe);
 	check_error(error);
-	acc_info.first_afe_row = numafe;
-	acc_info.last_afe_row = numafe + N;
 
 	std::vector<MSKint64t> afe_index(N);
 	for (int i = 0; i < N; i++)
@@ -424,14 +419,13 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 	MSKint64t domain_index;
 	error = MSK_appendquadraticconedomain(m_model.get(), N, &domain_index);
 	check_error(error);
-	acc_info.domain_index = domain_index;
 
 	// add acc
 	error = MSK_appendacc(m_model.get(), domain_index, N, afe_index.data(), nullptr);
 	check_error(error);
 
 	IndexT index = m_acc_index.size();
-	m_acc_index.push_back(acc_info);
+	m_acc_index.push_back(true);
 	ConstraintIndex constraint_index(ConstraintType::Cone, index);
 
 	return constraint_index;
@@ -441,18 +435,39 @@ void MOSEKModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	MSKrescodee error;
 	MSKint32t constraint_row = _constraint_index(constraint);
-	if (constraint_row >= 0)
+	if (constraint_row < 0)
+		return;
+
+	switch (constraint.type)
 	{
-		switch (constraint.type)
-		{
-		case ConstraintType::Linear:
-		case ConstraintType::Quadratic:
-			m_linear_quadratic_constraint_index.delete_index(constraint.index);
-			error = MSK_removecons(m_model.get(), 1, &constraint_row);
-			break;
-		default:
-			throw std::runtime_error("Unknown constraint type");
-		}
+	case ConstraintType::Linear:
+	case ConstraintType::Quadratic:
+		m_linear_quadratic_constraint_index.delete_index(constraint.index);
+		error = MSK_removecons(m_model.get(), 1, &constraint_row);
+		break;
+	case ConstraintType::Cone: {
+		m_acc_index[constraint.index] = false;
+		// ACC cannot be deleted, we just set its domain to R^n (no constraint)
+		// get the dimension of this ACC
+		MSKint64t N;
+		error = MSK_getaccn(m_model.get(), constraint_row, &N);
+		check_error(error);
+		// get AFE list of ACC
+		std::vector<MSKint64t> afeidxlist(N);
+		error = MSK_getaccafeidxlist(m_model.get(), constraint_row, afeidxlist.data());
+		check_error(error);
+		// add a N-dim Rn domain
+		MSKint64t domain_index;
+		error = MSK_appendrdomain(m_model.get(), N, &domain_index);
+		check_error(error);
+		// set the ACC to this domain
+		error =
+		    MSK_putacc(m_model.get(), constraint_row, domain_index, N, afeidxlist.data(), nullptr);
+		check_error(error);
+	}
+	break;
+	default:
+		throw std::runtime_error("Unknown constraint type");
 	}
 	check_error(error);
 }
@@ -1178,6 +1193,9 @@ MSKint32t MOSEKModel::_constraint_index(const ConstraintIndex &constraint)
 	case ConstraintType::Linear:
 	case ConstraintType::Quadratic:
 		return m_linear_quadratic_constraint_index.get_index(constraint.index);
+		break;
+	case ConstraintType::Cone:
+		return m_acc_index[constraint.index] ? constraint.index : -1;
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");

@@ -2,6 +2,7 @@ import pyoptinterface as poi
 from pytest import approx
 import pytest
 
+
 def test_soc(model_interface):
     model = model_interface
 
@@ -27,3 +28,20 @@ def test_soc(model_interface):
     assert z_val == approx(4.0)
     obj_val = model.get_value(obj)
     assert obj_val == approx(12.0)
+
+    model.delete_constraint(con1)
+    xx = model.add_variable(lb=0.0, name="xx")
+    model.add_linear_constraint(xx - 2 * x, poi.ConstraintSense.Equal, 0.0)
+
+    model.add_second_order_cone_constraint([xx, y, z])
+    model.optimize()
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
+    x_val = model.get_value(x)
+    y_val = model.get_value(y)
+    z_val = model.get_value(z)
+    assert x_val == approx(2.5)
+    assert y_val == approx(3.0)
+    assert z_val == approx(4.0)
+    obj_val = model.get_value(obj)
+    assert obj_val == approx(9.5)

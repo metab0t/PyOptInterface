@@ -30,16 +30,6 @@ struct MOSEKfreemodelT
 	};
 };
 
-struct ACCInfo
-{
-	MSKint64t first_acc_row;
-	MSKint64t last_acc_row;
-
-	MSKint64t first_afe_row;
-	MSKint64t last_afe_row;
-	MSKint64t domain_index;
-};
-
 class MOSEKModel
 {
   public:
@@ -149,7 +139,10 @@ class MOSEKModel
 
 	MonotoneIndexer<MSKint32t> m_linear_quadratic_constraint_index;
 
-	std::vector<ACCInfo> m_acc_index;
+	// ACC cannot be removed from the model, so we just keeps track of the state whether it is deleted
+	// If a constraint is deleted, we will not remove it from the model, but just mark it as deleted
+	// and set the domain to R^n (i.e. no constraint)
+	std::vector<bool> m_acc_index;
 
 	// Mosek does not discriminate between integer variable and binary variable
 	// So we need to keep track of binary variables
