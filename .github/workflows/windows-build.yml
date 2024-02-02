@@ -28,117 +28,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Install lessmsi
-        run: |
-          curl -L -o D:\lessmsi.zip https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip
-          7z x D:\lessmsi.zip -oD:\lessmsi
-          echo "PATH=$env:PATH;D:\lessmsi" >> $env:GITHUB_ENV
-      - name: Test lessmsi
-        run: |
-          lessmsi h
-
-      - name: Create directory to store installers
-        run: |
-          New-Item -ItemType Directory -Force -Path "D:\installers"
-          New-Item -ItemType Directory -Force -Path "D:\highs"
-
-      - name: Cache Installers
-        id: cache-installers-windows
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-installers-windows
+      - uses: ./.github/actions/setup_optimizers_windows
         with:
-          path: D:\installers
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-
-      - if: ${{ steps.cache-installers-windows.outputs.cache-hit != 'true' }}
-        name: Download Installers
-        run: |
-          curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-          curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.0.6/win64/CardinalOptimizer-7.0.6-win64.zip
-          curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.1.22/moseksetupwin64x86.msi
-
-      - name: Setup Gurobi Installation
-        env:
           GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
-        run: |
-          lessmsi x D:\installers\gurobi.msi "D:\" gurobi_cl.exe
-          lessmsi x D:\installers\gurobi.msi "D:\" gurobi110.dll gurobi110.lib
-          lessmsi x D:\installers\gurobi.msi "D:\" gurobi_c.h
-          ls D:\SourceDir\gurobi1100\win64
-          # set environment variables
-          echo "GUROBI_HOME=D:\SourceDir\gurobi1100\win64" >> $env:GITHUB_ENV
-          echo "PATH=$env:PATH;D:\SourceDir\gurobi1100\win64\bin" >> $env:GITHUB_ENV
-          echo $env:GUROBI_HOME
-          
-          # setup license using secrets
-          echo $env:GUROBI_WLS > D:\gurobi.lic
-          echo "GRB_LICENSE_FILE=D:\gurobi.lic" >> $env:GITHUB_ENV
-      - name: Test Gurobi
-        run: |
-          gurobi_cl
-
-      - name: Setup COPT Installation
-        env:
           COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
-        run: |
-          # unzip with 7zip
-          7z x D:\installers\copt.zip -oD:\
-          ls D:\copt70
-          # set environment variables
-          echo "COPT_HOME=D:\copt70" >> $env:GITHUB_ENV
-          echo "PATH=$env:PATH;D:\copt70\bin" >> $env:GITHUB_ENV
-          echo $env:COPT_HOME
-
-          # setup license using secrets
-          echo $env:COPT_CLIENT_INI > D:\client.ini
-          echo "COPT_LICENSE_DIR=D:\" >> $env:GITHUB_ENV
-#      - name: Test COPT
-#        run: |
-#          copt_cmd -c "quit"
-
-      - name: Setup MOSEK Installation
-        env:
           MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
-        run: |
-          lessmsi x D:\installers\mosek.msi "D:\" msktestlic.exe
-          lessmsi x D:\installers\mosek.msi "D:\" mosek64_10_1.dll mosek64_10_1.lib tbb12.dll svml_dispmd.dll
-          lessmsi x D:\installers\mosek.msi "D:\" mosek.h
-          ls D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86
-          # set environment variables
-          echo "MOSEK_10_1_BINDIR=D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
-          echo "PATH=$env:PATH;D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
-          echo $env:MOSEK_10_1_BINDIR
-
-          # setup license using secrets
-          echo $env:MOSEK_LICENSE > D:\mosek.lic
-          echo "MOSEKLM_LICENSE_FILE=D:\mosek.lic" >> $env:GITHUB_ENV
-      - name: Test MOSEK
-        run: |
-          msktestlic
-
-      - name: Download HiGHS artifact from my own build
-        uses: dawidd6/action-download-artifact@v3
-        with:
-          # GitHub token, a Personal Access Token with `public_repo` scope
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          workflow: build.yml
-          repo: metab0t/highs_autobuild
-          path: D:\highs
-          name: highs-artifact-windows-latest
-
-      - name: Setup HiGHS Installation
-        run: |
-          ls D:\highs
-          # set environment variables
-          echo "HiGHS_HOME=D:\highs" >> $env:GITHUB_ENV
-          echo "PATH=$env:PATH;D:\highs\bin" >> $env:GITHUB_ENV
-          echo $env:HiGHS_HOME
-      - name: Test HiGHS
-        run: |
-          highs --version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_LICENSE: true
 
       - name: Install python deps
         run: |

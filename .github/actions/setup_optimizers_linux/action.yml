@@ -1,0 +1,141 @@
+name: "Install optimizers on linux"
+
+inputs:
+  GUROBI_WLS: 
+    description: "..."
+    required: true
+  COPT_CLIENT_INI:
+    description: "..."
+    required: true
+  MOSEK_LICENSE:
+    description: "..."
+    required: true
+  GITHUB_TOKEN:
+    description: "..."
+    required: true
+  CHECK_LICENSE: 
+    description: "..."
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create directory to store installers
+      shell: bash
+      run: |
+        mkdir -p ~/installers
+        mkdir -p ~/highs
+
+    - name: Cache Installers
+      id: cache-installers-linux
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-installers-linux
+      with:
+        path: ~/installers
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+
+    - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }}
+      shell: bash
+      name: Download Installers
+      run: |
+        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.0.6/linux64/CardinalOptimizer-7.0.6-lnx64.tar.gz
+        curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.1.22/mosektoolslinux64x86.tar.bz2
+
+    - name: Setup Gurobi Installation
+      shell: bash
+      env:
+        GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
+      run: |
+        tar xfz ~/installers/gurobi.tar.gz -C ~/
+        ls ~/gurobi1100/linux64
+        # set environment variables
+        export GUROBI_HOME="${HOME}/gurobi1100/linux64"
+        echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${GUROBI_HOME}/bin" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib" >> $GITHUB_ENV
+        echo $GUROBI_HOME
+        
+        # setup license using secrets
+        echo "$GUROBI_WLS" > ~/gurobi.lic
+        echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
+    - name: Test Gurobi
+      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      shell: bash
+      run: |
+        gurobi_cl
+
+    - name: Setup COPT Installation
+      shell: bash
+      env:
+        COPT_CLIENT_INI: ${{ inputs.COPT_CLIENT_INI }}
+      run: |
+        tar xfz ~/installers/copt.tar.gz -C ~/
+        ls ~/copt70
+        # set environment variables
+        export COPT_HOME="${HOME}/copt70"
+        echo "COPT_HOME=${COPT_HOME}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${COPT_HOME}/bin" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${COPT_HOME}/lib" >> $GITHUB_ENV
+        echo $COPT_HOME
+
+        # setup license using secrets
+        echo "$COPT_CLIENT_INI" > ~/client.ini
+        echo "COPT_LICENSE_DIR=${HOME}" >> $GITHUB_ENV
+  #   - name: Test COPT
+  #     if: ${{ inputs.CHECK_LICENSE == 'true' }}
+  #     shell: bash
+  #     run: |
+  #       copt_cmd -c "quit"
+
+    - name: Setup MOSEK Installation
+      shell: bash
+      env:
+        MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
+      run: |
+        tar jxf ~/installers/mosek.tar.bz2 -C ~/
+        ls ~/mosek
+        # set environment variables
+        export MOSEK_10_1_BINDIR="${HOME}/mosek/10.1/tools/platform/linux64x86/bin"
+        echo "MOSEK_10_1_BINDIR=${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
+        echo $MOSEK_10_1_BINDIR
+
+        # setup license using secrets
+        echo "$MOSEK_LICENSE" > ~/mosek.lic
+        echo "MOSEKLM_LICENSE_FILE=${HOME}/mosek.lic" >> $GITHUB_ENV
+    - name: Test MOSEK
+      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      shell: bash
+      run: |
+        msktestlic
+
+    - name: Download HiGHS artifact from my own build
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        # GitHub token, a Personal Access Token with `public_repo` scope
+        github_token: ${{inputs.GITHUB_TOKEN}}
+        workflow: build.yml
+        repo: metab0t/highs_autobuild
+        path: /home/runner/highs
+        name: highs-artifact-ubuntu-latest
+
+    - name: Setup HiGHS Installation
+      shell: bash
+      run: |
+        ls ~/highs
+        chmod -R +xr ~/highs
+        # set environment variables
+        export HiGHS_HOME="${HOME}/highs"
+        echo "HiGHS_HOME=${HiGHS_HOME}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${HiGHS_HOME}/bin" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HiGHS_HOME}/lib" >> $GITHUB_ENV
+        echo $HiGHS_HOME
+    - name: Test HiGHS
+      shell: bash
+      run: |
+        highs --version
