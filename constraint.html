@@ -223,6 +223,12 @@ of <code class="docutils literal notranslate"><span class="pre">Expression</span
 <p>Not all optimizers support all types of constraints. Please refer to the documentation of the
 optimizer you are using to see which types of constraints are supported.</p>
 </div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+</pre></div>
+</div>
 <section id="linear-constraint">
 <h2>Linear Constraint<a class="headerlink" href="#linear-constraint" title="Link to this heading">#</a></h2>
 <p>It is defined as:</p>
@@ -237,6 +243,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 \end{split}\]</div>
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_linear_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_linear_constraint">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_linear_constraint" title="Link to this definition">#</a></dt>
@@ -245,7 +257,7 @@ optimizer you are using to see which types of constraints are supported.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> – the expression of the constraint</p></li>
-<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode" title="pyoptinterface.TerminationStatusCode"><em>pyoptinterface.TerminationStatusCode</em></a>) – the sense
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense
 of the constraint, which can be <code class="docutils literal notranslate"><span class="pre">GreaterEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, or <code class="docutils literal notranslate"><span class="pre">LessEqual</span></code></p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – the right-hand side of the constraint</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
@@ -272,6 +284,13 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 \end{split}\]</div>
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_quadratic_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span>
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_quadratic_constraint">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_quadratic_constraint" title="Link to this definition">#</a></dt>
@@ -280,7 +299,7 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> – the expression of the constraint</p></li>
-<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.TerminationStatusCode" title="pyoptinterface.TerminationStatusCode"><em>pyoptinterface.TerminationStatusCode</em></a>) – the sense
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense
 of the constraint, which can be <code class="docutils literal notranslate"><span class="pre">GreaterEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, or <code class="docutils literal notranslate"><span class="pre">LessEqual</span></code></p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – the right-hand side of the constraint</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
@@ -304,6 +323,12 @@ variables=(t,x) \in \mathbb{R}^{N} : t \ge \lVert x \rVert_2
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_second_order_cone_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code>
 class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_second_order_cone_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_second_order_cone_constraint">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_second_order_cone_constraint" title="Link to this definition">#</a></dt>
@@ -327,6 +352,12 @@ class.</p>
 <p>SOS constraints are used to model special structures in the optimization problem.
 It contains two types: <code class="docutils literal notranslate"><span class="pre">SOS1</span></code> and <code class="docutils literal notranslate"><span class="pre">SOS2</span></code>, the details can be found in <a class="reference external" href="https://en.wikipedia.org/wiki/Special_ordered_set">Wikipedia</a>.</p>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_sos_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_sos_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_sos_constraint">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_sos_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sos_type</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_sos_constraint" title="Link to this definition">#</a></dt>
@@ -401,7 +432,7 @@ model:</p>
 calling the <code class="docutils literal notranslate"><span class="pre">set_normalized_rhs</span></code> method of the model.</p>
 <p>For linear constraints, we can modify the coefficients of the linear part of the constraint by
 calling the <code class="docutils literal notranslate"><span class="pre">set_normalized_coefficient</span></code> method of the model.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">TerminationStatusCode</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
 <span class="c1"># modify the right-hand side of the constraint</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_normalized_rhs</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
