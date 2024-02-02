@@ -69,6 +69,8 @@ model.md
 variable.md
 expression.md
 constraint.md
+objective.md
+container.md
 common_model_interface.md
 ```
 

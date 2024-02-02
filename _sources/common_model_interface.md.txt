@@ -153,18 +153,36 @@ query whether a constraint is active
 
 ```{py:function} model.set_normalized_rhs(con, value)
 
-Set the right-hand side of a normalized constraint
+set the right-hand side of a normalized constraint
 
 :param con: the handle of the constraint
 :param value: the new right-hand side value
 ```
 
+```{py:function} model.get_normalized_rhs(con)
+
+get the right-hand side of a normalized constraint
+
+:param con: the handle of the constraint
+:return: the right-hand side value
+```
+
 ```{py:function} model.set_normalized_coefficient(con, var, value)
-Set the coefficient of a variable in a normalized constraint
+
+set the coefficient of a variable in a normalized constraint
 
 :param con: the handle of the constraint
 :param var: the handle of the variable
 :param value: the new coefficient value
+```
+
+```{py:function} model.get_normalized_coefficient(con, var)
+
+get the coefficient of a variable in a normalized constraint
+
+:param con: the handle of the constraint
+:param var: the handle of the variable
+:return: the coefficient value
 ```
 
 ## Objective
@@ -177,4 +195,22 @@ set the objective function of the model
 
 :param expr: the handle of the expression
 :param pyoptinterface.ObjectiveSense sense: the sense of the objective function
+```
+
+### Modify the linear part of the objective function
+
+```{py:function} model.set_objective_coefficient(var, value)
+
+modify the coefficient of a variable in the linear part of the objective function
+
+:param var: the handle of the variable
+:param float value: the new coefficient value
+```
+
+```{py:function} model.get_objective_coefficient(var)
+
+get the coefficient of a variable in the linear part of the objective function
+
+:param var: the handle of the variable
+:return: the coefficient value
 ```

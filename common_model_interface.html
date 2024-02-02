@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pyoptinterface package" href="api/pyoptinterface.html" /><link rel="prev" title="Constraint" href="constraint.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pyoptinterface package" href="api/pyoptinterface.html" /><link rel="prev" title="Container" href="container.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>Common Model Interface - PyOptInterface documentation</title>
@@ -162,6 +162,8 @@
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Common Model Interface</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
@@ -462,7 +464,7 @@ continuous</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_normalized_rhs">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_rhs" title="Link to this definition">#</a></dt>
-<dd><p>Set the right-hand side of a normalized constraint</p>
+<dd><p>set the right-hand side of a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -474,9 +476,23 @@ continuous</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="model.get_normalized_rhs">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_rhs" title="Link to this definition">#</a></dt>
+<dd><p>get the right-hand side of a normalized constraint</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>con</strong> – the handle of the constraint</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the right-hand side value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="model.set_normalized_coefficient">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_coefficient" title="Link to this definition">#</a></dt>
-<dd><p>Set the coefficient of a variable in a normalized constraint</p>
+<dd><p>set the coefficient of a variable in a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -484,6 +500,23 @@ continuous</p></li>
 <li><p><strong>var</strong> – the handle of the variable</p></li>
 <li><p><strong>value</strong> – the new coefficient value</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.get_normalized_coefficient">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_coefficient" title="Link to this definition">#</a></dt>
+<dd><p>get the coefficient of a variable in a normalized constraint</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>con</strong> – the handle of the constraint</p></li>
+<li><p><strong>var</strong> – the handle of the variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the coefficient value</p>
 </dd>
 </dl>
 </dd></dl>
@@ -509,6 +542,37 @@ continuous</p></li>
 </dd></dl>
 
 </section>
+<section id="modify-the-linear-part-of-the-objective-function">
+<h3>Modify the linear part of the objective function<a class="headerlink" href="#modify-the-linear-part-of-the-objective-function" title="Link to this heading">#</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.set_objective_coefficient">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective_coefficient" title="Link to this definition">#</a></dt>
+<dd><p>modify the coefficient of a variable in the linear part of the objective function</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – the handle of the variable</p></li>
+<li><p><strong>value</strong> (<em>float</em>) – the new coefficient value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.get_objective_coefficient">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_objective_coefficient" title="Link to this definition">#</a></dt>
+<dd><p>get the coefficient of a variable in the linear part of the objective function</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var</strong> – the handle of the variable</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the coefficient value</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 </section>
 
@@ -526,14 +590,14 @@ continuous</p></li>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="constraint.html">
+          <a class="prev-page" href="container.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Constraint</div>
+                <div class="title">Container</div>
                 
               </div>
             </a>
@@ -618,7 +682,9 @@ continuous</p></li>
 </li>
 <li><a class="reference internal" href="#modify-constraint">Modify constraint</a><ul>
 <li><a class="reference internal" href="#model.set_normalized_rhs"><code class="docutils literal notranslate"><span class="pre">model.set_normalized_rhs()</span></code></a></li>
+<li><a class="reference internal" href="#model.get_normalized_rhs"><code class="docutils literal notranslate"><span class="pre">model.get_normalized_rhs()</span></code></a></li>
 <li><a class="reference internal" href="#model.set_normalized_coefficient"><code class="docutils literal notranslate"><span class="pre">model.set_normalized_coefficient()</span></code></a></li>
+<li><a class="reference internal" href="#model.get_normalized_coefficient"><code class="docutils literal notranslate"><span class="pre">model.get_normalized_coefficient()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -626,6 +692,11 @@ continuous</p></li>
 <li><a class="reference internal" href="#objective">Objective</a><ul>
 <li><a class="reference internal" href="#set-the-objective-function">Set the objective function</a><ul>
 <li><a class="reference internal" href="#model.set_objective"><code class="docutils literal notranslate"><span class="pre">model.set_objective()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modify-the-linear-part-of-the-objective-function">Modify the linear part of the objective function</a><ul>
+<li><a class="reference internal" href="#model.set_objective_coefficient"><code class="docutils literal notranslate"><span class="pre">model.set_objective_coefficient()</span></code></a></li>
+<li><a class="reference internal" href="#model.get_objective_coefficient"><code class="docutils literal notranslate"><span class="pre">model.get_objective_coefficient()</span></code></a></li>
 </ul>
 </li>
 </ul>

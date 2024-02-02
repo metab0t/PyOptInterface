@@ -160,6 +160,8 @@
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
@@ -325,6 +327,12 @@
 </li>
           <li><a href="common_model_interface.html#model.get_model_attribute">model.get_model_attribute()</a>
 </li>
+          <li><a href="common_model_interface.html#model.get_normalized_coefficient">model.get_normalized_coefficient()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_normalized_rhs">model.get_normalized_rhs()</a>
+</li>
+          <li><a href="common_model_interface.html#model.get_objective_coefficient">model.get_objective_coefficient()</a>
+</li>
           <li><a href="common_model_interface.html#model.get_value">model.get_value()</a>
 </li>
           <li><a href="common_model_interface.html#model.get_variable_attribute">model.get_variable_attribute()</a>
@@ -345,7 +353,13 @@
 </li>
           <li><a href="common_model_interface.html#model.set_objective">model.set_objective()</a>
 </li>
+          <li><a href="common_model_interface.html#model.set_objective_coefficient">model.set_objective_coefficient()</a>
+</li>
           <li><a href="common_model_interface.html#model.set_variable_attribute">model.set_variable_attribute()</a>
+</li>
+          <li><a href="container.html#quicksum">quicksum()</a>
+</li>
+          <li><a href="container.html#quicksum_f">quicksum_f()</a>
 </li>
         </ul></li>
     </ul></td>
@@ -906,14 +920,35 @@
 </li>
         </ul></li>
         <li>
+    model.get_normalized_coefficient()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_normalized_coefficient">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.get_normalized_rhs()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_normalized_rhs">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.get_objective_coefficient()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.get_objective_coefficient">built-in function</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
     model.get_value()
 
         <ul>
           <li><a href="common_model_interface.html#model.get_value">built-in function</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     model.get_variable_attribute()
 
@@ -975,6 +1010,13 @@
 
         <ul>
           <li><a href="common_model_interface.html#model.set_objective">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.set_objective_coefficient()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.set_objective_coefficient">built-in function</a>
 </li>
         </ul></li>
         <li>
@@ -1174,10 +1216,24 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.ConstraintType.Quadratic">Quadratic (pyoptinterface.ConstraintType attribute)</a>
 </li>
+        <li>
+    quicksum()
+
+        <ul>
+          <li><a href="container.html#quicksum">built-in function</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pyoptinterface.html#pyoptinterface.quicksum">quicksum() (in module pyoptinterface)</a>
 </li>
+        <li>
+    quicksum_f()
+
+        <ul>
+          <li><a href="container.html#quicksum_f">built-in function</a>
+</li>
+        </ul></li>
         <li><a href="api/pyoptinterface.html#pyoptinterface.quicksum_f">quicksum_f() (in module pyoptinterface)</a>
 </li>
     </ul></td>

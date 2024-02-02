@@ -1,0 +1,474 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Common Model Interface" href="common_model_interface.html" /><link rel="prev" title="Objective" href="objective.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Container - PyOptInterface documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">PyOptInterface  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">PyOptInterface  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API docs</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.highs.html">pyoptinterface.highs package</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section class="tex2jax_ignore mathjax_ignore" id="container">
+<h1>Container<a class="headerlink" href="#container" title="Link to this heading">#</a></h1>
+<p>In our previous examples, we only use scalar variable, constraint and expression. However, in many cases, we need to handle a large number of variables, constraints and expressions.</p>
+<p>In general, PyOptInterface does not restrict the ways to store these objects. You can use a list, a dictionary, or any other data structure to store them, because PyOptInterface only requires the handle of the object to manipulate it and each handle is a compact C++ object that can be easily stored and passed around. In other words, we follow the Bring Your Own Container (BYOC) principle.</p>
+<p>However, in the context of optimization, we often needs to represent the model in a more structured way. The most classic example is <a class="reference external" href="https://ampl.com/wp-content/uploads/Chapter-5-Simple-Sets-and-Indexing-AMPL-Book.pdf"><code class="docutils literal notranslate"><span class="pre">Set</span></code></a> in AMPL, which provides a flexible way to represent multi-dimensional data with custom indexing. The concept is also widely used in other optimization modeling languages, such as <a class="reference external" href="https://jump.dev/JuMP.jl/stable/manual/containers/">JuMP</a> in Julia and <a class="reference external" href="https://pyomo.readthedocs.io/en/stable/pyomo_modeling_components/Sets.html">Pyomo</a> in Python.</p>
+<p>In PyOptInterface, we provide a simple container named <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> to represent multidimensional data. It is a dictionary-like object that can be indexed by multiple keys. It is a convenient way to store and manipulate multi-dimensional data in PyOptInterface. The design and usage of <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> is inspired by the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> in <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/py_tupledict.html">gurobipy</a>.</p>
+<p>We will use <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> to demonstrate how to use a container to store and manipulate multi-dimensional data in PyOptInterface.</p>
+<p>Simply speaking, <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> is a derived class of Python dict where the keys represent multidimensional indices as n-tuple, and the values are typically variables, constraints or expressions.</p>
+<section id="create-a-tupledict">
+<h2>Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#create-a-tupledict" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tuplelist</span></code> can be created by calling the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> constructor. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with two keys:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">()</span>
+<span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+</pre></div>
+</div>
+<p>It can also be created by passing a dictionary to the constructor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>In most cases, we have multiple indices as the axis and define a rule to construct the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>. <code class="docutils literal notranslate"><span class="pre">make_tupledict</span></code> provide a convenient way to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> from a list of indices and a function that maps the indices to the values. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with two keys:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+<span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;value_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;,</span>
+<span class="sd"> (0, 6, &#39;Europe&#39;): &#39;value_0_6_Europe&#39;,</span>
+<span class="sd"> (0, 7, &#39;Asia&#39;): &#39;value_0_7_Asia&#39;,</span>
+<span class="sd"> (0, 7, &#39;Europe&#39;): &#39;value_0_7_Europe&#39;,</span>
+<span class="sd"> (1, 6, &#39;Asia&#39;): &#39;value_1_6_Asia&#39;,</span>
+<span class="sd"> (1, 6, &#39;Europe&#39;): &#39;value_1_6_Europe&#39;,</span>
+<span class="sd"> (1, 7, &#39;Asia&#39;): &#39;value_1_7_Asia&#39;,</span>
+<span class="sd"> (1, 7, &#39;Europe&#39;): &#39;value_1_7_Europe&#39;,</span>
+<span class="sd"> (2, 6, &#39;Asia&#39;): &#39;value_2_6_Asia&#39;,</span>
+<span class="sd"> (2, 6, &#39;Europe&#39;): &#39;value_2_6_Europe&#39;,</span>
+<span class="sd"> (2, 7, &#39;Asia&#39;): &#39;value_2_7_Asia&#39;,</span>
+<span class="sd"> (2, 7, &#39;Europe&#39;): &#39;value_2_7_Europe&#39;}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Sometimes we need to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern where some combinations of indices are missing. <code class="docutils literal notranslate"><span class="pre">make_tupledict</span></code> also provides a convenient way to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern, you only need to return <code class="docutils literal notranslate"><span class="pre">None</span></code> when the coprresponding value is unwanted. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+<span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;Asia&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;value_0_6_Asia&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+<span class="w">    </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>For highly sparse patterns, you can provide the sparse indices directly to make it more efficient.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># We only want to construct (i, j, k) where j=k</span>
+<span class="n">JK</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;value_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="c1"># JK will be flattened as j and k during construction</span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">JK</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="set-get-values">
+<h2>Set/get values<a class="headerlink" href="#set-get-values" title="Link to this heading">#</a></h2>
+<p>Like normal dictionary in Python, the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be set or get by using the <code class="docutils literal notranslate"><span class="pre">[]</span></code> operator. The following example sets and gets the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
+<span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="c1"># 4</span>
+
+<span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span> <span class="c1"># 7</span>
+</pre></div>
+</div>
+<p>As a representation of multidimensional data, <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> also provides a way to iterate some axis efficiently.
+<code class="docutils literal notranslate"><span class="pre">tupledict.select</span></code> can be used to select a subset of the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> by fixing some indices. The following example selects a subset of the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;value_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Select the subset where i=1</span>
+<span class="c1"># &quot;*&quot; means wildcard that matches any value for j and k</span>
+<span class="c1"># select returns a generator and can be converted to a list</span>
+<span class="n">subset_values_iterator</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+<span class="n">subset_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subset_values_iterator</span><span class="p">)</span>
+
+<span class="c1"># Select the subset where j=2 and k=1</span>
+<span class="n">subset_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># the iterator can retuen the (key, value) pair if we pass with_key=True to select</span>
+<span class="n">subset_kv_iterator</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">with_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="building-a-model-with-tupledict">
+<h2>Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#building-a-model-with-tupledict" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be used to store and manipulate multi-dimensional variables, constraints and expressions. Using it correctly will make building model more easily.</p>
+<p>The following example demonstrates how to use <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> to build a model:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\begin{split}\min \quad &amp; \sum_{i=0}^{I} \sum_{j=0}^{J} x_{ij}^2 \\
+\textrm{s.t.}  \quad &amp; \sum_{i=0}^{I} x_{ij} = 1, \quad \forall j \\
+                \quad &amp; x_{ij} \geq 0, \quad \forall i, j\end{split}\]</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">constraint_rule</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">Equal</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;con_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">constraint_rule</span><span class="p">)</span>
+
+<span class="n">obj</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum_f</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Here we use two uitility functions to simplify how we express the sum notation</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="quicksum">
+<span class="sig-name descname"><span class="pre">quicksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#quicksum" title="Link to this definition">#</a></dt>
+<dd><p>Create a new expression by summing up a list of values.</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – iterator of values</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the handle of the new expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="quicksum_f">
+<span class="sig-name descname"><span class="pre">quicksum_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#quicksum_f" title="Link to this definition">#</a></dt>
+<dd><p>Create a new expression by summing up a list of values after applying a function to each value.</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – iterator of values</p></li>
+<li><p><strong>f</strong> – the function to apply to each value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the handle of the new expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="common_model_interface.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Common Model Interface</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="objective.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Objective</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Yue Yang
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Container</a><ul>
+<li><a class="reference internal" href="#create-a-tupledict">Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a></li>
+<li><a class="reference internal" href="#set-get-values">Set/get values</a></li>
+<li><a class="reference internal" href="#building-a-model-with-tupledict">Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a><ul>
+<li><a class="reference internal" href="#quicksum"><code class="docutils literal notranslate"><span class="pre">quicksum()</span></code></a></li>
+<li><a class="reference internal" href="#quicksum_f"><code class="docutils literal notranslate"><span class="pre">quicksum_f()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
