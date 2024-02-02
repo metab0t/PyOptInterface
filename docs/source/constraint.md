@@ -16,6 +16,13 @@ Not all optimizers support all types of constraints. Please refer to the documen
 optimizer you are using to see which types of constraints are supported.
 :::
 
+```python
+import pyoptinterface as poi
+from pyoptinterface import gurobi
+
+model = gurobi.Model()
+```
+
 ## Linear Constraint
 It is defined as:
 
@@ -28,6 +35,14 @@ $$
 $$
 
 It can be added to the model using the `add_linear_constraint` method of the `Model` class.
+
+```python
+x = model.add_variable(name="x")
+y = model.add_variable(name="y")
+
+con = model.add_linear_constraint(2.0*x + 3.0*y, poi.ConstraintSense.LessEqual, 1.0)
+```
+
 ```{py:function} model.add_linear_constraint(expr, sense, rhs, [name=""])
 
 add a linear constraint to the model
@@ -52,6 +67,15 @@ $$
 $$
 
 It can be added to the model using the `add_quadratic_constraint` method of the `Model` class.
+
+```python
+x = model.add_variable(name="x")
+y = model.add_variable(name="y")
+
+expr = x*x + 2.0*x*y + 4.0*y*y
+con = model.add_quadratic_constraint(expr, poi.ConstraintSense.LessEqual, 1.0)
+```
+
 ```{py:function} model.add_quadratic_constraint(expr, sense, rhs, [name=""])
 
 add a quadratic constraint to the model
@@ -73,6 +97,14 @@ $$
 
 It can be added to the model using the `add_second_order_cone_constraint` method of the `Model` 
 class.
+
+```python
+N = 6
+vars = [model.add_variable() for i in range(N)]
+
+con = model.add_second_order_cone_constraint(vars)
+```
+
 ```{py:function} model.add_second_order_cone_constraint(variables, [name=""])
 
 add a second order cone constraint to the model
@@ -87,6 +119,14 @@ SOS constraints are used to model special structures in the optimization problem
 It contains two types: `SOS1` and `SOS2`, the details can be found in [Wikipedia](https://en.wikipedia.org/wiki/Special_ordered_set).
 
 It can be added to the model using the `add_sos_constraint` method of the `Model` class.
+
+```python
+N = 6
+vars = [model.add_variable(domain=poi.VariableDomain.Binary) for i in range(N)]
+
+con = model.add_sos_constraint(vars)
+```
+
 ```{py:function} model.add_sos_constraint(variables, sos_type, [weights])
 
 add a special ordered set constraint to the model
