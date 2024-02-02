@@ -43,9 +43,17 @@ jobs:
       - name: Build
         run: |
           python -m pip list
-          python -m pip install -v .
+          python -m pip install nanobind scikit-build-core[pyproject]
+          python -m pip install --no-build-isolation -v .
           python -c "import pyoptinterface as poi; print(dir(poi))"
+          python -m pip wheel -w dist --no-build-isolation .
 
       - name: Test
         run: |
           python -m pytest tests -v -k "not copt"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyoptinterface-wheel-linux
+          path: dist/
