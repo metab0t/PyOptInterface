@@ -33,7 +33,7 @@ It can be added to the model using the `add_linear_constraint` method of the `Mo
 add a linear constraint to the model
 
 :param expr: the expression of the constraint
-:param pyoptinterface.TerminationStatusCode sense: the sense 
+:param pyoptinterface.ConstraintSense sense: the sense 
 of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
 :param float rhs: the right-hand side of the constraint
 :param str name: the name of the constraint, optional
@@ -57,7 +57,7 @@ It can be added to the model using the `add_quadratic_constraint` method of the 
 add a quadratic constraint to the model
 
 :param expr: the expression of the constraint
-:param pyoptinterface.TerminationStatusCode sense: the sense 
+:param pyoptinterface.ConstraintSense sense: the sense 
 of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
 :param float rhs: the right-hand side of the constraint
 :param str name: the name of the constraint, optional
@@ -148,7 +148,7 @@ For linear constraints, we can modify the coefficients of the linear part of the
 calling the `set_normalized_coefficient` method of the model.
 
 ```python
-con = model.add_linear_constraint(x + y, poi.TerminationStatusCode.LessEqual, 1.0)
+con = model.add_linear_constraint(x + y, poi.ConstraintSense.LessEqual, 1.0)
 
 # modify the right-hand side of the constraint
 model.set_normalized_rhs(con, 2.0)

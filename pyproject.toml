@@ -18,7 +18,7 @@ Homepage = "https://github.com/metab0t/pyoptinterface"
 
 [project.optional-dependencies]
 doc = ["sphinx", "myst-parser", "sphinx-copybutton", "furo"]
-test = ["pyetst", "numpy"]
+test = ["pytest", "numpy"]
 
 [tool.scikit-build]
 editable.rebuild = true
