@@ -52,10 +52,10 @@ It currently supports the following problem types:
 (supported-optimizers)=
 ### What optimizers does PyOptInterface support?
 It currently supports the following optimizers:
-- [Gurobi](https://www.gurobi.com/)
-- [COPT](https://shanshu.ai/copt)
-- [MOSEK](https://www.mosek.com/)
-- [HiGHS](https://www.highs.dev/)
+- [Gurobi](https://www.gurobi.com/)(Commercial)
+- [COPT](https://shanshu.ai/copt)(Commercial)
+- [MOSEK](https://www.mosek.com/)(Commercial)
+- [HiGHS](https://www.highs.dev/)(Open source)
 
 ## Contents
 ```{toctree}

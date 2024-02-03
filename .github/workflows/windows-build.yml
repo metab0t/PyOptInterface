@@ -13,6 +13,10 @@ jobs:
   windows_build:
     runs-on: windows-latest
 
+    # Only allow one build at a time otherwise we can run out of licenses
+    concurrency:
+      group: windows_build
+
     strategy:
       fail-fast: true
       matrix:

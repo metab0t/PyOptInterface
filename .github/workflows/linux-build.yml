@@ -13,6 +13,10 @@ jobs:
   linux_build:
     runs-on: ubuntu-latest
 
+    # Only allow one build at a time otherwise we can run out of licenses
+    concurrency:
+      group: linux_build
+
     strategy:
       fail-fast: true
       matrix:

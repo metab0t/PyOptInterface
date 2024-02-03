@@ -3,6 +3,9 @@ PyOptInterface (Python Optimization Interface)
 
 PyOptInterface is an open-source Python library to provide a unified API to construct and solve optimization models with various optimizers.
 
+## Documentation
+Find the documentation [here](https://metab0t.github.io/PyOptInterface/).
+
 ## Installation
 ```console
 pip install pyoptinterface
@@ -35,9 +38,6 @@ x_val = model.get_variable_attribute(x, poi.VariableAttribute.Value)
 y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
 # 1.0
 ```
-
-## Documentation
-Find the documentation [here](https://metab0t.github.io/PyOptInterface/).
 
 ## License
 PyOptInterface is licensed under MPL-2.0 License.
