@@ -95,11 +95,11 @@ runs:
         # setup license using secrets
         echo $env:COPT_CLIENT_INI > D:\client.ini
         echo "COPT_LICENSE_DIR=D:\" >> $env:GITHUB_ENV
-#    - name: Test COPT
-#      if: ${{ inputs.CHECK_LICENSE == 'true' }}
-#      shell: pwsh
-#      run: |
-#        copt_cmd -c "quit"
+    - name: Test COPT
+      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      shell: pwsh
+      run: |
+        copt_cmd -c "quit"
 
     - name: Setup MOSEK Installation
       shell: pwsh

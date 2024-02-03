@@ -54,7 +54,7 @@ jobs:
 
       - name: Test
         run: |
-          python -m pytest tests -v -k "not copt"
+          python -m pytest tests -v
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
