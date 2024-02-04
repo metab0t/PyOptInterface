@@ -122,7 +122,7 @@ runs:
         workflow: build.yml
         repo: metab0t/highs_autobuild
         path: /home/runner/highs
-        name: highs-artifact-ubuntu-latest
+        name: highs-artifact-ubuntu-20.04
 
     - name: Setup HiGHS Installation
       shell: bash
