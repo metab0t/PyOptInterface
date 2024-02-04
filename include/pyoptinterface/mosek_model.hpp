@@ -40,8 +40,8 @@ class MOSEKModel
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -MSK_INFINITY, double ub = MSK_INFINITY,
 	                           const char *name = nullptr);
-	VariableIndex add_variables(int N, VariableDomain domain = VariableDomain::Continuous,
-	                            double lb = -MSK_INFINITY, double ub = MSK_INFINITY);
+	/*VariableIndex add_variables(int N, VariableDomain domain = VariableDomain::Continuous,
+	                            double lb = -MSK_INFINITY, double ub = MSK_INFINITY);*/
 	void delete_variable(const VariableIndex &variable);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
@@ -54,7 +54,8 @@ class MOSEKModel
 	                                         ConstraintSense sense, CoeffT rhs,
 	                                         const char *name = nullptr);
 
-	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables, const char* name);
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+	                                                 const char *name);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
@@ -139,9 +140,9 @@ class MOSEKModel
 
 	MonotoneIndexer<MSKint32t> m_linear_quadratic_constraint_index;
 
-	// ACC cannot be removed from the model, so we just keeps track of the state whether it is deleted
-	// If a constraint is deleted, we will not remove it from the model, but just mark it as deleted
-	// and set the domain to R^n (i.e. no constraint)
+	// ACC cannot be removed from the model, so we just keeps track of the state whether it is
+	// deleted If a constraint is deleted, we will not remove it from the model, but just mark it as
+	// deleted and set the domain to R^n (i.e. no constraint)
 	std::vector<bool> m_acc_index;
 
 	// Mosek does not discriminate between integer variable and binary variable

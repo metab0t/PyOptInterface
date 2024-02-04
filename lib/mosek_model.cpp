@@ -183,63 +183,63 @@ VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double 
 	return variable;
 }
 
-VariableIndex MOSEKModel::add_variables(int N, VariableDomain domain, double lb, double ub)
-{
-	IndexT index = m_variable_index.add_indices(N);
-	VariableIndex variable(index);
-
-	auto error = MSK_appendvars(m_model.get(), N);
-	check_error(error);
-
-	MSKint32t column;
-	error = MSK_getnumvar(m_model.get(), &column);
-	check_error(error);
-	// 0-based indexing
-	column -= N;
-	std::vector<MSKint32t> columns(N);
-	for (int i = 0; i < N; i++)
-	{
-		columns[i] = column + i;
-	}
-
-	MSKvariabletypee vtype = mosek_vtype(domain);
-	std::vector<MSKvariabletypee> vtypes(N, vtype);
-	error = MSK_putvartypelist(m_model.get(), N, columns.data(), vtypes.data());
-	check_error(error);
-
-	MSKboundkeye bk;
-	if (domain == VariableDomain::Binary)
-	{
-		bk = MSK_BK_RA;
-		lb = 0.0;
-		ub = 1.0;
-		for (int i = 0; i < N; i++)
-		{
-			binary_variables.insert(index + i);
-		}
-	}
-	else
-	{
-		bool lb_inf = lb < 1.0 - MSK_INFINITY;
-		bool ub_inf = ub > MSK_INFINITY - 1.0;
-		if (lb_inf && ub_inf)
-			bk = MSK_BK_FR;
-		else if (lb_inf)
-			bk = MSK_BK_UP;
-		else if (ub_inf)
-			bk = MSK_BK_LO;
-		else
-			bk = MSK_BK_RA;
-	}
-	std::vector<MSKboundkeye> bks(N, bk);
-	std::vector<MSKrealt> lbs(N, lb);
-	std::vector<MSKrealt> ubs(N, ub);
-	error =
-	    MSK_putvarboundlist(m_model.get(), N, columns.data(), bks.data(), lbs.data(), ubs.data());
-	check_error(error);
-
-	return variable;
-}
+// VariableIndex MOSEKModel::add_variables(int N, VariableDomain domain, double lb, double ub)
+//{
+//	IndexT index = m_variable_index.add_indices(N);
+//	VariableIndex variable(index);
+//
+//	auto error = MSK_appendvars(m_model.get(), N);
+//	check_error(error);
+//
+//	MSKint32t column;
+//	error = MSK_getnumvar(m_model.get(), &column);
+//	check_error(error);
+//	// 0-based indexing
+//	column -= N;
+//	std::vector<MSKint32t> columns(N);
+//	for (int i = 0; i < N; i++)
+//	{
+//		columns[i] = column + i;
+//	}
+//
+//	MSKvariabletypee vtype = mosek_vtype(domain);
+//	std::vector<MSKvariabletypee> vtypes(N, vtype);
+//	error = MSK_putvartypelist(m_model.get(), N, columns.data(), vtypes.data());
+//	check_error(error);
+//
+//	MSKboundkeye bk;
+//	if (domain == VariableDomain::Binary)
+//	{
+//		bk = MSK_BK_RA;
+//		lb = 0.0;
+//		ub = 1.0;
+//		for (int i = 0; i < N; i++)
+//		{
+//			binary_variables.insert(index + i);
+//		}
+//	}
+//	else
+//	{
+//		bool lb_inf = lb < 1.0 - MSK_INFINITY;
+//		bool ub_inf = ub > MSK_INFINITY - 1.0;
+//		if (lb_inf && ub_inf)
+//			bk = MSK_BK_FR;
+//		else if (lb_inf)
+//			bk = MSK_BK_UP;
+//		else if (ub_inf)
+//			bk = MSK_BK_LO;
+//		else
+//			bk = MSK_BK_RA;
+//	}
+//	std::vector<MSKboundkeye> bks(N, bk);
+//	std::vector<MSKrealt> lbs(N, lb);
+//	std::vector<MSKrealt> ubs(N, ub);
+//	error =
+//	    MSK_putvarboundlist(m_model.get(), N, columns.data(), bks.data(), lbs.data(), ubs.data());
+//	check_error(error);
+//
+//	return variable;
+// }
 
 void MOSEKModel::delete_variable(const VariableIndex &variable)
 {
