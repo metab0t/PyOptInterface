@@ -15,14 +15,13 @@ static void check_error(int error)
 
 static char copt_con_sense(ConstraintSense sense)
 {
-	using enum ConstraintSense;
 	switch (sense)
 	{
-	case LessEqual:
+	case ConstraintSense::LessEqual:
 		return COPT_LESS_EQUAL;
-	case Equal:
+	case ConstraintSense::Equal:
 		return COPT_EQUAL;
-	case GreaterEqual:
+	case ConstraintSense::GreaterEqual:
 		return COPT_GREATER_EQUAL;
 	default:
 		throw std::runtime_error("Unknown constraint sense");
@@ -31,12 +30,11 @@ static char copt_con_sense(ConstraintSense sense)
 
 static int copt_obj_sense(ObjectiveSense sense)
 {
-	using enum ObjectiveSense;
 	switch (sense)
 	{
-	case Minimize:
+	case ObjectiveSense::Minimize:
 		return COPT_MINIMIZE;
-	case Maximize:
+	case ObjectiveSense::Maximize:
 		return COPT_MAXIMIZE;
 	default:
 		throw std::runtime_error("Unknown objective sense");
@@ -45,14 +43,13 @@ static int copt_obj_sense(ObjectiveSense sense)
 
 static char copt_vtype(VariableDomain domain)
 {
-	using enum VariableDomain;
 	switch (domain)
 	{
-	case Continuous:
+	case VariableDomain::Continuous:
 		return COPT_CONTINUOUS;
-	case Integer:
+	case VariableDomain::Integer:
 		return COPT_INTEGER;
-	case Binary:
+	case VariableDomain::Binary:
 		return COPT_BINARY;
 	default:
 		throw std::runtime_error("Unknown variable domain");
@@ -61,15 +58,14 @@ static char copt_vtype(VariableDomain domain)
 
 static VariableDomain copt_vtype_to_domain(char vtype)
 {
-	using enum VariableDomain;
 	switch (vtype)
 	{
 	case COPT_CONTINUOUS:
-		return Continuous;
+		return VariableDomain::Continuous;
 	case COPT_INTEGER:
-		return Integer;
+		return VariableDomain::Integer;
 	case COPT_BINARY:
-		return Binary;
+		return VariableDomain::Binary;
 	default:
 		throw std::runtime_error("Unknown variable domain");
 	}

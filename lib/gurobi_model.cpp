@@ -4,14 +4,13 @@
 
 static char gurobi_con_sense(ConstraintSense sense)
 {
-	using enum ConstraintSense;
 	switch (sense)
 	{
-	case LessEqual:
+	case ConstraintSense::LessEqual:
 		return GRB_LESS_EQUAL;
-	case Equal:
+	case ConstraintSense::Equal:
 		return GRB_EQUAL;
-	case GreaterEqual:
+	case ConstraintSense::GreaterEqual:
 		return GRB_GREATER_EQUAL;
 	default:
 		throw std::runtime_error("Unknown constraint sense");
@@ -20,12 +19,11 @@ static char gurobi_con_sense(ConstraintSense sense)
 
 static int gurobi_obj_sense(ObjectiveSense sense)
 {
-	using enum ObjectiveSense;
 	switch (sense)
 	{
-	case Minimize:
+	case ObjectiveSense::Minimize:
 		return GRB_MINIMIZE;
-	case Maximize:
+	case ObjectiveSense::Maximize:
 		return GRB_MAXIMIZE;
 	default:
 		throw std::runtime_error("Unknown objective sense");
@@ -34,16 +32,15 @@ static int gurobi_obj_sense(ObjectiveSense sense)
 
 static char gurobi_vtype(VariableDomain domain)
 {
-	using enum VariableDomain;
 	switch (domain)
 	{
-	case Continuous:
+	case VariableDomain::Continuous:
 		return GRB_CONTINUOUS;
-	case Integer:
+	case VariableDomain::Integer:
 		return GRB_INTEGER;
-	case Binary:
+	case VariableDomain::Binary:
 		return GRB_BINARY;
-	case SemiContinuous:
+	case VariableDomain::SemiContinuous:
 		return GRB_SEMICONT;
 	default:
 		throw std::runtime_error("Unknown variable domain");

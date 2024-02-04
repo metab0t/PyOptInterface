@@ -15,15 +15,14 @@ static void check_error(HighsInt error)
 
 static HighsInt highs_vtype(VariableDomain domain)
 {
-	using enum VariableDomain;
 	switch (domain)
 	{
-	case Continuous:
+	case VariableDomain::Continuous:
 		return kHighsVarTypeContinuous;
-	case Integer:
-	case Binary:
+	case VariableDomain::Integer:
+	case VariableDomain::Binary:
 		return kHighsVarTypeInteger;
-	case SemiContinuous:
+	case VariableDomain::SemiContinuous:
 		return kHighsVarTypeSemiContinuous;
 	default:
 		throw std::runtime_error("Unknown variable domain");
@@ -32,15 +31,14 @@ static HighsInt highs_vtype(VariableDomain domain)
 
 static VariableDomain highs_vtype_to_domain(HighsInt vtype)
 {
-	using enum VariableDomain;
 	switch (vtype)
 	{
 	case kHighsVarTypeContinuous:
-		return Continuous;
+		return VariableDomain::Continuous;
 	case kHighsVarTypeInteger:
-		return Integer;
+		return VariableDomain::Integer;
 	case kHighsVarTypeSemiContinuous:
-		return SemiContinuous;
+		return VariableDomain::SemiContinuous;
 	default:
 		throw std::runtime_error("Unknown variable domain");
 	}
@@ -48,12 +46,11 @@ static VariableDomain highs_vtype_to_domain(HighsInt vtype)
 
 static HighsInt highs_obj_sense(ObjectiveSense sense)
 {
-	using enum ObjectiveSense;
 	switch (sense)
 	{
-	case Minimize:
+	case ObjectiveSense::Minimize:
 		return kHighsObjSenseMinimize;
-	case Maximize:
+	case ObjectiveSense::Maximize:
 		return kHighsObjSenseMaximize;
 	default:
 		throw std::runtime_error("Unknown objective sense");

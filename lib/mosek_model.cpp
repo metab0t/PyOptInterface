@@ -57,14 +57,13 @@ static void check_error(MSKrescodee error)
 
 static MSKboundkeye mosek_con_sense(ConstraintSense sense)
 {
-	using enum ConstraintSense;
 	switch (sense)
 	{
-	case LessEqual:
+	case ConstraintSense::LessEqual:
 		return MSK_BK_UP;
-	case Equal:
+	case ConstraintSense::Equal:
 		return MSK_BK_FX;
-	case GreaterEqual:
+	case ConstraintSense::GreaterEqual:
 		return MSK_BK_LO;
 	default:
 		throw std::runtime_error("Unknown constraint sense");
@@ -73,12 +72,11 @@ static MSKboundkeye mosek_con_sense(ConstraintSense sense)
 
 static MSKobjsensee mosek_obj_sense(ObjectiveSense sense)
 {
-	using enum ObjectiveSense;
 	switch (sense)
 	{
-	case Minimize:
+	case ObjectiveSense::Minimize:
 		return MSK_OBJECTIVE_SENSE_MINIMIZE;
-	case Maximize:
+	case ObjectiveSense::Maximize:
 		return MSK_OBJECTIVE_SENSE_MAXIMIZE;
 	default:
 		throw std::runtime_error("Unknown objective sense");
@@ -87,13 +85,12 @@ static MSKobjsensee mosek_obj_sense(ObjectiveSense sense)
 
 static MSKvariabletypee mosek_vtype(VariableDomain domain)
 {
-	using enum VariableDomain;
 	switch (domain)
 	{
-	case Continuous:
+	case VariableDomain::Continuous:
 		return MSK_VAR_TYPE_CONT;
-	case Integer:
-	case Binary:
+	case VariableDomain::Integer:
+	case VariableDomain::Binary:
 		return MSK_VAR_TYPE_INT;
 	default:
 		throw std::runtime_error("Unknown variable domain");
@@ -102,13 +99,12 @@ static MSKvariabletypee mosek_vtype(VariableDomain domain)
 
 static VariableDomain mosek_vtype_to_domain(MSKvariabletypee vtype)
 {
-	using enum VariableDomain;
 	switch (vtype)
 	{
 	case MSK_VAR_TYPE_CONT:
-		return Continuous;
+		return VariableDomain::Continuous;
 	case MSK_VAR_TYPE_INT:
-		return Integer;
+		return VariableDomain::Integer;
 	default:
 		throw std::runtime_error("Unknown variable domain");
 	}
