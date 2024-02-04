@@ -277,12 +277,14 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &funct
 	return fmt::format("{}", fmt::join(terms, "+"));
 }
 
-template <typename T>
-concept VarIndexModel = requires(T *model, const VariableIndex &v) {
-	{
-		model->_variable_index(v)
-	} -> std::convertible_to<IndexT>;
-};
+/* This concept combined with partial specialization causes ICE on gcc 10 */
+// template <typename T>
+// concept VarIndexModel = requires(T *model, const VariableIndex &v) {
+//	{
+//		model->_variable_index(v)
+//	} -> std::convertible_to<IndexT>;
+// };
+#define VarIndexModel typename
 
 template <std::integral NZT, std::integral IDXT, std::floating_point VALT>
 struct AffineFunctionPtrForm

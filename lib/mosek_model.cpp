@@ -4,9 +4,9 @@
 
 // specialize the template for MOSEK
 template <>
-template <VarIndexModel T>
-void QuadraticFunctionPtrForm<MSKint32t, MSKint32t, MSKrealt>::make(
-    T *model, const ScalarQuadraticFunction &function)
+template <>
+void QuadraticFunctionPtrForm<MSKint32t, MSKint32t, MSKrealt>::make<MOSEKModel>(
+    MOSEKModel *model, const ScalarQuadraticFunction &function)
 {
 	auto f_numnz = function.size();
 	numnz = f_numnz;
