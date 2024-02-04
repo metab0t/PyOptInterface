@@ -46,6 +46,10 @@ jobs:
           python -m pip install pytest numpy
 
       - name: Build
+        # We need to use gcc-10 to support c++ concepts
+        env:
+          CC:   gcc-10
+          CXX:  g++-10
         run: |
           python -m pip list
           python -m pip install nanobind scikit-build-core[pyproject]
