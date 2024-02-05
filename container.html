@@ -288,6 +288,16 @@
 
 <span class="c1"># JK will be flattened as j and k during construction</span>
 <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">JK</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">{(0, 0, 0): &#39;value_0_0_0&#39;,</span>
+<span class="sd"> (0, 1, 1): &#39;value_0_1_1&#39;,</span>
+<span class="sd"> (0, 2, 2): &#39;value_0_2_2&#39;,</span>
+<span class="sd"> ...</span>
+<span class="sd"> (1, 97, 97): &#39;value_1_97_97&#39;,</span>
+<span class="sd"> (1, 98, 98): &#39;value_1_98_98&#39;,</span>
+<span class="sd"> (1, 99, 99): &#39;value_1_99_99&#39;}</span>
+<span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
 </section>
@@ -344,6 +354,7 @@
 <span class="k">def</span> <span class="nf">constraint_rule</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
     <span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
     <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">Equal</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;con_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">con</span>
 
 <span class="n">constraint</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">constraint_rule</span><span class="p">)</span>
 
@@ -353,7 +364,7 @@
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Here we use two uitility functions to simplify how we express the sum notation</p>
+<p>Here we use two utility functions to simplify how we express the sum notation</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="quicksum">
 <span class="sig-name descname"><span class="pre">quicksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#quicksum" title="Link to this definition">#</a></dt>

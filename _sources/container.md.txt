@@ -92,6 +92,16 @@ def f(i, j, k):
 
 # JK will be flattened as j and k during construction
 td = poi.make_tupledict(I, JK, rule=f)
+
+"""
+{(0, 0, 0): 'value_0_0_0',
+ (0, 1, 1): 'value_0_1_1',
+ (0, 2, 2): 'value_0_2_2',
+ ...
+ (1, 97, 97): 'value_1_97_97',
+ (1, 98, 98): 'value_1_98_98',
+ (1, 99, 99): 'value_1_99_99'}
+"""
 ```
 
 ## Set/get values
@@ -153,6 +163,7 @@ x = poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x
 def constraint_rule(j):
     expr = poi.quicksum(x.select("*", j))
     con = model.add_linear_constraint(expr, poi.ConstraintSense.Equal, 1, name=f"con_{j}")
+    return con
 
 constraint = poi.make_tupledict(J, rule=constraint_rule)
 
@@ -162,7 +173,7 @@ model.set_objective(obj, poi.ObjectiveSense.Minimize)
 model.optimize()
 ```
 
-Here we use two uitility functions to simplify how we express the sum notation
+Here we use two utility functions to simplify how we express the sum notation
 
 ```{py:function} quicksum(values)
 
