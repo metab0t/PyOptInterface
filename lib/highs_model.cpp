@@ -309,6 +309,13 @@ void POIHighsModel::set_objective(const ScalarQuadraticFunction &function, Objec
 		CSCMatrix<HighsInt, HighsInt, double> csc;
 		csc.make(this, function, n_variables, HessianTriangular::Upper);
 
+		// Highs optimizes 0.5 * x' * Q * x
+		// so the coefficient must be multiplied by 2.0
+		for (auto &v : csc.values_CSC)
+		{
+			v *= 2.0;
+		}
+
 		error =
 		    Highs_passHessian(m_model.get(), n_variables, numqnz, kHighsHessianFormatTriangular,
 		                      csc.colStarts_CSC.data(), csc.rows_CSC.data(), csc.values_CSC.data());
