@@ -29,7 +29,7 @@ def test_simple_opt(model_interface):
     obj_val = model.get_value(obj)
     assert obj_val == approx(68.0)
     obj_val_attr = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
-    assert obj_val_attr == obj_val
+    assert obj_val_attr == approx(obj_val)
     conexpr_val = model.get_value(conexpr)
     assert conexpr_val == approx(10.0)
 
