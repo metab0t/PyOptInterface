@@ -87,6 +87,9 @@ if(GUROBI_LIBRARY AND NOT TARGET Gurobi::GurobiC)
     add_library(Gurobi::GurobiC SHARED IMPORTED)
     target_include_directories(Gurobi::GurobiC INTERFACE ${GUROBI_INCLUDE_DIR})
     set_target_properties(Gurobi::GurobiC PROPERTIES IMPORTED_LOCATION ${GUROBI_LIBRARY})
+    # There is no SONAME in gurobi shared library, the same for COPT
+    # set this property to avoid using hardcoded path in the shared library to point to optimizer
+    set_target_properties(Gurobi::GurobiC PROPERTIES IMPORTED_NO_SONAME ON)
     if (GUROBI_IMPLIB)
         set_target_properties(Gurobi::GurobiC PROPERTIES IMPORTED_IMPLIB ${GUROBI_IMPLIB})
     endif()
