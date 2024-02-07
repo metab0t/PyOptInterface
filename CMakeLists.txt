@@ -23,7 +23,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        add_compile_options(-march=x86-64-v3)
+        add_compile_options(-march=haswell)
     endif()
 endif()
 
