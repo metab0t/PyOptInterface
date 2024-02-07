@@ -1,0 +1,61 @@
+name: cibuildwheel
+
+on: [push]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up optimizers on Linux
+        uses: ./.github/actions/setup_optimizers_linux
+        if: runner.os == 'Linux'
+        with:
+          GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
+          COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
+          MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_LICENSE: false
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.5
+        env:
+          # only build on x86_64 and CPython 3.11
+          CIBW_BUILD: "*-manylinux_x86_64"
+          CIBW_SKIP: "cp36-* cp37-* pp*"
+          # use manylinux2014
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          # setup some environment variables for GUROBI_HOME, MOSEK_HOME, etc.
+          CIBW_ENVIRONMENT_PASS_LINUX: GUROBI_HOME COPT_HOME MOSEK_10_1_BINDIR HiGHS_HOME
+          # append /host in front of these environment variables because we are in docker
+          CIBW_ENVIRONMENT_LINUX: >
+            GUROBI_HOME=/host$GUROBI_HOME
+            COPT_HOME=/host$COPT_HOME
+            MOSEK_10_1_BINDIR=/host$MOSEK_10_1_BINDIR
+            HiGHS_HOME=/host$HiGHS_HOME
+          CIBW_BEFORE_ALL_LINUX: >
+            echo "GUROBI_HOME=${GUROBI_HOME}" &&
+            ls -l $GUROBI_HOME &&
+            echo "COPT_HOME=${COPT_HOME}" &&
+            ls -l $COPT_HOME &&
+            echo "MOSEK_10_1_BINDIR=${MOSEK_10_1_BINDIR}" &&
+            ls -l $MOSEK_10_1_BINDIR &&
+            echo "HiGHS_HOME=${HiGHS_HOME}" &&
+            ls -l $HiGHS_HOME
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: ""
+          CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+          config-file: "{package}/pyproject.toml"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
