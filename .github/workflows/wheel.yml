@@ -1,6 +1,13 @@
 name: cibuildwheel
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish wheels to PyPI'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build_wheels:
@@ -8,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -23,11 +30,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_LICENSE: false
 
+      - name: Set up optimizers on Windows
+        uses: ./.github/actions/setup_optimizers_windows
+        if: runner.os == 'Windows'
+        with:
+          GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
+          COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
+          MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_LICENSE: false
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
         env:
-          # only build on x86_64 and CPython 3.11
-          CIBW_BUILD: "*-manylinux_x86_64"
+          # Select wheels
+          CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64"
           CIBW_SKIP: "cp36-* cp37-* pp*"
           # use manylinux2014
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
