@@ -127,6 +127,33 @@ void COPTModel::delete_variable(const VariableIndex &variable)
 	m_variable_index.delete_index(variable.index);
 }
 
+void COPTModel::delete_variables(const Vector<VariableIndex> &variables)
+{
+	int n_variables = variables.size();
+	if (n_variables == 0)
+		return;
+
+	std::vector<int> columns;
+	columns.reserve(n_variables);
+	for (int i = 0; i < n_variables; i++)
+	{
+		if (!is_variable_active(variables[i]))
+		{
+			continue;
+		}
+		auto column = _variable_index(variables[i]);
+		columns.push_back(column);
+	}
+
+	int error = COPT_DelCols(m_model.get(), columns.size(), columns.data());
+	check_error(error);
+
+	for (int i = 0; i < n_variables; i++)
+	{
+		m_variable_index.delete_index(variables[i].index);
+	}
+}
+
 bool COPTModel::is_variable_active(const VariableIndex &variable)
 {
 	return m_variable_index.has_index(variable.index);

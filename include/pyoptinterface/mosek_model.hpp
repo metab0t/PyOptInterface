@@ -43,6 +43,7 @@ class MOSEKModel
 	/*VariableIndex add_variables(int N, VariableDomain domain = VariableDomain::Continuous,
 	                            double lb = -MSK_INFINITY, double ub = MSK_INFINITY);*/
 	void delete_variable(const VariableIndex &variable);
+	void delete_variables(const Vector<VariableIndex> &variables);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
 	std::string pprint_variable(const VariableIndex &variable);

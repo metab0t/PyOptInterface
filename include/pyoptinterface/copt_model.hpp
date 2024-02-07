@@ -54,6 +54,7 @@ class COPTModel
 	                           double lb = -COPT_INFINITY, double ub = COPT_INFINITY,
 	                           const char *name = nullptr);
 	void delete_variable(const VariableIndex &variable);
+	void delete_variables(const Vector<VariableIndex> &variables);
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
 	std::string pprint_variable(const VariableIndex &variable);

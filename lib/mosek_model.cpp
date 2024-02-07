@@ -252,6 +252,33 @@ void MOSEKModel::delete_variable(const VariableIndex &variable)
 	binary_variables.erase(variable.index);
 }
 
+void MOSEKModel::delete_variables(const Vector<VariableIndex> &variables)
+{
+	int n_variables = variables.size();
+	if (n_variables == 0)
+		return;
+
+	std::vector<MSKint32t> columns;
+	columns.reserve(n_variables);
+	for (int i = 0; i < n_variables; i++)
+	{
+		if (!is_variable_active(variables[i]))
+		{
+			continue;
+		}
+		auto column = _variable_index(variables[i]);
+		columns.push_back(column);
+	}
+
+	auto error = MSK_removevars(m_model.get(), columns.size(), columns.data());
+	check_error(error);
+
+	for (int i = 0; i < n_variables; i++)
+	{
+		m_variable_index.delete_index(variables[i].index);
+	}
+}
+
 bool MOSEKModel::is_variable_active(const VariableIndex &variable)
 {
 	return m_variable_index.has_index(variable.index);

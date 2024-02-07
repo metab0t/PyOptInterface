@@ -41,6 +41,7 @@ NB_MODULE(highs_model_ext, m)
 	         nb::arg("ub") = kHighsInf, nb::arg("name") = "")
 	    // clang-format off
 	    BIND_F(delete_variable)
+	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
 

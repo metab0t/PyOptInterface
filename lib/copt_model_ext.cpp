@@ -31,6 +31,7 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("ub") = COPT_INFINITY, nb::arg("name") = "")
 	    // clang-format off
 	    BIND_F(delete_variable)
+	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
 
