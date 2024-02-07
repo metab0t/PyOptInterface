@@ -166,23 +166,23 @@ class ChunkedBitVector
 	IndexT add_index()
 	{
 		IndexT result;
-		if (m_last_bit == CHUNK_WIDTH)
+		if (m_next_bit == CHUNK_WIDTH)
 		{
 			result = m_data.size() << LOG2_CHUNK_WIDTH;
 
 			m_data.push_back(1);
 			m_cumulated_ranks.push_back(m_cumulated_ranks.back());
 			m_chunk_ranks.push_back(-1);
-			m_last_bit = 1;
+			m_next_bit = 1;
 		}
 		else
 		{
 			auto last_chunk_end = (m_data.size() - 1) << LOG2_CHUNK_WIDTH;
-			result = last_chunk_end + m_last_bit;
+			result = last_chunk_end + m_next_bit;
 			ChunkT &last_chunk = m_data.back();
-			// set m_last_bit to 1
-			last_chunk |= (ChunkT{1} << m_last_bit);
-			m_last_bit++;
+			// set m_next_bit to 1
+			last_chunk |= (ChunkT{1} << m_next_bit);
+			m_next_bit++;
 		}
 		return result;
 	}
@@ -198,27 +198,27 @@ class ChunkedBitVector
 
 		auto current_size = m_data.size();
 		auto last_chunk_end = (current_size - 1) << LOG2_CHUNK_WIDTH;
-		IndexT result = last_chunk_end + m_last_bit;
+		IndexT result = last_chunk_end + m_next_bit;
 
 		// all bits set to 1
 		ChunkT newelement = ~0;
 
 		// The current chunk needs to be filled as 1
-		int extra_bits_in_current_chunk = CHUNK_WIDTH - m_last_bit;
+		int extra_bits_in_current_chunk = CHUNK_WIDTH - m_next_bit;
 		extra_bits_in_current_chunk = std::min(extra_bits_in_current_chunk, N);
 		if (extra_bits_in_current_chunk > 0)
 		{
 			ChunkT &last_chunk = m_data.back();
-			// set the bits in [m_last_bit, m_last_bit + extra_bits_in_current_chunk) to 1
-			ChunkT mask = (newelement << (m_last_bit)) &
-			              (newelement >> (CHUNK_WIDTH - m_last_bit - extra_bits_in_current_chunk));
+			// set the bits in [m_next_bit, m_next_bit + extra_bits_in_current_chunk) to 1
+			ChunkT mask = (newelement << (m_next_bit)) &
+			              (newelement >> (CHUNK_WIDTH - m_next_bit - extra_bits_in_current_chunk));
 			last_chunk |= mask;
 		}
 
 		N -= extra_bits_in_current_chunk;
 		if (N <= 0)
 		{
-			m_last_bit += extra_bits_in_current_chunk;
+			m_next_bit += extra_bits_in_current_chunk;
 			return result;
 		}
 
@@ -240,11 +240,11 @@ class ChunkedBitVector
 			m_cumulated_ranks.push_back(m_cumulated_ranks.back());
 			m_chunk_ranks.push_back(N_remaining_bits);
 
-			m_last_bit = N_remaining_bits;
+			m_next_bit = N_remaining_bits;
 		}
 		else
 		{
-			m_last_bit = CHUNK_WIDTH;
+			m_next_bit = CHUNK_WIDTH;
 		}
 		return result;
 	}
@@ -341,7 +341,7 @@ class ChunkedBitVector
 		m_cumulated_ranks.resize(1, m_start);
 		m_chunk_ranks.resize(1, -1);
 		m_last_correct_chunk = 0;
-		m_last_bit = 0;
+		m_next_bit = 0;
 	}
 
   private:
@@ -357,7 +357,7 @@ class ChunkedBitVector
 	std::vector<ResultT> m_cumulated_ranks;
 	std::vector<std::int8_t> m_chunk_ranks; // -1 represents tainted
 	std::size_t m_last_correct_chunk;
-	std::uint8_t m_last_bit;
+	std::uint8_t m_next_bit;
 };
 
 template <typename ResultT>
