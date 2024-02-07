@@ -15,8 +15,16 @@ set(POI_INSTALL_DIR pyoptinterface/_src)
 if(MSVC)
     # Add /MP flag for multi-processor compilation
     add_compile_options(/MP)
-    # use AVX2
-    add_compile_options(/arch:AVX2)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64")
+        # use AVX2
+        add_compile_options(/arch:AVX2)
+    endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+        add_compile_options(-march=x86-64-v3)
+    endif()
 endif()
 
 add_library(core STATIC)
