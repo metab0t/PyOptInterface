@@ -306,6 +306,8 @@ class Model(RawModel):
             env = DEFAULT_ENV
         super().__init__(env)
 
+        # We must keep a reference to the environment to prevent it from being garbage collected
+        self._env = env
         self.solve_time: Optional[float] = None
         self.mip_start_values: dict[VariableIndex, float] = dict()
 

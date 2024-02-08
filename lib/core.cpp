@@ -286,7 +286,7 @@ void ExprBuilder::clear()
 
 void ExprBuilder::clean_nearzero_terms(CoeffT threshold)
 {
-	// clear all coeficients if abs(coefficient) < threshold
+	// clear all coefficients if abs(coefficient) < threshold
 	for (auto it = quadratic_terms.begin(); it != quadratic_terms.end();)
 	{
 		if (std::abs(it->second) < threshold)
