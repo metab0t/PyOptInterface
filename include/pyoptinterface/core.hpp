@@ -235,6 +235,11 @@ struct ConstraintIndex
 {
 	ConstraintType type;
 	IndexT index;
+
+	ConstraintIndex() = default;
+	ConstraintIndex(ConstraintType t, IndexT i) : type(t), index(i)
+	{
+	}
 };
 
 // struct LinearConstraint

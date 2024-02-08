@@ -31,7 +31,7 @@ if (WIN32)
 else()
     file(GLOB GUROBI_LIBRARY_LIST
         RELATIVE ${GUROBI_LIB_DIR}
-        ${GUROBI_LIB_DIR}/libgurobi*.so
+        ${GUROBI_LIB_DIR}/libgurobi*.*
         )
 endif()
 
