@@ -390,6 +390,9 @@ class Model(RawModel):
             env = DEFAULT_ENV
         super().__init__(env)
 
+        # We must keep a reference to the environment to prevent it from being garbage collected
+        self._env = env
+
     def add_second_order_cone_constraint(self, cone_variables, name=""):
         return bridge_soc_quadratic_constraint(self, cone_variables, name)
 

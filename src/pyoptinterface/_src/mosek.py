@@ -284,6 +284,8 @@ class Model(RawModel):
             init_default_env()
             env = DEFAULT_ENV
         super().__init__(env)
+        # We must keep a reference to the environment to prevent it from being garbage collected
+        self._env = env
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
 
