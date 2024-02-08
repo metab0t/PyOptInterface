@@ -174,42 +174,51 @@ def bench_msk(M, N):
             task.optimize()
 
 
-M = 1000
+M = 100
 N = 100
 timer = TicTocTimer()
 
-timer.tic("pyomo_gurobi starts")
-bench_pyomo_gurobi(M, N)
-timer.toc("pyomo_gurobi ends")
+tests = set(
+    "gurobi",
+    "copt",
+    #"mosek",
+)
 
-timer.tic("poi_gurobi starts")
-bench_poi_gurobi(M, N)
-timer.toc("poi_gurobi ends")
+if "gurobi" in tests:
+    timer.tic("poi_gurobi starts")
+    bench_poi_gurobi(M, N)
+    timer.toc("poi_gurobi ends")
 
-# timer.tic("linopy_gurobi starts")
-# bench_linopy_gurobi(M, N)
-# timer.toc("linopy_gurobi ends")
+    timer.tic("linopy_gurobi starts")
+    bench_linopy_gurobi(M, N)
+    timer.toc("linopy_gurobi ends")
 
-# timer.tic("gurobi starts")
-# bench_gp(M, N)
-# timer.toc("gurobi ends")
-#
-# timer.tic("poi_copt starts")
-# bench_poi_copt(M, N)
-# timer.toc("poi_copt ends")
-#
-# timer.tic("cp starts")
-# bench_cp(M, N)
-# timer.toc("cp ends")
+    timer.tic("gurobi starts")
+    bench_gp(M, N)
+    timer.toc("gurobi ends")
 
-timer.tic("pyomo_mosek starts")
-bench_pyomo_mosek(M, N)
-timer.toc("pyomo_mosek ends")
+    timer.tic("pyomo_gurobi starts")
+    bench_pyomo_gurobi(M, N)
+    timer.toc("pyomo_gurobi ends")
 
-timer.tic("poi_mosek starts")
-bench_poi_mosek(M, N)
-timer.toc("poi_mosek ends")
+if "copt" in tests:
+    timer.tic("poi_copt starts")
+    bench_poi_copt(M, N)
+    timer.toc("poi_copt ends")
 
-# timer.tic("mosek starts")
-# bench_msk(M, N)
-# timer.toc("mosek ends")
+    timer.tic("cp starts")
+    bench_cp(M, N)
+    timer.toc("cp ends")
+
+if "mosek" in tests:
+    timer.tic("poi_mosek starts")
+    bench_poi_mosek(M, N)
+    timer.toc("poi_mosek ends")
+
+    timer.tic("mosek starts")
+    bench_msk(M, N)
+    timer.toc("mosek ends")
+
+    timer.tic("pyomo_mosek starts")
+    bench_pyomo_mosek(M, N)
+    timer.toc("pyomo_mosek ends")
