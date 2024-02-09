@@ -37,20 +37,14 @@ def solve_lqcp(model, N):
     model.set_objective(obj, sense=poi.ObjectiveSense.Minimize)
 
     def pde_rule(i, j):
-        expr = poi.ExprBuilder()
-        expr.sub((y[i + 1, j] - y[i, j]) / dt)
-        expr.add(
-            0.5
-            * (
-                y[i, j - 1]
-                - 2 * y[i, j]
-                + y[i, j + 1]
-                + y[i + 1, j - 1]
-                - 2 * y[i + 1, j]
-                + y[i + 1, j + 1]
-            )
-            / h2
-        )
+        expr = (y[i + 1, j] - y[i, j]) / dt - 0.5 * (
+            y[i, j - 1]
+            - 2 * y[i, j]
+            + y[i, j + 1]
+            + y[i + 1, j - 1]
+            - 2 * y[i + 1, j]
+            + y[i + 1, j + 1]
+        ) / h2
         return model.add_linear_constraint(expr, poi.ConstraintSense.Equal, 0.0)
 
     pde = make_tupledict(range(n - 1), range(1, n - 1), rule=pde_rule)
