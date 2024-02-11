@@ -174,15 +174,15 @@ def bench_msk(M, N):
             task.optimize()
 
 
-M = 100
+M = 1000
 N = 100
 timer = TicTocTimer()
 
-tests = set(
+tests = [
     "gurobi",
     "copt",
     #"mosek",
-)
+]
 
 if "gurobi" in tests:
     timer.tic("poi_gurobi starts")

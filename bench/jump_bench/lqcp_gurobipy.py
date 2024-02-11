@@ -69,15 +69,12 @@ def main(Ns=[500, 1000, 1500, 2000]):
     dir = os.path.realpath(os.path.dirname(__file__))
     for n in Ns:
         start = time.time()
-        try:
-            model = solve_lqcp(n)
-        except:
-            pass
+        model = solve_lqcp(n)
         run_time = round(time.time() - start)
-        content = "gurobipy lqcp-%i -1 %i\n" % (n, run_time)
+        content = "gurobipy lqcp-%i -1 %i" % (n, run_time)
         print(content)
         with open(dir + "/benchmarks.csv", "a") as io:
-            io.write(content)
+            io.write(f"{content}\n")
     return
 
 

@@ -46,13 +46,15 @@ NB_MODULE(core_ext, m)
 	    .def(nb::self + ScalarAffineFunction())
 	    .def(nb::self + ScalarQuadraticFunction())
 	    .def(nb::self - CoeffT())
+	    .def(CoeffT() - nb::self)
 	    .def(nb::self - VariableIndex())
 	    .def(nb::self - ScalarAffineFunction())
 	    .def(nb::self - ScalarQuadraticFunction())
 	    .def(nb::self * CoeffT())
 	    .def(CoeffT() * nb::self)
 	    .def(nb::self * VariableIndex())
-	    .def(nb::self * ScalarAffineFunction());
+	    .def(nb::self * ScalarAffineFunction())
+	    .def(nb::self / CoeffT());
 
 	nb::class_<ConstraintIndex>(m, "ConstraintIndex")
 	    .def_ro("type", &ConstraintIndex::type)
@@ -91,7 +93,8 @@ NB_MODULE(core_ext, m)
 	    .def(nb::self * CoeffT())
 	    .def(CoeffT() * nb::self)
 	    .def(nb::self * VariableIndex())
-	    .def(nb::self * ScalarAffineFunction());
+	    .def(nb::self * ScalarAffineFunction())
+	    .def(nb::self / CoeffT());
 
 	nb::class_<ScalarQuadraticFunction>(m, "ScalarQuadraticFunction")
 	    .def(nb::init<>())
@@ -124,7 +127,8 @@ NB_MODULE(core_ext, m)
 	    .def(nb::self - ScalarAffineFunction())
 	    .def(nb::self - ScalarQuadraticFunction())
 	    .def(nb::self * CoeffT())
-	    .def(CoeffT() * nb::self);
+	    .def(CoeffT() * nb::self)
+	    .def(nb::self / CoeffT());
 
 	nb::class_<VariablePair>(m, "VariablePair").def(nb::init<IndexT, IndexT>());
 

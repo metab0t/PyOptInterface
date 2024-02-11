@@ -71,10 +71,7 @@ def main(Ns=[25, 50, 75, 100]):
     dir = os.path.realpath(os.path.dirname(__file__))
     for n in Ns:
         start = time.time()
-        try:
-            model = solve_facility("gurobi_persistent", n, n)
-        except:
-            pass
+        model = solve_facility("gurobi_persistent", n, n)
         run_time = round(time.time() - start)
         with open(dir + "/benchmarks.csv", "a") as io:
             io.write("pyomo fac-%i -1 %i\n" % (n, run_time))

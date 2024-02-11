@@ -915,7 +915,7 @@ auto operator*(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
 }
 auto operator*(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction
 {
-	return b * a;
+	return a * b;
 }
 
 auto operator*(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction
@@ -996,4 +996,19 @@ auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFun
 auto operator*(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
 {
 	return a * b;
+}
+
+auto operator/(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction
+{
+	return a * (1.0 / b);
+}
+
+auto operator/(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
+{
+	return a * (1.0 / b);
+}
+
+auto operator/(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction
+{
+	return a * (1.0 / b);
 }

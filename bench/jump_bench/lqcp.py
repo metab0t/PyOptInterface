@@ -79,10 +79,7 @@ def main(Ns=[500, 1000, 1500, 2000]):
     dir = os.path.realpath(os.path.dirname(__file__))
     for n in Ns:
         start = time.time()
-        try:
-            model = solve_lqcp("gurobi_persistent", n)
-        except:
-            pass
+        model = solve_lqcp("gurobi_persistent", n)
         run_time = round(time.time() - start)
         with open(dir + "/benchmarks.csv", "a") as io:
             io.write("pyomo lqcp-%i -1 %i\n" % (n, run_time))

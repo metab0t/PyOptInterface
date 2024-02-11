@@ -360,5 +360,55 @@ class ChunkedBitVector
 	std::uint8_t m_next_bit;
 };
 
+template <std::signed_integral T>
+class SimpleMonotoneVector
+{
+  private:
+	std::vector<T> m_data;
+	T m_start = 0;
+
+  public:
+	SimpleMonotoneVector() = default;
+	SimpleMonotoneVector(T start) : m_start(start)
+	{
+	}
+
+	IndexT add_index()
+	{
+		IndexT index = m_data.size();
+		m_data.push_back(index);
+		return index;
+	}
+	void delete_index(const IndexT &index)
+	{
+		if (m_data[index] < 0)
+		{
+			return;
+		}
+		m_data[index] = -1;
+		for (IndexT i = index + 1; i < m_data.size(); i++)
+		{
+			m_data[i] -= 1;
+		}
+	}
+	bool has_index(const IndexT &index)
+	{
+		return get_index(index) >= 0;
+	}
+	T get_index(const IndexT &index)
+	{
+		if (index >= m_data.size())
+		{
+			throw std::runtime_error("Index out of range");
+		}
+		return m_data[index];
+	}
+	void clear()
+	{
+		m_data.clear();
+	}
+};
+
 template <typename ResultT>
 using MonotoneIndexer = ChunkedBitVector<std::uint64_t, ResultT>;
+// using MonotoneIndexer = SimpleMonotoneVector<ResultT>;

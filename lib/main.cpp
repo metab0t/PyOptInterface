@@ -333,6 +333,6 @@ auto test_highs_capi() -> void
 
 auto main() -> int
 {
-	test_highs_capi();
+	test_gurobi();
 	return 0;
 }

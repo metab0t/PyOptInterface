@@ -100,12 +100,18 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(is_constraint_active)
 	    // clang-format on
 
-	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
-	                              &GurobiModelMixin::set_objective))
-	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
-	                              &GurobiModelMixin::set_objective))
-	    .def("set_objective", nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
-	                              &GurobiModelMixin::set_objective))
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
+	             &GurobiModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
+	             &GurobiModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
+	             &GurobiModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    // clang-format off
 	    BIND_F(optimize)

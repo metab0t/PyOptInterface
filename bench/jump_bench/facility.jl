@@ -53,7 +53,7 @@ function main(io::IO, Ns = [25, 50, 75, 100])
             model = solve_facility(get_model(type), n, n)
             run_time = round(Int, time() - start)
             num_var = num_variables(model)
-            println(io, "$type fac-$n $num_var $run_time")
+            println(io, "jump_$type fac-$n $num_var $run_time")
         end
     end
 end

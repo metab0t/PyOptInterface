@@ -53,15 +53,12 @@ def main(Ns=[25, 50, 75, 100]):
     dir = os.path.realpath(os.path.dirname(__file__))
     for n in Ns:
         start = time.time()
-        try:
-            model = solve_facility(n, n)
-        except:
-            pass
+        model = solve_facility(n, n)
         run_time = round(time.time() - start)
-        content = "gurobipy fac-%i -1 %i\n" % (n, run_time)
+        content = "gurobipy fac-%i -1 %i" % (n, run_time)
         print(content)
         with open(dir + "/benchmarks.csv", "a") as io:
-            io.write(content)
+            io.write(f"{content}\n")
     return
 
 

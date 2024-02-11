@@ -170,9 +170,12 @@ class GurobiModel
 	MonotoneIndexer<int> m_sos_constraint_index;
 
 	/* flag to indicate whether the model needs update */
-	bool m_needs_update = false;
-	void _require_update();
-	void _update_if_necessary();
+	bool m_variable_update = false;
+	bool m_constraint_update = false;
+	bool m_attribute_update = false;
+	bool m_deletion_update = false;
+	void _update_all_if_necessary();
+	void _update_constraint_if_necessary();
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;

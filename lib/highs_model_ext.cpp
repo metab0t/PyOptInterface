@@ -82,12 +82,18 @@ NB_MODULE(highs_model_ext, m)
 	    .def("delete_constraint", &HighsModelMixin::delete_constraint)
 	    .def("is_constraint_active", &HighsModelMixin::is_constraint_active)
 
-	    .def("set_objective", nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
-	                              &HighsModelMixin::set_objective))
-	    .def("set_objective", nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
-	                              &HighsModelMixin::set_objective))
-	    .def("set_objective", nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
-	                              &HighsModelMixin::set_objective))
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
+	             &HighsModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
+	             &HighsModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def(
+	        "set_objective",
+	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&HighsModelMixin::set_objective),
+	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    // clang-format off
 	    BIND_F(optimize)

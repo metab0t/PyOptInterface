@@ -210,6 +210,10 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
 auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 auto operator*(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
 
+auto operator/(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
+auto operator/(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
+auto operator/(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
+
 enum class ConstraintType
 {
 	Linear,
