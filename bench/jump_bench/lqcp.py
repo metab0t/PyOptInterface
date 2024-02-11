@@ -4,12 +4,13 @@
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
 import pyomo.environ as pyo
+from pyomo.contrib import appsi
 from pyomo.opt import SolverFactory
 import os
 import time
 
 
-def solve_lqcp(solver, N):
+def solve_lqcp(solve_f, N):
     model = pyo.ConcreteModel()
     model.n = N
     model.m = N
@@ -64,25 +65,42 @@ def solve_lqcp(solver, N):
         ] == (2 * model.dx) * (model.u[i] - model.y[i, model.n - 0])
 
     model.bc2 = pyo.Constraint(pyo.RangeSet(1, model.n), rule=bc2_rule)
-    opt = SolverFactory(solver)
+
+    solve_f(model)
+    return model
+
+
+def gurobi_persistent(model):
+    opt = SolverFactory("gurobi_persistent")
     opt.options["timelimit"] = 0.0
     opt.options["presolve"] = False
-    if solver == "gurobi_persistent":
-        opt.set_instance(model)
-        opt.solve(tee=True, load_solutions=False)
-    else:
-        opt.solve(model, tee=True, load_solutions=False)
-    return model
+    opt.set_instance(model)
+    opt.solve(tee=False, load_solutions=False)
+
+
+def appsi_gurobi(model):
+    opt = appsi.solvers.Gurobi()
+    opt.gurobi_options["OutputFlag"] = 0
+    opt.gurobi_options["TimeLimit"] = 0.0
+    opt.gurobi_options["Presolve"] = 0
+    opt.config.load_solution = False
+    opt.solve(model)
 
 
 def main(Ns=[500, 1000, 1500, 2000]):
     dir = os.path.realpath(os.path.dirname(__file__))
-    for n in Ns:
-        start = time.time()
-        model = solve_lqcp("gurobi_persistent", n)
-        run_time = round(time.time() - start)
-        with open(dir + "/benchmarks.csv", "a") as io:
-            io.write("pyomo lqcp-%i -1 %i\n" % (n, run_time))
+    for solver_f, solver_name in [
+        (appsi_gurobi, "appsi"),
+        # (gurobi_persistent, "persistent"),
+    ]:
+        for n in Ns:
+            start = time.time()
+            model = solve_lqcp(solver_f, n)
+            run_time = round(time.time() - start)
+            content = "pyomo_%s lqcp-%i -1 %i" % (solver_name, n, run_time)
+            print(content)
+            with open(dir + "/benchmarks.csv", "a") as io:
+                io.write(f"{content}\n")
     return
 
 
