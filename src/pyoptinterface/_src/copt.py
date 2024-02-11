@@ -241,7 +241,9 @@ model_attribute_get_func_map = {
     ModelAttribute.SimplexIterations: lambda model: model.get_model_raw_attribute_int(
         "SimplexIter"
     ),
-    ModelAttribute.SolveTimeSec: lambda model: model.solve_time,
+    ModelAttribute.SolveTimeSec: lambda model: model.get_raw_parameter_double(
+        "SolvingTime"
+    ),
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
         "Threads"
     ),
@@ -308,7 +310,6 @@ class Model(RawModel):
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
-        self.solve_time: Optional[float] = None
         self.mip_start_values: dict[VariableIndex, float] = dict()
 
     @staticmethod
@@ -464,6 +465,4 @@ class Model(RawModel):
                 values = list(mip_start.values())
                 self.add_mip_start(variables, values)
                 mip_start.clear()
-        start_time = time.time()
         super().optimize()
-        self.solve_time = time.time() - start_time

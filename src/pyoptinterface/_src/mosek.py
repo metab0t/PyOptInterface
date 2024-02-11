@@ -206,7 +206,9 @@ model_attribute_get_func_map = {
     ModelAttribute.ObjectiveSense: lambda model: model.get_obj_sense(),
     ModelAttribute.DualObjectiveValue: lambda model: model.getdualobj(),
     ModelAttribute.ObjectiveValue: lambda model: model.getprimalobj(),
-    ModelAttribute.SolveTimeSec: lambda model: model.solve_time,
+    ModelAttribute.SolveTimeSec: lambda model: model.get_raw_information_double(
+        "MSK_DINF_OPTIMIZER_TIME"
+    ),
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
         "MSK_IPAR_NUM_THREADS"
     ),
