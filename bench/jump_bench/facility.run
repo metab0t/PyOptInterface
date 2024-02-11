@@ -1,0 +1,16 @@
+param t0;
+
+model facility.mod;
+
+option solver_msg 0;
+option presolve 0;
+option solver 'gurobi';
+option gurobi_options 'outlev=0 timelim=0 presolve=0';
+
+for {n in {25, 50, 75, 100}} {
+    let G := n;
+    let F := n;
+    let t0 := time();
+    solve >NUL;
+    printf "n=%d, time=%d\n", n, time()-t0
+}

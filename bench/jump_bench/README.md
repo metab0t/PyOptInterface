@@ -17,4 +17,7 @@ $ python lqcp_poi.py
 $ julia gurobi_cpp_run.jl
 
 $ julia produce_table.jl
+
+$ ampl facility.run
+$ ampl lqcp.run
 ```

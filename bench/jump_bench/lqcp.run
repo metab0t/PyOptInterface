@@ -1,0 +1,15 @@
+param t0;
+
+model lqcp.mod;
+
+option solver_msg 0;
+option presolve 0;
+option solver 'gurobi';
+option gurobi_options 'outlev=0 timelim=0 presolve=0';
+
+for {n_value in {500, 1000, 1500, 2000}} {
+    let n := n_value;
+    let t0 := time();
+    solve >NUL;
+    printf "n=%d, time=%d\n", n, time()-t0
+}
