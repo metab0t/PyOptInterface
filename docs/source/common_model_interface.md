@@ -189,12 +189,12 @@ get the coefficient of a variable in a normalized constraint
 
 ### Set the objective function
 
-```{py:function} model.set_objective(expr, sense)
+```{py:function} model.set_objective(expr, [sense=pyoptinterface.ObjectiveSense.Minimize])
 
 set the objective function of the model
 
 :param expr: the handle of the expression
-:param pyoptinterface.ObjectiveSense sense: the sense of the objective function
+:param pyoptinterface.ObjectiveSense sense: the sense of the objective function (Minimize/Maximize), defaults to Minimize
 ```
 
 ### Modify the linear part of the objective function
