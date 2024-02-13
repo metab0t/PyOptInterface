@@ -529,13 +529,13 @@ continuous</p></li>
 <h3>Set the objective function<a class="headerlink" href="#set-the-objective-function" title="Link to this heading">#</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_objective">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">sense=pyoptinterface.ObjectiveSense.Minimize</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective" title="Link to this definition">#</a></dt>
 <dd><p>set the objective function of the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> – the handle of the expression</p></li>
-<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ObjectiveSense" title="pyoptinterface.ObjectiveSense"><em>pyoptinterface.ObjectiveSense</em></a>) – the sense of the objective function</p></li>
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ObjectiveSense" title="pyoptinterface.ObjectiveSense"><em>pyoptinterface.ObjectiveSense</em></a>) – the sense of the objective function (Minimize/Maximize), defaults to Minimize</p></li>
 </ul>
 </dd>
 </dl>
