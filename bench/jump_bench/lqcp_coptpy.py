@@ -3,13 +3,15 @@
 # Use of this source code is governed by an MIT-style license that can be found
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
-from gurobipy import *
+from coptpy import *
+import coptpy as cp
 import os
 import time
 
 
 def solve_lqcp(N):
-    m = Model("lqcp")
+    env = cp.Envr()
+    m = env.createModel("lqcp")
 
     dx = 1.0 / N
     T = 1.58
@@ -27,7 +29,7 @@ def solve_lqcp(N):
         + 2 * quicksum((y[N, j] - yt[j]) ** 2 for j in range(1, N))
         + (y[N, N] - yt[N]) ** 2
         + 1 / 4 * a * dt * (2 * quicksum(u[i] ** 2 for i in range(1, N)) + u[N] ** 2),
-        GRB.MINIMIZE,
+        COPT.MINIMIZE,
     )
 
     for i in range(N):
@@ -57,10 +59,10 @@ def solve_lqcp(N):
             y[i, N - 2] - 4 * y[i, N - 1] + 3 * y[i, N] == 2 * dx * (u[i] - y[i, N])
         )
 
-    m.setParam("OutputFlag", 0)
+    m.setParam("Logging", 0)
     m.setParam("TimeLimit", 0.0)
     m.setParam("Presolve", 0)
-    m.optimize()
+    m.solve()
 
     return m
 
@@ -71,7 +73,7 @@ def main(Ns=[500, 1000, 1500, 2000]):
         start = time.time()
         model = solve_lqcp(n)
         run_time = round(time.time() - start)
-        content = "gurobipy lqcp-%i -1 %i" % (n, run_time)
+        content = "coptpy lqcp-%i -1 %i" % (n, run_time)
         print(content)
         with open(dir + "/benchmarks.csv", "a") as io:
             io.write(f"{content}\n")

@@ -15,7 +15,7 @@ for i in 1:size(df, 1)
     end
 end
 
-columns = ["model", "variables", "gurobi", "gurobipy", "poi", "jump_direct", "jump_default", "pyomo_appsi"]
+columns = ["model", "variables", "gurobi", "gurobipy", "poi_gurobi", "jump_direct", "pyomo_appsi"]
 keys = [
     "fac-25",
     "fac-50",

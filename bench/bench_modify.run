@@ -1,4 +1,5 @@
 param t0;
+param t1;
 let t0 := time();
 
 model bench_modify.mod;
@@ -17,4 +18,5 @@ for {j in (N div 2 + 1)..N} {
     solve >NUL;
 }
 
-printf "%d\n", time()-t0
+let t1 := time();
+printf "%d\n", t1-t0;

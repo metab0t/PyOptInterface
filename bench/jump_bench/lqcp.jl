@@ -7,6 +7,7 @@ using JuMP
 import Gurobi
 
 function solve_lqcp(model, n)
+    set_silent(model)
     set_time_limit_sec(model, 0.0)
     set_optimizer_attribute(model, "Presolve", 0)
     m  = n
@@ -54,21 +55,21 @@ function get_model(arg)
 end
 
 function main(io::IO, Ns = [500, 1000, 1500, 2000])
-    for type in ["direct", "default"]
+    # for type in ["direct", "default"]
+    for type in ["direct"]
         for n in Ns
             start = time()
             model = solve_lqcp(get_model(type), n)
             run_time = round(Int, time() - start)
             num_var = num_variables(model)
-            println(io, "jump_$type lqcp-$n $num_var $run_time")
+            content = "jump_$type lqcp-$n $num_var $run_time"
+            println(stdout, content)
+            println(io, content)
         end
     end
 end
 
-if isempty(ARGS)
-    main(stdout, [5])
-else
-    open(joinpath(@__DIR__, "benchmarks.csv"), "a") do io
-        main(io)
-    end
+main(stdout, [5])
+open(joinpath(@__DIR__, "benchmarks.csv"), "a") do io
+    main(io)
 end

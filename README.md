@@ -45,3 +45,8 @@ PyOptInterface is licensed under MPL-2.0 License.
 It uses [nanobind](https://github.com/wjakob/nanobind), [fmtlib](https://github.com/fmtlib/fmt) and [martinus/unordered_dense](https://github.com/martinus/unordered_dense) as dependencies.
 
 The design of PyOptInterface is inspired by [JuMP.jl](https://jump.dev).
+
+Some solver-related code is adapted from corresponding solver interface package in `JuMP.jl` 
+ecosystem, which is licensed under MIT License.
+
+The code in `bench\jump_bench` is adapted from benchmark suite of paper of `JuMP.jl`.
