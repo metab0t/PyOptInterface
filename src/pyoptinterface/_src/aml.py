@@ -23,8 +23,8 @@ def make_nd_variable(
         kw_args["ub"] = ub
 
     def f(*args):
-        suffix = str(args)
         if name is not None:
+            suffix = str(args)
             kw_args["name"] = f"{name}{suffix}"
         return model.add_variable(**kw_args)
 
