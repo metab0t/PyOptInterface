@@ -29,6 +29,7 @@ from .solver_common import (
     _direct_set_entity_attribute,
 )
 from .constraint_bridge import bridge_soc_quadratic_constraint
+from .aml import make_nd_variable
 
 DEFAULT_ENV = None
 
@@ -290,6 +291,8 @@ class Model(RawModel):
         self._env = env
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
+
+        self.add_variables = make_nd_variable.__get__(self)
 
     def add_second_order_cone_constraint(
         self, cone_variables, name="", use_bridge=False

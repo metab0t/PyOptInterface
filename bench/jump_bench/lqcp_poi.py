@@ -17,8 +17,8 @@ def solve_lqcp(m, N):
     h2 = dx**2
     a = 0.001
 
-    y = poi.make_nd_variable(m, range(N + 1), range(N + 1), lb=0.0, ub=1.0)
-    u = poi.make_nd_variable(m, range(N + 1), lb=-1.0, ub=1.0)
+    y = m.add_variables(range(N + 1), range(N + 1), lb=0.0, ub=1.0)
+    u = m.add_variables(range(N + 1), lb=-1.0, ub=1.0)
 
     yt = {j: 0.5 * (1 - (j * dx) ** 2) for j in range(N + 1)}
 
@@ -76,7 +76,7 @@ def main(Ns=[500, 1000, 1500, 2000]):
     }.get(solver_name.lower(), None)
     if model_constructor is None:
         raise ValueError(f"Unknown solver {solver_name}")
-    
+
     solver_name = solver_name.lower()
 
     for n in Ns:

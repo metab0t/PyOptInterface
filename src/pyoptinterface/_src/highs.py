@@ -28,6 +28,7 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
+from .aml import make_nd_variable
 
 variable_attribute_get_func_map = {
     VariableAttribute.Value: lambda model, v: model.get_value(v),
@@ -234,6 +235,8 @@ class Model(RawModel):
         super().__init__()
 
         self.mip_start_values: dict[VariableIndex, float] = dict()
+
+        self.add_variables = make_nd_variable.__get__(self)
 
     @staticmethod
     def supports_variable_attribute(self, attribute: VariableAttribute):

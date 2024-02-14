@@ -12,14 +12,12 @@ import time
 
 def solve_facility(m, G, F):
     # Create variables
-    y = poi.make_nd_variable(m, range(1, F + 1), range(1, 3), lb=0.0, ub=1.0)
-    s = poi.make_nd_variable(m, range(G + 1), range(G + 1), range(1, F + 1), lb=0.0)
-    z = poi.make_nd_variable(
-        m, range(G + 1), range(G + 1), range(1, F + 1), domain=poi.VariableDomain.Binary
+    y = m.add_variables(range(1, F + 1), range(1, 3), lb=0.0, ub=1.0)
+    s = m.add_variables(range(G + 1), range(G + 1), range(1, F + 1), lb=0.0)
+    z = m.add_variables(
+        range(G + 1), range(G + 1), range(1, F + 1), domain=poi.VariableDomain.Binary
     )
-    r = poi.make_nd_variable(
-        m, range(G + 1), range(G + 1), range(1, F + 1), range(1, 3)
-    )
+    r = m.add_variables(range(G + 1), range(G + 1), range(1, F + 1), range(1, 3))
     d = m.add_variable()
 
     # Set objective

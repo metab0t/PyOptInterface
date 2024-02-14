@@ -28,6 +28,7 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
+from .aml import make_nd_variable
 
 DEFAULT_ENV = None
 
@@ -311,6 +312,8 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
         self.mip_start_values: dict[VariableIndex, float] = dict()
+
+        self.add_variables = make_nd_variable.__get__(self)
 
     @staticmethod
     def supports_variable_attribute(self, attribute: VariableAttribute):
