@@ -39,6 +39,22 @@ continuous
 :return: the handle of the variable
 ```
 
+### Add multi-dimensional variables to the model as <project:#pyoptinterface.tupledict>
+
+```{py:function} model.add_variables(*coords, [lb=-inf, ub=+inf, domain=pyoptinterface.VariableDomain.Continuous, name=""])
+
+add a multi-dimensional variable to the model
+
+:param coords: the coordinates of the variable, can be a list of Iterables
+:param float lb: the lower bound of the variable, optional, defaults to $-\infty$
+:param float ub: the upper bound of the variable, optional, defaults to $+\infty$
+:param pyoptinterface.VariableDomain domain: the domain of the variable, optional, defaults to 
+continuous
+:param str name: the name of the variable, optional
+:return: the multi-dimensional variable
+:rtype: pyoptinterface.tupledict
+```
+
 ### Get/set variable attributes
 
 ```{py:function} model.set_variable_attribute(var, attr, value)

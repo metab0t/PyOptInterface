@@ -30,6 +30,17 @@ from pyoptinterface._src.aml import (
     quicksum_f,
 )
 
+# Alias of ConstraintSense
+Eq = ConstraintSense.Equal
+"""Alias of `ConstraintSense.Equal` for equality constraints.
+"""
+Leq = ConstraintSense.LessEqual
+"""Alias of `ConstraintSense.LessEqual` for less-than-or-equal-to constraints.
+"""
+Geq = ConstraintSense.GreaterEqual
+"""Alias of `ConstraintSense.GreaterEqual` for greater-than-or-equal-to constraints.
+"""
+
 __all__ = [
     "VariableIndex",
     "ConstraintIndex",
@@ -51,4 +62,7 @@ __all__ = [
     "make_nd_variable",
     "quicksum",
     "quicksum_f",
+    "Eq",
+    "Leq",
+    "Geq",
 ]
