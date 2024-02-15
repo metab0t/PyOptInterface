@@ -158,7 +158,7 @@ model = gurobi.Model()
 I = range(10)
 J = range(20)
 
-x = poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x_{i}_{j}"))
+x = poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x({i},{j})"))
 
 def constraint_rule(j):
     expr = poi.quicksum(x.select("*", j))
@@ -190,4 +190,10 @@ Create a new expression by summing up a list of values after applying a function
 :param values: iterator of values
 :param f: the function to apply to each value
 :return: the handle of the new expression
+```
+
+We notice that `poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x({i},{j})"))` is a frequently used pattern to create a `tupledict` of variables, so we provide a convenient way to create a `tupledict` of variables by calling [`model.add_variables`](#model.add_variables):
+
+```python
+x = model.add_variables(I, J, lb=0, name="x")
 ```

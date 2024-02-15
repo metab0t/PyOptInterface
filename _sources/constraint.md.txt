@@ -55,6 +55,11 @@ of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
 :return: the handle of the constraint
 ```
 
+:::{note}
+
+PyOptInterface provides <project:#pyoptinterface.Eq>, <project:#pyoptinterface.Leq>, and <project:#pyoptinterface.Geq> as alias of <project:#pyoptinterface.ConstraintSense> to represent the sense of the constraint with a shorter name.
+:::
+
 ## Quadratic Constraint
 Like the linear constraint, it is defined as:
 

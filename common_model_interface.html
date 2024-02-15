@@ -272,6 +272,33 @@ continuous</p></li>
 </dd></dl>
 
 </section>
+<section id="add-multi-dimensional-variables-to-the-model-as">
+<h3>Add multi-dimensional variables to the model as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.tupledict</span></code></a><a class="headerlink" href="#add-multi-dimensional-variables-to-the-model-as" title="Link to this heading">#</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.add_variables">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*coords</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variables" title="Link to this definition">#</a></dt>
+<dd><p>add a multi-dimensional variable to the model</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> – the coordinates of the variable, can be a list of Iterables</p></li>
+<li><p><strong>lb</strong> (<em>float</em>) – the lower bound of the variable, optional, defaults to <span class="math notranslate nohighlight">\(-\infty\)</span></p></li>
+<li><p><strong>ub</strong> (<em>float</em>) – the upper bound of the variable, optional, defaults to <span class="math notranslate nohighlight">\(+\infty\)</span></p></li>
+<li><p><strong>domain</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain" title="pyoptinterface.VariableDomain"><em>pyoptinterface.VariableDomain</em></a>) – the domain of the variable, optional, defaults to
+continuous</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – the name of the variable, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the multi-dimensional variable</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict">pyoptinterface.tupledict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="get-set-variable-attributes">
 <h3>Get/set variable attributes<a class="headerlink" href="#get-set-variable-attributes" title="Link to this heading">#</a></h3>
 <dl class="py function">
@@ -643,6 +670,10 @@ continuous</p></li>
 <li><a class="reference internal" href="#variable">Variable</a><ul>
 <li><a class="reference internal" href="#add-a-variable-to-the-model">Add a variable to the model</a><ul>
 <li><a class="reference internal" href="#model.add_variable"><code class="docutils literal notranslate"><span class="pre">model.add_variable()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-multi-dimensional-variables-to-the-model-as">Add multi-dimensional variables to the model as <span class="xref myst"></span></a><ul>
+<li><a class="reference internal" href="#model.add_variables"><code class="docutils literal notranslate"><span class="pre">model.add_variables()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#get-set-variable-attributes">Get/set variable attributes</a><ul>
