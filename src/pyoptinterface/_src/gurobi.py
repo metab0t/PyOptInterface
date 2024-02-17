@@ -175,6 +175,7 @@ _RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusString
 ]
 
 gurobi_raw_type_map = {
+    0: "char",
     1: int,
     2: float,
     3: str,
@@ -529,3 +530,69 @@ class Model(RawModel):
         }
         set_function = set_function_map[param_type]
         set_function(param_name, value)
+
+    def get_model_raw_attribute(self, name: str):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        get_function_map = {
+            "char": self.get_model_raw_attribute_char,
+            int: self.get_model_raw_attribute_int,
+            float: self.get_model_raw_attribute_double,
+            str: self.get_model_raw_attribute_string,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(name)
+
+    def set_model_raw_attribute(self, name: str, value):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        set_function_map = {
+            "char": self.set_model_raw_attribute_char,
+            int: self.set_model_raw_attribute_int,
+            float: self.set_model_raw_attribute_double,
+            str: self.set_model_raw_attribute_string,
+        }
+        set_function = set_function_map[param_type]
+        set_function(name, value)
+
+    def get_variable_raw_attribute(self, variable, name: str):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        get_function_map = {
+            "char": self.get_variable_raw_attribute_char,
+            int: self.get_variable_raw_attribute_int,
+            float: self.get_variable_raw_attribute_double,
+            str: self.get_variable_raw_attribute_string,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(variable, name)
+
+    def set_variable_raw_attribute(self, variable, name: str, value):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        set_function_map = {
+            "char": self.set_variable_raw_attribute_char,
+            int: self.set_variable_raw_attribute_int,
+            float: self.set_variable_raw_attribute_double,
+            str: self.set_variable_raw_attribute_string,
+        }
+        set_function = set_function_map[param_type]
+        set_function(variable, name, value)
+
+    def get_constraint_raw_attribute(self, constraint, name: str):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        get_function_map = {
+            "char": self.get_constraint_raw_attribute_char,
+            int: self.get_constraint_raw_attribute_int,
+            float: self.get_constraint_raw_attribute_double,
+            str: self.get_constraint_raw_attribute_string,
+        }
+        get_function = get_function_map[param_type]
+        return get_function(constraint, name)
+
+    def set_constraint_raw_attribute(self, constraint, name: str, value):
+        param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
+        set_function_map = {
+            "char": self.set_constraint_raw_attribute_char,
+            int: self.set_constraint_raw_attribute_int,
+            float: self.set_constraint_raw_attribute_double,
+            str: self.set_constraint_raw_attribute_string,
+        }
+        set_function = set_function_map[param_type]
+        set_function(constraint, name, value)

@@ -811,15 +811,14 @@ void GurobiModel::set_objective_coefficient(const VariableIndex &variable, doubl
 
 int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 {
+	_update_constraint_if_necessary(constraint.type);
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
 		return m_linear_constraint_index.get_index(constraint.index);
 	case ConstraintType::Quadratic:
-		_update_constraint_if_necessary();
 		return m_quadratic_constraint_index.get_index(constraint.index);
 	case ConstraintType::SOS:
-		_update_constraint_if_necessary();
 		return m_sos_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -856,9 +855,19 @@ void GurobiModel::_update_all_if_necessary()
 	}
 }
 
-void GurobiModel::_update_constraint_if_necessary()
+void GurobiModel::_update_constraint_if_necessary(ConstraintType type)
 {
-	if (m_constraint_update || m_deletion_update)
+	bool need_update = false;
+	if (type == ConstraintType::Linear)
+	{
+		// Adding new linear constraints does not need to update the model
+		need_update = m_deletion_update;
+	}
+	else
+	{
+		need_update = m_constraint_update || m_deletion_update;
+	}
+	if (need_update)
 	{
 		update();
 		m_variable_update = false;

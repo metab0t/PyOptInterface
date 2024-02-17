@@ -170,12 +170,16 @@ class GurobiModel
 	MonotoneIndexer<int> m_sos_constraint_index;
 
 	/* flag to indicate whether the model needs update */
+	// new variables are created
 	bool m_variable_update = false;
+	// new constraints are created
 	bool m_constraint_update = false;
+	// set new attribute value
 	bool m_attribute_update = false;
+	// variable or constraint is deleted
 	bool m_deletion_update = false;
 	void _update_all_if_necessary();
-	void _update_constraint_if_necessary();
+	void _update_constraint_if_necessary(ConstraintType type);
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;
