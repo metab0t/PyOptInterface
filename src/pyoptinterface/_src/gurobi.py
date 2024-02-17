@@ -8,7 +8,7 @@ if platform.system() == "Windows":
         os.add_dll_directory(os.path.join(gurobi_home, "bin"))
 
 try:
-    from .gurobi_model_ext import RawModel, Env, GRB
+    from .gurobi_model_ext import RawModel, RawEnv, GRB
 except Exception as e:
     raise ImportError(
         f"Failed to import gurobi_model_ext. Please check if GUROBI_HOME is set correctly. Error: {e}"
@@ -38,7 +38,7 @@ DEFAULT_ENV = None
 def init_default_env():
     global DEFAULT_ENV
     if DEFAULT_ENV is None:
-        DEFAULT_ENV = Env()
+        DEFAULT_ENV = RawEnv()
 
 
 # Variable Attribute
@@ -383,6 +383,17 @@ constraint_attribute_set_func_map = {
         constraint, value
     ),
 }
+
+class Env(RawEnv):
+    def set_raw_parameter(self, param_name: str, value):
+        param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
+        set_function_map = {
+            int: self.set_raw_parameter_int,
+            float: self.set_raw_parameter_double,
+            str: self.set_raw_parameter_string,
+        }
+        set_function = set_function_map[param_type]
+        set_function(param_name, value)
 
 
 class Model(RawModel):

@@ -13,7 +13,7 @@ NB_MODULE(gurobi_model_ext, m)
 	bind_gurobi_constants(m);
 
 #define BIND_F(f) .def(#f, &GurobiEnv::f)
-	nb::class_<GurobiEnv>(m, "Env").def(nb::init<bool>(), nb::arg("empty") = false)
+	nb::class_<GurobiEnv>(m, "RawEnv").def(nb::init<bool>(), nb::arg("empty") = false)
 	    // clang-format off
 		BIND_F(start)
 		BIND_F(raw_parameter_type)
