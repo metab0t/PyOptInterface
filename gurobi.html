@@ -1,0 +1,549 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="COPT" href="copt.html" /><link rel="prev" title="Common Model Interface" href="common_model_interface.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Gurobi - PyOptInterface documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">PyOptInterface  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">PyOptInterface  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Gurobi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
+<li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API docs</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.highs.html">pyoptinterface.highs package</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section class="tex2jax_ignore mathjax_ignore" id="gurobi">
+<h1>Gurobi<a class="headerlink" href="#gurobi" title="Link to this heading">#</a></h1>
+<section id="initial-setup">
+<h2>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You need to install Gurobi separately from the <a class="reference external" href="https://www.gurobi.com/">Gurobi website</a>. After installing the software, you need to ensure the shared library of Gurobi is in the system path.</p>
+<ul class="simple">
+<li><p>Windows: The <code class="docutils literal notranslate"><span class="pre">GUROBI_HOME</span></code> environment must be set to the Gurobi installation directory (like <code class="docutils literal notranslate"><span class="pre">C:\gurobi1100\win64</span></code>). The Gurobi shared library <code class="docutils literal notranslate"><span class="pre">gurobi110.dll</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory of the installation directory. The Gurobi installer usually sets this environment variable automatically, but you can also set it manually.</p></li>
+<li><p>Linux: Add the Gurobi shared library to the <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> environment variable. The shared library <code class="docutils literal notranslate"><span class="pre">libgurobi110.so</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">lib</span></code> directory of the installation directory.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:/opt/gurobi1100/linux64/lib
+</pre></div>
+</div>
+<p>If you want to manage the license of Gurobi manually, you can create a <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object and pass it to the constructor of the <code class="docutils literal notranslate"><span class="pre">gurobi.Model</span></code> object, otherwise we will initialize an implicit global <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object automatically and use it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, you can set the parameter of the <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object to choose the licensing behavior.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter_string</span><span class="p">(</span><span class="s2">&quot;ComputeServer&quot;</span><span class="p">,</span> <span class="s2">&quot;myserver1:32123&quot;</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter_string</span><span class="p">(</span><span class="s2">&quot;ServerPassword&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="the-capability-of-gurobi-model">
+<h2>The capability of <code class="docutils literal notranslate"><span class="pre">gurobi.Model</span></code><a class="headerlink" href="#the-capability-of-gurobi-model" title="Link to this heading">#</a></h2>
+<section id="supported-constraints">
+<h3>Supported constraints<a class="headerlink" href="#supported-constraints" title="Link to this heading">#</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Constraint</p></th>
+<th class="head"><p>Supported</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_linear_constraint" title="model.add_linear_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_quadratic_constraint" title="model.add_quadratic_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_quadratic_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_second_order_cone_constraint" title="model.add_second_order_cone_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_second_order_cone_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_sos_constraint" title="model.add_sos_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_sos_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-model-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attribute</span></a><a class="headerlink" href="#supported-model-attribute" title="Link to this heading">#</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjectiveSense</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>DualStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>PrimalStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>RawStatusString</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>TerminationStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>BarrierIterations</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>DualObjectiveValue</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>NodeCount</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>NumberOfThreads</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>ObjectiveBound</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjectiveValue</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>RelativeGap</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Silent</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>SimplexIterations</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>SolverName</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>SolverVersion</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>SolveTimeSec</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>TimeLimitSec</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-variable-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attribute</span></a><a class="headerlink" href="#supported-variable-attribute" title="Link to this heading">#</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerBound</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>UpperBound</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Domain</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>PrimalStart</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Value</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-constraint-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attribute</span></a><a class="headerlink" href="#supported-constraint-attribute" title="Link to this heading">#</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Primal</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>Dual</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="solver-specific-operations">
+<h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">#</a></h2>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">#</a></h3>
+<p>For <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/parameters.html#sec:Parameters">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="c1"># get the value of the parameter</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_parameter</span><span class="p">(</span><span class="s2">&quot;TimeLimit&quot;</span><span class="p">)</span>
+
+<span class="c1"># set the value of the parameter</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;TimeLimit&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="attribute">
+<h3>Attribute<a class="headerlink" href="#attribute" title="Link to this heading">#</a></h3>
+<p>Gurobi supports a lot of <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/attributes.html#sec:Attributes">attributes</a> for the model, variable, and constraint. We provide methods to get or set the value of the attribute.</p>
+<ul class="simple">
+<li><p>Model attribute: <code class="docutils literal notranslate"><span class="pre">model.get_model_raw_attribute(name:</span> <span class="pre">str)</span></code> and <code class="docutils literal notranslate"><span class="pre">model.set_model_raw_attribute(name:</span> <span class="pre">str,</span> <span class="pre">value:</span> <span class="pre">Any)</span></code></p></li>
+<li><p>Variable attribute: <code class="docutils literal notranslate"><span class="pre">model.get_variable_raw_attribute(variable,</span> <span class="pre">name:</span> <span class="pre">str)</span></code> and <code class="docutils literal notranslate"><span class="pre">model.set_variable_raw_attribute(variable,</span> <span class="pre">name:</span> <span class="pre">str,</span> <span class="pre">value:</span> <span class="pre">Any)</span></code></p></li>
+<li><p>Constraint attribute: <code class="docutils literal notranslate"><span class="pre">model.get_constraint_raw_attribute(constraint,</span> <span class="pre">name:</span> <span class="pre">str)</span></code> and <code class="docutils literal notranslate"><span class="pre">model.set_constraint_raw_attribute(constraint,</span> <span class="pre">name:</span> <span class="pre">str,</span> <span class="pre">value:</span> <span class="pre">Any)</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="copt.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">COPT</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="common_model_interface.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Common Model Interface</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Yue Yang
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Gurobi</a><ul>
+<li><a class="reference internal" href="#initial-setup">Initial setup</a></li>
+<li><a class="reference internal" href="#the-capability-of-gurobi-model">The capability of <code class="docutils literal notranslate"><span class="pre">gurobi.Model</span></code></a><ul>
+<li><a class="reference internal" href="#supported-constraints">Supported constraints</a></li>
+<li><a class="reference internal" href="#supported-model-attribute">Supported <span class="xref myst">model attribute</span></a></li>
+<li><a class="reference internal" href="#supported-variable-attribute">Supported <span class="xref myst">variable attribute</span></a></li>
+<li><a class="reference internal" href="#supported-constraint-attribute">Supported <span class="xref myst">constraint attribute</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#solver-specific-operations">Solver-specific operations</a><ul>
+<li><a class="reference internal" href="#parameter">Parameter</a></li>
+<li><a class="reference internal" href="#attribute">Attribute</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

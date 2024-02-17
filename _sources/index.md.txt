@@ -72,6 +72,10 @@ constraint.md
 objective.md
 container.md
 common_model_interface.md
+gurobi.md
+copt.md
+mosek.md
+highs.md
 ```
 
 ```{toctree}

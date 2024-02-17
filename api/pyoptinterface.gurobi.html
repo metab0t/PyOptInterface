@@ -165,6 +165,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gurobi.html">Gurobi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../copt.html">COPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mosek.html">Mosek</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../highs.html">HiGHS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul class="current">
@@ -286,6 +290,11 @@
 <span class="sig-name descname"><span class="pre">get_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface._src.attributes.ConstraintAttribute"><span class="pre">ConstraintAttribute</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_constraint_attribute" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_constraint_raw_attribute">
+<span class="sig-name descname"><span class="pre">get_constraint_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_constraint_raw_attribute_char">
 <span class="sig-name descname"><span class="pre">get_constraint_raw_attribute_char</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_char" title="Link to this definition">#</a></dt>
@@ -309,6 +318,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_model_attribute">
 <span class="sig-name descname"><span class="pre">get_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface._src.attributes.ModelAttribute"><span class="pre">ModelAttribute</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_model_attribute" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_model_raw_attribute">
+<span class="sig-name descname"><span class="pre">get_model_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_model_raw_attribute" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -386,6 +400,11 @@
 <span class="sig-name descname"><span class="pre">get_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface._src.attributes.VariableAttribute"><span class="pre">VariableAttribute</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_variable_attribute" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_variable_raw_attribute">
+<span class="sig-name descname"><span class="pre">get_variable_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.get_variable_raw_attribute_char">
 <span class="sig-name descname"><span class="pre">get_variable_raw_attribute_char</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute_char" title="Link to this definition">#</a></dt>
@@ -461,6 +480,11 @@
 <span class="sig-name descname"><span class="pre">set_constraint_name</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_constraint_name" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_constraint_raw_attribute">
+<span class="sig-name descname"><span class="pre">set_constraint_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_constraint_raw_attribute_char">
 <span class="sig-name descname"><span class="pre">set_constraint_raw_attribute_char</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_char" title="Link to this definition">#</a></dt>
@@ -484,6 +508,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_model_attribute">
 <span class="sig-name descname"><span class="pre">set_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface._src.attributes.ModelAttribute"><span class="pre">ModelAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_model_attribute" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_model_raw_attribute">
+<span class="sig-name descname"><span class="pre">set_model_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_model_raw_attribute" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -549,6 +578,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_variable_name">
 <span class="sig-name descname"><span class="pre">set_variable_name</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_variable_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_variable_raw_attribute">
+<span class="sig-name descname"><span class="pre">set_variable_raw_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_variable_raw_attribute" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -673,11 +707,13 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.delete_variable"><code class="docutils literal notranslate"><span class="pre">Model.delete_variable</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.delete_variables"><code class="docutils literal notranslate"><span class="pre">Model.delete_variables</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_char"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_raw_attribute_char</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_raw_attribute_int</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_constraint_raw_attribute_string"><code class="docutils literal notranslate"><span class="pre">Model.get_constraint_raw_attribute_string</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_model_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_model_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_model_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_model_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_model_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.get_model_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_model_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.get_model_raw_attribute_int</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_model_raw_attribute_list_double"><code class="docutils literal notranslate"><span class="pre">Model.get_model_raw_attribute_list_double</span></code></a></li>
@@ -693,6 +729,7 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_raw_parameter_string"><code class="docutils literal notranslate"><span class="pre">Model.get_raw_parameter_string</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_value"><code class="docutils literal notranslate"><span class="pre">Model.get_value</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_variable_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_variable_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.get_variable_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute_char"><code class="docutils literal notranslate"><span class="pre">Model.get_variable_raw_attribute_char</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.get_variable_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.get_variable_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.get_variable_raw_attribute_int</span></code></a></li>
@@ -708,11 +745,13 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.raw_parameter_type"><code class="docutils literal notranslate"><span class="pre">Model.raw_parameter_type</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_name"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_name</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_char"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute_char</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute_int</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute_string"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute_string</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_model_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_model_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_model_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_model_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_model_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.set_model_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_model_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.set_model_raw_attribute_int</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_model_raw_attribute_string"><code class="docutils literal notranslate"><span class="pre">Model.set_model_raw_attribute_string</span></code></a></li>
@@ -726,6 +765,7 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_raw_parameter_string"><code class="docutils literal notranslate"><span class="pre">Model.set_raw_parameter_string</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_name"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_name</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_raw_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_raw_attribute_char"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_raw_attribute_char</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_raw_attribute_double"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_raw_attribute_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_variable_raw_attribute_int"><code class="docutils literal notranslate"><span class="pre">Model.set_variable_raw_attribute_int</span></code></a></li>
