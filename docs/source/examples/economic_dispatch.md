@@ -2,8 +2,6 @@
 file_format: mystnb
 kernelspec:
   name: python3
-otherkey1: val1
-otherkey2: val2
 ---
 # Economic dispatch
 
