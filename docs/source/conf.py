@@ -14,11 +14,17 @@ author = "Yue Yang"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx_copybutton",
     "sphinx.ext.githubpages",
+    "sphinx_copybutton",
+    "myst_nb"
 ]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.ipynb': 'myst-nb',
+    '.md': 'myst-nb',
+}
 
 myst_enable_extensions = ["colon_fence", "amsmath", "dollarmath", "fieldlist"]
 

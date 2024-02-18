@@ -1,4 +1,6 @@
 sphinx
 myst-parser
+myst-nb
 sphinx-copybutton
 furo
+numpy
