@@ -10,6 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -170,6 +171,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../highs.html">HiGHS</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/economic_dispatch.html">Economic dispatch</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="pyoptinterface.html">pyoptinterface package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -218,10 +223,15 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Env">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.gurobi.</span></span><span class="sig-name descname"><span class="pre">Env</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Env" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RawEnv</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Env.raw_parameter_type">
 <span class="sig-name descname"><span class="pre">raw_parameter_type</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Env.raw_parameter_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Env.set_raw_parameter">
+<span class="sig-name descname"><span class="pre">set_raw_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Env.set_raw_parameter" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -692,6 +702,7 @@
 <li><a class="reference internal" href="#">pyoptinterface.gurobi package</a><ul>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Env"><code class="docutils literal notranslate"><span class="pre">Env</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Env.raw_parameter_type"><code class="docutils literal notranslate"><span class="pre">Env.raw_parameter_type</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Env.set_raw_parameter"><code class="docutils literal notranslate"><span class="pre">Env.set_raw_parameter()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Env.set_raw_parameter_double"><code class="docutils literal notranslate"><span class="pre">Env.set_raw_parameter_double</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Env.set_raw_parameter_int"><code class="docutils literal notranslate"><span class="pre">Env.set_raw_parameter_int</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Env.set_raw_parameter_string"><code class="docutils literal notranslate"><span class="pre">Env.set_raw_parameter_string</span></code></a></li>

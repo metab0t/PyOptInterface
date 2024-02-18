@@ -10,6 +10,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -170,6 +171,10 @@
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -238,8 +243,8 @@
 </div>
 <p>For example, you can set the parameter of the <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object to choose the licensing behavior.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter_string</span><span class="p">(</span><span class="s2">&quot;ComputeServer&quot;</span><span class="p">,</span> <span class="s2">&quot;myserver1:32123&quot;</span><span class="p">)</span>
-<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter_string</span><span class="p">(</span><span class="s2">&quot;ServerPassword&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;ComputeServer&quot;</span><span class="p">,</span> <span class="s2">&quot;myserver1:32123&quot;</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;ServerPassword&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)</span>
 <span class="n">env</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>

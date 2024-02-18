@@ -29,8 +29,8 @@ For example, you can set the parameter of the `gurobi.Env` object to choose the 
 
 ```python
 env = gurobi.Env(empty=True)
-env.set_raw_parameter_string("ComputeServer", "myserver1:32123")
-env.set_raw_parameter_string("ServerPassword", "pass")
+env.set_raw_parameter("ComputeServer", "myserver1:32123")
+env.set_raw_parameter("ServerPassword", "pass")
 env.start()
 
 model = gurobi.Model(env)

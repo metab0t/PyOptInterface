@@ -62,7 +62,6 @@ It currently supports the following optimizers:
 :maxdepth: 2
 :titlesonly:
 :caption: Usage Guide
-:glob:
 
 getting_started.md
 model.md
@@ -76,6 +75,14 @@ gurobi.md
 copt.md
 mosek.md
 highs.md
+```
+
+```{toctree}
+:maxdepth: 2
+:titlesonly:
+:caption: Examples
+
+examples/economic_dispatch.md
 ```
 
 ```{toctree}
