@@ -53,7 +53,7 @@ runs:
       name: Download Installers
       run: |
         curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.0.6/win64/CardinalOptimizer-7.0.6-win64.zip
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.0/win64/CardinalOptimizer-7.1.0-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.1.22/moseksetupwin64x86.msi
 
     - name: Setup Gurobi Installation
@@ -86,10 +86,10 @@ runs:
       run: |
         # unzip with 7zip
         7z x D:\installers\copt.zip -oD:\
-        ls D:\copt70
+        ls D:\copt71
         # set environment variables
-        echo "COPT_HOME=D:\copt70" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\copt70\bin" >> $env:GITHUB_ENV
+        echo "COPT_HOME=D:\copt71" >> $env:GITHUB_ENV
+        echo "PATH=$env:PATH;D:\copt71\bin" >> $env:GITHUB_ENV
         echo $env:COPT_HOME
 
         # setup license using secrets

@@ -42,7 +42,7 @@ runs:
       name: Download Installers
       run: |
         curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.0.6/linux64/CardinalOptimizer-7.0.6-lnx64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.0/linux64/CardinalOptimizer-7.1.0-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.1.22/mosektoolslinux64x86.tar.bz2
 
     - name: Setup Gurobi Installation
@@ -74,9 +74,9 @@ runs:
         COPT_CLIENT_INI: ${{ inputs.COPT_CLIENT_INI }}
       run: |
         tar xfz ~/installers/copt.tar.gz -C ~/
-        ls ~/copt70
+        ls ~/copt71
         # set environment variables
-        export COPT_HOME="${HOME}/copt70"
+        export COPT_HOME="${HOME}/copt71"
         echo "COPT_HOME=${COPT_HOME}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${COPT_HOME}/bin" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${COPT_HOME}/lib" >> $GITHUB_ENV
