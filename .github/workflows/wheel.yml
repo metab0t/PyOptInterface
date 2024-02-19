@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Publish wheels to PyPI'
+        description: 'Publish wheels to PyPI: (testpypi/pypi/none)'
         required: false
-        type: boolean
-        default: false
+        type: choice
+        options:
+          - testpypi
+          - pypi
+          - none
+        default: none
+          
 
 jobs:
   build_wheels:
@@ -74,5 +79,33 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ runner.os }}
           path: ./wheelhouse/*.whl
+
+  publish-to-testpypi:
+    name: Publish Python wheels to TestPyPI
+    needs:
+    - build_wheels
+    runs-on: ubuntu-latest
+    if: github.event.inputs.publish == 'testpypi'
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pyoptinterface
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        pattern: cibw-wheels-*
+        merge-multiple: true
+        path: dist/
+    - name: List all the dists
+      run: ls -l dist/
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
