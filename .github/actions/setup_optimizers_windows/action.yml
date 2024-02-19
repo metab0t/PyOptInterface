@@ -132,7 +132,7 @@ runs:
         workflow: build.yml
         repo: metab0t/highs_autobuild
         path: D:\highs
-        name: highs-artifact-windows-latest
+        name: highs-artifact-Windows-X64
 
     - name: Setup HiGHS Installation
       shell: pwsh
