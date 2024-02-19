@@ -181,6 +181,7 @@ Create a new expression by summing up a list of values.
 
 :param values: iterator of values
 :return: the handle of the new expression
+:rtype: pyoptinterface.ExprBuilder
 ```
 
 ```{py:function} quicksum_f(values, f)
@@ -190,6 +191,7 @@ Create a new expression by summing up a list of values after applying a function
 :param values: iterator of values
 :param f: the function to apply to each value
 :return: the handle of the new expression
+:rtype: pyoptinterface.ExprBuilder
 ```
 
 We notice that `poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x({i},{j})"))` is a frequently used pattern to create a `tupledict` of variables, so we provide a convenient way to create a `tupledict` of variables by calling [`model.add_variables`](#model.add_variables):
