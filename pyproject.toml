@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyoptinterface"
-version = "0.0.1"
+version = "0.0.1.dev0"
 description = "Python interface to multiple optimization solvers"
 readme = "README.md"
 license = { file = "LICENSE.md" }
