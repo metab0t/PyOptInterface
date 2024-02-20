@@ -180,4 +180,4 @@ runs:
     - name: Test HiGHS
       shell: bash
       run: |
-        highs --version
+        DYLD_LIBRARY_PATH=${HiGHS_HOME}/lib highs --version
