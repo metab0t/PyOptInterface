@@ -188,7 +188,9 @@ class GurobiModel
 	};
 	std::uint64_t m_update_flag = 0;
 	void _update_for_information();
+	void _update_for_variable_index();
 	void _update_for_constraint_index(ConstraintType type);
+
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;

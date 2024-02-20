@@ -654,6 +654,7 @@ std::string GurobiModel::get_variable_raw_attribute_string(const VariableIndex &
 
 int GurobiModel::_variable_index(const VariableIndex &variable)
 {
+	_update_for_variable_index();
 	return m_variable_index.get_index(variable.index);
 }
 
@@ -858,6 +859,14 @@ void GurobiModel::check_error(int error)
 void GurobiModel::_update_for_information()
 {
 	if (m_update_flag)
+	{
+		update();
+	}
+}
+
+void GurobiModel::_update_for_variable_index()
+{
+	if (m_update_flag & m_variable_deletion)
 	{
 		update();
 	}
