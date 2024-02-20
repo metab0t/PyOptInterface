@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-12, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +44,17 @@ jobs:
           MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_LICENSE: false
+
+      - name: Set up optimizers on macOS
+        uses: ./.github/actions/setup_optimizers_macos
+        if: runner.os == 'macOS'
+        with:
+          GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
+          COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
+          MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_LICENSE: false
+          ARCH: ${{ runner.arch }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
@@ -79,7 +90,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ runner.os }}
+          name: cibw-wheels-${{ runner.os }}-${{ runner.arch }}
           path: ./wheelhouse/*.whl
 
   publish-to-testpypi:
