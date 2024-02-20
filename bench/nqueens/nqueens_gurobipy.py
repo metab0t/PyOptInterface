@@ -1,5 +1,6 @@
 from gurobipy import *
-import os, time
+import os
+import time
 
 
 def solve_nqueens(n):
@@ -46,5 +47,6 @@ def main(Ns=range(800, 2001, 400)):
         with open(dir + "/benchmarks.csv", "a") as io:
             io.write(f"{content}\n")
     return
+
 
 main()

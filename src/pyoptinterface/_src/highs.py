@@ -1,6 +1,5 @@
-import os, platform
-import time
-from typing import Optional
+import os
+import platform
 
 if platform.system() == "Windows":
     highs_home = os.environ.get("HiGHS_HOME", None)
@@ -21,7 +20,7 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType, VariableIndex, ObjectiveSense
+from .core_ext import ConstraintType, VariableIndex
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,

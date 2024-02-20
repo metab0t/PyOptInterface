@@ -17,13 +17,13 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
-    "myst_nb"
+    "myst_nb",
 ]
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.ipynb': 'myst-nb',
-    '.md': 'myst-nb',
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".md": "myst-nb",
 }
 
 myst_enable_extensions = ["colon_fence", "amsmath", "dollarmath", "fieldlist"]

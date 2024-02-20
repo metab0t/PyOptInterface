@@ -1,6 +1,7 @@
 # try to load DLL of gurobi in${GUROBI_HOME}/bin
 # only on windows
-import os, platform
+import os
+import platform
 
 if platform.system() == "Windows":
     gurobi_home = os.environ.get("GUROBI_HOME", None)
@@ -384,6 +385,7 @@ constraint_attribute_set_func_map = {
     ),
 }
 
+
 class Env(RawEnv):
     def set_raw_parameter(self, param_name: str, value):
         param_type = gurobi_raw_type_map[self.raw_parameter_type(param_name)]
@@ -406,7 +408,9 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
 
-        self.add_second_order_cone_constraint = bridge_soc_quadratic_constraint.__get__(self)
+        self.add_second_order_cone_constraint = bridge_soc_quadratic_constraint.__get__(
+            self
+        )
 
         self.add_variables = make_nd_variable.__get__(self)
 

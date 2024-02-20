@@ -1,4 +1,5 @@
-import os, platform
+import os
+import platform
 from typing import Optional
 
 if platform.system() == "Windows":
@@ -21,7 +22,7 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType, VariableIndex, ObjectiveSense
+from .core_ext import ConstraintType
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,

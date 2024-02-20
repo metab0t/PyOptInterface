@@ -1,7 +1,7 @@
 import gurobipy as gp
 import coptpy as cp
 import pyoptinterface as poi
-from pyoptinterface import gurobi, copt
+from pyoptinterface import copt
 
 
 def bench_poi_base(N):

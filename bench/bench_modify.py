@@ -1,10 +1,8 @@
 import pyoptinterface as poi
 from pyoptinterface import gurobi, copt
 
-from pyomo.common.timing import TicTocTimer
 
 import gurobipy as gp
-from gurobipy import GRB
 import coptpy as cp
 
 import time

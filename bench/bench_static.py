@@ -181,7 +181,7 @@ timer = TicTocTimer()
 tests = [
     "gurobi",
     "copt",
-    #"mosek",
+    # "mosek",
 ]
 
 if "gurobi" in tests:

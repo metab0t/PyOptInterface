@@ -1,6 +1,5 @@
-import os, platform
-import time
-from typing import Optional
+import os
+import platform
 
 if platform.system() == "Windows":
     copt_home = os.environ.get("COPT_HOME", None)
@@ -21,7 +20,7 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType, VariableIndex, ObjectiveSense
+from .core_ext import ConstraintType, VariableIndex, ObjectiveSense
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,

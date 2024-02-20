@@ -1,9 +1,7 @@
-from .core_ext import ExprBuilder, VariableIndex
-from .tupledict import make_tupledict, flatten_tuple, tupledict
+from .core_ext import ExprBuilder
+from .tupledict import make_tupledict
 
 from collections.abc import Collection
-import math
-from itertools import product
 
 
 def make_nd_variable(
