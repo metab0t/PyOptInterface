@@ -60,8 +60,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.5
         env:
           # Select wheels
-          CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64"
+          CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
           CIBW_SKIP: "cp36-* cp37-* pp*"
+          CIBW_ARCHS: "native"
           # use manylinux2014
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           # setup some environment variables for GUROBI_HOME, MOSEK_HOME, etc.
