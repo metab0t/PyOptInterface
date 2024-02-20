@@ -858,7 +858,6 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 {
 	MSKboundkeye bound_type_old, bound_key;
 	MSKrealt lb_old, ub_old;
-	bool needs_reset = false;
 	auto column = _checked_variable_index(variable);
 	auto error = MSK_getvarbound(m_model.get(), column, &bound_type_old, &lb_old, &ub_old);
 	check_error(error);
@@ -867,33 +866,15 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 	{
 	case MSK_BK_FR:
 		bound_key = MSK_BK_LO;
-		needs_reset = true;
 		break;
 	case MSK_BK_LO:
-		if (lb_old < lb)
-		{
-			needs_reset = false;
-		}
-		else
-		{
-			bound_key = MSK_BK_LO;
-			needs_reset = true;
-		}
+		bound_key = MSK_BK_LO;
 		break;
 	case MSK_BK_UP:
 		bound_key = MSK_BK_RA;
-		needs_reset = true;
 		break;
 	case MSK_BK_RA:
-		if (lb_old < lb)
-		{
-			needs_reset = false;
-		}
-		else
-		{
-			bound_key = MSK_BK_RA;
-			needs_reset = true;
-		}
+		bound_key = MSK_BK_RA;
 		break;
 	case MSK_BK_FX:
 		throw std::runtime_error("Cannot set lower bound for fixed variable");
@@ -901,18 +882,14 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 		throw std::runtime_error("Unknown bound type");
 	}
 
-	if (needs_reset)
-	{
-		error = MSK_putvarbound(m_model.get(), column, bound_key, lb, ub_old);
-		check_error(error);
-	}
+	error = MSK_putvarbound(m_model.get(), column, bound_key, lb, ub_old);
+	check_error(error);
 }
 
 void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double ub)
 {
 	MSKboundkeye bound_type_old, bound_key;
 	MSKrealt lb_old, ub_old;
-	bool needs_reset = false;
 	auto column = _checked_variable_index(variable);
 	auto error = MSK_getvarbound(m_model.get(), column, &bound_type_old, &lb_old, &ub_old);
 	check_error(error);
@@ -921,33 +898,15 @@ void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double 
 	{
 	case MSK_BK_FR:
 		bound_key = MSK_BK_UP;
-		needs_reset = true;
 		break;
 	case MSK_BK_UP:
-		if (ub_old > ub)
-		{
-			needs_reset = false;
-		}
-		else
-		{
-			bound_key = MSK_BK_UP;
-			needs_reset = true;
-		}
+		bound_key = MSK_BK_UP;
 		break;
 	case MSK_BK_LO:
 		bound_key = MSK_BK_RA;
-		needs_reset = true;
 		break;
 	case MSK_BK_RA:
-		if (ub_old > ub)
-		{
-			needs_reset = false;
-		}
-		else
-		{
-			bound_key = MSK_BK_RA;
-			needs_reset = true;
-		}
+		bound_key = MSK_BK_RA;
 		break;
 	case MSK_BK_FX:
 		throw std::runtime_error("Cannot set upper bound for fixed variable");
@@ -955,11 +914,8 @@ void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double 
 		throw std::runtime_error("Unknown bound type");
 	}
 
-	if (needs_reset)
-	{
-		error = MSK_putvarbound(m_model.get(), column, bound_key, lb_old, ub);
-		check_error(error);
-	}
+	error = MSK_putvarbound(m_model.get(), column, bound_key, lb_old, ub);
+	check_error(error);
 }
 
 void MOSEKModel::set_variable_primal(const VariableIndex &variable, double primal)

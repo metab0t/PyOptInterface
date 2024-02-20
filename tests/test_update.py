@@ -3,12 +3,8 @@ from pytest import approx
 import pytest
 
 
-def test_gurobi_lazyupdate(model_interface):
+def test_update(model_interface):
     model = model_interface
-
-    name = model.get_model_attribute(poi.ModelAttribute.SolverName)
-    if name.lower() != "gurobi":
-        pytest.skip("This test is only for Gurobi")
 
     x = model.add_variables(range(3), lb=1.0, ub=2.0)
 
