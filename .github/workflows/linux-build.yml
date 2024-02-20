@@ -64,5 +64,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pyoptinterface-wheel-linux-${{ matrix.python-version }}
+          name: pyoptinterface-wheel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.python-version }}
           path: dist/

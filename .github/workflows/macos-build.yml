@@ -1,4 +1,4 @@
-name: windows-build
+name: macos-build
 
 on:
     pull_request:
@@ -10,16 +10,14 @@ on:
 
 jobs:
 
-  windows_build:
-    runs-on: windows-latest
-
-    # Only allow one build at a time otherwise we can run out of licenses
-    concurrency:
-      group: windows_build
+  macos_build:
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: true
       matrix:
+        os: [macos-latest]
+        # python-version: ["3.9", "3.10", "3.11", "3.12"]
         python-version: ["3.11"]
 
     env:
@@ -32,13 +30,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - uses: ./.github/actions/setup_optimizers_windows
+      - uses: ./.github/actions/setup_optimizers_macos
         with:
           GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
           COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
           MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHECK_LICENSE: true
+          CHECK_LICENSE: false
+          ARCH: ${{ runner.arch }}
 
       - name: Install python deps
         run: |
@@ -51,10 +50,6 @@ jobs:
           python -m pip install --no-build-isolation -v .
           python -c "import pyoptinterface as poi; print(dir(poi))"
           python -m pip wheel -w dist --no-build-isolation .
-
-      - name: Test
-        run: |
-          python -m pytest tests -v
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
