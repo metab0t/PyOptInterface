@@ -170,16 +170,25 @@ class GurobiModel
 	MonotoneIndexer<int> m_sos_constraint_index;
 
 	/* flag to indicate whether the model needs update */
-	// new variables are created
-	bool m_variable_update = false;
-	// new constraints are created
-	bool m_constraint_update = false;
-	// set new attribute value
-	bool m_attribute_update = false;
-	// variable or constraint is deleted
-	bool m_deletion_update = false;
-	void _update_all_if_necessary();
-	void _update_constraint_if_necessary(ConstraintType type);
+	enum : std::uint64_t
+	{
+		m_variable_creation = 1,
+		m_variable_deletion = 1 << 1,
+		m_linear_constraint_creation = 1 << 2,
+		m_linear_constraint_deletion = 1 << 3,
+		m_quadratic_constraint_creation = 1 << 4,
+		m_quadratic_constraint_deletion = 1 << 5,
+		m_sos_constraint_creation = 1 << 6,
+		m_sos_constraint_deletion = 1 << 7,
+		m_general_constraint_creation = 1 << 8,
+		m_general_constraint_deletion = 1 << 9,
+		m_objective_update = 1 << 10,
+		m_attribute_update = 1 << 11,
+		m_constraint_coefficient_update = 1 << 12,
+	};
+	std::uint64_t m_update_flag = 0;
+	void _update_for_information();
+	void _update_for_constraint_index(ConstraintType type);
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;
