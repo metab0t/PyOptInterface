@@ -7,17 +7,20 @@ name = "pyoptinterface"
 version = "0.0.1.dev0"
 description = "Python interface to multiple optimization solvers"
 readme = "README.md"
-license = { file = "LICENSE.md" }
 requires-python = ">=3.8"
-authors = [{ name = "Yue Yang", email = "metab0t@outlook.com" },
+authors = [{ name = "Yue Yang", email = "metab0t@outlook.com" }]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering',
+    'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
 ]
-classifiers = []
 
 [project.urls]
 Homepage = "https://github.com/metab0t/pyoptinterface"
 
 [project.optional-dependencies]
-doc = ["sphinx", "myst-parser", "sphinx-copybutton", "furo"]
+doc = ["sphinx", "myst-parser", "myst-nb", "sphinx-copybutton", "furo", "numpy"]
 test = ["pytest", "numpy"]
 
 [tool.scikit-build]
@@ -27,6 +30,6 @@ cmake.build-type = "Release"
 
 [tool.scikit-build.cmake.define]
 ENABLE_GUROBI_CXX = "OFF"
-PYTHON_VERSION = {env="PYTHON_VERSION", default="3.8"}
+PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.8" }
 CMAKE_FIND_DEBUG_MODE = "OFF"
 ENABLE_TEST_MAIN = "OFF"

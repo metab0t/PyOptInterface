@@ -21,7 +21,7 @@ model = gurobi.Model()
 x = model.add_variable(lb=0, ub=1, domain=poi.VariableDomain.Continuous, name="x")
 y = model.add_variable(lb=0, ub=1, domain=poi.VariableDomain.Integer, name="y")
 
-con = model.add_linear_constraint(x+y, poi.ConstraintSense.GreaterEqual, 1.2, name="con")
+con = model.add_linear_constraint(x+y, poi.Geq, 1.2, name="con")
 
 obj = x*x + y*y
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
@@ -46,7 +46,5 @@ It uses [nanobind](https://github.com/wjakob/nanobind), [fmtlib](https://github.
 
 The design of PyOptInterface is inspired by [JuMP.jl](https://jump.dev).
 
-Some solver-related code is adapted from corresponding solver interface package in `JuMP.jl` 
+Some solver-related code in `src` folder is adapted from corresponding solver interface package in `JuMP.jl` 
 ecosystem, which is licensed under MIT License.
-
-The code in `bench\jump_bench` is adapted from benchmark suite of paper of `JuMP.jl`.
