@@ -8,7 +8,7 @@ from pyoptinterface import copt
 model = copt.Model()
 ```
 
-You need to install COPT separately from the [COPT website](https://shanshu.ai/copt). After installing the software, you need to ensure the shared library of COPT is in the system path.
+You need to install COPT separately from the [COPT release page](https://github.com/COPT-Public/COPT-Release). After installing the software, you need to ensure the shared library of COPT is in the system path.
 
 - Windows: The `COPT_HOME` environment must be set to the COPT installation directory (like `C:\Program Files\copt71`). The COPT shared library `copt.dll` is located in the `bin` directory of the installation directory. The COPT installer usually sets this environment variable automatically, but you can also set it manually.
 
