@@ -1,6 +1,5 @@
 import pyoptinterface as poi
 from pytest import approx
-import pytest
 
 
 def test_update(model_interface):
