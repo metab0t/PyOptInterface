@@ -11,6 +11,7 @@ build/
 .vscode/
 
 bench/local
+debug/
 
 docs/jupyter_execute
 docs/build
