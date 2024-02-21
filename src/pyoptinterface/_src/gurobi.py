@@ -12,7 +12,7 @@ try:
     from .gurobi_model_ext import RawModel, RawEnv, GRB
 except Exception as e:
     raise ImportError(
-        f"Failed to import gurobi_model_ext. Please check if GUROBI_HOME is set correctly. Error: {e}"
+        f"Failed to import gurobi_model_ext. Please ensure that the dynamic library of Gurobi is loadable. Error: {e}"
     )
 from .attributes import (
     VariableAttribute,

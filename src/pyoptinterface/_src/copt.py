@@ -10,7 +10,7 @@ try:
     from .copt_model_ext import RawModel, Env, COPT
 except Exception as e:
     raise ImportError(
-        f"Failed to import copt_model_ext. Please check if COPT_HOME is set correctly. Error: {e}"
+        f"Failed to import copt_model_ext. Please ensure that the dynamic library of COPT is loadable. Error: {e}"
     )
 
 from .attributes import (

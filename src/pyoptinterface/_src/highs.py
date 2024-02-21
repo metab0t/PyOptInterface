@@ -10,7 +10,7 @@ try:
     from .highs_model_ext import RawModel, HighsSolutionStatus, Enum
 except Exception as e:
     raise ImportError(
-        f"Failed to import highs_model_ext. Please check if HiGHS_HOME is set correctly. Error: {e}"
+        f"Failed to import highs_model_ext. Please ensure that the dynamic library of HiGHS is loadable. Error: {e}"
     )
 
 from .attributes import (

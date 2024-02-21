@@ -12,7 +12,7 @@ try:
     from .mosek_model_ext import RawModel, Env, Enum
 except Exception as e:
     raise ImportError(
-        f"Failed to import mosek_model_ext. Please check if MOSEK_10_1_BINDIR is set correctly. Error: {e}"
+        f"Failed to import mosek_model_ext. Please ensure that the dynamic library of Mosek is loadable. Error: {e}"
     )
 
 from .attributes import (
