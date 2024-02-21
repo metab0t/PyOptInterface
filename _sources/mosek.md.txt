@@ -8,14 +8,7 @@ from pyoptinterface import mosek
 model = mosek.Model()
 ```
 
-You need to install Mosek separately from the [Mosek website](https://mosek.com). After installing the software, you need to ensure the shared library of Mosek is in the system path.
-
-- Windows: The `MOSEK_10_1_BINDIR` environment must be set to the directory of binary files in Mosek installation directory (like `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin`). The Mosek shared library `mosek64_10_1.dll` is located in the `MOSEK_10_1_BINDIR` directory. The Mosek installer usually sets this environment variable automatically, but you can also set it manually.
-
-- Linux: Add the Mosek shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libmosek64.so` is located in the `bin` directory of the installation directory.
-```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/mosek/10.1/tools/platform/linux64x86/bin
-```
+You need to follow the instructions in [Getting Started](getting_started.md#mosek) to set up the optimizer correctly.
 
 If you want to manage the license of Mosek manually, you can create a `mosek.Env` object and pass it to the constructor of the `mosek.Model` object, otherwise we will initialize an implicit global `mosek.Env` object automatically and use it.
 

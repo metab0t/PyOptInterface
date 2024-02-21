@@ -8,15 +8,7 @@ from pyoptinterface import highs
 model = highs.Model()
 ```
 
-You need to install HiGHS separately from the [HiGHS website](https://ergo-code.github.io/HiGHS/stable/installation/#Install-HiGHS). The easiest way to install HiGHS is our [GitHub release page](https://github.com/metab0t/highs_autobuild/releases), download the zip file of your platform and extract it to a directory.
-
-After installing the software, you need to ensure the shared library of HiGHS is in the system path.
-
-- Windows: The `HiGHS_HOME` environment must be set to the directory of binary files in HiGHS installation directory (like `D:\highs`). The HiGHS shared library `highs.dll` is located in the `bin` directory under `HiGHS_HOME`.
-- Linux: Add the HiGHS shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libhighs.so` is located in the `lib` directory of the installation directory.
-```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/highs/lib
-```
+You need to follow the instructions in [Getting Started](getting_started.md#highs) to set up the optimizer correctly.
 
 ## The capability of `highs.Model`
 

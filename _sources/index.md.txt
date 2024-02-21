@@ -54,7 +54,7 @@ It currently supports the following problem types:
 It currently supports the following optimizers:
 - [Gurobi](https://www.gurobi.com/)(Commercial)
 - [COPT](https://shanshu.ai/copt)(Commercial)
-- [MOSEK](https://www.mosek.com/)(Commercial)
+- [Mosek](https://www.mosek.com/)(Commercial)
 - [HiGHS](https://www.highs.dev/)(Open source)
 
 ## Contents

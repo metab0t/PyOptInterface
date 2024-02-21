@@ -2,7 +2,7 @@
 
 ## Installation
 PyOptInterface has no dependencies other than Python itself. It can be installed via pip:
-```console
+```
 pip install pyoptinterface
 ```
 
@@ -11,7 +11,147 @@ After installation, you can import the package via:
 import pyoptinterface as poi
 ```
 
+PyOptInterface does not include any solvers. You need to install a solver separately. We will introduce how to setup the solvers to use with PyOptInterface.
+
+## Setup of optimizers
+### Gurobi
+Follow the `Full installation` part of the [Gurobi installation guide](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer) to install Gurobi and set your license.
+
+You can check if Gurobi is installed correctly:
+
+#### Windows:
+Run this command in `cmd` console
+```cmd
+> echo %GUROBI_HOME%
+C:\gurobi1100\win64
+```
+
+Or run this command in `powershell` console
+```powershell
+> $env:GUROBI_HOME
+C:\gurobi1100\win64
+```
+
+#### Linux and macOS
+Run this command in terminal and enter an interactive shell without error
+```bash
+gurobi_cl
+```
+
+### COPT
+Download the installer from the [COPT release page](https://github.com/COPT-Public/COPT-Release) and follw the [installation guide](https://guide.coap.online/copt/en-doc/install.html).
+
+You can check if COPT is installed correctly:
+
+#### Windows:
+Run this command in `cmd` console
+```cmd
+> echo %COPT_HOME%
+C:\Program Files\copt71
+```
+
+Or run this command in `powershell` console
+```powershell
+> $env:COPT_HOME
+C:\Program Files\copt71
+```
+
+#### Linux and macOS
+Run this command in terminal and enter an interactive shell without error
+```bash
+copt_cmd
+```
+
+### Mosek
+Download the installer from the [Mosek download page](https://www.mosek.com/downloads/) and follw the [installation guide](https://docs.mosek.com/latest/install/installation.html).
+
+You can check if Mosek is installed correctly:
+
+#### Windows:
+Run this command in `cmd` console
+```cmd
+> echo %MOSEK_10_1_BINDIR%
+C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
+```
+
+Or run this command in `powershell` console
+```powershell
+> $env:MOSEK_10_1_BINDIR
+C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
+```
+
+#### Linux and macOS
+Run this command in terminal to solve a simple problem without error
+```bash
+msktestlic
+```
+
+The output will end with
+```
+************************************
+A license was checked out correctly.
+************************************
+```
+
+### HiGHS
+HiGHS is an open-source solver, you can install it from source following the instructions [HiGHS website](https://ergo-code.github.io/HiGHS/stable/installation/#Install-HiGHS).
+
+We also provide pre-built HiGHS on our [GitHub release page](https://github.com/metab0t/highs_autobuild/releases), download the zip file of your platform and extract it to a directory.
+
+The directory of HiGHS should contain the following files:
+```
+<HiGHS_HOME>
+|-- bin
+|   |-- highs.dll (Windows)
+|   |-- highs.exe (Windows) or highs (Linux/macOS)
+|-- include
+|   |-- highs
+|       |-- Highs.h
+|       |-- ...
+|-- lib
+|   |-- highs.lib (Windows) or libhighs.so (Linux) or libhighs.dylib (macOS)
+|   |-- ...
+```
+
+#### Windows:
+You need to set the `HiGHS_HOME` environment to the directory of HiGHS installation directory (like `D:\highs`). The HiGHS shared library `highs.dll` is located in the `bin` directory under `HiGHS_HOME`.
+Optionally, you can add the `%HiGHS_HOME%\bin` directory to the system PATH.
+
+Run this command in `cmd` console to check
+```cmd
+> echo %HiGHS_HOME%
+D:\highs
+```
+
+Or run this command in `powershell` console
+```powershell
+> $env:HiGHS_HOME
+D:\highs
+```
+
+#### Linux
+Add the HiGHS shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libhighs.so` is located in the `lib` directory of the installation directory.
+
+Run this command in terminal
+```bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/highs/lib
+```
+
+You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+
+#### macOS
+Add the HiGHS shared library to the `DYLD_LIBRARY_PATH` environment variable. The shared library `libhighs.dylib` is located in the `lib` directory of the installation directory.
+
+Run this command in terminal
+```bash
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/highs/lib
+```
+
+You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+
+
 ## Let's build a simple model and solve it
+After setting up the solvers, we can build a simple model and solve it.
 As the first step, we will solve the following simple Quadratic Programming (QP) problem:
 
 ```{math}
@@ -22,14 +162,10 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
 
 First, we need to create a model object:
 
-:::{tip}
-You need to acquire a valid license of [supported solvers](#supported-optimizers) to use them. If you want to use another optimizer, you can replace `gurobi` with `copt` or `mosek`)
-:::
-
 ```python
 import pyoptinterface as poi
 from pyoptinterface import gurobi
-# from pyoptinterface import copt (if you want to use COPT)
+# from pyoptinterface import copt, highs, mosek (if you want to use other optimizers)
 
 model = gurobi.Model()
 ```

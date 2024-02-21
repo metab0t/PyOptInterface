@@ -223,17 +223,155 @@
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>PyOptInterface has no dependencies other than Python itself. It can be installed via pip:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install pyoptinterface</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span>
 </pre></div>
 </div>
 <p>After installation, you can import the package via:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 </pre></div>
 </div>
+<p>PyOptInterface does not include any solvers. You need to install a solver separately. We will introduce how to setup the solvers to use with PyOptInterface.</p>
+</section>
+<section id="setup-of-optimizers">
+<h2>Setup of optimizers<a class="headerlink" href="#setup-of-optimizers" title="Link to this heading">#</a></h2>
+<section id="gurobi">
+<h3>Gurobi<a class="headerlink" href="#gurobi" title="Link to this heading">#</a></h3>
+<p>Follow the <code class="docutils literal notranslate"><span class="pre">Full</span> <span class="pre">installation</span></code> part of the <a class="reference external" href="https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer">Gurobi installation guide</a> to install Gurobi and set your license.</p>
+<p>You can check if Gurobi is installed correctly:</p>
+<section id="windows">
+<h4>Windows:<a class="headerlink" href="#windows" title="Link to this heading">#</a></h4>
+<p>Run this command in <code class="docutils literal notranslate"><span class="pre">cmd</span></code> console</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>&gt; echo %GUROBI_HOME%
+C:\gurobi1100\win64
+</pre></div>
+</div>
+<p>Or run this command in <code class="docutils literal notranslate"><span class="pre">powershell</span></code> console</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">&gt;</span> <span class="nv">$env:GUROBI_HOME</span>
+<span class="n">C</span><span class="p">:\</span><span class="n">gurobi1100</span><span class="p">\</span><span class="n">win64</span>
+</pre></div>
+</div>
+</section>
+<section id="linux-and-macos">
+<h4>Linux and macOS<a class="headerlink" href="#linux-and-macos" title="Link to this heading">#</a></h4>
+<p>Run this command in terminal and enter an interactive shell without error</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gurobi_cl
+</pre></div>
+</div>
+</section>
+</section>
+<section id="copt">
+<h3>COPT<a class="headerlink" href="#copt" title="Link to this heading">#</a></h3>
+<p>Download the installer from the <a class="reference external" href="https://github.com/COPT-Public/COPT-Release">COPT release page</a> and follw the <a class="reference external" href="https://guide.coap.online/copt/en-doc/install.html">installation guide</a>.</p>
+<p>You can check if COPT is installed correctly:</p>
+<section id="id1">
+<h4>Windows:<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<p>Run this command in <code class="docutils literal notranslate"><span class="pre">cmd</span></code> console</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>&gt; echo %COPT_HOME%
+C:\Program Files\copt71
+</pre></div>
+</div>
+<p>Or run this command in <code class="docutils literal notranslate"><span class="pre">powershell</span></code> console</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">&gt;</span> <span class="nv">$env:COPT_HOME</span>
+<span class="n">C</span><span class="p">:\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">copt71</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Linux and macOS<a class="headerlink" href="#id2" title="Link to this heading">#</a></h4>
+<p>Run this command in terminal and enter an interactive shell without error</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>copt_cmd
+</pre></div>
+</div>
+</section>
+</section>
+<section id="mosek">
+<h3>Mosek<a class="headerlink" href="#mosek" title="Link to this heading">#</a></h3>
+<p>Download the installer from the <a class="reference external" href="https://www.mosek.com/downloads/">Mosek download page</a> and follw the <a class="reference external" href="https://docs.mosek.com/latest/install/installation.html">installation guide</a>.</p>
+<p>You can check if Mosek is installed correctly:</p>
+<section id="id3">
+<h4>Windows:<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<p>Run this command in <code class="docutils literal notranslate"><span class="pre">cmd</span></code> console</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>&gt; echo %MOSEK_10_1_BINDIR%
+C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
+</pre></div>
+</div>
+<p>Or run this command in <code class="docutils literal notranslate"><span class="pre">powershell</span></code> console</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">&gt;</span> <span class="nv">$env:MOSEK_10_1_BINDIR</span>
+<span class="n">C</span><span class="p">:\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Mosek</span><span class="p">\</span><span class="n">10</span><span class="p">.</span><span class="n">1</span><span class="p">\</span><span class="n">tools</span><span class="p">\</span><span class="n">platform</span><span class="p">\</span><span class="n">win64x86</span><span class="p">\</span><span class="n">bin</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h4>Linux and macOS<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<p>Run this command in terminal to solve a simple problem without error</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>msktestlic
+</pre></div>
+</div>
+<p>The output will end with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">************************************</span>
+<span class="n">A</span> <span class="n">license</span> <span class="n">was</span> <span class="n">checked</span> <span class="n">out</span> <span class="n">correctly</span><span class="o">.</span>
+<span class="o">************************************</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="highs">
+<h3>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">#</a></h3>
+<p>HiGHS is an open-source solver, you can install it from source following the instructions <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/installation/#Install-HiGHS">HiGHS website</a>.</p>
+<p>We also provide pre-built HiGHS on our <a class="reference external" href="https://github.com/metab0t/highs_autobuild/releases">GitHub release page</a>, download the zip file of your platform and extract it to a directory.</p>
+<p>The directory of HiGHS should contain the following files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">HiGHS_HOME</span><span class="o">&gt;</span>
+<span class="o">|--</span> <span class="nb">bin</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">highs</span><span class="o">.</span><span class="n">dll</span> <span class="p">(</span><span class="n">Windows</span><span class="p">)</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">highs</span><span class="o">.</span><span class="n">exe</span> <span class="p">(</span><span class="n">Windows</span><span class="p">)</span> <span class="ow">or</span> <span class="n">highs</span> <span class="p">(</span><span class="n">Linux</span><span class="o">/</span><span class="n">macOS</span><span class="p">)</span>
+<span class="o">|--</span> <span class="n">include</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">highs</span>
+<span class="o">|</span>       <span class="o">|--</span> <span class="n">Highs</span><span class="o">.</span><span class="n">h</span>
+<span class="o">|</span>       <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|--</span> <span class="n">lib</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">highs</span><span class="o">.</span><span class="n">lib</span> <span class="p">(</span><span class="n">Windows</span><span class="p">)</span> <span class="ow">or</span> <span class="n">libhighs</span><span class="o">.</span><span class="n">so</span> <span class="p">(</span><span class="n">Linux</span><span class="p">)</span> <span class="ow">or</span> <span class="n">libhighs</span><span class="o">.</span><span class="n">dylib</span> <span class="p">(</span><span class="n">macOS</span><span class="p">)</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+</pre></div>
+</div>
+<section id="id5">
+<h4>Windows:<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
+<p>You need to set the <code class="docutils literal notranslate"><span class="pre">HiGHS_HOME</span></code> environment to the directory of HiGHS installation directory (like <code class="docutils literal notranslate"><span class="pre">D:\highs</span></code>). The HiGHS shared library <code class="docutils literal notranslate"><span class="pre">highs.dll</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory under <code class="docutils literal notranslate"><span class="pre">HiGHS_HOME</span></code>.
+Optionally, you can add the <code class="docutils literal notranslate"><span class="pre">%HiGHS_HOME%\bin</span></code> directory to the system PATH.</p>
+<p>Run this command in <code class="docutils literal notranslate"><span class="pre">cmd</span></code> console to check</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>&gt; echo %HiGHS_HOME%
+D:\highs
+</pre></div>
+</div>
+<p>Or run this command in <code class="docutils literal notranslate"><span class="pre">powershell</span></code> console</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">&gt;</span> <span class="nv">$env:HiGHS_HOME</span>
+<span class="n">D</span><span class="p">:\</span><span class="n">highs</span>
+</pre></div>
+</div>
+</section>
+<section id="linux">
+<h4>Linux<a class="headerlink" href="#linux" title="Link to this heading">#</a></h4>
+<p>Add the HiGHS shared library to the <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> environment variable. The shared library <code class="docutils literal notranslate"><span class="pre">libhighs.so</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">lib</span></code> directory of the installation directory.</p>
+<p>Run this command in terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:/opt/highs/lib
+</pre></div>
+</div>
+<p>You can also add the above command to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code> file to make it permanent.</p>
+</section>
+<section id="macos">
+<h4>macOS<a class="headerlink" href="#macos" title="Link to this heading">#</a></h4>
+<p>Add the HiGHS shared library to the <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code> environment variable. The shared library <code class="docutils literal notranslate"><span class="pre">libhighs.dylib</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">lib</span></code> directory of the installation directory.</p>
+<p>Run this command in terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:/opt/highs/lib
+</pre></div>
+</div>
+<p>You can also add the above command to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code> file to make it permanent.</p>
+</section>
+</section>
 </section>
 <section id="let-s-build-a-simple-model-and-solve-it">
 <h2>Let’s build a simple model and solve it<a class="headerlink" href="#let-s-build-a-simple-model-and-solve-it" title="Link to this heading">#</a></h2>
-<p>As the first step, we will solve the following simple Quadratic Programming (QP) problem:</p>
+<p>After setting up the solvers, we can build a simple model and solve it.
+As the first step, we will solve the following simple Quadratic Programming (QP) problem:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\begin{split}\min \quad &amp; x^{2}_{1} + 2x^{2}_{2} \\
@@ -241,13 +379,9 @@
                \quad &amp; x_{1}, x_{2} \geq 0\end{split}\]</div>
 </div>
 <p>First, we need to create a model object:</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You need to acquire a valid license of <a class="reference internal" href="index.html#supported-optimizers"><span class="std std-ref">supported solvers</span></a> to use them. If you want to use another optimizer, you can replace <code class="docutils literal notranslate"><span class="pre">gurobi</span></code> with <code class="docutils literal notranslate"><span class="pre">copt</span></code> or <code class="docutils literal notranslate"><span class="pre">mosek</span></code>)</p>
-</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
-<span class="c1"># from pyoptinterface import copt (if you want to use COPT)</span>
+<span class="c1"># from pyoptinterface import copt, highs, mosek (if you want to use other optimizers)</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
@@ -371,6 +505,30 @@
             <ul>
 <li><a class="reference internal" href="#">Getting Started</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#setup-of-optimizers">Setup of optimizers</a><ul>
+<li><a class="reference internal" href="#gurobi">Gurobi</a><ul>
+<li><a class="reference internal" href="#windows">Windows:</a></li>
+<li><a class="reference internal" href="#linux-and-macos">Linux and macOS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#copt">COPT</a><ul>
+<li><a class="reference internal" href="#id1">Windows:</a></li>
+<li><a class="reference internal" href="#id2">Linux and macOS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mosek">Mosek</a><ul>
+<li><a class="reference internal" href="#id3">Windows:</a></li>
+<li><a class="reference internal" href="#id4">Linux and macOS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#highs">HiGHS</a><ul>
+<li><a class="reference internal" href="#id5">Windows:</a></li>
+<li><a class="reference internal" href="#linux">Linux</a></li>
+<li><a class="reference internal" href="#macos">macOS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#let-s-build-a-simple-model-and-solve-it">Let’s build a simple model and solve it</a></li>
 </ul>
 </li>

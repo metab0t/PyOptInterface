@@ -227,14 +227,7 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You need to install Gurobi separately from the <a class="reference external" href="https://www.gurobi.com/">Gurobi website</a>. After installing the software, you need to ensure the shared library of Gurobi is in the system path.</p>
-<ul class="simple">
-<li><p>Windows: The <code class="docutils literal notranslate"><span class="pre">GUROBI_HOME</span></code> environment must be set to the Gurobi installation directory (like <code class="docutils literal notranslate"><span class="pre">C:\gurobi1100\win64</span></code>). The Gurobi shared library <code class="docutils literal notranslate"><span class="pre">gurobi110.dll</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory of the installation directory. The Gurobi installer usually sets this environment variable automatically, but you can also set it manually.</p></li>
-<li><p>Linux: Add the Gurobi shared library to the <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> environment variable. The shared library <code class="docutils literal notranslate"><span class="pre">libgurobi110.so</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">lib</span></code> directory of the installation directory.</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:/opt/gurobi1100/linux64/lib
-</pre></div>
-</div>
+<p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#gurobi"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
 <p>If you want to manage the license of Gurobi manually, you can create a <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object and pass it to the constructor of the <code class="docutils literal notranslate"><span class="pre">gurobi.Model</span></code> object, otherwise we will initialize an implicit global <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object automatically and use it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
 

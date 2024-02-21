@@ -227,14 +227,7 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You need to install COPT separately from the <a class="reference external" href="https://github.com/COPT-Public/COPT-Release">COPT release page</a>. After installing the software, you need to ensure the shared library of COPT is in the system path.</p>
-<ul class="simple">
-<li><p>Windows: The <code class="docutils literal notranslate"><span class="pre">COPT_HOME</span></code> environment must be set to the COPT installation directory (like <code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\copt71</span></code>). The COPT shared library <code class="docutils literal notranslate"><span class="pre">copt.dll</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory of the installation directory. The COPT installer usually sets this environment variable automatically, but you can also set it manually.</p></li>
-<li><p>Linux: Add the COPT shared library to the <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> environment variable. The shared library <code class="docutils literal notranslate"><span class="pre">libcopt.so</span></code> is located in the <code class="docutils literal notranslate"><span class="pre">lib</span></code> directory of the installation directory.</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:/opt/copt71/lib
-</pre></div>
-</div>
+<p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#copt"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
 <p>If you want to manage the license of COPT manually, you can create a <code class="docutils literal notranslate"><span class="pre">copt.Env</span></code> object and pass it to the constructor of the <code class="docutils literal notranslate"><span class="pre">copt.Model</span></code> object, otherwise we will initialize an implicit global <code class="docutils literal notranslate"><span class="pre">copt.Env</span></code> object automatically and use it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
 
