@@ -92,9 +92,9 @@ runs:
         echo "PATH=$env:PATH;D:\copt71\bin" >> $env:GITHUB_ENV
         echo $env:COPT_HOME
 
-        # setup license using secrets
-        echo $env:COPT_CLIENT_INI > D:\client.ini
-        echo "COPT_LICENSE_DIR=D:\" >> $env:GITHUB_ENV
+        # Just use the size-limited license
+        # echo $env:COPT_CLIENT_INI > D:\client.ini
+        # echo "COPT_LICENSE_DIR=D:\" >> $env:GITHUB_ENV
     - name: Test COPT
       if: ${{ inputs.CHECK_LICENSE == 'true' }}
       shell: pwsh

@@ -103,9 +103,9 @@ runs:
         echo $COPT_HOME
         ls $COPT_HOME
 
-        # setup license using secrets
-        echo "$COPT_CLIENT_INI" > ~/client.ini
-        echo "COPT_LICENSE_DIR=${HOME}" >> $GITHUB_ENV
+        # Just use the size-limited license
+        # echo "$COPT_CLIENT_INI" > ~/client.ini
+        # echo "COPT_LICENSE_DIR=${HOME}" >> $GITHUB_ENV
     - name: Test COPT
       if: ${{ inputs.CHECK_LICENSE == 'true' }}
       shell: bash
