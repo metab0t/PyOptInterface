@@ -8,14 +8,7 @@ from pyoptinterface import gurobi
 model = gurobi.Model()
 ```
 
-You need to install Gurobi separately from the [Gurobi website](https://www.gurobi.com/). After installing the software, you need to ensure the shared library of Gurobi is in the system path.
-
-- Windows: The `GUROBI_HOME` environment must be set to the Gurobi installation directory (like `C:\gurobi1100\win64`). The Gurobi shared library `gurobi110.dll` is located in the `bin` directory of the installation directory. The Gurobi installer usually sets this environment variable automatically, but you can also set it manually.
-
-- Linux: Add the Gurobi shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libgurobi110.so` is located in the `lib` directory of the installation directory.
-```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/gurobi1100/linux64/lib
-```
+You need to follow the instructions in [Getting Started](getting_started.md#gurobi) to set up the optimizer correctly.
 
 If you want to manage the license of Gurobi manually, you can create a `gurobi.Env` object and pass it to the constructor of the `gurobi.Model` object, otherwise we will initialize an implicit global `gurobi.Env` object automatically and use it.
 

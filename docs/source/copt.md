@@ -8,14 +8,7 @@ from pyoptinterface import copt
 model = copt.Model()
 ```
 
-You need to install COPT separately from the [COPT release page](https://github.com/COPT-Public/COPT-Release). After installing the software, you need to ensure the shared library of COPT is in the system path.
-
-- Windows: The `COPT_HOME` environment must be set to the COPT installation directory (like `C:\Program Files\copt71`). The COPT shared library `copt.dll` is located in the `bin` directory of the installation directory. The COPT installer usually sets this environment variable automatically, but you can also set it manually.
-
-- Linux: Add the COPT shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libcopt.so` is located in the `lib` directory of the installation directory.
-```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/copt71/lib
-```
+You need to follow the instructions in [Getting Started](getting_started.md#copt) to set up the optimizer correctly.
 
 If you want to manage the license of COPT manually, you can create a `copt.Env` object and pass it to the constructor of the `copt.Model` object, otherwise we will initialize an implicit global `copt.Env` object automatically and use it.
 
