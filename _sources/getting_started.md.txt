@@ -14,6 +14,71 @@ import pyoptinterface as poi
 PyOptInterface does not include any solvers. You need to install a solver separately. We will introduce how to set up the solvers to use with PyOptInterface.
 
 ## Setup of optimizers
+
+The setup of optimizer aims to put the shared library of the optimizer in a loadable path so that PyOptInterface can load them correctly.
+
+On Windows, we use different environment variables to specify the installation directory of the optimizers.
+
+The table below shows the environment variables used by PyOptInterface on Windows:
+
+:::{list-table}
+:header-rows: 1
+
+*   - Optimizer
+    - Environment variable
+    - Typical value
+*   - Gurobi
+    - `GUROBI_HOME`
+    - `C:\gurobi1100\win64`
+*   - COPT
+    - `COPT_HOME`
+    - `C:\Program Files\copt71`
+*   - Mosek
+    - `MOSEK_10_1_BINDIR`
+    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin`
+*   - HiGHS
+    - `HiGHS_HOME`
+    - `D:\highs`
+
+:::
+
+On Linux, we use the `LD_LIBRARY_PATH` environment variable to specify the shared library path. On macOS, we use the `DYLD_LIBRARY_PATH` environment variable to specify the shared library path.
+
+For example, in order to make the shared library of HiGHS `libhighs.so` in path `/opt/highs/lib` loadable, you need to add the following line to your `.bashrc` or `.zshrc` file:
+
+- Linux: `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/highs/lib`
+- macOS: `export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/highs/lib`
+
+The table below shows the typical path of shared library on Linux and macOS:
+
+:::{list-table}
+:header-rows: 1
+
+*   - Optimizer
+    - Linux
+    - macOS(ARM)
+    - macOS(Intel)
+*   - Gurobi
+    - `/opt/gurobi1100/linux64/lib`
+    - `/opt/gurobi1100/macos_universal2/lib`
+    - `/opt/gurobi1100/macos_universal2/lib`
+*   - COPT
+    - `/opt/copt71/lib`
+    - `/opt/copt71/lib`
+    - `/opt/copt71/lib`
+*   - Mosek
+    - `/opt/mosek/10.1/tools/platform/linux64x86/bin`
+    - `/opt/mosek/10.1/tools/platform/osxaarch64/bin`
+    - `/opt/mosek/10.1/tools/platform/osx64x86/bin`
+*   - HiGHS
+    - `/opt/highs/lib`
+    - `/opt/highs/lib`
+    - `/opt/highs/lib`
+
+:::
+
+
+The detailed setup of each optimizer is as follows:
 ### Gurobi
 Follow the `Full installation` part of the [Gurobi installation guide](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer) to install Gurobi and set your license.
 
@@ -80,7 +145,30 @@ Or run this command in `powershell` console
 C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
 ```
 
-#### Linux and macOS
+#### Linux
+Add the Mosek shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libmosek64.so` is located in the `10.1/tools/platform/linux64x86/bin` directory of the installation directory.
+
+Run this command in terminal
+```bash
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/mosek/10.1/tools/platform/linux64x86/bin
+```
+
+You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+
+#### macOS
+Add the Mosek shared library to the `DYLD_LIBRARY_PATH` environment variable. The shared library `libmosek64.dylib` is located in the `lib` directory of the installation directory.
+
+Run this command in terminal (ARM-based Mac)
+```bash
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/mosek/10.1/tools/platform/osxaarch64/bin
+```
+or (Intel-based Mac)
+```bash
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/mosek/10.1/tools/platform/osx64x86/bin
+```
+
+You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+
 Run this command in terminal to solve a simple problem without error
 ```bash
 msktestlic
@@ -203,7 +291,7 @@ The Gurobi solver will be invoked to solve the model and writes the log to the c
 
 We can query the status of the model via:
 ```python
-assert model.get_model_attribute(poi.ModelAttributes.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
+assert model.get_model_attribute(poi.ModelAttribute.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
 ```
 
 The solution of the model can be queried via:
@@ -228,7 +316,7 @@ obj = x1*x1 + 2*x2*x2
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
 model.optimize()
-assert model.get_model_attribute(poi.ModelAttributes.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
+assert model.get_model_attribute(poi.ModelAttribute.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
 
 print("x1 = ", model.get_value(x1))
 print("x2 = ", model.get_value(x2))
