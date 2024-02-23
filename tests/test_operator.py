@@ -96,7 +96,10 @@ def test_operator():
         vars[4],
         3 * vars[2],
         2 * vars[1] + vars[3],
+        2 * vars[2] + vars[3] + 5.0,
         13 * vars[4] * vars[4],
+        17 * vars[3] * vars[3] + 1.0,
+        17 * vars[3] * vars[5] + 3 * vars[1],
         11 * vars[5] * vars[5] + 7 * vars[1] + 3.0,
     ]
     exprs += [ExprBuilder(e) for e in exprs]
@@ -118,6 +121,9 @@ def test_operator():
                 continue
             expr = op(ei, ej)
             value = evaluate(expr, var_value_map)
+            # flag = value == approx(op(expr_values[i], expr_values[j]))
+            # if not flag:
+            #     k = 1
             assert value == approx(op(expr_values[i], expr_values[j]))
 
     op = truediv

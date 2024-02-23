@@ -1034,8 +1034,8 @@ auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
 		auto d0 = b.constant.value();
 		for (int i = 0; i < a.coefficients.size(); i++)
 		{
-			auto ci = b.coefficients[i];
-			auto xi = b.variables[i];
+			auto ci = a.coefficients[i];
+			auto xi = a.variables[i];
 			t._add_affine_term(xi, ci * d0);
 		}
 	}
