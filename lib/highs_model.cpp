@@ -701,7 +701,8 @@ void POIHighsModel::set_obj_sense(ObjectiveSense sense)
 
 double POIHighsModel::get_obj_value()
 {
-	return Highs_getObjectiveValue(m_model.get());
+	double obj = Highs_getObjectiveValue(m_model.get());
+	return obj;
 }
 
 HighsInt POIHighsModel::_variable_index(const VariableIndex &variable)

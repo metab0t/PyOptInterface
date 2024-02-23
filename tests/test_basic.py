@@ -44,6 +44,30 @@ def test_basic():
     assert np.allclose(sqf.affine_part.coefficients, [4.0])
     assert sqf.affine_part.constant == approx(5.0)
 
+    t = poi.ExprBuilder(v)
+    t.mul(2.0)
+    assert t.degree() == 1
+
+    t.mul(vars[0])
+    assert t.degree() == 2
+
+    t.div(0.5)
+    assert t.degree() == 2
+
+    t = poi.ExprBuilder(v * v + 2.0 * v + 1.0)
+    t += 2.0
+    t -= v
+    t *= 4.0
+    t /= 2.0
+    sqf = poi.ScalarQuadraticFunction(t)
+    sqf.canonicalize()
+    assert list(sqf.variable_1s) == [0]
+    assert list(sqf.variable_2s) == [0]
+    assert np.allclose(sqf.coefficients, [2.0])
+    assert list(sqf.affine_part.variables) == [0]
+    assert np.allclose(sqf.affine_part.coefficients, [2.0])
+    assert sqf.affine_part.constant == approx(6.0)
+
 
 def test_monotoneindexer():
     indexer = IntMonotoneIndexer()

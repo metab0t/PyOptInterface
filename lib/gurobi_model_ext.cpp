@@ -13,7 +13,8 @@ NB_MODULE(gurobi_model_ext, m)
 	bind_gurobi_constants(m);
 
 #define BIND_F(f) .def(#f, &GurobiEnv::f)
-	nb::class_<GurobiEnv>(m, "RawEnv").def(nb::init<bool>(), nb::arg("empty") = false)
+	nb::class_<GurobiEnv>(m, "RawEnv")
+	    .def(nb::init<bool>(), nb::arg("empty") = false)
 	    // clang-format off
 		BIND_F(start)
 		BIND_F(raw_parameter_type)
@@ -112,6 +113,10 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
 	             &GurobiModelMixin::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def(
+	        "set_objective",
+	        nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModelMixin::set_objective_as_constant),
+	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    // clang-format off
 	    BIND_F(optimize)

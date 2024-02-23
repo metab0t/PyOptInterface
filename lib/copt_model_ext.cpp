@@ -100,6 +100,9 @@ NB_MODULE(copt_model_ext, m)
 	    .def("set_objective",
 	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModelMixin::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+		.def("set_objective",
+	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    // clang-format off
 	    BIND_F(optimize)

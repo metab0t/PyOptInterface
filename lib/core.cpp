@@ -45,6 +45,10 @@ ScalarAffineFunction::ScalarAffineFunction(const ExprBuilder &t)
 		coefficients.push_back(c);
 		variables.push_back(v);
 	}
+	if (t.constant_term)
+	{
+		constant = t.constant_term.value();
+	}
 }
 
 size_t ScalarAffineFunction::size() const
@@ -118,8 +122,7 @@ ScalarQuadraticFunction::ScalarQuadraticFunction(const ExprBuilder &t)
 		variable_1s.push_back(vp.var_1);
 		variable_2s.push_back(vp.var_2);
 	}
-	std::optional<ScalarAffineFunction> affine_part;
-	if (!t.affine_terms.empty())
+	if (!t.affine_terms.empty() || t.constant_term)
 	{
 		affine_part = ScalarAffineFunction(t);
 	}
@@ -222,6 +225,11 @@ bool VariablePair::operator<(const VariablePair &x) const
 		return var_1 < x.var_1;
 	else
 		return var_2 < x.var_2;
+}
+
+ExprBuilder::ExprBuilder(CoeffT c)
+{
+	this->add(c);
 }
 
 ExprBuilder::ExprBuilder(const VariableIndex &v)
@@ -464,7 +472,7 @@ void ExprBuilder::sub(const ScalarQuadraticFunction &q)
 {
 	if (q.affine_part)
 	{
-		this->add(q.affine_part.value());
+		this->sub(q.affine_part.value());
 	}
 
 	auto N = q.coefficients.size();
@@ -491,6 +499,14 @@ void ExprBuilder::sub(const ExprBuilder &t)
 
 void ExprBuilder::mul(CoeffT c)
 {
+	for (auto &[varpair, cc] : quadratic_terms)
+	{
+		cc *= c;
+	}
+	for (auto &[v, cc] : affine_terms)
+	{
+		cc *= c;
+	}
 	if (constant_term)
 	{
 		constant_term = constant_term.value() * c;
@@ -552,6 +568,10 @@ void ExprBuilder::mul(const ScalarAffineFunction &a)
 			ci *= d0;
 		}
 	}
+	else
+	{
+		affine_terms.clear();
+	}
 
 	if (constant_term)
 	{
@@ -568,6 +588,10 @@ void ExprBuilder::mul(const ScalarAffineFunction &a)
 	{
 		constant_term = a.constant.value() * constant_term.value();
 	}
+	else
+	{
+		constant_term.reset();
+	}
 }
 void ExprBuilder::mul(const ScalarQuadraticFunction &q)
 {
@@ -578,15 +602,40 @@ void ExprBuilder::mul(const ScalarQuadraticFunction &q)
 		    "ExprBuilder with degree {} cannot multiply with ScalarQuadraticFunction", deg));
 	}
 
-	auto N = q.coefficients.size();
-	if (constant_term)
+	if (!constant_term)
+		return;
+
+	auto c = constant_term.value();
 	{
+		auto N = q.coefficients.size();
 		quadratic_terms.reserve(N);
-		auto c = constant_term.value();
 		for (auto i = 0; i < N; i++)
 		{
 			_add_quadratic_term(q.variable_1s[i], q.variable_2s[i], c * q.coefficients[i]);
 		}
+	}
+	if (q.affine_part)
+	{
+		auto &affine_part = q.affine_part.value();
+		auto N = affine_part.coefficients.size();
+		affine_terms.reserve(N);
+		for (auto i = 0; i < N; i++)
+		{
+			_add_affine_term(affine_part.variables[i], c * affine_part.coefficients[i]);
+		}
+
+		if (affine_part.constant)
+		{
+			constant_term = c * affine_part.constant.value();
+		}
+		else
+		{
+			constant_term.reset();
+		}
+	}
+	else
+	{
+		constant_term.reset();
 	}
 }
 void ExprBuilder::mul(const ExprBuilder &t)
@@ -654,6 +703,10 @@ void ExprBuilder::mul(const ExprBuilder &t)
 				ci *= d0;
 			}
 		}
+		else
+		{
+			affine_terms.clear();
+		}
 
 		if (constant_term)
 		{
@@ -667,6 +720,10 @@ void ExprBuilder::mul(const ExprBuilder &t)
 		if (t.constant_term && constant_term)
 		{
 			constant_term = t.constant_term.value() * constant_term.value();
+		}
+		else
+		{
+			constant_term.reset();
 		}
 	}
 	else if (deg1 == 2)
@@ -697,15 +754,31 @@ void ExprBuilder::mul(const ExprBuilder &t)
 	}
 }
 
+void ExprBuilder::div(CoeffT c)
+{
+	for (auto &[varpair, cc] : quadratic_terms)
+	{
+		cc /= c;
+	}
+	for (auto &[v, cc] : affine_terms)
+	{
+		cc /= c;
+	}
+	if (constant_term)
+	{
+		constant_term = constant_term.value() / c;
+	}
+}
+
 // Operator overloading functions
 
 auto operator+(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction
 {
 	return ScalarAffineFunction(a, 1.0, b);
 }
-auto operator+(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction
+auto operator+(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const VariableIndex &a, const VariableIndex &b) -> ScalarAffineFunction
@@ -718,9 +791,9 @@ auto operator+(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
 	CoeffT new_constant = a.constant.value_or(0.0) + b;
 	return ScalarAffineFunction(a.coefficients, a.variables, new_constant);
 }
-auto operator+(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction
+auto operator+(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction
@@ -731,9 +804,9 @@ auto operator+(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarA
 	variables.push_back(b.index);
 	return ScalarAffineFunction(coefficients, variables, a.constant);
 }
-auto operator+(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarAffineFunction
+auto operator+(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
@@ -745,46 +818,58 @@ auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b) -> 
 
 auto operator+(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction
 {
-	ScalarAffineFunction affine_part(b);
+	ScalarAffineFunction affine_part;
 	if (a.affine_part)
 	{
 		affine_part = operator+(a.affine_part.value(), b);
 	}
+	else
+	{
+		affine_part = ScalarAffineFunction(b);
+	}
 	return ScalarQuadraticFunction(a.coefficients, a.variable_1s, a.variable_2s, affine_part);
 }
-auto operator+(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
+auto operator+(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction
 {
-	ScalarAffineFunction affine_part(b);
+	ScalarAffineFunction affine_part;
 	if (a.affine_part)
 	{
 		affine_part = operator+(a.affine_part.value(), b);
 	}
+	else
+	{
+		affine_part = ScalarAffineFunction(b);
+	}
 	return ScalarQuadraticFunction(a.coefficients, a.variable_1s, a.variable_2s, affine_part);
 }
-auto operator+(const VariableIndex &b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
+auto operator+(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction
 {
-	ScalarAffineFunction affine_part(b);
+	ScalarAffineFunction affine_part;
 	if (a.affine_part)
 	{
 		affine_part = operator+(a.affine_part.value(), b);
 	}
+	else
+	{
+		affine_part = b;
+	}
 	return ScalarQuadraticFunction(a.coefficients, a.variable_1s, a.variable_2s, affine_part);
 }
-auto operator+(const ScalarAffineFunction &b, const ScalarQuadraticFunction &a)
+auto operator+(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction
 {
-	return a + b;
+	return b + a;
 }
 
 auto operator+(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
@@ -800,9 +885,9 @@ auto operator-(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction
 	return ScalarAffineFunction(a, 1.0, -b);
 }
 
-auto operator-(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction
+auto operator-(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction
 {
-	return ScalarAffineFunction(a, -1.0, b);
+	return ScalarAffineFunction(b, -1.0, a);
 }
 
 auto operator-(const VariableIndex &a, const VariableIndex &b) -> ScalarAffineFunction
@@ -815,18 +900,9 @@ auto operator-(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
 	return operator+(a, -b);
 }
 
-auto operator-(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction
+auto operator-(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	ScalarAffineFunction aa = a;
-	for (auto &c : aa.coefficients)
-	{
-		c *= -1.0;
-	}
-	if (aa.constant)
-	{
-		aa.constant = -aa.constant.value();
-	}
-	return operator+(aa, b);
+	return operator+(operator*(b, -1.0), a);
 }
 
 auto operator-(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction
@@ -838,14 +914,14 @@ auto operator-(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarA
 	return ScalarAffineFunction(coefficients, variables, a.constant);
 }
 
-auto operator-(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarAffineFunction
+auto operator-(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(operator*(b, -1.0), a);
 }
 
 auto operator-(const ScalarAffineFunction &a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(a, operator*(b, -1.0));
 }
 
 auto operator-(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction
@@ -853,9 +929,9 @@ auto operator-(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFun
 	return operator+(a, -b);
 }
 
-auto operator-(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
+auto operator-(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(operator*(b, -1.0), a);
 }
 
 auto operator-(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction
@@ -863,9 +939,9 @@ auto operator-(const ScalarQuadraticFunction &a, const VariableIndex &b) -> Scal
 	return operator+(a, ScalarAffineFunction(b, -1.0));
 }
 
-auto operator-(const VariableIndex &b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
+auto operator-(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(operator*(b, -1.0), a);
 }
 
 auto operator-(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
@@ -874,25 +950,25 @@ auto operator-(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
 	return operator+(a, operator*(b, -1.0));
 }
 
-auto operator-(const ScalarAffineFunction &b, const ScalarQuadraticFunction &a)
+auto operator-(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(operator*(b, -1.0), a);
 }
 
 auto operator-(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction
 {
-	return operator+(operator*(a, -1.0), b);
+	return operator+(a, operator*(b, -1.0));
 }
 
 auto operator*(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction
 {
 	return ScalarAffineFunction(a, b);
 }
-auto operator*(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction
+auto operator*(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction
 {
-	return a * b;
+	return b * a;
 }
 
 auto operator*(const VariableIndex &a, const VariableIndex &b) -> ScalarQuadraticFunction
@@ -913,9 +989,9 @@ auto operator*(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
 	}
 	return aa;
 }
-auto operator*(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction
+auto operator*(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction
 {
-	return a * b;
+	return b * a;
 }
 
 auto operator*(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction
@@ -932,9 +1008,9 @@ auto operator*(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarQ
 
 	return ScalarQuadraticFunction(coefficients, variable_1s, variable_2s, affine_part);
 }
-auto operator*(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarQuadraticFunction
+auto operator*(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarQuadraticFunction
 {
-	return a * b;
+	return b * a;
 }
 
 auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
@@ -993,9 +1069,9 @@ auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFun
 	}
 	return aa;
 }
-auto operator*(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction
+auto operator*(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction
 {
-	return a * b;
+	return b * a;
 }
 
 auto operator/(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction
@@ -1011,4 +1087,172 @@ auto operator/(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction
 auto operator/(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction
 {
 	return a * (1.0 / b);
+}
+
+auto operator+(const ExprBuilder &a, CoeffT b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.add(b);
+	return e;
+}
+auto operator+(CoeffT b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a + b;
+}
+
+auto operator+(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.add(b);
+	return e;
+}
+auto operator+(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a + b;
+}
+
+auto operator+(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.add(b);
+	return e;
+}
+auto operator+(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a + b;
+}
+
+auto operator+(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.add(b);
+	return e;
+}
+auto operator+(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a + b;
+}
+
+auto operator+(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.add(b);
+	return e;
+}
+
+auto operator-(const ExprBuilder &a, CoeffT b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.sub(b);
+	return e;
+}
+auto operator-(CoeffT b, const ExprBuilder &a) -> ExprBuilder
+{
+	ExprBuilder e = a - b;
+	e.mul(-1.0);
+	return e;
+}
+
+auto operator-(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.sub(b);
+	return e;
+}
+auto operator-(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder
+{
+	ExprBuilder e = a - b;
+	e.mul(-1.0);
+	return e;
+}
+
+auto operator-(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.sub(b);
+	return e;
+}
+auto operator-(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	ExprBuilder e = a - b;
+	e.mul(-1.0);
+	return e;
+}
+
+auto operator-(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.sub(b);
+	return e;
+}
+auto operator-(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	ExprBuilder e = a - b;
+	e.mul(-1.0);
+	return e;
+}
+
+auto operator-(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.sub(b);
+	return e;
+}
+
+auto operator*(const ExprBuilder &a, CoeffT b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.mul(b);
+	return e;
+}
+auto operator*(CoeffT b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a * b;
+}
+
+auto operator*(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.mul(b);
+	return e;
+}
+auto operator*(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a * b;
+}
+
+auto operator*(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.mul(b);
+	return e;
+}
+auto operator*(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a * b;
+}
+
+auto operator*(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.mul(b);
+	return e;
+}
+auto operator*(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder
+{
+	return a * b;
+}
+
+auto operator*(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.mul(b);
+	return e;
+}
+
+auto operator/(const ExprBuilder &a, CoeffT b) -> ExprBuilder
+{
+	ExprBuilder e = a;
+	e.div(b);
+	return e;
 }

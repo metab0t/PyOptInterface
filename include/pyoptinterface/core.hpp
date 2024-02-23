@@ -118,6 +118,7 @@ struct ExprBuilder
 	std::optional<CoeffT> constant_term;
 
 	ExprBuilder() = default;
+	ExprBuilder(CoeffT c);
 	ExprBuilder(const VariableIndex &v);
 	ExprBuilder(const ScalarAffineFunction &a);
 	ExprBuilder(const ScalarQuadraticFunction &q);
@@ -140,6 +141,8 @@ struct ExprBuilder
 	void mul(const ScalarQuadraticFunction &q);
 	void mul(const ExprBuilder &t);
 
+	void div(CoeffT c);
+
 	bool empty() const;
 	int degree() const;
 
@@ -159,60 +162,96 @@ struct ExprBuilder
 };
 
 auto operator+(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
-auto operator+(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction;
+auto operator+(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator+(const VariableIndex &a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator+(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
-auto operator+(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator+(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator+(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction;
-auto operator+(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator+(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
     -> ScalarAffineFunction;
 auto operator+(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
-auto operator+(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator+(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator+(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
-auto operator+(const VariableIndex &b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator+(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator+(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction;
-auto operator+(const ScalarAffineFunction &b, const ScalarQuadraticFunction &a)
+auto operator+(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction;
 auto operator+(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction;
 
 auto operator-(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
-auto operator-(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction;
+auto operator-(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator-(const VariableIndex &a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator-(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
-auto operator-(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator-(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator-(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction;
-auto operator-(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator-(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator-(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
     -> ScalarAffineFunction;
 auto operator-(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
-auto operator-(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator-(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator-(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
-auto operator-(const VariableIndex &b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator-(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator-(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction;
-auto operator-(const ScalarAffineFunction &b, const ScalarQuadraticFunction &a)
+auto operator-(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction;
 auto operator-(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
     -> ScalarQuadraticFunction;
 
 auto operator*(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
-auto operator*(CoeffT b, const VariableIndex &a) -> ScalarAffineFunction;
+auto operator*(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator*(const VariableIndex &a, const VariableIndex &b) -> ScalarQuadraticFunction;
 auto operator*(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
-auto operator*(CoeffT b, const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator*(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator*(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
-auto operator*(const VariableIndex &b, const ScalarAffineFunction &a) -> ScalarQuadraticFunction;
+auto operator*(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarQuadraticFunction;
 auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
     -> ScalarQuadraticFunction;
 auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
-auto operator*(CoeffT b, const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator*(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 
 auto operator/(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
 auto operator/(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
 auto operator/(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
+
+// Operator overloading for	ExprBuilder
+// Sadly, they are inefficient than the add/sub/mul/div functions but they are important for a
+// user-friendly interface
+// The functions are like ScalarQuadraticFunction but returns a ExprBuilder
+auto operator+(const ExprBuilder &a, CoeffT b) -> ExprBuilder;
+auto operator+(CoeffT b, const ExprBuilder &a) -> ExprBuilder;
+auto operator+(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder;
+auto operator+(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator+(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder;
+auto operator+(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator+(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder;
+auto operator+(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator+(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder;
+
+auto operator-(const ExprBuilder &a, CoeffT b) -> ExprBuilder;
+auto operator-(CoeffT b, const ExprBuilder &a) -> ExprBuilder;
+auto operator-(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder;
+auto operator-(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator-(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder;
+auto operator-(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator-(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder;
+auto operator-(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator-(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder;
+
+auto operator*(const ExprBuilder &a, CoeffT b) -> ExprBuilder;
+auto operator*(CoeffT b, const ExprBuilder &a) -> ExprBuilder;
+auto operator*(const ExprBuilder &a, const VariableIndex &b) -> ExprBuilder;
+auto operator*(const VariableIndex &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator*(const ExprBuilder &a, const ScalarAffineFunction &b) -> ExprBuilder;
+auto operator*(const ScalarAffineFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator*(const ExprBuilder &a, const ScalarQuadraticFunction &b) -> ExprBuilder;
+auto operator*(const ScalarQuadraticFunction &b, const ExprBuilder &a) -> ExprBuilder;
+auto operator*(const ExprBuilder &a, const ExprBuilder &b) -> ExprBuilder;
+
+auto operator/(const ExprBuilder &a, CoeffT b) -> ExprBuilder;
 
 enum class ConstraintType
 {

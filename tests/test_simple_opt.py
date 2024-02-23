@@ -85,3 +85,20 @@ def test_simple_opt(model_interface):
     y_val = model.get_variable_attribute(y, poi.VariableAttribute.Value)
     assert x_val == approx(8.0)
     assert y_val == approx(8.0)
+
+
+def test_constant_objective(model_interface):
+    model = model_interface
+
+    x = model.add_variable(lb=0.0, ub=1.0)
+    obj = 1.0
+    model.set_objective(obj, poi.ObjectiveSense.Minimize)
+    model.optimize()
+    obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+    assert obj_val == approx(1.0)
+    model.set_objective(obj, poi.ObjectiveSense.Maximize)
+    model.optimize()
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
+    obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+    assert obj_val == approx(1.0)

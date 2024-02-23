@@ -24,6 +24,9 @@ concept CommercialSolverConstraint = requires(CommercialSolverT *model, const ch
 	{
 		model->pprint_variable(std::declval<const VariableIndex &>())
 	} -> std::convertible_to<std::string>;
+	{
+		model->set_objective(std::declval<const ScalarAffineFunction &>(), ObjectiveSense())
+	} -> std::same_as<void>;
 };
 
 template <CommercialSolverConstraint T>
@@ -50,6 +53,8 @@ class CommercialSolverMixin : public T
 	std::string pprint_expression(const ScalarAffineFunction &function, int precision = 4);
 	std::string pprint_expression(const ScalarQuadraticFunction &function, int precision = 4);
 	std::string pprint_expression(const ExprBuilder &function, int precision = 4);
+
+	void set_objective_as_constant(CoeffT c, ObjectiveSense sense);
 };
 
 template <CommercialSolverConstraint T>
@@ -275,6 +280,13 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &funct
 		terms.push_back(fmt::format("{:.{}g}", function.constant_term.value(), precision));
 	}
 	return fmt::format("{}", fmt::join(terms, "+"));
+}
+
+template <CommercialSolverConstraint T>
+void CommercialSolverMixin<T>::set_objective_as_constant(CoeffT c, ObjectiveSense sense)
+{
+	ScalarAffineFunction f(c);
+	get_base()->set_objective(f, sense);
 }
 
 /* This concept combined with partial specialization causes ICE on gcc 10 */

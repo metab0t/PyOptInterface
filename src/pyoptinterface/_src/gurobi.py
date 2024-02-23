@@ -549,7 +549,6 @@ class Model(RawModel):
     def get_model_raw_attribute(self, name: str):
         param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
         get_function_map = {
-            "char": self.get_model_raw_attribute_char,
             int: self.get_model_raw_attribute_int,
             float: self.get_model_raw_attribute_double,
             str: self.get_model_raw_attribute_string,
@@ -560,7 +559,6 @@ class Model(RawModel):
     def set_model_raw_attribute(self, name: str, value):
         param_type = gurobi_raw_type_map[self.raw_attribute_type(name)]
         set_function_map = {
-            "char": self.set_model_raw_attribute_char,
             int: self.set_model_raw_attribute_int,
             float: self.set_model_raw_attribute_double,
             str: self.set_model_raw_attribute_string,

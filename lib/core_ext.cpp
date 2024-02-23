@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/operators.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/pair.h>
 #include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/core.hpp"
@@ -134,6 +135,7 @@ NB_MODULE(core_ext, m)
 
 	nb::class_<ExprBuilder>(m, "ExprBuilder")
 	    .def(nb::init<>())
+	    .def(nb::init<CoeffT>())
 	    .def(nb::init<const VariableIndex &>())
 	    .def(nb::init<const ScalarAffineFunction &>())
 	    .def(nb::init<const ScalarQuadraticFunction &>())
@@ -162,7 +164,39 @@ NB_MODULE(core_ext, m)
 	    .def("mul", nb::overload_cast<const VariableIndex &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ScalarAffineFunction &>(&ExprBuilder::mul))
 	    .def("mul", nb::overload_cast<const ScalarQuadraticFunction &>(&ExprBuilder::mul))
-	    .def("mul", nb::overload_cast<const ExprBuilder &>(&ExprBuilder::mul));
+	    .def("mul", nb::overload_cast<const ExprBuilder &>(&ExprBuilder::mul))
+	    .def("div", &ExprBuilder::div)
+	    .def(nb::self + CoeffT())
+	    .def(CoeffT() + nb::self)
+	    .def(nb::self + VariableIndex())
+	    .def(nb::self + ScalarAffineFunction())
+	    .def(nb::self + ScalarQuadraticFunction())
+	    .def(nb::self + ExprBuilder())
+	    .def(VariableIndex() + nb::self)
+	    .def(ScalarAffineFunction() + nb::self)
+	    .def(ScalarQuadraticFunction() + nb::self)
+	    .def(ExprBuilder() + nb::self)
+	    .def(nb::self - CoeffT())
+	    .def(CoeffT() - nb::self)
+	    .def(nb::self - VariableIndex())
+	    .def(nb::self - ScalarAffineFunction())
+	    .def(nb::self - ScalarQuadraticFunction())
+	    .def(nb::self - ExprBuilder())
+	    .def(VariableIndex() - nb::self)
+	    .def(ScalarAffineFunction() - nb::self)
+	    .def(ScalarQuadraticFunction() - nb::self)
+	    .def(ExprBuilder() - nb::self)
+	    .def(nb::self * CoeffT())
+	    .def(CoeffT() * nb::self)
+	    .def(nb::self * VariableIndex())
+	    .def(nb::self * ScalarAffineFunction())
+	    .def(nb::self * ScalarQuadraticFunction())
+	    .def(nb::self * ExprBuilder())
+	    .def(VariableIndex() * nb::self)
+	    .def(ScalarAffineFunction() * nb::self)
+	    .def(ScalarQuadraticFunction() * nb::self)
+	    .def(ExprBuilder() * nb::self)
+	    .def(nb::self / CoeffT());
 
 	// We need to test the functionality of MonotoneIndexer
 	using IntMonotoneIndexer = MonotoneIndexer<int>;
