@@ -69,23 +69,18 @@ def make_nd_variable(
 #     return tupledict(kvs)
 
 
-def quicksum(terms):
-    expr = ExprBuilder()
+def quicksum_(expr: ExprBuilder, terms, f=None):
     if isinstance(terms, dict):
         iter = terms.values()
     else:
         iter = terms
+    if f:
+        iter = map(f, iter)
     for v in iter:
         expr.add(v)
-    return expr
 
 
-def quicksum_f(terms, f):
+def quicksum(terms, f=None):
     expr = ExprBuilder()
-    if isinstance(terms, dict):
-        iter = terms.values()
-    else:
-        iter = terms
-    for v in iter:
-        expr.add(f(v))
+    quicksum_(expr, terms, f)
     return expr

@@ -19,7 +19,7 @@ def bench_poi_base(model, M, N):
     expr = poi.quicksum(x)
     con = model.add_linear_constraint(expr, poi.ConstraintSense.Equal, M * N / 2)
 
-    obj = poi.quicksum_f(x, lambda v: v * v)
+    obj = poi.quicksum(x, lambda v: v * v)
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
     model.set_model_attribute(poi.ModelAttribute.Silent, True)
