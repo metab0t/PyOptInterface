@@ -167,7 +167,7 @@ def constraint_rule(j):
 
 constraint = poi.make_tupledict(J, rule=constraint_rule)
 
-obj = poi.quicksum_f(x.values(), lambda x: x*x)
+obj = poi.quicksum(x.values(), lambda x: x*x)
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
 model.optimize()
@@ -175,23 +175,27 @@ model.optimize()
 
 Here we use two utility functions to simplify how we express the sum notation
 
-```{py:function} quicksum(values)
+```{py:function} quicksum(values, [f=None])
 
-Create a new expression by summing up a list of values.
+Create a new expression by summing up a list of values (optionally, you can apply a function to
+each value in advance)
 
 :param values: iterator of values
+:param f: a function that takes a value and returns a new value
 :return: the handle of the new expression
 :rtype: pyoptinterface.ExprBuilder
 ```
 
-```{py:function} quicksum_f(values, f)
+There is also an in-place version:
 
-Create a new expression by summing up a list of values after applying a function to each value.
+```{py:function} quicksum_(expr, values, [f=None])
 
+Add a list of values to an existing expression (optionally, you can apply a function to each value in advance)
+
+:param pyoptinterface.ExprBuilder expr: the handle of the existing expression
 :param values: iterator of values
-:param f: the function to apply to each value
-:return: the handle of the new expression
-:rtype: pyoptinterface.ExprBuilder
+:param f: a function that takes a value and returns a new value
+:return: None
 ```
 
 We notice that `poi.make_tupledict(I, J, rule=lambda i, j: model.add_variable(lb=0, name=f"x({i},{j})"))` is a frequently used pattern to create a `tupledict` of variables, so we provide a convenient way to create a `tupledict` of variables by calling [`model.add_variables`](#model.add_variables):
