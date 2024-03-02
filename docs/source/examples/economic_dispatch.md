@@ -97,7 +97,7 @@ Then, we need to add the quadratic objective function to the model. We will use 
 obj = poi.ExprBuilder()
 for t in range(T):
     for i in range(N_G):
-        obj.add(a_cost[i] * P[i, t] * P[i, t] + b_cost[i] * P[i, t] + c_cost[i])
+        obj += a_cost[i] * P[i, t] * P[i, t] + b_cost[i] * P[i, t] + c_cost[i]
 model.set_objective(obj)
 ```
 

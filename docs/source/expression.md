@@ -1,3 +1,8 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
 # Expression
 
 ## Basic expression
@@ -8,11 +13,11 @@ PyOptInterface currently supports polynomial expressions with degree up to 2, in
 
 The expression can be expressed by arithmetic operations of variables and constants. For example, we can create a quadratic expression by adding two quadratic expressions, multiplying a linear expression with a constant expression, etc.
 
-```python
+```{code-cell}
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import highs
 
-model = gurobi.Model()
+model = highs.Model()
 
 x = model.add_variable()
 
@@ -40,30 +45,42 @@ $$
 \frac{1}{2} \sum_{i=1}^N x_i^2 - \sum_{i=1}^N x_i
 $$
 
-```python
-expr = poi.ExprBuilder()
-
+```{code-cell}
 N = 1000
-xs = [model.add_variable() for _ in range(N)]
+x = [model.add_variable() for _ in range(N)]
 
-for i in range(N):
-    expr += x[i] * x[i]
-    expr -= 2 * x[i]
+def fast_expr():
+    expr = poi.ExprBuilder()
+    for i in range(N):
+        expr += 0.5 * x[i] * x[i]
+        expr -= x[i]
 
-expr *= 0.5
+def slow_expr():
+    expr = 0
+    for i in range(N):
+        expr += 0.5 * x[i] * x[i]
+        expr -= x[i]
+
+```
+
+```{code-cell}
+%time fast_expr()
+```
+
+```{code-cell}
+%time slow_expr()
 ```
 
 ## Pretty print expression
 If the names of variables are specified, We can use the `pprint` method to print the expression in a human-readable format:
 
-```python
+```{code-cell}
 x = model.add_variable(name="x")
 y = model.add_variable(name="y")
 
 expr = x * x + 2 * x * y + y * y
 
 model.pprint(expr)
-# output: 1*x*x + 2*x*y + 1*y*y
 ```
 
 ## Value of expression
