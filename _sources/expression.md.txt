@@ -28,11 +28,11 @@ expr3 = x * expr2 + expr1
 ## Efficient expression construction
 PyOptInterface provides a special class `ExprBuilder` to construct expressions efficiently. It is especially useful when we need to construct a large expression with many terms.
 
-It supports the following operations:
-- `add`: add a term to the expression
-- `sub`: subtract a term from the expression
-- `mul`: multiply the expression with a constant or another expression
-- `div`: divide the expression with a constant
+It supports the following in-place assignment operations:
+- `+=`: add a term to the expression
+- `-=`: subtract a term from the expression
+- `*=`: multiply the expression with a constant or another expression
+- `/=`: divide the expression with a constant
 
 For example, we can use `ExprBuilder` to construct the following expression efficiently:
 
@@ -47,10 +47,10 @@ N = 1000
 xs = [model.add_variable() for _ in range(N)]
 
 for i in range(N):
-    expr.add(x[i] * x[i])
-    expr.sub(2 * x[i])
+    expr += x[i] * x[i]
+    expr -= 2 * x[i]
 
-expr.mul(0.5)
+expr *= 0.5
 ```
 
 ## Pretty print expression

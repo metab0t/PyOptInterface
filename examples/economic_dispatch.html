@@ -332,6 +332,19 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_G</span><span class="p">):</span>
+<span class="ne">----&gt; </span><span class="mi">4</span>         <span class="n">obj</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a_cost</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">]</span> <span class="o">*</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">b_cost</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">c_cost</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span>: &#39;ExprBuilder&#39; object has no attribute &#39;add&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <p>Finally, we can solve the model and query the solution.</p>
 <div class="cell docutils container">
@@ -340,19 +353,6 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objective value: &quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.OPTIMAL
-Objective value:  12684.0
-Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.001255, 14328.500000, 0
-83, 0.002368, 12684.000000, 0
-Model   status      : Optimal
-Simplex   iterations: 63
-Objective value     :  1.2684000000e+04
-HiGHS run time      :          0.00
 </pre></div>
 </div>
 </div>
@@ -367,19 +367,6 @@ HiGHS run time      :          0.00
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N_G</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
 
 <span class="n">P_value</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[100., 100., 100., 100., 100., 100., 100., 100., 100., 100., 100.,
-        100., 100., 100., 100., 100., 100., 100., 100., 100., 100., 100.,
-        100., 100.],
-       [ 70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,
-         70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,
-         70.,  70.],
-       [ 50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,
-         50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,
-         50.,  50.]])
 </pre></div>
 </div>
 </div>
@@ -405,34 +392,6 @@ HiGHS run time      :          0.00
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N_G</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">P_value</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.OPTIMALIteration, Runtime, ObjVal, NullspaceDim
-0, 0.003731, 15430.225000, 0
-151, 0.005646, 13740.213571, 10
-Model   status      : Optimal
-Simplex   iterations: 86
-Objective value     :  1.3740213571e+04
-HiGHS run time      :          0.01
-
-Objective value:  13740.213571428569
-[[100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.        ]
- [ 70.          71.          72.          73.          74.
-   75.          76.          77.          78.          79.
-   80.          81.          82.          83.          83.71428571
-   84.28571429  84.85714286  85.42857143  86.          86.57142857
-   87.14285714  87.71428571  88.28571429  88.85714286]
- [ 50.          50.          50.          50.          50.
-   50.          50.          50.          50.          50.
-   50.          50.          50.          50.          50.28571429
-   50.71428571  51.14285714  51.57142857  52.          52.42857143
-   52.85714286  53.28571429  53.71428571  54.14285714]]
 </pre></div>
 </div>
 </div>

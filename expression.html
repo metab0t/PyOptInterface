@@ -249,12 +249,12 @@
 <section id="efficient-expression-construction">
 <h2>Efficient expression construction<a class="headerlink" href="#efficient-expression-construction" title="Link to this heading">#</a></h2>
 <p>PyOptInterface provides a special class <code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code> to construct expressions efficiently. It is especially useful when we need to construct a large expression with many terms.</p>
-<p>It supports the following operations:</p>
+<p>It supports the following in-place assignment operations:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">add</span></code>: add a term to the expression</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sub</span></code>: subtract a term from the expression</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mul</span></code>: multiply the expression with a constant or another expression</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">div</span></code>: divide the expression with a constant</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">+=</span></code>: add a term to the expression</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-=</span></code>: subtract a term from the expression</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*=</span></code>: multiply the expression with a constant or another expression</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/=</span></code>: divide the expression with a constant</p></li>
 </ul>
 <p>For example, we can use <code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code> to construct the following expression efficiently:</p>
 <div class="math-wrapper docutils container">
@@ -269,10 +269,10 @@
 <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">expr</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">expr</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">expr</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">expr</span> <span class="o">-=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-<span class="n">expr</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">expr</span> <span class="o">*=</span> <span class="mf">0.5</span>
 </pre></div>
 </div>
 </section>
