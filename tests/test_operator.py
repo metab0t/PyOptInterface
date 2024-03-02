@@ -142,25 +142,25 @@ def test_quicksum():
     N = 6
     vars = [VariableIndex(i) for i in range(N)]
     var_value_map = {v.index: float(v.index) for v in vars}
-    vars_dict = {i : v for i, v in enumerate(vars)}
+    vars_dict = {i: v for i, v in enumerate(vars)}
 
     expr = ExprBuilder()
     for v in vars:
-        expr.add(v)
+        expr += v
     expr_sum = quicksum(vars_dict)
     assert evaluate(expr_sum, var_value_map) == approx(evaluate(expr, var_value_map))
 
     f = lambda x: x * x
     expr = ExprBuilder()
     for v in vars:
-        expr.add(f(v))
+        expr += f(v)
     expr_sum = quicksum(vars, f)
     assert evaluate(expr_sum, var_value_map) == approx(evaluate(expr, var_value_map))
 
     c = 3.0
     expr = ExprBuilder(c)
     for v in vars:
-        expr.add(v)
+        expr += v
     expr_sum = ExprBuilder(c)
     quicksum_(expr_sum, vars)
     assert evaluate(expr_sum, var_value_map) == approx(evaluate(expr, var_value_map))
@@ -168,7 +168,7 @@ def test_quicksum():
     f = lambda x: x * x
     expr = ExprBuilder(c)
     for v in vars:
-        expr.add(f(v))
+        expr += f(v)
     expr_sum = ExprBuilder(c)
     quicksum_(expr_sum, vars_dict, f)
     assert evaluate(expr_sum, var_value_map) == approx(evaluate(expr, var_value_map))

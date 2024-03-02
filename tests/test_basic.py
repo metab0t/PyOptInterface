@@ -11,15 +11,15 @@ def test_basic():
     assert v.index == 0
 
     t = poi.ExprBuilder()
-    t.add(v)
-    t.add(v * v)
+    t += v
+    t += v * v
     assert t.degree() == 2
     assert t.empty() == False
 
     t = poi.ExprBuilder(v)
     t.add_affine_term(vars[1], 2.0)
-    t.add(3.0 * vars[2])
-    t.sub(4.0 * vars[3])
+    t += 3.0 * vars[2]
+    t -= 4.0 * vars[3]
     assert t.degree() == 1
     assert t.empty() == False
 
@@ -45,13 +45,13 @@ def test_basic():
     assert sqf.affine_part.constant == approx(5.0)
 
     t = poi.ExprBuilder(v)
-    t.mul(2.0)
+    t *= 2.0
     assert t.degree() == 1
 
-    t.mul(vars[0])
+    t *= vars[0]
     assert t.degree() == 2
 
-    t.div(0.5)
+    t /= 0.5
     assert t.degree() == 2
 
     t = poi.ExprBuilder(v * v + 2.0 * v + 1.0)

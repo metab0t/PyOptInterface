@@ -77,7 +77,7 @@ def quicksum_(expr: ExprBuilder, terms, f=None):
     if f:
         iter = map(f, iter)
     for v in iter:
-        expr.add(v)
+        expr += v
 
 
 def quicksum(terms, f=None):
