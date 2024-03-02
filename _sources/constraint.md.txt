@@ -193,7 +193,7 @@ For linear constraints, we can modify the coefficients of the linear part of the
 calling the `set_normalized_coefficient` method of the model.
 
 ```python
-con = model.add_linear_constraint(x + y, poi.ConstraintSense.LessEqual, 1.0)
+con = model.add_linear_constraint(x + y, poi.Leq, 1.0)
 
 # modify the right-hand side of the constraint
 model.set_normalized_rhs(con, 2.0)

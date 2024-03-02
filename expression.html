@@ -229,10 +229,12 @@
 <li><p>constant expression</p></li>
 </ul>
 <p>The expression can be expressed by arithmetic operations of variables and constants. For example, we can create a quadratic expression by adding two quadratic expressions, multiplying a linear expression with a constant expression, etc.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
 <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span>
 
@@ -244,6 +246,13 @@
 <span class="c1"># create a quadratic expression by adding two quadratic expressions</span>
 <span class="n">expr3</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">expr2</span> <span class="o">+</span> <span class="n">expr1</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.6.0: Copyright (c) 2023 HiGHS under MIT licence terms
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="efficient-expression-construction">
@@ -263,30 +272,72 @@
 \frac{1}{2} \sum_{i=1}^N x_i^2 - \sum_{i=1}^N x_i
 \]</div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">ExprBuilder</span><span class="p">()</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
 
-<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="k">def</span> <span class="nf">fast_expr</span><span class="p">():</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">ExprBuilder</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">expr</span> <span class="o">-=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">expr</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">expr</span> <span class="o">-=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-<span class="n">expr</span> <span class="o">*=</span> <span class="mf">0.5</span>
+<span class="k">def</span> <span class="nf">slow_expr</span><span class="p">():</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">expr</span> <span class="o">-=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 </pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">time</span> fast_expr()
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 911 µs, sys: 0 ns, total: 911 µs
+Wall time: 915 µs
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">time</span> slow_expr()
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 32.6 ms, sys: 13 µs, total: 32.6 ms
+Wall time: 32.7 ms
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="pretty-print-expression">
 <h2>Pretty print expression<a class="headerlink" href="#pretty-print-expression" title="Link to this heading">#</a></h2>
 <p>If the names of variables are specified, We can use the <code class="docutils literal notranslate"><span class="pre">pprint</span></code> method to print the expression in a human-readable format:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
 <span class="n">expr</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
-<span class="c1"># output: 1*x*x + 2*x*y + 1*y*y</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;1*x*x+2*x*y+1*y*y&#39;
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="value-of-expression">
