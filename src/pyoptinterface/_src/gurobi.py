@@ -2,6 +2,7 @@
 # only on windows
 import os
 import platform
+import types
 
 if platform.system() == "Windows":
     gurobi_home = os.environ.get("GUROBI_HOME", None)
@@ -83,9 +84,6 @@ variable_attribute_set_translate_func_map = {
 }
 
 variable_attribute_set_func_map = {
-    VariableAttribute.Value: lambda model, v, x: model.set_variable_raw_attribute_double(
-        v, "X", x
-    ),
     VariableAttribute.LowerBound: lambda model, v, x: model.set_variable_raw_attribute_double(
         v, "LB", x
     ),
@@ -408,32 +406,32 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
 
-        self.add_second_order_cone_constraint = bridge_soc_quadratic_constraint.__get__(
-            self
+        self.add_second_order_cone_constraint = types.MethodType(
+            bridge_soc_quadratic_constraint, self
         )
 
-        self.add_variables = make_nd_variable.__get__(self)
-
-    @staticmethod
-    def supports_variable_attribute(self, attribute: VariableAttribute):
-        return (
-            attribute in variable_attribute_get_func_map
-            or attribute in variable_attribute_set_func_map
-        )
+        self.add_variables = types.MethodType(make_nd_variable, self)
 
     @staticmethod
-    def supports_model_attribute(self, attribute: ModelAttribute):
-        return (
-            attribute in model_attribute_get_func_map
-            or attribute in model_attribute_set_func_map
-        )
+    def supports_variable_attribute(attribute: VariableAttribute, settable=False):
+        if settable:
+            return attribute in variable_attribute_set_func_map
+        else:
+            return attribute in variable_attribute_get_func_map
 
     @staticmethod
-    def supports_constraint_attribute(self, attribute: ConstraintAttribute):
-        return (
-            attribute in constraint_attribute_get_func_map
-            or attribute in constraint_attribute_set_func_map
-        )
+    def supports_model_attribute(attribute: ModelAttribute, settable=False):
+        if settable:
+            return attribute in model_attribute_set_func_map
+        else:
+            return attribute in model_attribute_get_func_map
+
+    @staticmethod
+    def supports_constraint_attribute(attribute: ConstraintAttribute, settable=False):
+        if settable:
+            return attribute in constraint_attribute_set_func_map
+        else:
+            return attribute in constraint_attribute_get_func_map
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):

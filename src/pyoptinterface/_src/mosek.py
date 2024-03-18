@@ -1,6 +1,7 @@
 import os
 import platform
 from typing import Optional
+import types
 
 if platform.system() == "Windows":
     bindir = os.environ.get("MOSEK_10_1_BINDIR", None)
@@ -293,7 +294,7 @@ class Model(RawModel):
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
 
-        self.add_variables = make_nd_variable.__get__(self)
+        self.add_variables = types.MethodType(make_nd_variable, self)
 
     def add_second_order_cone_constraint(
         self, cone_variables, name="", use_bridge=False
@@ -305,25 +306,25 @@ class Model(RawModel):
         return con
 
     @staticmethod
-    def supports_variable_attribute(self, attribute: VariableAttribute):
-        return (
-            attribute in variable_attribute_get_func_map
-            or attribute in variable_attribute_set_func_map
-        )
+    def supports_variable_attribute(attribute: VariableAttribute, settable=False):
+        if settable:
+            return attribute in variable_attribute_set_func_map
+        else:
+            return attribute in variable_attribute_get_func_map
 
     @staticmethod
-    def supports_model_attribute(self, attribute: ModelAttribute):
-        return (
-            attribute in model_attribute_get_func_map
-            or attribute in model_attribute_set_func_map
-        )
+    def supports_model_attribute(attribute: ModelAttribute, settable=False):
+        if settable:
+            return attribute in model_attribute_set_func_map
+        else:
+            return attribute in model_attribute_get_func_map
 
     @staticmethod
-    def supports_constraint_attribute(self, attribute: ConstraintAttribute):
-        return (
-            attribute in constraint_attribute_get_func_map
-            or attribute in constraint_attribute_set_func_map
-        )
+    def supports_constraint_attribute(attribute: ConstraintAttribute, settable=False):
+        if settable:
+            return attribute in constraint_attribute_set_func_map
+        else:
+            return attribute in constraint_attribute_get_func_map
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):
