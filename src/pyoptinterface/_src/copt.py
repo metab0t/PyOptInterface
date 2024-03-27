@@ -2,6 +2,7 @@ import os
 import platform
 import types
 from pathlib import Path
+import logging
 
 from .copt_model_ext import RawModel, Env, COPT, load_library, is_library_loaded
 from .attributes import (
@@ -20,7 +21,10 @@ from .solver_common import (
 )
 from .aml import make_nd_variable
 
-if not is_library_loaded():
+
+def detected_libraries():
+    libs = []
+
     subdir = {
         "Linux": "lib",
         "Darwin": "lib",
@@ -32,11 +36,26 @@ if not is_library_loaded():
         "Windows": "copt.dll",
     }[platform.system()]
 
+    # Environment
     home = os.environ.get("COPT_HOME", None)
     if home and os.path.exists(home):
         lib = Path(home) / subdir / libname
         if lib.exists():
-            ret = load_library(str(lib))
+            libs.append(str(lib))
+
+    # default names
+    default_libname = libname
+    libs.append(default_libname)
+
+    return libs
+
+
+libs = detected_libraries()
+for lib in libs:
+    ret = load_library(lib)
+    if ret:
+        logging.info(f"Loaded COPT library: {lib}")
+        break
 
 DEFAULT_ENV = None
 

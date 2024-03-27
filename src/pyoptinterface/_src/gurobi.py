@@ -5,6 +5,7 @@ import platform
 import types
 from pathlib import Path
 import re
+import logging
 
 from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library, is_library_loaded
 from .attributes import (
@@ -26,7 +27,10 @@ from .solver_common import (
 from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_nd_variable
 
-if not is_library_loaded():
+
+def detected_libraries():
+    libs = []
+
     subdir = {
         "Linux": "lib",
         "Darwin": "lib",
@@ -43,18 +47,46 @@ if not is_library_loaded():
         "Windows": "*.dll",
     }[platform.system()]
 
+    # Environment
     home = os.environ.get("GUROBI_HOME", None)
     if home and os.path.exists(home):
         dir = Path(home) / subdir
-        libs = []
         for path in dir.glob(suffix_pattern):
             match = re.match(libname_pattern, path.name)
             if match:
-                libs.append(path)
-        for lib in libs:
-            ret = load_library(str(lib))
-            if ret:
-                break
+                libs.append(str(path))
+
+    # gurobipy installation
+    try:
+        import gurobipy
+
+        dir = Path(gurobipy.__path__[0])
+        if platform.system() != "Windows":
+            dir = dir / ".libs"
+        for path in dir.glob(suffix_pattern):
+            match = re.match(libname_pattern, path.name)
+            if match:
+                libs.append(str(path))
+    except Exception:
+        pass
+
+    # default names
+    default_libname = {
+        "Linux": "libgurobi110.so",
+        "Darwin": "libgurobi110.dylib",
+        "Windows": "gurobi110.dll",
+    }[platform.system()]
+    libs.append(default_libname)
+
+    return libs
+
+
+libs = detected_libraries()
+for lib in libs:
+    ret = load_library(lib)
+    if ret:
+        logging.info(f"Loaded Gurobi library: {lib}")
+        break
 
 DEFAULT_ENV = None
 

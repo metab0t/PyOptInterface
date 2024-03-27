@@ -1,3 +1,4 @@
+import logging
 import os
 import platform
 import types
@@ -26,7 +27,10 @@ from .solver_common import (
 )
 from .aml import make_nd_variable
 
-if not is_library_loaded():
+
+def detected_libraries():
+    libs = []
+
     subdir = {
         "Linux": "lib",
         "Darwin": "lib",
@@ -38,23 +42,39 @@ if not is_library_loaded():
         "Windows": "highs.dll",
     }[platform.system()]
 
+    # Environment
     home = os.environ.get("HiGHS_HOME", None)
     if home and os.path.exists(home):
         lib = Path(home) / subdir / libname
         if lib.exists():
-            ret = load_library(str(lib))
+            libs.append(str(lib))
 
-    if not is_library_loaded():
-        try:
-            import highsbox
+    # HiGHS pypi installation
+    try:
+        import highsbox
 
-            home = highsbox.highs_dist_dir()
-            if os.path.exists(home):
-                lib = Path(home) / subdir / libname
-                if lib.exists():
-                    ret = load_library(str(lib))
-        except Exception as e:
-            pass
+        home = highsbox.highs_dist_dir()
+
+        if os.path.exists(home):
+            lib = Path(home) / subdir / libname
+            if lib.exists():
+                libs.append(str(lib))
+    except Exception:
+        pass
+
+    # default names
+    default_libname = libname
+    libs.append(default_libname)
+
+    return libs
+
+
+libs = detected_libraries()
+for lib in libs:
+    ret = load_library(lib)
+    if ret:
+        logging.info(f"Loaded HiGHS library: {lib}")
+        break
 
 variable_attribute_get_func_map = {
     VariableAttribute.Value: lambda model, v: model.get_value(v),

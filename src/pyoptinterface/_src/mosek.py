@@ -4,6 +4,7 @@ from typing import Optional
 import types
 from pathlib import Path
 import re
+import logging
 
 from .mosek_model_ext import RawModel, Env, Enum, load_library, is_library_loaded
 from .attributes import (
@@ -23,7 +24,10 @@ from .solver_common import (
 from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_nd_variable
 
-if not is_library_loaded():
+
+def detected_libraries():
+    libs = []
+
     libname_pattern = {
         "Linux": r"libmosek64\.so",
         "Darwin": r"libmosek64\.dylib",
@@ -35,18 +39,56 @@ if not is_library_loaded():
         "Windows": "*.dll",
     }[platform.system()]
 
+    # Environment
     home = os.environ.get("MOSEK_10_1_BINDIR", None)
     if home and os.path.exists(home):
         dir = Path(home)
-        libs = []
         for path in dir.glob(suffix_pattern):
             match = re.match(libname_pattern, path.name)
             if match:
-                libs.append(path)
-        for lib in libs:
-            ret = load_library(str(lib))
-            if ret:
-                break
+                libs.append(str(path))
+
+    # mosekpy installation
+    try:
+        import mosek
+
+        dir = Path(mosek.__path__[0])
+
+        libname_pattern = {
+            "Linux": r"libmosek64\.so\.*",
+            "Darwin": r"libmosek64\.*\.dylib",
+            "Windows": r"mosek64_(\d+)_(\d+)\.dll",
+        }[platform.system()]
+        suffix_pattern = {
+            "Linux": "*.so.*",
+            "Darwin": "*.dylib",
+            "Windows": "*.dll",
+        }[platform.system()]
+
+        for path in dir.glob(suffix_pattern):
+            match = re.match(libname_pattern, path.name)
+            if match:
+                libs.append(str(path))
+    except Exception:
+        pass
+
+    # default names
+    default_libname = {
+        "Linux": "libmosek64.so",
+        "Darwin": "libmosek64.dylib",
+        "Windows": "mosek64_10_1.dll",
+    }[platform.system()]
+    libs.append(default_libname)
+
+    return libs
+
+
+libs = detected_libraries()
+for lib in libs:
+    ret = load_library(lib)
+    if ret:
+        logging.info(f"Loaded Mosek library: {lib}")
+        break
 
 DEFAULT_ENV = None
 
