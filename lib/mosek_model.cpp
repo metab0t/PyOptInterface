@@ -91,15 +91,15 @@ bool load_library(const std::string &path)
 		return false;
 	}
 
-#define B(f)                                                       \
-	{                                                              \
-		auto ptr = static_cast<decltype(f)>(lib.get_symbol(#f));   \
-		if (ptr == nullptr)                                        \
-		{                                                          \
-			fmt::print("function {} is not loaded correctly", #f); \
-			return false;                                          \
-		}                                                          \
-		f = ptr;                                                   \
+#define B(f)                                                          \
+	{                                                                 \
+		auto ptr = reinterpret_cast<decltype(f)>(lib.get_symbol(#f)); \
+		if (ptr == nullptr)                                           \
+		{                                                             \
+			fmt::print("function {} is not loaded correctly", #f);    \
+			return false;                                             \
+		}                                                             \
+		f = ptr;                                                      \
 	}
 	B(MSK_getcodedesc);
 	B(MSK_makeemptytask);

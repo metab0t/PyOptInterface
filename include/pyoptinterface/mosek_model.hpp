@@ -2,7 +2,11 @@
 
 #include <memory>
 
-#include "solvers/mosek/mosek.h"
+#ifdef _MSC_VER
+#include "solvers/mosek/mosek_win.h"
+#else
+#include "solvers/mosek/mosek_linux.h"
+#endif
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"

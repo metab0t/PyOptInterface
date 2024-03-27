@@ -34,7 +34,7 @@ class DynamicLibrary
 		    library, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR));
 
 #else
-		handle = dlopen(library.c_str(), RTLD_NOW);
+		handle = dlopen(library, RTLD_NOW);
 #endif
 		return handle != nullptr;
 	}
@@ -49,10 +49,10 @@ class DynamicLibrary
 #if defined(_MSC_VER)
 		FARPROC function_address = GetProcAddress(static_cast<HINSTANCE>(handle), name);
 #else
-		const void *function_address = dlsym(handle, name);
+		void *function_address = dlsym(handle, name);
 #endif
 
-		return static_cast<void *>(function_address);
+		return reinterpret_cast<void *>(function_address);
 	}
 
   private:
