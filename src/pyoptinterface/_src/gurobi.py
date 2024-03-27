@@ -81,12 +81,17 @@ def detected_libraries():
     return libs
 
 
-libs = detected_libraries()
-for lib in libs:
-    ret = load_library(lib)
-    if ret:
-        logging.info(f"Loaded Gurobi library: {lib}")
-        break
+def autoload_library():
+    libs = detected_libraries()
+    for lib in libs:
+        ret = load_library(lib)
+        if ret:
+            logging.info(f"Loaded Gurobi library: {lib}")
+            return True
+    return False
+
+
+autoload_library()
 
 DEFAULT_ENV = None
 
