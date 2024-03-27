@@ -10,6 +10,9 @@ extern void bind_mosek_constants(nb::module_ &m);
 
 NB_MODULE(mosek_model_ext, m)
 {
+	m.def("is_library_loaded", &mosek::is_library_loaded);
+	m.def("load_library", &mosek::load_library);
+
 	bind_mosek_constants(m);
 
 	nb::class_<MOSEKEnv>(m, "Env")

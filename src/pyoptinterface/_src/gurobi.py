@@ -3,18 +3,10 @@
 import os
 import platform
 import types
+from pathlib import Path
+import re
 
-if platform.system() == "Windows":
-    gurobi_home = os.environ.get("GUROBI_HOME", None)
-    if gurobi_home and os.path.exists(gurobi_home):
-        os.add_dll_directory(os.path.join(gurobi_home, "bin"))
-
-try:
-    from .gurobi_model_ext import RawModel, RawEnv, GRB
-except Exception as e:
-    raise ImportError(
-        f"Failed to import gurobi_model_ext. Please ensure that the dynamic library of Gurobi is loadable. Error: {e}"
-    )
+from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library, is_library_loaded
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -33,6 +25,36 @@ from .solver_common import (
 )
 from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_nd_variable
+
+if not is_library_loaded():
+    subdir = {
+        "Linux": "lib",
+        "Darwin": "lib",
+        "Windows": "bin",
+    }[platform.system()]
+    libname_pattern = {
+        "Linux": r"libgurobi(\d+)\.so",
+        "Darwin": r"libgurobi(\d+)\.dylib",
+        "Windows": r"gurobi(\d+)\.dll",
+    }[platform.system()]
+    suffix_pattern = {
+        "Linux": "*.so",
+        "Darwin": "*.dylib",
+        "Windows": "*.dll",
+    }[platform.system()]
+
+    home = os.environ.get("GUROBI_HOME", None)
+    if home and os.path.exists(home):
+        dir = Path(home) / subdir
+        libs = []
+        for path in dir.glob(suffix_pattern):
+            match = re.match(libname_pattern, path.name)
+            if match:
+                libs.append(path)
+        for lib in libs:
+            ret = load_library(str(lib))
+            if ret:
+                break
 
 DEFAULT_ENV = None
 

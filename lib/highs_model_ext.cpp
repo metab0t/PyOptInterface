@@ -10,6 +10,9 @@ extern void bind_highs_constants(nb::module_ &m);
 
 NB_MODULE(highs_model_ext, m)
 {
+	m.def("is_library_loaded", &highs::is_library_loaded);
+	m.def("load_library", &highs::load_library);
+
 	bind_highs_constants(m);
 
 	nb::enum_<HighsSolutionStatus>(m, "HighsSolutionStatus")

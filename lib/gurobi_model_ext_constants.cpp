@@ -1,5 +1,5 @@
 #include <nanobind/nanobind.h>
-#include "gurobi_c.h"
+#include "solvers/gurobi/gurobi_c.h"
 
 namespace nb = nanobind;
 

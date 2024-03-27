@@ -1,5 +1,5 @@
 #include <nanobind/nanobind.h>
-#include "copt.h"
+#include "solvers/copt/copt.h"
 
 namespace nb = nanobind;
 

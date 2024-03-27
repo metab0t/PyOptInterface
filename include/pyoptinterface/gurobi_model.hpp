@@ -2,11 +2,72 @@
 
 #include <memory>
 
-#include "gurobi_c.h"
+#include "solvers/gurobi/gurobi_c.h"
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
+
+// define Gurobi C APIs
+namespace gurobi
+{
+#define B(f) extern decltype(&::f) f
+
+B(GRBnewmodel);
+B(GRBfreemodel);
+B(GRBgetenv);
+B(GRBaddvar);
+B(GRBdelvars);
+B(GRBaddconstr);
+B(GRBaddqconstr);
+B(GRBaddsos);
+B(GRBdelconstrs);
+B(GRBdelqconstrs);
+B(GRBdelsos);
+B(GRBdelq);
+B(GRBsetdblattrarray);
+B(GRBaddqpterms);
+B(GRBoptimize);
+B(GRBupdatemodel);
+B(GRBgetparamtype);
+B(GRBsetintparam);
+B(GRBsetdblparam);
+B(GRBsetstrparam);
+B(GRBgetintparam);
+B(GRBgetdblparam);
+B(GRBgetstrparam);
+B(GRBgetattrinfo);
+B(GRBsetintattr);
+B(GRBsetdblattr);
+B(GRBsetstrattr);
+B(GRBgetintattr);
+B(GRBgetdblattr);
+B(GRBgetstrattr);
+B(GRBgetdblattrarray);
+B(GRBgetdblattrlist);
+B(GRBsetintattrelement);
+B(GRBsetcharattrelement);
+B(GRBsetdblattrelement);
+B(GRBsetstrattrelement);
+B(GRBgetintattrelement);
+B(GRBgetcharattrelement);
+B(GRBgetdblattrelement);
+B(GRBgetstrattrelement);
+B(GRBgetcoeff);
+B(GRBchgcoeffs);
+B(GRBgeterrormsg);
+B(GRBversion);
+B(GRBemptyenv);
+B(GRBloadenv);
+B(GRBfreeenv);
+B(GRBstartenv);
+
+#undef B
+
+bool is_library_loaded();
+
+bool load_library(const std::string &path);
+} // namespace gurobi
 
 class GurobiEnv
 {
@@ -34,7 +95,7 @@ struct GRBfreemodelT
 {
 	void operator()(GRBmodel *model) const
 	{
-		GRBfreemodel(model);
+		gurobi::GRBfreemodel(model);
 	};
 };
 
@@ -190,7 +251,6 @@ class GurobiModel
 	void _update_for_information();
 	void _update_for_variable_index();
 	void _update_for_constraint_index(ConstraintType type);
-
 
 	/* Gurobi part */
 	GRBenv *m_env = nullptr;

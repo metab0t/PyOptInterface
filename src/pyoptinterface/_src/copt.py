@@ -1,19 +1,9 @@
 import os
 import platform
 import types
+from pathlib import Path
 
-if platform.system() == "Windows":
-    copt_home = os.environ.get("COPT_HOME", None)
-    if copt_home and os.path.exists(copt_home):
-        os.add_dll_directory(os.path.join(copt_home, "bin"))
-
-try:
-    from .copt_model_ext import RawModel, Env, COPT
-except Exception as e:
-    raise ImportError(
-        f"Failed to import copt_model_ext. Please ensure that the dynamic library of COPT is loadable. Error: {e}"
-    )
-
+from .copt_model_ext import RawModel, Env, COPT, load_library, is_library_loaded
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -29,6 +19,24 @@ from .solver_common import (
     _direct_set_entity_attribute,
 )
 from .aml import make_nd_variable
+
+if not is_library_loaded():
+    subdir = {
+        "Linux": "lib",
+        "Darwin": "lib",
+        "Windows": "bin",
+    }[platform.system()]
+    libname = {
+        "Linux": "libcopt.so",
+        "Darwin": "libcopt.dylib",
+        "Windows": "copt.dll",
+    }[platform.system()]
+
+    home = os.environ.get("COPT_HOME", None)
+    if home and os.path.exists(home):
+        lib = Path(home) / subdir / libname
+        if lib.exists():
+            ret = load_library(str(lib))
 
 DEFAULT_ENV = None
 

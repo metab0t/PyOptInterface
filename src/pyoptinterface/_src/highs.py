@@ -1,19 +1,15 @@
 import os
 import platform
 import types
+from pathlib import Path
 
-if platform.system() == "Windows":
-    highs_home = os.environ.get("HiGHS_HOME", None)
-    if highs_home and os.path.exists(highs_home):
-        os.add_dll_directory(os.path.join(highs_home, "bin"))
-
-try:
-    from .highs_model_ext import RawModel, HighsSolutionStatus, Enum
-except Exception as e:
-    raise ImportError(
-        f"Failed to import highs_model_ext. Please ensure that the dynamic library of HiGHS is loadable. Error: {e}"
-    )
-
+from .highs_model_ext import (
+    RawModel,
+    HighsSolutionStatus,
+    Enum,
+    load_library,
+    is_library_loaded,
+)
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -29,6 +25,36 @@ from .solver_common import (
     _direct_set_entity_attribute,
 )
 from .aml import make_nd_variable
+
+if not is_library_loaded():
+    subdir = {
+        "Linux": "lib",
+        "Darwin": "lib",
+        "Windows": "bin",
+    }[platform.system()]
+    libname = {
+        "Linux": "libhighs.so",
+        "Darwin": "libhighs.dylib",
+        "Windows": "highs.dll",
+    }[platform.system()]
+
+    home = os.environ.get("HiGHS_HOME", None)
+    if home and os.path.exists(home):
+        lib = Path(home) / subdir / libname
+        if lib.exists():
+            ret = load_library(str(lib))
+
+    if not is_library_loaded():
+        try:
+            import highsbox
+
+            home = highsbox.highs_dist_dir()
+            if os.path.exists(home):
+                lib = Path(home) / subdir / libname
+                if lib.exists():
+                    ret = load_library(str(lib))
+        except Exception as e:
+            pass
 
 variable_attribute_get_func_map = {
     VariableAttribute.Value: lambda model, v: model.get_value(v),

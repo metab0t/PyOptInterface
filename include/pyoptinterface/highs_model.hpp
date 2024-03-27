@@ -9,11 +9,75 @@
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
 
+namespace highs
+{
+#define B(f) extern decltype(&::f) f
+
+B(Highs_create);
+B(Highs_destroy);
+B(Highs_addCol);
+B(Highs_getNumCol);
+B(Highs_changeColIntegrality);
+B(Highs_passColName);
+B(Highs_deleteColsBySet);
+B(Highs_addRow);
+B(Highs_getNumRow);
+B(Highs_passRowName);
+B(Highs_deleteRowsBySet);
+B(Highs_passHessian);
+B(Highs_changeColsCostByRange);
+B(Highs_changeObjectiveOffset);
+B(Highs_changeObjectiveSense);
+B(Highs_run);
+B(Highs_getNumCols);
+B(Highs_getNumRows);
+B(Highs_getModelStatus);
+B(Highs_getDualRay);
+B(Highs_getPrimalRay);
+B(Highs_getIntInfoValue);
+B(Highs_getSolution);
+B(Highs_getHessianNumNz);
+B(Highs_getBasis);
+B(Highs_version);
+B(Highs_getRunTime);
+B(Highs_getOptionType);
+B(Highs_setBoolOptionValue);
+B(Highs_setIntOptionValue);
+B(Highs_setDoubleOptionValue);
+B(Highs_setStringOptionValue);
+B(Highs_getBoolOptionValue);
+B(Highs_getIntOptionValue);
+B(Highs_getDoubleOptionValue);
+B(Highs_getStringOptionValue);
+B(Highs_getInfoType);
+B(Highs_getInt64InfoValue);
+B(Highs_getDoubleInfoValue);
+B(Highs_getColName);
+B(Highs_getColIntegrality);
+B(Highs_changeColsBoundsBySet);
+B(Highs_getColsBySet);
+B(Highs_getRowName);
+B(Highs_getObjectiveSense);
+B(Highs_getObjectiveValue);
+B(Highs_getColsByRange);
+B(Highs_setSolution);
+B(Highs_getRowsBySet);
+B(Highs_changeRowsBoundsBySet);
+B(Highs_changeCoeff);
+B(Highs_changeColCost);
+
+#undef B
+
+bool is_library_loaded();
+
+bool load_library(const std::string &path);
+} // namespace highs
+
 struct HighsfreemodelT
 {
 	void operator()(void *model) const
 	{
-		Highs_destroy(model);
+		highs::Highs_destroy(model);
 	};
 };
 

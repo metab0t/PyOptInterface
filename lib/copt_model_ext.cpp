@@ -10,6 +10,9 @@ extern void bind_copt_constants(nb::module_ &m);
 
 NB_MODULE(copt_model_ext, m)
 {
+	m.def("is_library_loaded", &copt::is_library_loaded);
+	m.def("load_library", &copt::load_library);
+
 	bind_copt_constants(m);
 
 	nb::class_<COPTEnvConfig>(m, "EnvConfig").def(nb::init<>()).def("set", &COPTEnvConfig::set);
@@ -100,7 +103,7 @@ NB_MODULE(copt_model_ext, m)
 	    .def("set_objective",
 	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModelMixin::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
-		.def("set_objective",
+	    .def("set_objective",
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 

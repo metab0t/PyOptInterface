@@ -10,6 +10,9 @@ extern void bind_gurobi_constants(nb::module_ &m);
 
 NB_MODULE(gurobi_model_ext, m)
 {
+	m.def("is_library_loaded", &gurobi::is_library_loaded);
+	m.def("load_library", &gurobi::load_library);
+
 	bind_gurobi_constants(m);
 
 #define BIND_F(f) .def(#f, &GurobiEnv::f)

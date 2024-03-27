@@ -1,6 +1,156 @@
+#include "pyoptinterface/dylib.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/copt_model.hpp"
 #include "fmt/core.h"
+
+namespace copt
+{
+#define B(f) decltype(&::f) f = nullptr
+
+B(COPT_GetRetcodeMsg);
+B(COPT_CreateProb);
+B(COPT_DeleteProb);
+B(COPT_AddCol);
+B(COPT_DelCols);
+B(COPT_AddRow);
+B(COPT_AddQConstr);
+B(COPT_AddSOSs);
+B(COPT_AddCones);
+B(COPT_DelRows);
+B(COPT_DelQConstrs);
+B(COPT_DelSOSs);
+B(COPT_DelCones);
+B(COPT_DelQuadObj);
+B(COPT_ReplaceColObj);
+B(COPT_SetObjConst);
+B(COPT_SetObjSense);
+B(COPT_SetQuadObj);
+B(COPT_Solve);
+B(COPT_SearchParamAttr);
+B(COPT_SetIntParam);
+B(COPT_SetDblParam);
+B(COPT_GetIntParam);
+B(COPT_GetDblParam);
+B(COPT_GetIntAttr);
+B(COPT_GetDblAttr);
+B(COPT_GetColInfo);
+B(COPT_GetColName);
+B(COPT_SetColNames);
+B(COPT_GetColType);
+B(COPT_SetColType);
+B(COPT_SetColLower);
+B(COPT_SetColUpper);
+B(COPT_GetRowInfo);
+B(COPT_GetQConstrInfo);
+B(COPT_GetRowName);
+B(COPT_GetQConstrName);
+B(COPT_SetRowNames);
+B(COPT_SetQConstrNames);
+B(COPT_AddMipStart);
+B(COPT_GetQConstrRhs);
+B(COPT_SetRowLower);
+B(COPT_SetRowUpper);
+B(COPT_SetQConstrRhs);
+B(COPT_GetElem);
+B(COPT_SetElem);
+B(COPT_SetColObj);
+B(COPT_GetBanner);
+B(COPT_CreateEnv);
+B(COPT_CreateEnvWithConfig);
+B(COPT_DeleteEnv);
+B(COPT_CreateEnvConfig);
+B(COPT_DeleteEnvConfig);
+B(COPT_SetEnvConfig);
+
+#undef B
+
+static DynamicLibrary lib;
+static bool is_loaded = false;
+
+bool is_library_loaded()
+{
+	return is_loaded;
+}
+
+bool load_library(const std::string &path)
+{
+	bool success = lib.try_load(path.c_str());
+	if (!success)
+	{
+		return false;
+	}
+
+#define B(f)                                                       \
+	{                                                              \
+		auto ptr = static_cast<decltype(f)>(lib.get_symbol(#f));   \
+		if (ptr == nullptr)                                        \
+		{                                                          \
+			fmt::print("function {} is not loaded correctly", #f); \
+			return false;                                          \
+		}                                                          \
+		f = ptr;                                                   \
+	}
+	B(COPT_GetRetcodeMsg);
+	B(COPT_CreateProb);
+	B(COPT_DeleteProb);
+	B(COPT_AddCol);
+	B(COPT_DelCols);
+	B(COPT_AddRow);
+	B(COPT_AddQConstr);
+	B(COPT_AddSOSs);
+	B(COPT_AddCones);
+	B(COPT_DelRows);
+	B(COPT_DelQConstrs);
+	B(COPT_DelSOSs);
+	B(COPT_DelCones);
+	B(COPT_DelQuadObj);
+	B(COPT_ReplaceColObj);
+	B(COPT_SetObjConst);
+	B(COPT_SetObjSense);
+	B(COPT_SetQuadObj);
+	B(COPT_Solve);
+	B(COPT_SearchParamAttr);
+	B(COPT_SetIntParam);
+	B(COPT_SetDblParam);
+	B(COPT_GetIntParam);
+	B(COPT_GetDblParam);
+	B(COPT_GetIntAttr);
+	B(COPT_GetDblAttr);
+	B(COPT_GetColInfo);
+	B(COPT_GetColName);
+	B(COPT_SetColNames);
+	B(COPT_GetColType);
+	B(COPT_SetColType);
+	B(COPT_SetColLower);
+	B(COPT_SetColUpper);
+	B(COPT_GetRowInfo);
+	B(COPT_GetQConstrInfo);
+	B(COPT_GetRowName);
+	B(COPT_GetQConstrName);
+	B(COPT_SetRowNames);
+	B(COPT_SetQConstrNames);
+	B(COPT_AddMipStart);
+	B(COPT_GetQConstrRhs);
+	B(COPT_SetRowLower);
+	B(COPT_SetRowUpper);
+	B(COPT_SetQConstrRhs);
+	B(COPT_GetElem);
+	B(COPT_SetElem);
+	B(COPT_SetColObj);
+	B(COPT_GetBanner);
+	B(COPT_CreateEnv);
+	B(COPT_CreateEnvWithConfig);
+	B(COPT_DeleteEnv);
+	B(COPT_CreateEnvConfig);
+	B(COPT_DeleteEnvConfig);
+	B(COPT_SetEnvConfig);
+#undef B
+
+	is_loaded = true;
+
+	return true;
+}
+} // namespace copt
 
 static void check_error(int error)
 {
@@ -8,7 +158,7 @@ static void check_error(int error)
 	{
 		char errmsg[COPT_BUFFSIZE];
 
-		COPT_GetRetcodeMsg(error, errmsg, COPT_BUFFSIZE);
+		copt::COPT_GetRetcodeMsg(error, errmsg, COPT_BUFFSIZE);
 		throw std::runtime_error(errmsg);
 	}
 }
@@ -91,8 +241,12 @@ COPTModel::COPTModel(const COPTEnv &env)
 
 void COPTModel::init(const COPTEnv &env)
 {
+	if (!copt::is_library_loaded())
+	{
+		throw std::runtime_error("COPT library is not loaded");
+	}
 	copt_prob *model;
-	int error = COPT_CreateProb(env.m_env, &model);
+	int error = copt::COPT_CreateProb(env.m_env, &model);
 	check_error(error);
 	m_model = std::unique_ptr<copt_prob, COPTfreemodelT>(model);
 }
@@ -107,7 +261,7 @@ VariableIndex COPTModel::add_variable(VariableDomain domain, double lb, double u
 	VariableIndex variable(index);
 
 	char vtype = copt_vtype(domain);
-	int error = COPT_AddCol(m_model.get(), 0.0, 0, NULL, NULL, vtype, lb, ub, name);
+	int error = copt::COPT_AddCol(m_model.get(), 0.0, 0, NULL, NULL, vtype, lb, ub, name);
 	check_error(error);
 
 	return variable;
@@ -121,7 +275,7 @@ void COPTModel::delete_variable(const VariableIndex &variable)
 	}
 
 	int variable_column = _variable_index(variable);
-	int error = COPT_DelCols(m_model.get(), 1, &variable_column);
+	int error = copt::COPT_DelCols(m_model.get(), 1, &variable_column);
 	check_error(error);
 
 	m_variable_index.delete_index(variable.index);
@@ -145,7 +299,7 @@ void COPTModel::delete_variables(const Vector<VariableIndex> &variables)
 		columns.push_back(column);
 	}
 
-	int error = COPT_DelCols(m_model.get(), columns.size(), columns.data());
+	int error = copt::COPT_DelCols(m_model.get(), columns.size(), columns.data());
 	check_error(error);
 
 	for (int i = 0; i < n_variables; i++)
@@ -190,7 +344,7 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 		name = nullptr;
 	}
 
-	int error = COPT_AddRow(m_model.get(), numnz, cind, cval, g_sense, g_rhs, g_rhs, name);
+	int error = copt::COPT_AddRow(m_model.get(), numnz, cind, cval, g_sense, g_rhs, g_rhs, name);
 	check_error(error);
 	return constraint_index;
 }
@@ -234,8 +388,8 @@ ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 		name = nullptr;
 	}
 
-	int error = COPT_AddQConstr(m_model.get(), numlnz, lind, lval, numqnz, qrow, qcol, qval,
-	                            g_sense, g_rhs, name);
+	int error = copt::COPT_AddQConstr(m_model.get(), numlnz, lind, lval, numqnz, qrow, qcol, qval,
+	                                  g_sense, g_rhs, name);
 	check_error(error);
 	return constraint_index;
 }
@@ -266,7 +420,7 @@ ConstraintIndex COPTModel::add_sos_constraint(const Vector<VariableIndex> &varia
 	int *ind = ind_v.data();
 	double *weight = (double *)weights.data();
 
-	int error = COPT_AddSOSs(m_model.get(), numsos, &types, beg, cnt, ind, weight);
+	int error = copt::COPT_AddSOSs(m_model.get(), numsos, &types, beg, cnt, ind, weight);
 	check_error(error);
 	return constraint_index;
 }
@@ -289,7 +443,7 @@ ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<Variabl
 	int coneCnt[] = {N};
 	int *coneIdx = ind_v.data();
 
-	int error = COPT_AddCones(m_model.get(), 1, coneType, coneBeg, coneCnt, coneIdx);
+	int error = copt::COPT_AddCones(m_model.get(), 1, coneType, coneBeg, coneCnt, coneIdx);
 	check_error(error);
 
 	// COPT does not support name for cone constraints
@@ -307,19 +461,19 @@ void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 		{
 		case ConstraintType::Linear:
 			m_linear_constraint_index.delete_index(constraint.index);
-			error = COPT_DelRows(m_model.get(), 1, &constraint_row);
+			error = copt::COPT_DelRows(m_model.get(), 1, &constraint_row);
 			break;
 		case ConstraintType::Quadratic:
 			m_quadratic_constraint_index.delete_index(constraint.index);
-			error = COPT_DelQConstrs(m_model.get(), 1, &constraint_row);
+			error = copt::COPT_DelQConstrs(m_model.get(), 1, &constraint_row);
 			break;
 		case ConstraintType::SOS:
 			m_sos_constraint_index.delete_index(constraint.index);
-			error = COPT_DelSOSs(m_model.get(), 1, &constraint_row);
+			error = copt::COPT_DelSOSs(m_model.get(), 1, &constraint_row);
 			break;
 		case ConstraintType::Cone:
 			m_cone_constraint_index.delete_index(constraint.index);
-			error = COPT_DelCones(m_model.get(), 1, &constraint_row);
+			error = copt::COPT_DelCones(m_model.get(), 1, &constraint_row);
 			break;
 		default:
 			throw std::runtime_error("Unknown constraint type");
@@ -352,7 +506,7 @@ void COPTModel::_set_affine_objective(const ScalarAffineFunction &function, Obje
 	if (clear_quadratic)
 	{
 		// First delete all quadratic terms
-		error = COPT_DelQuadObj(m_model.get());
+		error = copt::COPT_DelQuadObj(m_model.get());
 		check_error(error);
 	}
 
@@ -376,13 +530,13 @@ void COPTModel::_set_affine_objective(const ScalarAffineFunction &function, Obje
 		obj_v[column] = function.coefficients[i];
 	}
 
-	error = COPT_ReplaceColObj(m_model.get(), n_variables, ind_v.data(), obj_v.data());
+	error = copt::COPT_ReplaceColObj(m_model.get(), n_variables, ind_v.data(), obj_v.data());
 	check_error(error);
-	error = COPT_SetObjConst(m_model.get(), function.constant.value_or(0.0));
+	error = copt::COPT_SetObjConst(m_model.get(), function.constant.value_or(0.0));
 	check_error(error);
 
 	int obj_sense = copt_obj_sense(sense);
-	error = COPT_SetObjSense(m_model.get(), obj_sense);
+	error = copt::COPT_SetObjSense(m_model.get(), obj_sense);
 	check_error(error);
 }
 
@@ -395,7 +549,7 @@ void COPTModel::set_objective(const ScalarQuadraticFunction &function, Objective
 {
 	int error = 0;
 	// First delete all quadratic terms
-	error = COPT_DelQuadObj(m_model.get());
+	error = copt::COPT_DelQuadObj(m_model.get());
 	check_error(error);
 
 	// Add quadratic term
@@ -409,7 +563,7 @@ void COPTModel::set_objective(const ScalarQuadraticFunction &function, Objective
 		int *qcol = ptr_form.col;
 		double *qval = ptr_form.value;
 
-		error = COPT_SetQuadObj(m_model.get(), numqnz, qrow, qcol, qval);
+		error = copt::COPT_SetQuadObj(m_model.get(), numqnz, qrow, qcol, qval);
 		check_error(error);
 	}
 
@@ -448,38 +602,34 @@ void COPTModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
 
 void COPTModel::optimize()
 {
-	int error = COPT_Solve(m_model.get());
+	int error = copt::COPT_Solve(m_model.get());
 	check_error(error);
 }
 
-extern "C"
-{
-	int COPT_SearchParamAttr(copt_prob *prob, const char *name, int *p_type);
-}
 int COPTModel::raw_parameter_attribute_type(const char *name)
 {
 	int retval;
-	int error = COPT_SearchParamAttr(m_model.get(), name, &retval);
+	int error = copt::COPT_SearchParamAttr(m_model.get(), name, &retval);
 	check_error(error);
 	return retval;
 }
 
 void COPTModel::set_raw_parameter_int(const char *param_name, int value)
 {
-	int error = COPT_SetIntParam(m_model.get(), param_name, value);
+	int error = copt::COPT_SetIntParam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void COPTModel::set_raw_parameter_double(const char *param_name, double value)
 {
-	int error = COPT_SetDblParam(m_model.get(), param_name, value);
+	int error = copt::COPT_SetDblParam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 int COPTModel::get_raw_parameter_int(const char *param_name)
 {
 	int retval;
-	int error = COPT_GetIntParam(m_model.get(), param_name, &retval);
+	int error = copt::COPT_GetIntParam(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -487,7 +637,7 @@ int COPTModel::get_raw_parameter_int(const char *param_name)
 double COPTModel::get_raw_parameter_double(const char *param_name)
 {
 	double retval;
-	int error = COPT_GetDblParam(m_model.get(), param_name, &retval);
+	int error = copt::COPT_GetDblParam(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -495,7 +645,7 @@ double COPTModel::get_raw_parameter_double(const char *param_name)
 int COPTModel::get_raw_attribute_int(const char *attr_name)
 {
 	int retval;
-	int error = COPT_GetIntAttr(m_model.get(), attr_name, &retval);
+	int error = copt::COPT_GetIntAttr(m_model.get(), attr_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -503,7 +653,7 @@ int COPTModel::get_raw_attribute_int(const char *attr_name)
 double COPTModel::get_raw_attribute_double(const char *attr_name)
 {
 	double retval;
-	int error = COPT_GetDblAttr(m_model.get(), attr_name, &retval);
+	int error = copt::COPT_GetDblAttr(m_model.get(), attr_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -512,7 +662,7 @@ double COPTModel::get_variable_info(const VariableIndex &variable, const char *i
 {
 	auto column = _checked_variable_index(variable);
 	double retval;
-	int error = COPT_GetColInfo(m_model.get(), info_name, 1, &column, &retval);
+	int error = copt::COPT_GetColInfo(m_model.get(), info_name, 1, &column, &retval);
 	check_error(error);
 	return retval;
 }
@@ -522,10 +672,10 @@ std::string COPTModel::get_variable_name(const VariableIndex &variable)
 	auto column = _checked_variable_index(variable);
 	int error;
 	int reqsize;
-	error = COPT_GetColName(m_model.get(), column, NULL, 0, &reqsize);
+	error = copt::COPT_GetColName(m_model.get(), column, NULL, 0, &reqsize);
 	check_error(error);
 	std::string retval(reqsize - 1, '\0');
-	error = COPT_GetColName(m_model.get(), column, retval.data(), reqsize, &reqsize);
+	error = copt::COPT_GetColName(m_model.get(), column, retval.data(), reqsize, &reqsize);
 	check_error(error);
 	return retval;
 }
@@ -534,7 +684,7 @@ void COPTModel::set_variable_name(const VariableIndex &variable, const char *nam
 {
 	auto column = _checked_variable_index(variable);
 	const char *names[] = {name};
-	int error = COPT_SetColNames(m_model.get(), 1, &column, names);
+	int error = copt::COPT_SetColNames(m_model.get(), 1, &column, names);
 	check_error(error);
 }
 
@@ -542,7 +692,7 @@ VariableDomain COPTModel::get_variable_type(const VariableIndex &variable)
 {
 	auto column = _checked_variable_index(variable);
 	char vtype;
-	int error = COPT_GetColType(m_model.get(), 1, &column, &vtype);
+	int error = copt::COPT_GetColType(m_model.get(), 1, &column, &vtype);
 	check_error(error);
 	return copt_vtype_to_domain(vtype);
 }
@@ -551,21 +701,21 @@ void COPTModel::set_variable_type(const VariableIndex &variable, VariableDomain 
 {
 	char vtype = copt_vtype(domain);
 	auto column = _checked_variable_index(variable);
-	int error = COPT_SetColType(m_model.get(), 1, &column, &vtype);
+	int error = copt::COPT_SetColType(m_model.get(), 1, &column, &vtype);
 	check_error(error);
 }
 
 void COPTModel::set_variable_lower_bound(const VariableIndex &variable, double lb)
 {
 	auto column = _checked_variable_index(variable);
-	int error = COPT_SetColLower(m_model.get(), 1, &column, &lb);
+	int error = copt::COPT_SetColLower(m_model.get(), 1, &column, &lb);
 	check_error(error);
 }
 
 void COPTModel::set_variable_upper_bound(const VariableIndex &variable, double ub)
 {
 	auto column = _checked_variable_index(variable);
-	int error = COPT_SetColUpper(m_model.get(), 1, &column, &ub);
+	int error = copt::COPT_SetColUpper(m_model.get(), 1, &column, &ub);
 	check_error(error);
 }
 
@@ -578,10 +728,10 @@ double COPTModel::get_constraint_info(const ConstraintIndex &constraint, const c
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
-		error = COPT_GetRowInfo(m_model.get(), info_name, num, &row, &retval);
+		error = copt::COPT_GetRowInfo(m_model.get(), info_name, num, &row, &retval);
 		break;
 	case ConstraintType::Quadratic:
-		error = COPT_GetQConstrInfo(m_model.get(), info_name, num, &row, &retval);
+		error = copt::COPT_GetQConstrInfo(m_model.get(), info_name, num, &row, &retval);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -598,10 +748,10 @@ std::string COPTModel::get_constraint_name(const ConstraintIndex &constraint)
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
-		error = COPT_GetRowName(m_model.get(), row, NULL, 0, &reqsize);
+		error = copt::COPT_GetRowName(m_model.get(), row, NULL, 0, &reqsize);
 		break;
 	case ConstraintType::Quadratic:
-		error = COPT_GetQConstrName(m_model.get(), row, NULL, 0, &reqsize);
+		error = copt::COPT_GetQConstrName(m_model.get(), row, NULL, 0, &reqsize);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -611,10 +761,10 @@ std::string COPTModel::get_constraint_name(const ConstraintIndex &constraint)
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
-		error = COPT_GetRowName(m_model.get(), row, retval.data(), reqsize, &reqsize);
+		error = copt::COPT_GetRowName(m_model.get(), row, retval.data(), reqsize, &reqsize);
 		break;
 	case ConstraintType::Quadratic:
-		error = COPT_GetQConstrName(m_model.get(), row, retval.data(), reqsize, &reqsize);
+		error = copt::COPT_GetQConstrName(m_model.get(), row, retval.data(), reqsize, &reqsize);
 		break;
 	}
 	check_error(error);
@@ -629,10 +779,10 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 	switch (constraint.type)
 	{
 	case ConstraintType::Linear:
-		error = COPT_SetRowNames(m_model.get(), 1, &row, names);
+		error = copt::COPT_SetRowNames(m_model.get(), 1, &row, names);
 		break;
 	case ConstraintType::Quadratic:
-		error = COPT_SetQConstrNames(m_model.get(), 1, &row, names);
+		error = copt::COPT_SetQConstrNames(m_model.get(), 1, &row, names);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -643,7 +793,7 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 void COPTModel::set_obj_sense(ObjectiveSense sense)
 {
 	int obj_sense = copt_obj_sense(sense);
-	int error = COPT_SetObjSense(m_model.get(), obj_sense);
+	int error = copt::COPT_SetObjSense(m_model.get(), obj_sense);
 	check_error(error);
 }
 
@@ -665,7 +815,7 @@ void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vect
 	int *ind = ind_v.data();
 	double *val = (double *)values.data();
 
-	int error = COPT_AddMipStart(m_model.get(), numnz, ind, val);
+	int error = copt::COPT_AddMipStart(m_model.get(), numnz, ind, val);
 	check_error(error);
 }
 
@@ -678,9 +828,9 @@ double COPTModel::get_normalized_rhs(const ConstraintIndex &constraint)
 	{
 	case ConstraintType::Linear: {
 		double lb, ub;
-		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
+		error = copt::COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
 		check_error(error);
-		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
+		error = copt::COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
 		check_error(error);
 
 		bool lb_inf = lb < -COPT_INFINITY + 1.0;
@@ -696,7 +846,7 @@ double COPTModel::get_normalized_rhs(const ConstraintIndex &constraint)
 	break;
 	case ConstraintType::Quadratic: {
 		double rhs;
-		error = COPT_GetQConstrRhs(m_model.get(), num, &row, &rhs);
+		error = copt::COPT_GetQConstrRhs(m_model.get(), num, &row, &rhs);
 		check_error(error);
 		return rhs;
 	}
@@ -716,9 +866,9 @@ void COPTModel::set_normalized_rhs(const ConstraintIndex &constraint, double val
 	case ConstraintType::Linear: {
 		double lb, ub;
 
-		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
+		error = copt::COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_LB, num, &row, &lb);
 		check_error(error);
-		error = COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
+		error = copt::COPT_GetRowInfo(m_model.get(), COPT_DBLINFO_UB, num, &row, &ub);
 		check_error(error);
 
 		bool lb_inf = lb < -COPT_INFINITY + 1.0;
@@ -726,12 +876,12 @@ void COPTModel::set_normalized_rhs(const ConstraintIndex &constraint, double val
 
 		if (!lb_inf)
 		{
-			error = COPT_SetRowLower(m_model.get(), num, &row, &value);
+			error = copt::COPT_SetRowLower(m_model.get(), num, &row, &value);
 			check_error(error);
 		}
 		if (!ub_inf)
 		{
-			error = COPT_SetRowUpper(m_model.get(), num, &row, &value);
+			error = copt::COPT_SetRowUpper(m_model.get(), num, &row, &value);
 			check_error(error);
 		}
 
@@ -742,7 +892,7 @@ void COPTModel::set_normalized_rhs(const ConstraintIndex &constraint, double val
 	}
 	break;
 	case ConstraintType::Quadratic: {
-		error = COPT_SetQConstrRhs(m_model.get(), num, &row, &value);
+		error = copt::COPT_SetQConstrRhs(m_model.get(), num, &row, &value);
 		check_error(error);
 	}
 	break;
@@ -761,7 +911,7 @@ double COPTModel::get_normalized_coefficient(const ConstraintIndex &constraint,
 	int row = _checked_constraint_index(constraint);
 	int col = _checked_variable_index(variable);
 	double retval;
-	int error = COPT_GetElem(m_model.get(), col, row, &retval);
+	int error = copt::COPT_GetElem(m_model.get(), col, row, &retval);
 	check_error(error);
 	return retval;
 }
@@ -775,7 +925,7 @@ void COPTModel::set_normalized_coefficient(const ConstraintIndex &constraint,
 	}
 	int row = _checked_constraint_index(constraint);
 	int col = _checked_variable_index(variable);
-	int error = COPT_SetElem(m_model.get(), col, row, value);
+	int error = copt::COPT_SetElem(m_model.get(), col, row, value);
 	check_error(error);
 }
 
@@ -787,7 +937,7 @@ double COPTModel::get_objective_coefficient(const VariableIndex &variable)
 void COPTModel::set_objective_coefficient(const VariableIndex &variable, double value)
 {
 	auto column = _checked_variable_index(variable);
-	int error = COPT_SetColObj(m_model.get(), 1, &column, &value);
+	int error = copt::COPT_SetColObj(m_model.get(), 1, &column, &value);
 	check_error(error);
 }
 
@@ -840,43 +990,55 @@ void *COPTModel::get_raw_model()
 
 std::string COPTModel::version_string()
 {
-	std::string version =
-	    fmt::format("v{}.{}.{}", COPT_VERSION_MAJOR, COPT_VERSION_MINOR, COPT_VERSION_TECHNICAL);
-	return version;
+	char buffer[COPT_BUFFSIZE];
+	copt::COPT_GetBanner(buffer, COPT_BUFFSIZE);
+	return buffer;
 }
 
 COPTEnv::COPTEnv()
 {
-	int error = COPT_CreateEnv(&m_env);
+	if (!copt::is_library_loaded())
+	{
+		throw std::runtime_error("COPT library is not loaded");
+	}
+	int error = copt::COPT_CreateEnv(&m_env);
 	check_error(error);
 }
 
 COPTEnv::COPTEnv(COPTEnvConfig &config)
 {
-	int error = COPT_CreateEnvWithConfig(config.m_config, &m_env);
+	if (!copt::is_library_loaded())
+	{
+		throw std::runtime_error("COPT library is not loaded");
+	}
+	int error = copt::COPT_CreateEnvWithConfig(config.m_config, &m_env);
 	check_error(error);
 }
 
 COPTEnv::~COPTEnv()
 {
-	int error = COPT_DeleteEnv(&m_env);
+	int error = copt::COPT_DeleteEnv(&m_env);
 	check_error(error);
 }
 
 COPTEnvConfig::COPTEnvConfig()
 {
-	int error = COPT_CreateEnvConfig(&m_config);
+	if (!copt::is_library_loaded())
+	{
+		throw std::runtime_error("COPT library is not loaded");
+	}
+	int error = copt::COPT_CreateEnvConfig(&m_config);
 	check_error(error);
 }
 
 COPTEnvConfig::~COPTEnvConfig()
 {
-	int error = COPT_DeleteEnvConfig(&m_config);
+	int error = copt::COPT_DeleteEnvConfig(&m_config);
 	check_error(error);
 }
 
 void COPTEnvConfig::set(const char *param_name, const char *value)
 {
-	int error = COPT_SetEnvConfig(m_config, param_name, value);
+	int error = copt::COPT_SetEnvConfig(m_config, param_name, value);
 	check_error(error);
 }

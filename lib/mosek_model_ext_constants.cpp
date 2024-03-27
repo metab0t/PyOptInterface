@@ -1,5 +1,5 @@
 #include <nanobind/nanobind.h>
-#include "mosek.h"
+#include "solvers/mosek/mosek.h"
 
 namespace nb = nanobind;
 

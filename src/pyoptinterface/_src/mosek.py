@@ -2,20 +2,10 @@ import os
 import platform
 from typing import Optional
 import types
+from pathlib import Path
+import re
 
-if platform.system() == "Windows":
-    bindir = os.environ.get("MOSEK_10_1_BINDIR", None)
-    if bindir and os.path.exists(bindir):
-        os.add_dll_directory(bindir)
-
-
-try:
-    from .mosek_model_ext import RawModel, Env, Enum
-except Exception as e:
-    raise ImportError(
-        f"Failed to import mosek_model_ext. Please ensure that the dynamic library of Mosek is loadable. Error: {e}"
-    )
-
+from .mosek_model_ext import RawModel, Env, Enum, load_library, is_library_loaded
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -32,6 +22,31 @@ from .solver_common import (
 )
 from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_nd_variable
+
+if not is_library_loaded():
+    libname_pattern = {
+        "Linux": r"libmosek64\.so",
+        "Darwin": r"libmosek64\.dylib",
+        "Windows": r"mosek64_(\d+)_(\d+)\.dll",
+    }[platform.system()]
+    suffix_pattern = {
+        "Linux": "*.so",
+        "Darwin": "*.dylib",
+        "Windows": "*.dll",
+    }[platform.system()]
+
+    home = os.environ.get("MOSEK_10_1_BINDIR", None)
+    if home and os.path.exists(home):
+        dir = Path(home)
+        libs = []
+        for path in dir.glob(suffix_pattern):
+            match = re.match(libname_pattern, path.name)
+            if match:
+                libs.append(path)
+        for lib in libs:
+            ret = load_library(str(lib))
+            if ret:
+                break
 
 DEFAULT_ENV = None
 

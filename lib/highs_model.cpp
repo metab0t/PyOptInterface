@@ -1,6 +1,154 @@
+#include "pyoptinterface/dylib.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/highs_model.hpp"
 #include "fmt/core.h"
+
+namespace highs
+{
+#define B(f) decltype(&::f) f = nullptr
+
+B(Highs_create);
+B(Highs_destroy);
+B(Highs_addCol);
+B(Highs_getNumCol);
+B(Highs_changeColIntegrality);
+B(Highs_passColName);
+B(Highs_deleteColsBySet);
+B(Highs_addRow);
+B(Highs_getNumRow);
+B(Highs_passRowName);
+B(Highs_deleteRowsBySet);
+B(Highs_passHessian);
+B(Highs_changeColsCostByRange);
+B(Highs_changeObjectiveOffset);
+B(Highs_changeObjectiveSense);
+B(Highs_run);
+B(Highs_getNumCols);
+B(Highs_getNumRows);
+B(Highs_getModelStatus);
+B(Highs_getDualRay);
+B(Highs_getPrimalRay);
+B(Highs_getIntInfoValue);
+B(Highs_getSolution);
+B(Highs_getHessianNumNz);
+B(Highs_getBasis);
+B(Highs_version);
+B(Highs_getRunTime);
+B(Highs_getOptionType);
+B(Highs_setBoolOptionValue);
+B(Highs_setIntOptionValue);
+B(Highs_setDoubleOptionValue);
+B(Highs_setStringOptionValue);
+B(Highs_getBoolOptionValue);
+B(Highs_getIntOptionValue);
+B(Highs_getDoubleOptionValue);
+B(Highs_getStringOptionValue);
+B(Highs_getInfoType);
+B(Highs_getInt64InfoValue);
+B(Highs_getDoubleInfoValue);
+B(Highs_getColName);
+B(Highs_getColIntegrality);
+B(Highs_changeColsBoundsBySet);
+B(Highs_getColsBySet);
+B(Highs_getRowName);
+B(Highs_getObjectiveSense);
+B(Highs_getObjectiveValue);
+B(Highs_getColsByRange);
+B(Highs_setSolution);
+B(Highs_getRowsBySet);
+B(Highs_changeRowsBoundsBySet);
+B(Highs_changeCoeff);
+B(Highs_changeColCost);
+
+#undef B
+
+static DynamicLibrary lib;
+static bool is_loaded = false;
+
+bool is_library_loaded()
+{
+	return is_loaded;
+}
+
+bool load_library(const std::string &path)
+{
+	bool success = lib.try_load(path.c_str());
+	if (!success)
+	{
+		return false;
+	}
+
+#define B(f)                                                       \
+	{                                                              \
+		auto ptr = static_cast<decltype(f)>(lib.get_symbol(#f));   \
+		if (ptr == nullptr)                                        \
+		{                                                          \
+			fmt::print("function {} is not loaded correctly", #f); \
+			return false;                                          \
+		}                                                          \
+		f = ptr;                                                   \
+	}
+
+	B(Highs_create);
+	B(Highs_destroy);
+	B(Highs_addCol);
+	B(Highs_getNumCol);
+	B(Highs_changeColIntegrality);
+	B(Highs_passColName);
+	B(Highs_deleteColsBySet);
+	B(Highs_addRow);
+	B(Highs_getNumRow);
+	B(Highs_passRowName);
+	B(Highs_deleteRowsBySet);
+	B(Highs_passHessian);
+	B(Highs_changeColsCostByRange);
+	B(Highs_changeObjectiveOffset);
+	B(Highs_changeObjectiveSense);
+	B(Highs_run);
+	B(Highs_getNumCols);
+	B(Highs_getNumRows);
+	B(Highs_getModelStatus);
+	B(Highs_getDualRay);
+	B(Highs_getPrimalRay);
+	B(Highs_getIntInfoValue);
+	B(Highs_getSolution);
+	B(Highs_getHessianNumNz);
+	B(Highs_getBasis);
+	B(Highs_version);
+	B(Highs_getRunTime);
+	B(Highs_getOptionType);
+	B(Highs_setBoolOptionValue);
+	B(Highs_setIntOptionValue);
+	B(Highs_setDoubleOptionValue);
+	B(Highs_setStringOptionValue);
+	B(Highs_getBoolOptionValue);
+	B(Highs_getIntOptionValue);
+	B(Highs_getDoubleOptionValue);
+	B(Highs_getStringOptionValue);
+	B(Highs_getInfoType);
+	B(Highs_getInt64InfoValue);
+	B(Highs_getDoubleInfoValue);
+	B(Highs_getColName);
+	B(Highs_getColIntegrality);
+	B(Highs_changeColsBoundsBySet);
+	B(Highs_getColsBySet);
+	B(Highs_getRowName);
+	B(Highs_getObjectiveSense);
+	B(Highs_getObjectiveValue);
+	B(Highs_getColsByRange);
+	B(Highs_setSolution);
+	B(Highs_getRowsBySet);
+	B(Highs_changeRowsBoundsBySet);
+	B(Highs_changeCoeff);
+	B(Highs_changeColCost);
+
+#undef B
+
+	is_loaded = true;
+
+	return true;
+}
+} // namespace highs
 
 static void check_error(HighsInt error)
 {
@@ -64,7 +212,11 @@ POIHighsModel::POIHighsModel()
 
 void POIHighsModel::init()
 {
-	void *model = Highs_create();
+	if (!highs::is_library_loaded())
+	{
+		throw std::runtime_error("HiGHS library is not loaded");
+	}
+	void *model = highs::Highs_create();
 	m_model = std::unique_ptr<void, HighsfreemodelT>(model);
 }
 
@@ -83,10 +235,10 @@ VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, doub
 		lb = 0.0;
 		ub = 1.0;
 	}
-	auto error = Highs_addCol(m_model.get(), 0.0, lb, ub, 0, nullptr, nullptr);
+	auto error = highs::Highs_addCol(m_model.get(), 0.0, lb, ub, 0, nullptr, nullptr);
 	check_error(error);
 
-	auto column = Highs_getNumCol(m_model.get());
+	auto column = highs::Highs_getNumCol(m_model.get());
 	// 0-based indexing
 	column -= 1;
 
@@ -97,13 +249,13 @@ VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, doub
 		{
 			binary_variables.insert(index);
 		}
-		error = Highs_changeColIntegrality(m_model.get(), column, vtype);
+		error = highs::Highs_changeColIntegrality(m_model.get(), column, vtype);
 		check_error(error);
 	}
 
 	if (name)
 	{
-		error = Highs_passColName(m_model.get(), column, name);
+		error = highs::Highs_passColName(m_model.get(), column, name);
 		check_error(error);
 	}
 
@@ -118,7 +270,7 @@ void POIHighsModel::delete_variable(const VariableIndex &variable)
 	}
 
 	int variable_column = _variable_index(variable);
-	auto error = Highs_deleteColsBySet(m_model.get(), 1, &variable_column);
+	auto error = highs::Highs_deleteColsBySet(m_model.get(), 1, &variable_column);
 	check_error(error);
 
 	m_variable_index.delete_index(variable.index);
@@ -143,7 +295,7 @@ void POIHighsModel::delete_variables(const Vector<VariableIndex> &variables)
 		columns.push_back(column);
 	}
 
-	int error = Highs_deleteColsBySet(m_model.get(), columns.size(), columns.data());
+	int error = highs::Highs_deleteColsBySet(m_model.get(), columns.size(), columns.data());
 	check_error(error);
 
 	for (int i = 0; i < n_variables; i++)
@@ -202,10 +354,10 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 		break;
 	}
 
-	auto error = Highs_addRow(m_model.get(), lb, ub, numnz, cind, cval);
+	auto error = highs::Highs_addRow(m_model.get(), lb, ub, numnz, cind, cval);
 	check_error(error);
 
-	HighsInt row = Highs_getNumRow(m_model.get());
+	HighsInt row = highs::Highs_getNumRow(m_model.get());
 	// 0-based indexing
 	row -= 1;
 	if (name != nullptr && name[0] == '\0')
@@ -214,7 +366,7 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 	}
 	if (name)
 	{
-		error = Highs_passRowName(m_model.get(), row, name);
+		error = highs::Highs_passRowName(m_model.get(), row, name);
 		check_error(error);
 	}
 
@@ -236,7 +388,7 @@ void POIHighsModel::delete_constraint(const ConstraintIndex &constraint)
 	}
 
 	int constraint_row = _constraint_index(constraint);
-	auto error = Highs_deleteRowsBySet(m_model.get(), 1, &constraint_row);
+	auto error = highs::Highs_deleteRowsBySet(m_model.get(), 1, &constraint_row);
 	check_error(error);
 
 	m_linear_constraint_index.delete_index(constraint.index);
@@ -254,13 +406,14 @@ void POIHighsModel::_set_affine_objective(const ScalarAffineFunction &function,
 {
 	HighsInt error;
 
-	HighsInt n_variables = Highs_getNumCol(m_model.get());
+	HighsInt n_variables = highs::Highs_getNumCol(m_model.get());
 	if (clear_quadratic)
 	{
 		// First delete all quadratic terms
 		std::vector<HighsInt> colstarts(n_variables, 0);
-		error = Highs_passHessian(m_model.get(), n_variables, 0, kHighsHessianFormatTriangular,
-		                          colstarts.data(), nullptr, nullptr);
+		error =
+		    highs::Highs_passHessian(m_model.get(), n_variables, 0, kHighsHessianFormatTriangular,
+		                             colstarts.data(), nullptr, nullptr);
 
 		// HighsModel &model = ((Highs *)m_model.get())->model_;
 		// auto &hessian = model.hessian_;
@@ -282,13 +435,13 @@ void POIHighsModel::_set_affine_objective(const ScalarAffineFunction &function,
 		obj_v[column] = function.coefficients[i];
 	}
 
-	error = Highs_changeColsCostByRange(m_model.get(), 0, n_variables - 1, obj_v.data());
+	error = highs::Highs_changeColsCostByRange(m_model.get(), 0, n_variables - 1, obj_v.data());
 	check_error(error);
-	error = Highs_changeObjectiveOffset(m_model.get(), function.constant.value_or(0.0));
+	error = highs::Highs_changeObjectiveOffset(m_model.get(), function.constant.value_or(0.0));
 	check_error(error);
 
 	HighsInt obj_sense = highs_obj_sense(sense);
-	error = Highs_changeObjectiveSense(m_model.get(), obj_sense);
+	error = highs::Highs_changeObjectiveSense(m_model.get(), obj_sense);
 	check_error(error);
 }
 
@@ -303,7 +456,7 @@ void POIHighsModel::set_objective(const ScalarQuadraticFunction &function, Objec
 
 	// Add quadratic term
 	int numqnz = function.size();
-	HighsInt n_variables = Highs_getNumCol(m_model.get());
+	HighsInt n_variables = highs::Highs_getNumCol(m_model.get());
 	if (numqnz > 0)
 	{
 		CSCMatrix<HighsInt, HighsInt, double> csc;
@@ -316,16 +469,17 @@ void POIHighsModel::set_objective(const ScalarQuadraticFunction &function, Objec
 			v *= 2.0;
 		}
 
-		error =
-		    Highs_passHessian(m_model.get(), n_variables, numqnz, kHighsHessianFormatTriangular,
-		                      csc.colStarts_CSC.data(), csc.rows_CSC.data(), csc.values_CSC.data());
+		error = highs::Highs_passHessian(m_model.get(), n_variables, numqnz,
+		                                 kHighsHessianFormatTriangular, csc.colStarts_CSC.data(),
+		                                 csc.rows_CSC.data(), csc.values_CSC.data());
 		check_error(error);
 	}
 	else
 	{
 		std::vector<HighsInt> colstarts(n_variables, 0);
-		error = Highs_passHessian(m_model.get(), n_variables, 0, kHighsHessianFormatTriangular,
-		                          colstarts.data(), nullptr, nullptr);
+		error =
+		    highs::Highs_passHessian(m_model.get(), n_variables, 0, kHighsHessianFormatTriangular,
+		                             colstarts.data(), nullptr, nullptr);
 		check_error(error);
 	}
 
@@ -364,9 +518,7 @@ void POIHighsModel::set_objective(const ExprBuilder &function, ObjectiveSense se
 
 void POIHighsModel::optimize()
 {
-	auto hessian_nz = Highs_getHessianNumNz(m_model.get());
-	HighsInt error = Highs_run(m_model.get());
-	hessian_nz = Highs_getHessianNumNz(m_model.get());
+	HighsInt error = highs::Highs_run(m_model.get());
 
 	POIHighsSolution &x = m_solution;
 	x.status = error == kHighsStatusError ? HighsSolutionStatus::OPTIMIZE_ERROR
@@ -378,29 +530,29 @@ void POIHighsModel::optimize()
 	x.dual_solution_status = kHighsSolutionStatusNone;
 	x.has_dual_ray = false;
 	x.has_primal_ray = false;
-	auto numCols = Highs_getNumCols(model);
-	auto numRows = Highs_getNumRows(model);
-	x.model_status = Highs_getModelStatus(model);
+	auto numCols = highs::Highs_getNumCols(model);
+	auto numRows = highs::Highs_getNumRows(model);
+	x.model_status = highs::Highs_getModelStatus(model);
 
 	HighsInt status;
 	HighsInt *statusP = &status;
 	if (x.model_status == kHighsModelStatusInfeasible)
 	{
 		x.dual_ray.resize(numRows);
-		error = Highs_getDualRay(model, statusP, x.dual_ray.data());
+		error = highs::Highs_getDualRay(model, statusP, x.dual_ray.data());
 		x.has_dual_ray = (error == kHighsStatusOk) && (*statusP == 1);
 	}
 	else if (x.model_status == kHighsModelStatusUnbounded)
 	{
 		x.primal_ray.resize(numCols);
-		error = Highs_getPrimalRay(model, statusP, x.primal_ray.data());
+		error = highs::Highs_getPrimalRay(model, statusP, x.primal_ray.data());
 		x.has_primal_ray = (error == kHighsStatusOk) && (*statusP == 1);
 	}
 	else
 	{
-		Highs_getIntInfoValue(model, "primal_solution_status", statusP);
+		highs::Highs_getIntInfoValue(model, "primal_solution_status", statusP);
 		x.primal_solution_status = *statusP;
-		Highs_getIntInfoValue(model, "dual_solution_status", statusP);
+		highs::Highs_getIntInfoValue(model, "dual_solution_status", statusP);
 		x.dual_solution_status = *statusP;
 		if (x.primal_solution_status != kHighsSolutionStatusNone)
 		{
@@ -408,18 +560,18 @@ void POIHighsModel::optimize()
 			x.coldual.resize(numCols);
 			x.rowvalue.resize(numRows);
 			x.rowdual.resize(numRows);
-			Highs_getSolution(model, x.colvalue.data(), x.coldual.data(), x.rowvalue.data(),
-			                  x.rowdual.data());
+			highs::Highs_getSolution(model, x.colvalue.data(), x.coldual.data(), x.rowvalue.data(),
+			                         x.rowdual.data());
 
 			// HighsModel &h_model = ((Highs *)m_model.get())->model_;
 			// auto &hessian = h_model.hessian_;
-			auto hessian_nz = Highs_getHessianNumNz(model);
+			auto hessian_nz = highs::Highs_getHessianNumNz(model);
 			if (hessian_nz == 0)
 			{
 				// No basis is present in a QP.
 				x.colstatus.resize(numCols);
 				x.rowstatus.resize(numRows);
-				Highs_getBasis(model, x.colstatus.data(), x.rowstatus.data());
+				highs::Highs_getBasis(model, x.colstatus.data(), x.rowstatus.data());
 			}
 		}
 	}
@@ -432,63 +584,62 @@ void *POIHighsModel::get_raw_model()
 
 std::string POIHighsModel::version_string()
 {
-	std::string version =
-	    fmt::format("v{}.{}.{}", HIGHS_VERSION_MAJOR, HIGHS_VERSION_MINOR, HIGHS_VERSION_PATCH);
+	auto version = highs::Highs_version();
 	return version;
 }
 
 double POIHighsModel::getruntime()
 {
-	double runtime = Highs_getRunTime(m_model.get());
+	double runtime = highs::Highs_getRunTime(m_model.get());
 	return runtime;
 }
 
 int POIHighsModel::getnumrow()
 {
-	return Highs_getNumRow(m_model.get());
+	return highs::Highs_getNumRow(m_model.get());
 }
 
 int POIHighsModel::getnumcol()
 {
-	return Highs_getNumCol(m_model.get());
+	return highs::Highs_getNumCol(m_model.get());
 }
 
 int POIHighsModel::raw_option_type(const char *param_name)
 {
 	HighsInt retval;
-	auto error = Highs_getOptionType(m_model.get(), param_name, &retval);
+	auto error = highs::Highs_getOptionType(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
 
 void POIHighsModel::set_raw_option_bool(const char *param_name, bool value)
 {
-	auto error = Highs_setBoolOptionValue(m_model.get(), param_name, value);
+	auto error = highs::Highs_setBoolOptionValue(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void POIHighsModel::set_raw_option_int(const char *param_name, int value)
 {
-	auto error = Highs_setIntOptionValue(m_model.get(), param_name, value);
+	auto error = highs::Highs_setIntOptionValue(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void POIHighsModel::set_raw_option_double(const char *param_name, double value)
 {
-	auto error = Highs_setDoubleOptionValue(m_model.get(), param_name, value);
+	auto error = highs::Highs_setDoubleOptionValue(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void POIHighsModel::set_raw_option_string(const char *param_name, const char *value)
 {
-	auto error = Highs_setStringOptionValue(m_model.get(), param_name, value);
+	auto error = highs::Highs_setStringOptionValue(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 bool POIHighsModel::get_raw_option_bool(const char *param_name)
 {
 	HighsInt retval;
-	auto error = Highs_getBoolOptionValue(m_model.get(), param_name, &retval);
+	auto error = highs::Highs_getBoolOptionValue(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -496,7 +647,7 @@ bool POIHighsModel::get_raw_option_bool(const char *param_name)
 int POIHighsModel::get_raw_option_int(const char *param_name)
 {
 	HighsInt retval;
-	auto error = Highs_getIntOptionValue(m_model.get(), param_name, &retval);
+	auto error = highs::Highs_getIntOptionValue(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -504,7 +655,7 @@ int POIHighsModel::get_raw_option_int(const char *param_name)
 double POIHighsModel::get_raw_option_double(const char *param_name)
 {
 	double retval;
-	auto error = Highs_getDoubleOptionValue(m_model.get(), param_name, &retval);
+	auto error = highs::Highs_getDoubleOptionValue(m_model.get(), param_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -512,7 +663,7 @@ double POIHighsModel::get_raw_option_double(const char *param_name)
 std::string POIHighsModel::get_raw_option_string(const char *param_name)
 {
 	char retval[kHighsMaximumStringLength];
-	auto error = Highs_getStringOptionValue(m_model.get(), param_name, retval);
+	auto error = highs::Highs_getStringOptionValue(m_model.get(), param_name, retval);
 	check_error(error);
 	return std::string(retval);
 }
@@ -520,7 +671,7 @@ std::string POIHighsModel::get_raw_option_string(const char *param_name)
 int POIHighsModel::raw_info_type(const char *info_name)
 {
 	HighsInt retval;
-	auto error = Highs_getInfoType(m_model.get(), info_name, &retval);
+	auto error = highs::Highs_getInfoType(m_model.get(), info_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -528,7 +679,7 @@ int POIHighsModel::raw_info_type(const char *info_name)
 int POIHighsModel::get_raw_info_int(const char *info_name)
 {
 	HighsInt retval;
-	auto error = Highs_getIntInfoValue(m_model.get(), info_name, &retval);
+	auto error = highs::Highs_getIntInfoValue(m_model.get(), info_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -536,7 +687,7 @@ int POIHighsModel::get_raw_info_int(const char *info_name)
 std::int64_t POIHighsModel::get_raw_info_int64(const char *info_name)
 {
 	int64_t retval;
-	auto error = Highs_getInt64InfoValue(m_model.get(), info_name, &retval);
+	auto error = highs::Highs_getInt64InfoValue(m_model.get(), info_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -544,7 +695,7 @@ std::int64_t POIHighsModel::get_raw_info_int64(const char *info_name)
 double POIHighsModel::get_raw_info_double(const char *info_name)
 {
 	double retval;
-	auto error = Highs_getDoubleInfoValue(m_model.get(), info_name, &retval);
+	auto error = highs::Highs_getDoubleInfoValue(m_model.get(), info_name, &retval);
 	check_error(error);
 	return retval;
 }
@@ -553,7 +704,7 @@ std::string POIHighsModel::get_variable_name(const VariableIndex &variable)
 {
 	auto column = _checked_variable_index(variable);
 	char name[kHighsMaximumStringLength];
-	auto error = Highs_getColName(m_model.get(), column, name);
+	auto error = highs::Highs_getColName(m_model.get(), column, name);
 	check_error(error);
 	return std::string(name);
 }
@@ -561,7 +712,7 @@ std::string POIHighsModel::get_variable_name(const VariableIndex &variable)
 void POIHighsModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
 	auto column = _checked_variable_index(variable);
-	auto error = Highs_passColName(m_model.get(), column, name);
+	auto error = highs::Highs_passColName(m_model.get(), column, name);
 	check_error(error);
 }
 
@@ -573,7 +724,7 @@ VariableDomain POIHighsModel::get_variable_type(const VariableIndex &variable)
 	}
 	auto column = _checked_variable_index(variable);
 	HighsInt vtype;
-	auto error = Highs_getColIntegrality(m_model.get(), column, &vtype);
+	auto error = highs::Highs_getColIntegrality(m_model.get(), column, &vtype);
 	check_error(error);
 	return highs_vtype_to_domain(vtype);
 }
@@ -582,7 +733,7 @@ void POIHighsModel::set_variable_type(const VariableIndex &variable, VariableDom
 {
 	auto vtype = highs_vtype(domain);
 	auto column = _checked_variable_index(variable);
-	auto error = Highs_changeColIntegrality(m_model.get(), column, vtype);
+	auto error = highs::Highs_changeColIntegrality(m_model.get(), column, vtype);
 	check_error(error);
 
 	if (domain == VariableDomain::Binary)
@@ -590,7 +741,7 @@ void POIHighsModel::set_variable_type(const VariableIndex &variable, VariableDom
 		double lb = 0.0;
 		double ub = 1.0;
 		binary_variables.insert(variable.index);
-		error = Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &lb, &ub);
+		error = highs::Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &lb, &ub);
 		check_error(error);
 	}
 	else
@@ -604,8 +755,8 @@ double POIHighsModel::get_variable_lower_bound(const VariableIndex &variable)
 	auto column = _checked_variable_index(variable);
 	HighsInt numcol, nz;
 	double c, lb, ub;
-	auto error = Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz,
+	                                       nullptr, nullptr, nullptr);
 	check_error(error);
 	return lb;
 }
@@ -615,8 +766,8 @@ double POIHighsModel::get_variable_upper_bound(const VariableIndex &variable)
 	auto column = _checked_variable_index(variable);
 	HighsInt numcol, nz;
 	double c, lb, ub;
-	auto error = Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz,
+	                                       nullptr, nullptr, nullptr);
 	check_error(error);
 	return ub;
 }
@@ -627,10 +778,10 @@ void POIHighsModel::set_variable_lower_bound(const VariableIndex &variable, doub
 	auto column = _checked_variable_index(variable);
 	HighsInt numcol, nz;
 	double c, ub;
-	auto error = Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz,
+	                                       nullptr, nullptr, nullptr);
 	check_error(error);
-	error = Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &new_lb, &ub);
+	error = highs::Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &new_lb, &ub);
 	check_error(error);
 }
 
@@ -640,10 +791,10 @@ void POIHighsModel::set_variable_upper_bound(const VariableIndex &variable, doub
 	auto column = _checked_variable_index(variable);
 	HighsInt numcol, nz;
 	double c, lb;
-	auto error = Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz,
+	                                       nullptr, nullptr, nullptr);
 	check_error(error);
-	error = Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &lb, &new_ub);
+	error = highs::Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &lb, &new_ub);
 	check_error(error);
 }
 
@@ -651,7 +802,7 @@ std::string POIHighsModel::get_constraint_name(const ConstraintIndex &constraint
 {
 	auto row = _checked_constraint_index(constraint);
 	char name[kHighsMaximumStringLength];
-	auto error = Highs_getRowName(m_model.get(), row, name);
+	auto error = highs::Highs_getRowName(m_model.get(), row, name);
 	check_error(error);
 	return std::string(name);
 }
@@ -659,7 +810,7 @@ std::string POIHighsModel::get_constraint_name(const ConstraintIndex &constraint
 void POIHighsModel::set_constraint_name(const ConstraintIndex &constraint, const char *name)
 {
 	auto row = _checked_constraint_index(constraint);
-	auto error = Highs_passRowName(m_model.get(), row, name);
+	auto error = highs::Highs_passRowName(m_model.get(), row, name);
 	check_error(error);
 }
 
@@ -686,7 +837,7 @@ double POIHighsModel::get_constraint_dual(const ConstraintIndex &constraint)
 ObjectiveSense POIHighsModel::get_obj_sense()
 {
 	HighsInt obj_sense;
-	auto error = Highs_getObjectiveSense(m_model.get(), &obj_sense);
+	auto error = highs::Highs_getObjectiveSense(m_model.get(), &obj_sense);
 	check_error(error);
 	return obj_sense == kHighsObjSenseMinimize ? ObjectiveSense::Minimize
 	                                           : ObjectiveSense::Maximize;
@@ -695,13 +846,13 @@ ObjectiveSense POIHighsModel::get_obj_sense()
 void POIHighsModel::set_obj_sense(ObjectiveSense sense)
 {
 	auto obj_sense = highs_obj_sense(sense);
-	auto error = Highs_changeObjectiveSense(m_model.get(), obj_sense);
+	auto error = highs::Highs_changeObjectiveSense(m_model.get(), obj_sense);
 	check_error(error);
 }
 
 double POIHighsModel::get_obj_value()
 {
-	double obj = Highs_getObjectiveValue(m_model.get());
+	double obj = highs::Highs_getObjectiveValue(m_model.get());
 	return obj;
 }
 
@@ -752,14 +903,14 @@ void POIHighsModel::set_primal_start(const Vector<VariableIndex> &variables,
 	if (numnz == 0)
 		return;
 
-	auto numcol = Highs_getNumCol(m_model.get());
+	auto numcol = highs::Highs_getNumCol(m_model.get());
 	if (numcol == 0)
 		return;
 
 	HighsInt _numcol, nz;
 	std::vector<double> c(numcol), lb(numcol), ub(numcol);
-	auto error = Highs_getColsByRange(m_model.get(), 0, numcol - 1, &_numcol, c.data(), lb.data(),
-	                                  ub.data(), &nz, nullptr, nullptr, nullptr);
+	auto error = highs::Highs_getColsByRange(m_model.get(), 0, numcol - 1, &_numcol, c.data(),
+	                                         lb.data(), ub.data(), &nz, nullptr, nullptr, nullptr);
 	std::vector<double> vals(numcol);
 	for (int i = 0; i < numcol; i++)
 	{
@@ -788,7 +939,7 @@ void POIHighsModel::set_primal_start(const Vector<VariableIndex> &variables,
 		auto column = _checked_variable_index(variables[i]);
 		vals[column] = values[i];
 	}
-	error = Highs_setSolution(m_model.get(), vals.data(), nullptr, nullptr, nullptr);
+	error = highs::Highs_setSolution(m_model.get(), vals.data(), nullptr, nullptr, nullptr);
 	check_error(error);
 }
 
@@ -797,8 +948,8 @@ double POIHighsModel::get_normalized_rhs(const ConstraintIndex &constraint)
 	auto row = _checked_constraint_index(constraint);
 	HighsInt numrow, nz;
 	double ub, lb;
-	auto error = Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
+	                                       nullptr, nullptr);
 	check_error(error);
 
 	bool lb_inf = lb < -kHighsInf + 1.0;
@@ -817,8 +968,8 @@ void POIHighsModel::set_normalized_rhs(const ConstraintIndex &constraint, double
 	auto row = _checked_constraint_index(constraint);
 	HighsInt numrow, nz;
 	double ub, lb;
-	auto error = Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
+	                                       nullptr, nullptr);
 	check_error(error);
 
 	bool lb_inf = lb < -kHighsInf + 1.0;
@@ -833,7 +984,7 @@ void POIHighsModel::set_normalized_rhs(const ConstraintIndex &constraint, double
 		throw std::runtime_error("Constraint has no finite bound");
 	}
 
-	error = Highs_changeRowsBoundsBySet(m_model.get(), 1, &row, &lb, &ub);
+	error = highs::Highs_changeRowsBoundsBySet(m_model.get(), 1, &row, &lb, &ub);
 	check_error(error);
 }
 
@@ -843,16 +994,17 @@ double POIHighsModel::get_normalized_coefficient(const ConstraintIndex &constrai
 	auto row = _checked_constraint_index(constraint);
 	HighsInt numrow, nz;
 	double ub, lb;
-	auto error = Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, nullptr,
+	                                       nullptr, nullptr);
 	check_error(error);
 
 	std::vector<HighsInt> matrix_start(nz);
 	std::vector<HighsInt> matrix_index(nz);
 	std::vector<double> matrix_value(nz);
 
-	error = Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz, matrix_start.data(),
-	                           matrix_index.data(), matrix_value.data());
+	error =
+	    highs::Highs_getRowsBySet(m_model.get(), 1, &row, &numrow, &lb, &ub, &nz,
+	                              matrix_start.data(), matrix_index.data(), matrix_value.data());
 	check_error(error);
 
 	double coef = 0.0;
@@ -873,7 +1025,7 @@ void POIHighsModel::set_normalized_coefficient(const ConstraintIndex &constraint
 {
 	auto row = _checked_constraint_index(constraint);
 	auto col = _checked_variable_index(variable);
-	auto error = Highs_changeCoeff(m_model.get(), row, col, value);
+	auto error = highs::Highs_changeCoeff(m_model.get(), row, col, value);
 	check_error(error);
 }
 
@@ -882,8 +1034,8 @@ double POIHighsModel::get_objective_coefficient(const VariableIndex &variable)
 	auto column = _checked_variable_index(variable);
 	HighsInt numcol, nz;
 	double c, lb, ub;
-	auto error = Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz, nullptr,
-	                                nullptr, nullptr);
+	auto error = highs::Highs_getColsBySet(m_model.get(), 1, &column, &numcol, &c, &lb, &ub, &nz,
+	                                       nullptr, nullptr, nullptr);
 	check_error(error);
 	return c;
 }
@@ -891,6 +1043,6 @@ double POIHighsModel::get_objective_coefficient(const VariableIndex &variable)
 void POIHighsModel::set_objective_coefficient(const VariableIndex &variable, double value)
 {
 	auto column = _checked_variable_index(variable);
-	auto error = Highs_changeColCost(m_model.get(), column, value);
+	auto error = highs::Highs_changeColCost(m_model.get(), column, value);
 	check_error(error);
 }
