@@ -1,242 +1,183 @@
 # Getting Started
 
 ## Installation
-PyOptInterface has no dependencies other than Python itself. It can be installed via pip:
+PyOptInterface is available on PyPI. You can install it via pip:
+
 ```
 pip install pyoptinterface
 ```
 
-After installation, you can import the package via:
+After installation, you can import the package in Python console:
 ```python
 import pyoptinterface as poi
 ```
 
-PyOptInterface does not include any solvers. You need to install a solver separately. We will introduce how to set up the solvers to use with PyOptInterface.
+PyOptInterface has no dependencies other than Python itself. However, to use it with a specific solver, you need to install the corresponding solver manually. The details can be found on [the configurations of optimizers](https://metab0t.github.io/PyOptInterface/getting-started.html).
+
+In order to provide out-of-the-box support for open source optimizers (currently we support [HiGHS](https://github.com/ERGO-Code/HiGHS)), PyOptInterface can also be installed with pre-built optimizers. You can install them via pip:
+
+```
+pip install pyoptinterface[highs]
+```
+
+It will install a full-featured binary version of HiGHS optimizer via [highsbox](http://github.com/metab0t/highsbox), which can be used with PyOptInterface.
+
+We will introduce how to set up the optimizers to use with PyOptInterface in this page.
 
 ## Setup of optimizers
 
-The setup of optimizer aims to put the shared library of the optimizer in a loadable path so that PyOptInterface can load them correctly.
+PyOptInterface uses the `Dynamic Loading` technique to load the dynamic library of optimizers at runtime, so the optimizer it uses can be changed manually without recompiling the code.
 
-On Windows, we use different environment variables to specify the installation directory of the optimizers.
+The set up of optimizers includes two approaches:
+1. Automatic detection of the installation directory of the optimizers.
+2. Manually specifying the path of the dynamic library of optimizer.
 
-The table below shows the environment variables used by PyOptInterface on Windows:
+We will introduce the automatic detection and manual configuration in details
 
-:::{list-table}
-:header-rows: 1
+## Automatic detection of the installation directory of the optimizers
 
-*   - Optimizer
-    - Environment variable
-    - Typical value
-*   - Gurobi
-    - `GUROBI_HOME`
-    - `C:\gurobi1100\win64`
-*   - COPT
-    - `COPT_HOME`
-    - `C:\Program Files\copt71`
-*   - Mosek
-    - `MOSEK_10_1_BINDIR`
-    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin`
-*   - HiGHS
-    - `HiGHS_HOME`
-    - `D:\highs`
+The automatic detection includes three steps:
+1. Environment variable set by the installer of optimizer
+2. The official Python binding of the optimizer (if available)
+3. Search directly in the system loadable path (e.g. `/usr/lib`, `/usr/local/lib` on Linux or PATH on Windows)
 
-:::
+For the 3rd step, we want to explain more for novices.
 
-On Linux, we use the `LD_LIBRARY_PATH` environment variable to specify the shared library path. On macOS, we use the `DYLD_LIBRARY_PATH` environment variable to specify the shared library path.
+For example, in order to make the dynamic library of HiGHS `highs.dll`/`libhighs.so`/`libhighs.dylib` loadable, we need to put it in a loadable path recognized by the operating system. The typical loadable path on Linux is `/usr/lib`, `/usr/local/lib`, and the typical loadable path on Windows is `PATH`.
 
-For example, in order to make the shared library of HiGHS `libhighs.so` in path `/opt/highs/lib` loadable, you need to add the following line to your `.bashrc` or `.zshrc` file:
+On Linux, we use the `LD_LIBRARY_PATH` environment variable to specify the dynamic library path. On macOS, we use the `DYLD_LIBRARY_PATH` environment variable to specify the dynamic library path.
 
+If the dynamic library is in path `C:\highs\lib`/`/opt/highs/lib`:
+- Windows: `set PATH=%PATH%;C:\highs\lib`
 - Linux: `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/highs/lib`
 - macOS: `export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/highs/lib`
 
-The table below shows the typical path of shared library on Linux and macOS:
+The typical paths where the dynamic library of optimizers are located are as follows:
 
 :::{list-table}
 :header-rows: 1
 
 *   - Optimizer
+    - Windows
     - Linux
     - macOS(ARM)
     - macOS(Intel)
 *   - Gurobi
+    - `C:\gurobi1101\win64\bin`
     - `/opt/gurobi1100/linux64/lib`
     - `/opt/gurobi1100/macos_universal2/lib`
     - `/opt/gurobi1100/macos_universal2/lib`
 *   - COPT
+    - `C:\Program Files\copt71\bin`
     - `/opt/copt71/lib`
     - `/opt/copt71/lib`
     - `/opt/copt71/lib`
 *   - Mosek
+    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin`
     - `/opt/mosek/10.1/tools/platform/linux64x86/bin`
     - `/opt/mosek/10.1/tools/platform/osxaarch64/bin`
     - `/opt/mosek/10.1/tools/platform/osx64x86/bin`
 *   - HiGHS
+    - `D:\highs\bin`
     - `/opt/highs/lib`
     - `/opt/highs/lib`
     - `/opt/highs/lib`
 
 :::
 
-
-The detailed setup of each optimizer is as follows:
 ### Gurobi
-Follow the `Full installation` part of the [Gurobi installation guide](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer) to install Gurobi and set your license.
 
-You can check if Gurobi is installed correctly:
-
-#### Windows:
-Run this command in `cmd` console
-```cmd
-> echo %GUROBI_HOME%
-C:\gurobi1100\win64
-```
-
-Or run this command in `powershell` console
-```powershell
-> $env:GUROBI_HOME
-C:\gurobi1100\win64
-```
-
-#### Linux and macOS
-Run this command in terminal and enter an interactive shell without error
-```bash
-gurobi_cl
-```
+For Gurobi, the automatic detection looks for the following things in order:
+1. The environment variable `GUROBI_HOME` set by the installer of Gurobi
+2. The installation of `gurobipy`
+3. `gurobi110.dll`/`libgurobi110.so`/`libgurobi110.dylib` in the system loadable path
 
 ### COPT
-Download the installer from the [COPT release page](https://github.com/COPT-Public/COPT-Release) and follow the [installation guide](https://guide.coap.online/copt/en-doc/install.html).
 
-You can check if COPT is installed correctly:
-
-#### Windows:
-Run this command in `cmd` console
-```cmd
-> echo %COPT_HOME%
-C:\Program Files\copt71
-```
-
-Or run this command in `powershell` console
-```powershell
-> $env:COPT_HOME
-C:\Program Files\copt71
-```
-
-#### Linux and macOS
-Run this command in terminal and enter an interactive shell without error
-```bash
-copt_cmd
-```
+For COPT, the automatic detection looks for the following things in order:
+1. The environment variable `COPT_HOME` set by the installer of COPT
+2. `copt.dll`/`libcopt.so`/`libcopt.dylib` in the system loadable path
 
 ### Mosek
-Download the installer from the [Mosek download page](https://www.mosek.com/downloads/) and follow the [installation guide](https://docs.mosek.com/latest/install/installation.html).
 
-You can check if Mosek is installed correctly:
-
-#### Windows:
-Run this command in `cmd` console
-```cmd
-> echo %MOSEK_10_1_BINDIR%
-C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
-```
-
-Or run this command in `powershell` console
-```powershell
-> $env:MOSEK_10_1_BINDIR
-C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin
-```
-
-#### Linux
-Add the Mosek shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libmosek64.so` is located in the `10.1/tools/platform/linux64x86/bin` directory of the installation directory.
-
-Run this command in terminal
-```bash
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/mosek/10.1/tools/platform/linux64x86/bin
-```
-
-You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
-
-#### macOS
-Add the Mosek shared library to the `DYLD_LIBRARY_PATH` environment variable. The shared library `libmosek64.dylib` is located in the `lib` directory of the installation directory.
-
-Run this command in terminal (ARM-based Mac)
-```bash
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/mosek/10.1/tools/platform/osxaarch64/bin
-```
-or (Intel-based Mac)
-```bash
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/mosek/10.1/tools/platform/osx64x86/bin
-```
-
-You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
-
-Run this command in terminal to solve a simple problem without error
-```bash
-msktestlic
-```
-
-The output will end with
-```
-************************************
-A license was checked out correctly.
-************************************
-```
+For Mosek, the automatic detection looks for the following things in order:
+1. The environment variable `MOSEK_10_1_BINDIR` set by the installer of Mosek
+2. The installation of `mosek` PyPI package
+3. `mosek64_10_1.dll`/`libmosek64.so`/`libmosek64.dylib` in the system loadable path
 
 ### HiGHS
-HiGHS is an open-source solver, you can install it from source following the instructions [HiGHS website](https://ergo-code.github.io/HiGHS/stable/installation/#Install-HiGHS).
 
-We also provide pre-built HiGHS on our [GitHub release page](https://github.com/metab0t/highs_autobuild/releases), download the zip file of your platform and extract it to a directory.
+For HiGHS, the automatic detection looks for the following things in order:
+1. The environment variable `HiGHS_HOME` set by the user
+2. The installation of `highsbox` PyPI package (recommended)
+3. `highs.dll`/`libhighs.so`/`libhighs.dylib` in the system
 
-The directory of HiGHS should contain the following files:
-```
-<HiGHS_HOME>
-|-- bin
-|   |-- highs.dll (Windows)
-|   |-- highs.exe (Windows) or highs (Linux/macOS)
-|-- include
-|   |-- highs
-|       |-- Highs.h
-|       |-- ...
-|-- lib
-|   |-- highs.lib (Windows) or libhighs.so (Linux) or libhighs.dylib (macOS)
-|   |-- ...
-```
+For HiGHS, we recommend installing the `highsbox` PyPI package, which provides a full-featured binary version of HiGHS optimizer for you.
 
-#### Windows:
-You need to set the `HiGHS_HOME` environment to the directory of HiGHS installation directory (like `D:\highs`). The HiGHS shared library `highs.dll` is located in the `bin` directory under `HiGHS_HOME`.
-Optionally, you can add the `%HiGHS_HOME%\bin` directory to the system PATH.
+## Manually specifying the path of the dynamic library of optimizer
 
-Run this command in `cmd` console to check
-```cmd
-> echo %HiGHS_HOME%
-D:\highs
+If the automatic detection fails or you want to use the optimizer in a customized location, you can manually specify the path of the dynamic library of the optimizer.
+
+We take HiGHS as an example. Whether the optimizer has been successfully loaded can be checked via the following code:
+
+```python
+from pyoptinterface import highs
+
+print(highs.is_library_loaded())
 ```
 
-Or run this command in `powershell` console
-```powershell
-> $env:HiGHS_HOME
-D:\highs
+If the optimizer has not been successfully loaded, you can manually specify the path of the dynamic library of the optimizer via the following code:
+
+```python
+ret = highs.load_library("path/to/libhighs.so")
+
+print(f"Loading from custom path manually: {ret}")
 ```
 
-#### Linux
-Add the HiGHS shared library to the `LD_LIBRARY_PATH` environment variable. The shared library `libhighs.so` is located in the `lib` directory of the installation directory.
+The `load_library` function returns `True` if the library is successfully loaded, otherwise it returns `False`.
 
-Run this command in terminal
-```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/highs/lib
+If you want to revert to use the automatic detection, you can call the `autoload_library` function:
+
+```python
+ret = highs.autoload_library()
+
+print(f"Loading from automatically detected location: {ret}")
 ```
 
-You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+For other optimizers, just replace `highs` with the corresponding optimizer name like `gurobi`, `copt`, `mosek`.
 
-#### macOS
-Add the HiGHS shared library to the `DYLD_LIBRARY_PATH` environment variable. The shared library `libhighs.dylib` is located in the `lib` directory of the installation directory.
+The typical paths where the dynamic library of optimizers are located are as follows:
 
-Run this command in terminal
-```bash
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/highs/lib
-```
+:::{list-table}
+:header-rows: 1
 
-You can also add the above command to your `.bashrc` or `.zshrc` file to make it permanent.
+*   - Optimizer
+    - Windows
+    - Linux
+    - macOS(ARM)
+    - macOS(Intel)
+*   - Gurobi
+    - `C:\gurobi1101\win64\bin\gurobi110.dll`
+    - `/opt/gurobi1100/linux64/lib/libgurobi110.so`
+    - `/opt/gurobi1100/macos_universal2/lib/libgurobi110.dylib`
+    - `/opt/gurobi1100/macos_universal2/lib/libgurobi110.dylib`
+*   - COPT
+    - `C:\Program Files\copt71\bin\copt.dll`
+    - `/opt/copt71/lib/libcopt.so`
+    - `/opt/copt71/lib/libcopt.dylib`
+    - `/opt/copt71/lib/libcopt.dylib`
+*   - Mosek
+    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin\mosek64_10_1.dll`
+    - `/opt/mosek/10.1/tools/platform/linux64x86/bin/libmosek64.so`
+    - `/opt/mosek/10.1/tools/platform/osxaarch64/bin/libmosek64.dylib`
+    - `/opt/mosek/10.1/tools/platform/osx64x86/bin/libmosek64.dylib`
+*   - HiGHS
+    - `D:\highs\bin\highs.dll`
+    - `/opt/highs/lib/libhighs.so`
+    - `/opt/highs/lib/libhighs.dylib`
+    - `/opt/highs/lib/libhighs.dylib`
 
+:::
 
 ## Let's build a simple model and solve it
 After setting up the solvers, we can build a simple model and solve it.
@@ -252,10 +193,10 @@ First, we need to create a model object:
 
 ```python
 import pyoptinterface as poi
-from pyoptinterface import gurobi
-# from pyoptinterface import copt, highs, mosek (if you want to use other optimizers)
+from pyoptinterface import highs
+# from pyoptinterface import copt, gurobi, mosek (if you want to use other optimizers)
 
-model = gurobi.Model()
+model = highs.Model()
 ```
 
 Then, we need to add variables to the model:

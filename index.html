@@ -159,6 +159,7 @@
   <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
@@ -218,105 +219,44 @@
           </label>
         </div>
         <article role="main">
-          <section class="tex2jax_ignore mathjax_ignore" id="pyoptinterface">
-<h1>PyOptInterface<a class="headerlink" href="#pyoptinterface" title="Link to this heading">#</a></h1>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
-<section id="what-is-pyoptinterface">
-<h3>What is PyOptInterface?<a class="headerlink" href="#what-is-pyoptinterface" title="Link to this heading">#</a></h3>
+          <section class="tex2jax_ignore mathjax_ignore" id="pyoptinterface-python-optimization-interface">
+<h1>PyOptInterface (Python Optimization Interface)<a class="headerlink" href="#pyoptinterface-python-optimization-interface" title="Link to this heading">#</a></h1>
 <p><strong>PyOptInterface</strong> is an open-source Python library to provide a unified API to construct and solve optimization models with various optimizers.</p>
-</section>
-<section id="why-another-optimization-modeling-library-after-we-have-pyomo-cvxpy-jump-jl">
-<h3>Why another optimization modeling library after we have Pyomo/cvxpy/JuMP.jl?<a class="headerlink" href="#why-another-optimization-modeling-library-after-we-have-pyomo-cvxpy-jump-jl" title="Link to this heading">#</a></h3>
+<p>The detailed documentation can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/">here</a>.</p>
+<section id="key-features-compared-with-other-modeling-interfaces">
+<h2>Key features compared with other modeling interfaces<a class="headerlink" href="#key-features-compared-with-other-modeling-interfaces" title="Link to this heading">#</a></h2>
 <p>It is designed as a very thin wrapper of native C API of optimizers and attempts to provide common abstractions of an algebraic modelling environment including model, variable, constraint and expression with the least overhead of performance.</p>
 <p>The key features of PyOptInterface include:</p>
 <ul class="simple">
-<li><p>Very fast speed to construct optimization model (10-20x faster than Pyomo, comparable with JuMP.jl and some official Python bindings provided by vendor of optimizer)</p></li>
-<li><p>Low overhead to modify and re-solve the problem incrementally</p></li>
+<li><p>Very fast speed to construct optimization model (10x faster than Pyomo, comparable with JuMP.jl and some official Python bindings provided by vendors of optimizer)</p></li>
+<li><p>Low overhead to modify and re-solve the problem incrementally (including adding/removing variables/constraints, changing objective function, etc.)</p></li>
 <li><p>Unified API to cover common usages, write once and the code works for all optimizers</p></li>
-<li><p>You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendored Python binding of optimizer</p></li>
+<li><p>You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendor-specific Python binding of optimizer</p></li>
 </ul>
 </section>
-<section id="benchmark-result-of-time-to-construct-optimization-model">
-<h3>Benchmark result of time to construct optimization model<a class="headerlink" href="#benchmark-result-of-time-to-construct-optimization-model" title="Link to this heading">#</a></h3>
-<div class="table-wrapper colwidths-auto colwidths-given docutils container">
-<table class="docutils align-center">
-<thead>
-<tr class="row-odd"><th class="head"><p>Model</p></th>
-<th class="head"><p>Gurobi C++</p></th>
-<th class="head"><p>Gurobi Python</p></th>
-<th class="head"><p>PyOptInterface</p></th>
-<th class="head"><p>JuMP.jl</p></th>
-<th class="head"><p>Pyomo</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>fac-25</p></td>
-<td><p>0</p></td>
-<td><p>1</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>4</p></td>
-</tr>
-<tr class="row-odd"><td><p>fac-50</p></td>
-<td><p>1</p></td>
-<td><p>10</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>34</p></td>
-</tr>
-<tr class="row-even"><td><p>fac-75</p></td>
-<td><p>3</p></td>
-<td><p>32</p></td>
-<td><p>7</p></td>
-<td><p>7</p></td>
-<td><p>146</p></td>
-</tr>
-<tr class="row-odd"><td><p>fac-100</p></td>
-<td><p>6</p></td>
-<td><p>79</p></td>
-<td><p>19</p></td>
-<td><p>18</p></td>
-<td><p>335</p></td>
-</tr>
-<tr class="row-even"><td><p>lqcp-500</p></td>
-<td><p>1</p></td>
-<td><p>6</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-<td><p>25</p></td>
-</tr>
-<tr class="row-odd"><td><p>lqcp-1000</p></td>
-<td><p>4</p></td>
-<td><p>25</p></td>
-<td><p>8</p></td>
-<td><p>6</p></td>
-<td><p>115</p></td>
-</tr>
-<tr class="row-even"><td><p>lqcp-1500</p></td>
-<td><p>10</p></td>
-<td><p>57</p></td>
-<td><p>17</p></td>
-<td><p>17</p></td>
-<td><p>267</p></td>
-</tr>
-<tr class="row-odd"><td><p>lqcp-2000</p></td>
-<td><p>17</p></td>
-<td><p>101</p></td>
-<td><p>32</p></td>
-<td><p>39</p></td>
-<td><p>469</p></td>
-</tr>
-</tbody>
-</table>
+<section id="benchmark">
+<h2>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">#</a></h2>
+<p>The benchmark comparing PyOptInterface with some other modeling interfaces can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/benchmark.html">here</a>. PyOptInterface is among the fastest modeling interfaces in terms of model construction time.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>PyOptInterface is available on PyPI. You can install it via pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span>
+</pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Time measured in seconds, smaller is better</p>
+<p>After installation, you can import the package in Python console:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+</pre></div>
 </div>
+<p>PyOptInterface has no dependencies other than Python itself. However, to use it with a specific solver, you need to install the corresponding solver manually. The details can be found on <a class="reference external" href="https://metab0t.github.io/PyOptInterface/getting-started.html">the configurations of optimizers</a>.</p>
+<p>In order to provide out-of-the-box support for open source optimizers (currently we support <a class="reference external" href="https://github.com/ERGO-Code/HiGHS">HiGHS</a>), PyOptInterface can also be installed with pre-built optimizers. You can install them via pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span><span class="p">[</span><span class="n">highs</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It will install a full-featured binary version of HiGHS optimizer via <a class="reference external" href="http://github.com/metab0t/highsbox">highsbox</a>, which can be used with PyOptInterface.</p>
 </section>
 <section id="what-kind-of-problems-can-pyoptinterface-solve">
-<h3>What kind of problems can PyOptInterface solve?<a class="headerlink" href="#what-kind-of-problems-can-pyoptinterface-solve" title="Link to this heading">#</a></h3>
+<h2>What kind of problems can PyOptInterface solve?<a class="headerlink" href="#what-kind-of-problems-can-pyoptinterface-solve" title="Link to this heading">#</a></h2>
 <p>It currently supports the following problem types:</p>
 <ul class="simple">
 <li><p>Linear Programming (LP)</p></li>
@@ -330,15 +270,52 @@
 </ul>
 </section>
 <section id="what-optimizers-does-pyoptinterface-support">
-<span id="supported-optimizers"></span><h3>What optimizers does PyOptInterface support?<a class="headerlink" href="#what-optimizers-does-pyoptinterface-support" title="Link to this heading">#</a></h3>
+<h2>What optimizers does PyOptInterface support?<a class="headerlink" href="#what-optimizers-does-pyoptinterface-support" title="Link to this heading">#</a></h2>
 <p>It currently supports the following optimizers:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.gurobi.com/">Gurobi</a>(Commercial)</p></li>
 <li><p><a class="reference external" href="https://shanshu.ai/copt">COPT</a>(Commercial)</p></li>
 <li><p><a class="reference external" href="https://www.mosek.com/">Mosek</a>(Commercial)</p></li>
-<li><p><a class="reference external" href="https://www.highs.dev/">HiGHS</a>(Open source)</p></li>
+<li><p><a class="reference external" href="https://github.com/ERGO-Code">HiGHS</a>(Open source)</p></li>
 </ul>
 </section>
+<section id="short-example">
+<h2>Short Example<a class="headerlink" href="#short-example" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Continuous</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;con&quot;</span><span class="p">)</span>
+
+<span class="n">obj</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">set_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
+<span class="c1"># TerminationStatusCode.OPTIMAL</span>
+
+<span class="n">x_val</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># 0.2</span>
+
+<span class="n">y_val</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># 1.0</span>
+</pre></div>
+</div>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>PyOptInterface is licensed under MPL-2.0 License.</p>
+<p>It uses <a class="reference external" href="https://github.com/wjakob/nanobind">nanobind</a>, <a class="reference external" href="https://github.com/fmtlib/fmt">fmtlib</a> and <a class="reference external" href="https://github.com/martinus/unordered_dense">martinus/unordered_dense</a> as dependencies.</p>
+<p>The design of PyOptInterface is inspired by <a class="reference external" href="https://jump.dev">JuMP.jl</a>.</p>
+<p>Some solver-related code in <code class="docutils literal notranslate"><span class="pre">src</span></code> folder is adapted from the corresponding solver interface package in <code class="docutils literal notranslate"><span class="pre">JuMP.jl</span></code>
+ecosystem, which is licensed under MIT License.</p>
+<p>The header files in <code class="docutils literal notranslate"><span class="pre">thirdparty/solvers</span></code> directory are from the corresponding distribution of optimizers and are licensed under their own licenses.</p>
 </section>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">#</a></h2>
@@ -346,6 +323,7 @@
 <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
@@ -427,15 +405,14 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">PyOptInterface</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a><ul>
-<li><a class="reference internal" href="#what-is-pyoptinterface">What is PyOptInterface?</a></li>
-<li><a class="reference internal" href="#why-another-optimization-modeling-library-after-we-have-pyomo-cvxpy-jump-jl">Why another optimization modeling library after we have Pyomo/cvxpy/JuMP.jl?</a></li>
-<li><a class="reference internal" href="#benchmark-result-of-time-to-construct-optimization-model">Benchmark result of time to construct optimization model</a></li>
+<li><a class="reference internal" href="#">PyOptInterface (Python Optimization Interface)</a><ul>
+<li><a class="reference internal" href="#key-features-compared-with-other-modeling-interfaces">Key features compared with other modeling interfaces</a></li>
+<li><a class="reference internal" href="#benchmark">Benchmark</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#what-kind-of-problems-can-pyoptinterface-solve">What kind of problems can PyOptInterface solve?</a></li>
 <li><a class="reference internal" href="#what-optimizers-does-pyoptinterface-support">What optimizers does PyOptInterface support?</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#short-example">Short Example</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#contents">Contents</a><ul>
 </ul>
 </li>
