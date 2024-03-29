@@ -12,7 +12,7 @@ After installation, you can import the package in Python console:
 import pyoptinterface as poi
 ```
 
-PyOptInterface has no dependencies other than Python itself. However, to use it with a specific solver, you need to install the corresponding solver manually. The details can be found on [the configurations of optimizers](https://metab0t.github.io/PyOptInterface/getting-started.html).
+PyOptInterface has no dependencies other than Python itself. However, to use it with a specific optimizer, you need to install the corresponding optimizer manually. The details can be found on [the configurations of optimizers](https://metab0t.github.io/PyOptInterface/getting-started.html).
 
 In order to provide out-of-the-box support for open source optimizers (currently we support [HiGHS](https://github.com/ERGO-Code/HiGHS)), PyOptInterface can also be installed with pre-built optimizers. You can install them via pip:
 
@@ -180,7 +180,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
 :::
 
 ## Let's build a simple model and solve it
-After setting up the solvers, we can build a simple model and solve it.
+After setting up the optimizers, we can build a simple model and solve it.
 As the first step, we will solve the following simple Quadratic Programming (QP) problem:
 
 ```{math}
@@ -228,7 +228,7 @@ The model can be solved via:
 ```python
 model.optimize()
 ```
-The Gurobi solver will be invoked to solve the model and writes the log to the console.
+The Gurobi optimizer will be invoked to solve the model and writes the log to the console.
 
 We can query the status of the model via:
 ```python

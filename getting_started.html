@@ -231,7 +231,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 </pre></div>
 </div>
-<p>PyOptInterface has no dependencies other than Python itself. However, to use it with a specific solver, you need to install the corresponding solver manually. The details can be found on <a class="reference external" href="https://metab0t.github.io/PyOptInterface/getting-started.html">the configurations of optimizers</a>.</p>
+<p>PyOptInterface has no dependencies other than Python itself. However, to use it with a specific optimizer, you need to install the corresponding optimizer manually. The details can be found on <a class="reference external" href="https://metab0t.github.io/PyOptInterface/getting-started.html">the configurations of optimizers</a>.</p>
 <p>In order to provide out-of-the-box support for open source optimizers (currently we support <a class="reference external" href="https://github.com/ERGO-Code/HiGHS">HiGHS</a>), PyOptInterface can also be installed with pre-built optimizers. You can install them via pip:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span><span class="p">[</span><span class="n">highs</span><span class="p">]</span>
 </pre></div>
@@ -407,7 +407,7 @@
 </section>
 <section id="let-s-build-a-simple-model-and-solve-it">
 <h2>Let’s build a simple model and solve it<a class="headerlink" href="#let-s-build-a-simple-model-and-solve-it" title="Link to this heading">#</a></h2>
-<p>After setting up the solvers, we can build a simple model and solve it.
+<p>After setting up the optimizers, we can build a simple model and solve it.
 As the first step, we will solve the following simple Quadratic Programming (QP) problem:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -450,7 +450,7 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The Gurobi solver will be invoked to solve the model and writes the log to the console.</p>
+<p>The Gurobi optimizer will be invoked to solve the model and writes the log to the console.</p>
 <p>We can query the status of the model via:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">)</span> <span class="o">==</span> <span class="n">poi</span><span class="o">.</span><span class="n">TerminationStatusCode</span><span class="o">.</span><span class="n">OPTIMAL</span>
 </pre></div>
