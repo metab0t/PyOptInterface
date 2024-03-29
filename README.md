@@ -29,7 +29,7 @@ After installation, you can import the package in Python console:
 import pyoptinterface as poi
 ```
 
-PyOptInterface has no dependencies other than Python itself. However, to use it with a specific solver, you need to install the corresponding solver manually. The details can be found on [the configurations of optimizers](https://metab0t.github.io/PyOptInterface/getting-started.html).
+PyOptInterface has no dependencies other than Python itself. However, to use it with a specific optimizer, you need to install the corresponding optimizer manually. The details can be found on [the configurations of optimizers](https://metab0t.github.io/PyOptInterface/getting_started.html).
 
 In order to provide out-of-the-box support for open source optimizers (currently we support [HiGHS](https://github.com/ERGO-Code/HiGHS)), PyOptInterface can also be installed with pre-built optimizers. You can install them via pip:
 
