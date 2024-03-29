@@ -87,6 +87,8 @@ The typical paths where the dynamic library of optimizers are located are as fol
 
 ### Gurobi
 
+The currently supported version is **11.0.x**. Other versions may work but are not tested.
+
 For Gurobi, the automatic detection looks for the following things in order:
 1. The environment variable `GUROBI_HOME` set by the installer of Gurobi
 2. The installation of `gurobipy`
@@ -94,11 +96,15 @@ For Gurobi, the automatic detection looks for the following things in order:
 
 ### COPT
 
+The currently supported version is **7.1.x**. Other versions may work but are not tested.
+
 For COPT, the automatic detection looks for the following things in order:
 1. The environment variable `COPT_HOME` set by the installer of COPT
 2. `copt.dll`/`libcopt.so`/`libcopt.dylib` in the system loadable path
 
 ### Mosek
+
+The currently supported version is **10.1.x**. Other versions may work but are not tested.
 
 For Mosek, the automatic detection looks for the following things in order:
 1. The environment variable `MOSEK_10_1_BINDIR` set by the installer of Mosek
@@ -106,6 +112,8 @@ For Mosek, the automatic detection looks for the following things in order:
 3. `mosek64_10_1.dll`/`libmosek64.so`/`libmosek64.dylib` in the system loadable path
 
 ### HiGHS
+
+The currently supported version is **1.7.x**. Other versions may work but are not tested.
 
 For HiGHS, the automatic detection looks for the following things in order:
 1. The environment variable `HiGHS_HOME` set by the user

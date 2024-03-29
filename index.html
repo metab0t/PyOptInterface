@@ -273,10 +273,10 @@
 <h2>What optimizers does PyOptInterface support?<a class="headerlink" href="#what-optimizers-does-pyoptinterface-support" title="Link to this heading">#</a></h2>
 <p>It currently supports the following optimizers:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://www.gurobi.com/">Gurobi</a>(Commercial)</p></li>
-<li><p><a class="reference external" href="https://shanshu.ai/copt">COPT</a>(Commercial)</p></li>
-<li><p><a class="reference external" href="https://www.mosek.com/">Mosek</a>(Commercial)</p></li>
-<li><p><a class="reference external" href="https://github.com/ERGO-Code">HiGHS</a>(Open source)</p></li>
+<li><p><a class="reference external" href="https://shanshu.ai/copt">COPT</a> ( Commercial )</p></li>
+<li><p><a class="reference external" href="https://www.gurobi.com/">Gurobi</a> ( Commercial )</p></li>
+<li><p><a class="reference external" href="https://github.com/ERGO-Code">HiGHS</a> ( Open source )</p></li>
+<li><p><a class="reference external" href="https://www.mosek.com/">Mosek</a> ( Commercial )</p></li>
 </ul>
 </section>
 <section id="short-example">
@@ -291,7 +291,7 @@
 
 <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;con&quot;</span><span class="p">)</span>
 
-<span class="n">obj</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">set_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
