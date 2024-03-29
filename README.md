@@ -52,10 +52,10 @@ It currently supports the following problem types:
 
 ## What optimizers does PyOptInterface support?
 It currently supports the following optimizers:
-- [Gurobi](https://www.gurobi.com/)(Commercial)
-- [COPT](https://shanshu.ai/copt)(Commercial)
-- [Mosek](https://www.mosek.com/)(Commercial)
-- [HiGHS](https://github.com/ERGO-Code)(Open source)
+- [COPT](https://shanshu.ai/copt) ( Commercial )
+- [Gurobi](https://www.gurobi.com/) ( Commercial )
+- [HiGHS](https://github.com/ERGO-Code) ( Open source )
+- [Mosek](https://www.mosek.com/) ( Commercial )
 
 ## Short Example
 ```python
@@ -69,7 +69,7 @@ y = model.add_variable(lb=0, ub=1, domain=poi.VariableDomain.Integer, name="y")
 
 con = model.add_linear_constraint(x+y, poi.Geq, 1.2, name="con")
 
-obj = x*x + y*y
+obj = 2*x
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
 model.set_model_attribute(poi.ModelAttribute.Silent, False)
