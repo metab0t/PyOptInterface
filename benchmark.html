@@ -225,7 +225,7 @@
 <p>In our benchmark, we include the following modeling interfaces:</p>
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">C++</span></code>: Official C++ interfaces to Gurobi and COPT provided by the optimizers.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PyOptInterface</span></code>: The Python interface to Gurobi and COPT implemented by our paper.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyOptInterface</span></code>: The Python interface to Gurobi and COPT we implemented.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">JuMP</span></code>: An open-source algebraic modeling language in Julia, it is used with <code class="docutils literal notranslate"><span class="pre">Gurobi.jl</span></code> and <code class="docutils literal notranslate"><span class="pre">COPT.jl</span></code> to interact with optimizers. We use the direct mode feature of JuMP to skip an additional cache of the problem. The Julia code is warmed up by running a small case before the benchmark to rule out compilation latency of Julia.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">gurobipy</span></code> and <code class="docutils literal notranslate"><span class="pre">coptpy</span></code>: Official Python interfaces to Gurobi and COPT provided by the optimizers.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Pyomo</span></code>: An open-source algebraic modeling language in Python. We use the in-memory persistent solver interface of Pyomo to interact with Gurobi and COPT without writing the model to disk. The Pyomo support for COPT is bundled with the COPT distribution.</p></li>
