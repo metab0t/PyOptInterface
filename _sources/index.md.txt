@@ -8,18 +8,20 @@
 :caption: Usage Guide
 
 getting_started.md
-benchmark.md
 model.md
 variable.md
 expression.md
 constraint.md
 objective.md
 container.md
+numpy.md
+structure.md
 common_model_interface.md
 gurobi.md
 copt.md
 mosek.md
 highs.md
+benchmark.md
 ```
 
 ```{toctree}

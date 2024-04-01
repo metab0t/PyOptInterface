@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Common Model Interface" href="common_model_interface.html" /><link rel="prev" title="Objective" href="objective.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Numpy Container and N-queens Problem" href="numpy.html" /><link rel="prev" title="Objective" href="objective.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>Container - PyOptInterface documentation</title>
@@ -159,18 +159,20 @@
   <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -230,19 +232,36 @@
 <section id="create-a-tupledict">
 <h2>Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#create-a-tupledict" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">tuplelist</span></code> can be created by calling the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> constructor. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with two keys:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 
 <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">()</span>
 <span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(1, 2): 3, (4, 5): 6}
+</pre></div>
+</div>
+</div>
 </div>
 <p>It can also be created by passing a dictionary to the constructor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
 </pre></div>
 </div>
+</div>
+</div>
 <p>In most cases, we have multiple indices as the axis and define a rule to construct the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>. <code class="docutils literal notranslate"><span class="pre">make_tupledict</span></code> provide a convenient way to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> from a list of indices and a function that maps the indices to the values. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with two keys:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
 <span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">)</span>
 
@@ -251,24 +270,20 @@
 
 <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;,</span>
-<span class="sd"> (0, 6, &#39;Europe&#39;): &#39;value_0_6_Europe&#39;,</span>
-<span class="sd"> (0, 7, &#39;Asia&#39;): &#39;value_0_7_Asia&#39;,</span>
-<span class="sd"> (0, 7, &#39;Europe&#39;): &#39;value_0_7_Europe&#39;,</span>
-<span class="sd"> (1, 6, &#39;Asia&#39;): &#39;value_1_6_Asia&#39;,</span>
-<span class="sd"> (1, 6, &#39;Europe&#39;): &#39;value_1_6_Europe&#39;,</span>
-<span class="sd"> (1, 7, &#39;Asia&#39;): &#39;value_1_7_Asia&#39;,</span>
-<span class="sd"> (1, 7, &#39;Europe&#39;): &#39;value_1_7_Europe&#39;,</span>
-<span class="sd"> (2, 6, &#39;Asia&#39;): &#39;value_2_6_Asia&#39;,</span>
-<span class="sd"> (2, 6, &#39;Europe&#39;): &#39;value_2_6_Europe&#39;,</span>
-<span class="sd"> (2, 7, &#39;Asia&#39;): &#39;value_2_7_Asia&#39;,</span>
-<span class="sd"> (2, 7, &#39;Europe&#39;): &#39;value_2_7_Europe&#39;}</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Sometimes we need to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern where some combinations of indices are missing. <code class="docutils literal notranslate"><span class="pre">make_tupledict</span></code> also provides a convenient way to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern, you only need to return <code class="docutils literal notranslate"><span class="pre">None</span></code> when the coprresponding value is unwanted. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;, (0, 6, &#39;Europe&#39;): &#39;value_0_6_Europe&#39;, (0, 7, &#39;Asia&#39;): &#39;value_0_7_Asia&#39;, (0, 7, &#39;Europe&#39;): &#39;value_0_7_Europe&#39;, (1, 6, &#39;Asia&#39;): &#39;value_1_6_Asia&#39;, (1, 6, &#39;Europe&#39;): &#39;value_1_6_Europe&#39;, (1, 7, &#39;Asia&#39;): &#39;value_1_7_Asia&#39;, (1, 7, &#39;Europe&#39;): &#39;value_1_7_Europe&#39;, (2, 6, &#39;Asia&#39;): &#39;value_2_6_Asia&#39;, (2, 6, &#39;Europe&#39;): &#39;value_2_6_Europe&#39;, (2, 7, &#39;Asia&#39;): &#39;value_2_7_Asia&#39;, (2, 7, &#39;Europe&#39;): &#39;value_2_7_Europe&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Sometimes we need to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern where some combinations of indices are missing. <code class="docutils literal notranslate"><span class="pre">make_tupledict</span></code> also provides a convenient way to create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern, you only need to return <code class="docutils literal notranslate"><span class="pre">None</span></code> when the corresponding value is unwanted. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with a sparse pattern:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">J</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
 <span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">)</span>
 
@@ -278,17 +293,25 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-<span class="w">    </span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;}</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span><span class="n">corresponding</span>
+    
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">11</span>
+    <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span><span class="n">corresponding</span>
+                                            <span class="o">^</span>
+<span class="ne">SyntaxError</span>: invalid syntax
+</pre></div>
+</div>
+</div>
 </div>
 <p>For highly sparse patterns, you can provide the sparse indices directly to make it more efficient.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">J</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="n">K</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 
 <span class="c1"># We only want to construct (i, j, k) where j=k</span>
 <span class="n">JK</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">J</span><span class="p">]</span>
@@ -299,33 +322,30 @@
 <span class="c1"># JK will be flattened as j and k during construction</span>
 <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">JK</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">{(0, 0, 0): &#39;value_0_0_0&#39;,</span>
-<span class="sd"> (0, 1, 1): &#39;value_0_1_1&#39;,</span>
-<span class="sd"> (0, 2, 2): &#39;value_0_2_2&#39;,</span>
-<span class="sd"> ...</span>
-<span class="sd"> (1, 97, 97): &#39;value_1_97_97&#39;,</span>
-<span class="sd"> (1, 98, 98): &#39;value_1_98_98&#39;,</span>
-<span class="sd"> (1, 99, 99): &#39;value_1_99_99&#39;}</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="set-get-values">
 <h2>Set/get values<a class="headerlink" href="#set-get-values" title="Link to this heading">#</a></h2>
 <p>Like normal dictionary in Python, the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be set or get by using the <code class="docutils literal notranslate"><span class="pre">[]</span></code> operator. The following example sets and gets the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">({(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">6</span><span class="p">})</span>
 <span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="c1"># 4</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span> <span class="c1"># 7</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">]</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <p>As a representation of multidimensional data, <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> also provides a way to iterate some axis efficiently.
 <code class="docutils literal notranslate"><span class="pre">tupledict.select</span></code> can be used to select a subset of the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> by fixing some indices. The following example selects a subset of the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;value_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;value_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Select the subset where i=1</span>
 <span class="c1"># &quot;*&quot; means wildcard that matches any value for j and k</span>
@@ -340,6 +360,8 @@
 <span class="n">subset_kv_iterator</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">with_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
 </section>
 <section id="building-a-model-with-tupledict">
 <h2>Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#building-a-model-with-tupledict" title="Link to this heading">#</a></h2>
@@ -351,10 +373,12 @@
 \textrm{s.t.}  \quad &amp; \sum_{i=0}^{I} x_{ij} = 1, \quad \forall j \\
                 \quad &amp; x_{ij} \geq 0, \quad \forall i, j\end{split}\]</div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
 <span class="n">I</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">J</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
@@ -373,6 +397,8 @@
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 </pre></div>
+</div>
+</div>
 </div>
 <p>Here we use two utility functions to simplify how we express the sum notation</p>
 <dl class="py function">
@@ -427,12 +453,12 @@ each value in advance)</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="common_model_interface.html">
+          <a class="next-page" href="numpy.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Common Model Interface</div>
+                <div class="title">Numpy Container and N-queens Problem</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Variable" href="variable.html" /><link rel="prev" title="Benchmark" href="benchmark.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Variable" href="variable.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>Model - PyOptInterface documentation</title>
@@ -159,18 +159,20 @@
   <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -225,15 +227,20 @@
 <p>In this document we will only discuss the common interface of the model. For solver-specific interface, please refer to the documentation of the corresponding solver.</p>
 <section id="create-a-model">
 <h2>Create a model<a class="headerlink" href="#create-a-model" title="Link to this heading">#</a></h2>
-<p>A model is a concrete instance tied to a specific solver. To create a model, we need to import the corresponding module and call the constructor of the model class. For example, to create a Gurobi model, we can do:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+<p>A model is a concrete instance tied to a specific solver. To create a model, we need to import the corresponding module and call the constructor of the model class. For example, to create a HiGHS model, we can do:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+<p>You can replace <code class="docutils literal notranslate"><span class="pre">highs</span></code> with the name of the solver you want to use. The available solvers includes <code class="docutils literal notranslate"><span class="pre">copt</span></code>, <code class="docutils literal notranslate"><span class="pre">gurobi</span></code>, <code class="docutils literal notranslate"><span class="pre">highs</span></code> and <code class="docutils literal notranslate"><span class="pre">mosek</span></code>.</p>
 <p>Most commercial solvers require a <code class="docutils literal notranslate"><span class="pre">Environment</span></code>-like object to be initialized before creating a model in order to manage the license.</p>
-<p>By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class:</p>
+<p>By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: <a class="reference internal" href="gurobi.html"><span class="std std-doc">Gurobi</span></a>, <a class="reference internal" href="highs.html"><span class="std std-doc">HiGHS</span></a>, <a class="reference internal" href="copt.html"><span class="std std-doc">COPT</span></a>, <a class="reference internal" href="mosek.html"><span class="std std-doc">MOSEK</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 </pre></div>
@@ -241,7 +248,7 @@
 </section>
 <section id="inspect-and-customize-the-model">
 <h2>Inspect and customize the model<a class="headerlink" href="#inspect-and-customize-the-model" title="Link to this heading">#</a></h2>
-<p>We can query and modify the parameters of the model to manipulate the behavior of underlying solver.</p>
+<p>We can query and modify the parameters of the model to manipulate the behavior of the underlying solver.</p>
 <p>Like the design in <code class="docutils literal notranslate"><span class="pre">JuMP.jl</span></code>, we define a small subset of parameters that are common to all solvers. They are defined as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">pyoptinterface.ModelAttribute</span></a> enum class.
 The meanings of these standard attributes are the same as <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Model-attributes">Model attributes</a> and <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Optimizer-attributes">Optimizer attributes</a> in MathOptInterface.jl.</p>
 <div class="table-wrapper colwidths-given docutils container" id="id1">
@@ -318,15 +325,50 @@ The meanings of these standard attributes are the same as <a class="reference ex
 </table>
 </div>
 <p>We can set the value of a parameter by calling the <code class="docutils literal notranslate"><span class="pre">set_model_attribute</span></code> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># suppress the output of the solver</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># suppress the output of the solver</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="c1"># set the time limit to 10 seconds</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TimeLimitSec</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The value of parameter can be queried by calling the <code class="docutils literal notranslate"><span class="pre">get_model_attribute</span></code> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">objval</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">ObjectiveValue</span><span class="p">)</span>
+</div>
+</div>
+<p>The value of parameter can be queried by calling the <code class="docutils literal notranslate"><span class="pre">get_model_attribute</span></code> method of the model.</p>
+<p>For example, we build and solve a simple quadratic programming model, then query the objective value of the model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+
+<span class="n">objval</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">ObjectiveValue</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective value: </span><span class="si">{</span><span class="n">objval</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Objective value: 0.49999999999999994
+Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
+Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+00]
+Iteration, Runtime, ObjVal, NullspaceDim
+0, 0.000313, 1.000000, 0
+3, 0.000333, 0.500000, 1
+Model   status      : Optimal
+Objective value     :  5.0000000000e-01
+HiGHS run time      :          0.00
+</pre></div>
+</div>
+</div>
 </div>
 <p>Besides the standard attributes, we can also set/get the solver-specific attributes by calling the <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code>/<code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> method of the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gurobi</span>
@@ -348,15 +390,32 @@ The meanings of these standard attributes are the same as <a class="reference ex
 <section id="query-the-solution">
 <h2>Query the solution<a class="headerlink" href="#query-the-solution" title="Link to this heading">#</a></h2>
 <p>We can query the termination status of the model after optimization by query the <code class="docutils literal notranslate"><span class="pre">TerminationStatus</span></code> attribute of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tell if the optimizer obtains the optimal solution</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># tell if the optimizer obtains the optimal solution</span>
 <span class="n">termination_status</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">termination_status</span> <span class="o">==</span> <span class="n">poi</span><span class="o">.</span><span class="n">TerminationStatusCode</span><span class="o">.</span><span class="n">Optimal</span>
+<span class="k">assert</span> <span class="n">termination_status</span> <span class="o">==</span> <span class="n">poi</span><span class="o">.</span><span class="n">TerminationStatusCode</span><span class="o">.</span><span class="n">OPTIMAL</span>
 </pre></div>
 </div>
+</div>
+</div>
 <p>For value of variables and expressions, we can use <code class="docutils literal notranslate"><span class="pre">get_value</span></code> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">expr_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x0_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">expr_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x[0] = </span><span class="si">{</span><span class="n">x0_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x[0]^2 = </span><span class="si">{</span><span class="n">expr_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x[0] = 0.49999999999999994
+x[0]^2 = 0.24999999999999994
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -375,14 +434,14 @@ The meanings of these standard attributes are the same as <a class="reference ex
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="benchmark.html">
+          <a class="prev-page" href="getting_started.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Benchmark</div>
+                <div class="title">Getting Started</div>
                 
               </div>
             </a>

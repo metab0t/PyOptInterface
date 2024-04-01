@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expression" href="expression.html" /><link rel="prev" title="Model" href="model.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Building Bigger Optimization Model" href="structure.html" /><link rel="prev" title="Container" href="container.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
-        <title>Variable - PyOptInterface documentation</title>
+        <title>Numpy Container and N-queens Problem - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -136,7 +136,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -160,12 +160,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
@@ -215,85 +215,142 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section class="tex2jax_ignore mathjax_ignore" id="variable">
-<h1>Variable<a class="headerlink" href="#variable" title="Link to this heading">#</a></h1>
-<p>Variable represents a decision variable in the optimization problem. It can be created by calling the <a class="reference internal" href="common_model_interface.html#model.add_variable" title="model.add_variable"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">add_variable</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+          <section class="tex2jax_ignore mathjax_ignore" id="numpy-container-and-n-queens-problem">
+<h1>Numpy Container and N-queens Problem<a class="headerlink" href="#numpy-container-and-n-queens-problem" title="Link to this heading">#</a></h1>
+<p>In the previous <a class="reference internal" href="container.html"><span class="std std-doc">container</span></a> section, we have introduced the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> container to store and manipulate multi-dimensional data.</p>
+<p>However, due to the Bring Your Own Container (BYOC) principle, variables and constraints in PyOptInterface can just simple Python objects that can be stored in Numpy <code class="docutils literal notranslate"><span class="pre">ndarrays</span></code> directly as a multi-dimensional array, and you can enjoy the features of Numpy such like <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">fancy-indexing</a> automatically.</p>
+<p>We will use N-queens problem as example to show how to use Numpy <code class="docutils literal notranslate"><span class="pre">ndarrays</span></code> as container to store 2-dimensional variables and construct optimization model.</p>
+<p>Firstly, we import the necessary modules:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we create a 2-dimensional variable <code class="docutils literal notranslate"><span class="pre">x</span></code> with shape <span class="math notranslate nohighlight">\(N \times N\)</span> to represent the placement of queens. Each element of <code class="docutils literal notranslate"><span class="pre">x</span></code> is a binary variable that indicates whether a queen is placed at the corresponding position. We use <code class="docutils literal notranslate"><span class="pre">object</span></code> as the data type of <code class="docutils literal notranslate"><span class="pre">x</span></code> to store the binary variables. The following code snippet creates the variables:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">8</span>
 
-<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Continuous</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="variable-attributes">
-<h2>Variable Attributes<a class="headerlink" href="#variable-attributes" title="Link to this heading">#</a></h2>
-<p>After a variable is created, we can query or modify its attributes. The following table lists the standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attributes</span></a>:</p>
-<div class="table-wrapper colwidths-given docutils container" id="id1">
-<table class="docutils align-default" id="id1">
-<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
-<colgroup>
-<col style="width: 50.0%" />
-<col style="width: 50.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Attribute name</p></th>
-<th class="head"><p>Type</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Name</p></td>
-<td><p>str</p></td>
-</tr>
-<tr class="row-odd"><td><p>LowerBound</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-even"><td><p>UpperBound</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-odd"><td><p>Domain</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain" title="pyoptinterface.VariableDomain"><span class="xref myst py py-class">VariableDomain</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>PrimalStart</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-odd"><td><p>Value</p></td>
-<td><p>float</p></td>
-</tr>
-</tbody>
-</table>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the lower bound of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">LowerBound</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-<span class="c1"># set the upper bound of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">UpperBound</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we add the constraints to ensure that each row, each column has exact one queen, and each diagonal has at most one queen.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="c1"># Row and column</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="c1"># Diagonal</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="c1"># Anti-diagonal</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we solve the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 
-<span class="c1"># For mixed-integer programming, we can set the initial value of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">PrimalStart</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Termination status:&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
+Termination status: TerminationStatusCode.OPTIMAL
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+00]
+Presolving model
+42 rows, 64 cols, 252 nonzeros  0s
+42 rows, 64 cols, 270 nonzeros  0s
+Objective function is integral with scale 1
 
-<span class="c1"># get the value of the variable after optimization</span>
-<span class="n">x_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
+Solving MIP model with:
+   42 rows
+   64 cols (64 binary, 0 integer, 0 implied int., 0 continuous)
+   270 nonzeros
+
+        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
+         0       0         0   0.00%   0               inf                  inf        0      0      6        29     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      0
+  Dual bound        0
+  Gap               0% (tolerance: 0.01%)
+  Solution status   feasible
+                    0 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.06 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     267 (total)
+                    0 (strong br.)
+                    184 (separation)
+                    54 (heuristics)
 </pre></div>
 </div>
-</section>
-<section id="delete-variable">
-<h2>Delete variable<a class="headerlink" href="#delete-variable" title="Link to this heading">#</a></h2>
-<p>We can delete a variable by calling the <a class="reference internal" href="common_model_interface.html#model.delete_variable" title="model.delete_variable"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">delete_variable</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">delete_variable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</div>
+</div>
+<p>The solution can be obtained and visualized by the following code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">x_value</span> <span class="o">=</span> <span class="n">get_v</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">x_value</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>After a variable is deleted, it cannot be used in the model anymore, otherwise an exception will be raised.</p>
-<p>We can query whether a variable is active by calling the <a class="reference internal" href="#model.is_varoiable_active"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">is_variable_active</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">is_active</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_variable_active</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[0 0 1 0 0 0 0 0]
+ [1 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 1 0]
+ [0 0 0 0 1 0 0 0]
+ [0 0 0 0 0 0 0 1]
+ [0 1 0 0 0 0 0 0]
+ [0 0 0 1 0 0 0 0]
+ [0 0 0 0 0 1 0 0]]
 </pre></div>
 </div>
-</section>
+</div>
+</div>
 </section>
 
         </article>
@@ -301,23 +358,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="expression.html">
+          <a class="next-page" href="structure.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Expression</div>
+                <div class="title">Building Bigger Optimization Model</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="model.html">
+          <a class="prev-page" href="container.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Model</div>
+                <div class="title">Container</div>
                 
               </div>
             </a>
@@ -339,28 +396,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Variable</a><ul>
-<li><a class="reference internal" href="#variable-attributes">Variable Attributes</a></li>
-<li><a class="reference internal" href="#delete-variable">Delete variable</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -371,5 +408,7 @@
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
