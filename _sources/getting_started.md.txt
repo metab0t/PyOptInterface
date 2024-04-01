@@ -253,9 +253,9 @@ print("obj = ", model.get_value(obj))
 The whole code is as follows:
 ```python
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import highs
 
-model = gurobi.Model()
+model = highs.Model()
 x1 = model.add_variable(lb=0, name="x1")
 x2 = model.add_variable(lb=0, name="x2")
 
