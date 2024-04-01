@@ -1,3 +1,9 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
 # Model
 
 Model is the central class of the PyOptInterface package. It provides the interface to the solver and the user. The user can add variables, constraints and the objective function to the model. The model can be solved and the solution can be queried.
@@ -5,18 +11,20 @@ Model is the central class of the PyOptInterface package. It provides the interf
 In this document we will only discuss the common interface of the model. For solver-specific interface, please refer to the documentation of the corresponding solver.
 
 ## Create a model
-A model is a concrete instance tied to a specific solver. To create a model, we need to import the corresponding module and call the constructor of the model class. For example, to create a Gurobi model, we can do:
+A model is a concrete instance tied to a specific solver. To create a model, we need to import the corresponding module and call the constructor of the model class. For example, to create a HiGHS model, we can do:
 
-```python
+```{code-cell}
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import highs
 
-model = gurobi.Model()
+model = highs.Model()
 ```
+
+You can replace `highs` with the name of the solver you want to use. The available solvers includes `copt`, `gurobi`, `highs` and `mosek`.
 
 Most commercial solvers require a `Environment`-like object to be initialized before creating a model in order to manage the license.
 
-By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class:
+By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: [Gurobi](gurobi.md), [HiGHS](highs.md), [COPT](copt.md), [MOSEK](mosek.md).
 
 ```python
 env = gurobi.Env()
@@ -24,7 +32,7 @@ model = gurobi.Model(env)
 ```
 
 ## Inspect and customize the model
-We can query and modify the parameters of the model to manipulate the behavior of underlying solver.
+We can query and modify the parameters of the model to manipulate the behavior of the underlying solver.
 
 Like the design in `JuMP.jl`, we define a small subset of parameters that are common to all solvers. They are defined as [pyoptinterface.ModelAttribute](#pyoptinterface.ModelAttribute) enum class.
 The meanings of these standard attributes are the same as [Model attributes](https://jump.dev/JuMP.jl/stable/moi/reference/models/#Model-attributes) and [Optimizer attributes](https://jump.dev/JuMP.jl/stable/moi/reference/models/#Optimizer-attributes) in MathOptInterface.jl.
@@ -77,17 +85,28 @@ The meanings of these standard attributes are the same as [Model attributes](htt
 
 We can set the value of a parameter by calling the `set_model_attribute` method of the model:
 
-```python
+```{code-cell}
 # suppress the output of the solver
-model.set_model_attribute(poi.ModelAttribute.Silent, True)
+model.set_model_attribute(poi.ModelAttribute.Silent, False)
 # set the time limit to 10 seconds
 model.set_model_attribute(poi.ModelAttribute.TimeLimitSec, 10.0)
 ```
 
-The value of parameter can be queried by calling the `get_model_attribute` method of the model:
+The value of parameter can be queried by calling the `get_model_attribute` method of the model.
 
-```python
+For example, we build and solve a simple quadratic programming model, then query the objective value of the model:
+
+```{code-cell}
+x = model.add_variables(range(2), lb=0.0, ub=1.0)
+model.add_linear_constraint(x[0] + x[1], poi.Eq, 1.0)
+
+model.set_objective(x[0]*x[0] + x[1]*x[1], sense=poi.ObjectiveSense.Minimize)
+
+model.optimize()
+
 objval = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+
+print(f"Objective value: {objval}")
 ```
 
 Besides the standard attributes, we can also set/get the solver-specific attributes by calling the `set_raw_parameter`/`get_raw_parameter` method of the model:
@@ -111,15 +130,18 @@ model.optimize()
 ## Query the solution
 We can query the termination status of the model after optimization by query the `TerminationStatus` attribute of the model:
 
-```python
+```{code-cell}
 # tell if the optimizer obtains the optimal solution
 termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-assert termination_status == poi.TerminationStatusCode.Optimal
+assert termination_status == poi.TerminationStatusCode.OPTIMAL
 ```
 
 For value of variables and expressions, we can use `get_value` method of the model:
 
-```python
-x_value = model.get_value(x)
-expr_value = model.get_value(x*x)
+```{code-cell}
+x0_value = model.get_value(x[0])
+expr_value = model.get_value(x[0]*x[0])
+
+print(f"x[0] = {x0_value}")
+print(f"x[0]^2 = {expr_value}")
 ```

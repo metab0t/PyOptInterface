@@ -1,12 +1,12 @@
 # Variable
 
-Variable represents a decision variable in the optimization problem. It can be created by calling the `add_variable` method of the model:
+Variable represents a decision variable in the optimization problem. It can be created by calling the [`add_variable`](#model.add_variable) method of the model:
 
 ```python
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import highs
 
-model = gurobi.Model()
+model = highs.Model()
 
 x = model.add_variable(lb=0, ub=1.0, domain=poi.VariableDomain.Continuous, name="x")
 ```
@@ -48,7 +48,7 @@ x_value = model.get_variable_attribute(x, poi.VariableAttribute.Value)
 ```
 
 ## Delete variable
-We can delete a variable by calling the `delete_variable` method of the model:
+We can delete a variable by calling the [`delete_variable`](#model.delete_variable) method of the model:
 
 ```python
 model.delete_variable(x)
@@ -56,7 +56,7 @@ model.delete_variable(x)
 
 After a variable is deleted, it cannot be used in the model anymore, otherwise an exception will be raised.
 
-We can query whether a variable is active by calling the `is_variable_active` method of the model:
+We can query whether a variable is active by calling the [`is_variable_active`](#model.is_varoiable_active) method of the model:
 
 ```python
 is_active = model.is_variable_active(x)

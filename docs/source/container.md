@@ -1,3 +1,9 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
 # Container
 
 In our previous examples, we only use scalar variable, constraint and expression. However, in many cases, we need to handle a large number of variables, constraints and expressions.
@@ -15,23 +21,25 @@ Simply speaking, `tupledict` is a derived class of Python dict where the keys re
 ## Create a `tupledict`
 `tuplelist` can be created by calling the `tupledict` constructor. The following example creates a `tupledict` with two keys:
 
-```python
+```{code-cell}
 import pyoptinterface as poi
 
 td = poi.tupledict()
 td[1, 2] = 3
 td[4, 5] = 6
+
+print(td)
 ```
 
 It can also be created by passing a dictionary to the constructor:
 
-```python
+```{code-cell}
 td = poi.tupledict({(1, 2): 3, (4, 5): 6})
 ```
 
 In most cases, we have multiple indices as the axis and define a rule to construct the `tupledict`. `make_tupledict` provide a convenient way to create a `tupledict` from a list of indices and a function that maps the indices to the values. The following example creates a `tupledict` with two keys:
 
-```python
+```{code-cell}
 I = range(3)
 J = [6, 7]
 K = ("Asia", "Europe")
@@ -41,25 +49,12 @@ def f(i, j, k):
 
 td = poi.make_tupledict(I, J, K, rule=f)
 
-"""
-{(0, 6, 'Asia'): 'value_0_6_Asia',
- (0, 6, 'Europe'): 'value_0_6_Europe',
- (0, 7, 'Asia'): 'value_0_7_Asia',
- (0, 7, 'Europe'): 'value_0_7_Europe',
- (1, 6, 'Asia'): 'value_1_6_Asia',
- (1, 6, 'Europe'): 'value_1_6_Europe',
- (1, 7, 'Asia'): 'value_1_7_Asia',
- (1, 7, 'Europe'): 'value_1_7_Europe',
- (2, 6, 'Asia'): 'value_2_6_Asia',
- (2, 6, 'Europe'): 'value_2_6_Europe',
- (2, 7, 'Asia'): 'value_2_7_Asia',
- (2, 7, 'Europe'): 'value_2_7_Europe'}
-"""
+print(td)
 ```
 
-Sometimes we need to create a `tupledict` with a sparse pattern where some combinations of indices are missing. `make_tupledict` also provides a convenient way to create a `tupledict` with a sparse pattern, you only need to return `None` when the coprresponding value is unwanted. The following example creates a `tupledict` with a sparse pattern:
+Sometimes we need to create a `tupledict` with a sparse pattern where some combinations of indices are missing. `make_tupledict` also provides a convenient way to create a `tupledict` with a sparse pattern, you only need to return `None` when the corresponding value is unwanted. The following example creates a `tupledict` with a sparse pattern:
 
-```python
+```{code-cell}
 I = range(3)
 J = [6, 7]
 K = ("Asia", "Europe")
@@ -70,19 +65,17 @@ def f(i, j, k):
     else:
         return None
 
-td = poi.make_tupledict(I, J, K, rule=f)
+td = poi.make_tupledict(I, J, K, rule=f)corresponding
     
-"""
-{(0, 6, 'Asia'): 'value_0_6_Asia'}
-"""
+print(td)
 ```
 
 For highly sparse patterns, you can provide the sparse indices directly to make it more efficient.
 
 ```
 I = range(2)
-J = range(100)
-K = range(100)
+J = range(8)
+K = range(8)
 
 # We only want to construct (i, j, k) where j=k
 JK = [(j, j) for j in J]
@@ -93,33 +86,25 @@ def f(i, j, k):
 # JK will be flattened as j and k during construction
 td = poi.make_tupledict(I, JK, rule=f)
 
-"""
-{(0, 0, 0): 'value_0_0_0',
- (0, 1, 1): 'value_0_1_1',
- (0, 2, 2): 'value_0_2_2',
- ...
- (1, 97, 97): 'value_1_97_97',
- (1, 98, 98): 'value_1_98_98',
- (1, 99, 99): 'value_1_99_99'}
-"""
+print(td)
 ```
 
 ## Set/get values
 Like normal dictionary in Python, the values of a `tupledict` can be set or get by using the `[]` operator. The following example sets and gets the values of a `tupledict`:
 
-```python
+```{code-cell}
 td = poi.tupledict({(1, 2): 3, (4, 5): 6})
 td[1, 2] = 4
-print(td[1, 2]) # 4
+print(f"{td[1, 2]=}")
 
 td[4, 8] = 7
-print(td[4, 8]) # 7
+print(f"{td[4, 8]=}")
 ```
 
 As a representation of multidimensional data, `tupledict` also provides a way to iterate some axis efficiently.
 `tupledict.select` can be used to select a subset of the `tupledict` by fixing some indices. The following example selects a subset of the `tupledict`: 
 
-```python
+```{code-cell}
 
 td = poi.make_tupledict(range(3), range(3), range(3), rule=lambda i, j, k: f"value_{i}_{j}_{k}")
 
@@ -149,11 +134,11 @@ $$
 
 $$
 
-```python
+```{code-cell}
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import highs
 
-model = gurobi.Model()
+model = highs.Model()
 
 I = range(10)
 J = range(20)
