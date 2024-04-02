@@ -1,3 +1,8 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
 # Constraint
 
 The `Constraint` class is used to define a constraint in the optimization model. It is a subclass
@@ -16,11 +21,11 @@ Not all optimizers support all types of constraints. Please refer to the documen
 optimizer you are using to see which types of constraints are supported.
 :::
 
-```python
+```{code-cell}
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import copt
 
-model = gurobi.Model()
+model = copt.Model()
 ```
 
 ## Linear Constraint
@@ -36,7 +41,7 @@ $$
 
 It can be added to the model using the `add_linear_constraint` method of the `Model` class.
 
-```python
+```{code-cell}
 x = model.add_variable(name="x")
 y = model.add_variable(name="y")
 
@@ -73,7 +78,7 @@ $$
 
 It can be added to the model using the `add_quadratic_constraint` method of the `Model` class.
 
-```python
+```{code-cell}
 x = model.add_variable(name="x")
 y = model.add_variable(name="y")
 
@@ -103,7 +108,7 @@ $$
 It can be added to the model using the `add_second_order_cone_constraint` method of the `Model` 
 class.
 
-```python
+```{code-cell}
 N = 6
 vars = [model.add_variable() for i in range(N)]
 
@@ -125,7 +130,7 @@ It contains two types: `SOS1` and `SOS2`, the details can be found in [Wikipedia
 
 It can be added to the model using the `add_sos_constraint` method of the `Model` class.
 
-```python
+```{code-cell}
 N = 6
 vars = [model.add_variable(domain=poi.VariableDomain.Binary) for i in range(N)]
 

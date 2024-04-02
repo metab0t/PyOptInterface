@@ -237,11 +237,28 @@ of <code class="docutils literal notranslate"><span class="pre">Expression</span
 <p>Not all optimizers support all types of constraints. Please refer to the documentation of the
 optimizer you are using to see which types of constraints are supported.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">gurobi</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">copt</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-04-02 09:12:59 [INFO] checks license for COPT v7.1.0 20240204
+2024-04-02 09:12:59 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2024-04-02 09:12:59 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.8/x64/bin
+2024-04-02 09:12:59 [WARN] no license files in HOME folder: /home/runner/copt
+2024-04-02 09:12:59 [INFO] empty environment variable: COPT_LICENSE_DIR
+2024-04-02 09:12:59 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+
+No license found. Starting COPT with size limitations for non-commercial use
+Please apply for a license from www.shanshu.ai/copt
+</pre></div>
+</div>
+</div>
 </div>
 <section id="linear-constraint">
 <h2>Linear Constraint<a class="headerlink" href="#linear-constraint" title="Link to this heading">#</a></h2>
@@ -257,11 +274,15 @@ optimizer you are using to see which types of constraints are supported.</p>
 \end{split}\]</div>
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_linear_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
 <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_linear_constraint">
@@ -302,12 +323,16 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 \end{split}\]</div>
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_quadratic_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
 <span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span>
 <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_quadratic_constraint">
@@ -341,11 +366,15 @@ variables=(t,x) \in \mathbb{R}^{N} : t \ge \lVert x \rVert_2
 </div>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_second_order_cone_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code>
 class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
 
 <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_second_order_cone_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_second_order_cone_constraint">
@@ -370,11 +399,15 @@ class.</p>
 <p>SOS constraints are used to model special structures in the optimization problem.
 It contains two types: <code class="docutils literal notranslate"><span class="pre">SOS1</span></code> and <code class="docutils literal notranslate"><span class="pre">SOS2</span></code>, the details can be found in <a class="reference external" href="https://en.wikipedia.org/wiki/Special_ordered_set">Wikipedia</a>.</p>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_sos_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
 
 <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_sos_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">SOSType</span><span class="o">.</span><span class="n">SOS1</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_sos_constraint">
