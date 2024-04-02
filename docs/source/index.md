@@ -33,6 +33,14 @@ examples/economic_dispatch.md
 ```
 
 ```{toctree}
+:maxdepth: 2
+:titlesonly:
+:caption: Advanced
+
+develop.md
+```
+
+```{toctree}
 :maxdepth: 1
 :titlesonly:
 :caption: API docs
