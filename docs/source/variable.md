@@ -56,7 +56,7 @@ model.delete_variable(x)
 
 After a variable is deleted, it cannot be used in the model anymore, otherwise an exception will be raised.
 
-We can query whether a variable is active by calling the [`is_variable_active`](#model.is_varoiable_active) method of the model:
+We can query whether a variable is active by calling the [`is_variable_active`](#model.is_variable_active) method of the model:
 
 ```python
 is_active = model.is_variable_active(x)

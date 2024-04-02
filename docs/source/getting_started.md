@@ -1,3 +1,9 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
 # Getting Started
 
 ## Installation
@@ -199,7 +205,7 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
 
 First, we need to create a model object:
 
-```python
+```{code-cell}
 import pyoptinterface as poi
 from pyoptinterface import highs
 # from pyoptinterface import copt, gurobi, mosek (if you want to use other optimizers)
@@ -208,7 +214,7 @@ model = highs.Model()
 ```
 
 Then, we need to add variables to the model:
-```python
+```{code-cell}
 x1 = model.add_variable(lb=0, name="x1")
 x2 = model.add_variable(lb=0, name="x2")
 ```
@@ -217,7 +223,7 @@ The `lb` argument specifies the lower bound of the variable. It is optional and 
 The `name` argument is optional and can be used to specify the name of the variable.
 
 Then, we need to add constraints to the model:
-```python
+```{code-cell}
 con = model.add_linear_constraint(x1+x2, poi.ConstraintSense.Equal, 1, name="con")
 ```
 `model.add_linear_constraint` adds a linear constraint to the model.
@@ -227,46 +233,24 @@ con = model.add_linear_constraint(x1+x2, poi.ConstraintSense.Equal, 1, name="con
 - The fourth argument is optional and can be used to specify the name of the constraint.
 
 Finally, we need to set the objective function and solve the model:
-```python
+```{code-cell}
 obj = x1*x1 + 2*x2*x2
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
 ```
 
 The model can be solved via:
-```python
+```{code-cell}
 model.optimize()
 ```
-The Gurobi optimizer will be invoked to solve the model and writes the log to the console.
+The HiGHS optimizer will be invoked to solve the model and writes the log to the console.
 
 We can query the status of the model via:
-```python
-assert model.get_model_attribute(poi.ModelAttribute.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
+```{code-cell}
+model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
 ```
 
 The solution of the model can be queried via:
-```python
-print("x1 = ", model.get_value(x1))
-print("x2 = ", model.get_value(x2))
-print("obj = ", model.get_value(obj))
-```
-
-The whole code is as follows:
-```python
-import pyoptinterface as poi
-from pyoptinterface import highs
-
-model = highs.Model()
-x1 = model.add_variable(lb=0, name="x1")
-x2 = model.add_variable(lb=0, name="x2")
-
-con = model.add_linear_constraint(x1+x2, poi.ConstraintSense.Equal, 1, name="con")
-
-obj = x1*x1 + 2*x2*x2
-model.set_objective(obj, poi.ObjectiveSense.Minimize)
-
-model.optimize()
-assert model.get_model_attribute(poi.ModelAttribute.TerminationStatus) == poi.TerminationStatusCode.OPTIMAL
-
+```{code-cell}
 print("x1 = ", model.get_value(x1))
 print("x2 = ", model.get_value(x2))
 print("obj = ", model.get_value(obj))
