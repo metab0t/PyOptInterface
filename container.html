@@ -293,17 +293,14 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span><span class="n">corresponding</span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
     
 <span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">11</span>
-    <span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">f</span><span class="p">)</span><span class="n">corresponding</span>
-                                            <span class="o">^</span>
-<span class="ne">SyntaxError</span>: invalid syntax
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(0, 6, &#39;Asia&#39;): &#39;value_0_6_Asia&#39;}
 </pre></div>
 </div>
 </div>
@@ -337,6 +334,12 @@
 
 <span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">td</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">]</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>td[1, 2]=4
+td[4, 8]=7
 </pre></div>
 </div>
 </div>
@@ -396,6 +399,27 @@
 <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [0e+00, 0e+00]
+  RHS    [1e+00, 1e+00]
+Iteration, Runtime, ObjVal, NullspaceDim
+0, 0.000602, 20.000001, 0
+100, 0.001450, 5.833334, 50
+200, 0.002601, 3.333334, 100
+300, 0.005416, 2.361111, 150
+361, 0.008087, 2.000000, 180
+Model   status      : Optimal
+Objective value     :  2.0000000000e+00
+HiGHS run time      :          0.01
 </pre></div>
 </div>
 </div>
