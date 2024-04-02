@@ -1,37 +1,30 @@
 from gurobipy import *
+import numpy as np
 import os
 import time
 
 
-def solve_nqueens(n):
+def solve_nqueens(N):
     model = Model("queens")
     model.setParam("OutputFlag", 0)
     model.setParam("TimeLimit", 0.0)
     model.setParam("Presolve", 0)
 
-    x = model.addVars(n, n, vtype=GRB.BINARY)
+    x = np.empty((N, N), dtype=object)
+    for i in range(N):
+        for j in range(N):
+            x[i, j] = model.addVar(vtype=GRB.BINARY)
 
-    # one per row
-    for i in range(n):
-        model.addConstr(
-            quicksum(x[i, j] for j in range(n)) == 1,
-        )
-
-    # one per column
-    for j in range(n):
-        model.addConstr(quicksum(x[i, j] for i in range(n)) == 1)
-
-    # diagonal \
-    for i in range(2 * n - 1):
-        J = range(max(0, i - n + 1), min(n, i + 1))
-        gen = (x[j, i - j] for j in J)
-        model.addConstr(quicksum(gen) <= 1)
-
-    # diagonal /
-    for i in range(2 * n - 1):
-        J = range(max(0, i - n + 1), min(n, i + 1))
-        gen = (x[n - 1 - j, i - j] for j in J)
-        model.addConstr(quicksum(gen) <= 1)
+    for i in range(N):
+        # Row and column
+        model.addConstr(quicksum(x[i, :]) == 1.0)
+        model.addConstr(quicksum(x[:, i]) == 1.0)
+    flipx = np.fliplr(x)
+    for i in range(-N + 1, N):
+        # Diagonal
+        model.addConstr(quicksum(x.diagonal(i)) <= 1.0)
+        # Anti-diagonal
+        model.addConstr(quicksum(flipx.diagonal(i)) <= 1.0)
 
     model.optimize()
 

@@ -1,47 +1,28 @@
 import pyoptinterface as poi
 from pyoptinterface import gurobi
+import numpy as np
 import os
 import time
 
 
-def solve_nqueens(n):
+def solve_nqueens(N):
     model = gurobi.Model()
 
-    x = poi.make_nd_variable(
-        model, range(n), range(n), domain=poi.VariableDomain.Binary
-    )
+    x = np.empty((N, N), dtype=object)
+    for i in range(N):
+        for j in range(N):
+            x[i, j] = model.add_variable(domain=poi.VariableDomain.Binary)
 
-    # one per row
-    for i in range(n):
-        model.add_linear_constraint(
-            poi.quicksum(x[i, j] for j in range(n)), poi.ConstraintSense.Equal, 1.0
-        )
-
-    # one per column
-    for j in range(n):
-        model.add_linear_constraint(
-            poi.quicksum(x[i, j] for i in range(n)), poi.ConstraintSense.Equal, 1.0
-        )
-
-    # diagonal \
-    for i in range(2 * n - 1):
-        J = range(max(0, i - n + 1), min(n, i + 1))
-        gen = (x[j, i - j] for j in J)
-        model.add_linear_constraint(
-            poi.quicksum(gen),
-            poi.ConstraintSense.LessEqual,
-            1.0,
-        )
-
-    # diagonal /
-    for i in range(2 * n - 1):
-        J = range(max(0, i - n + 1), min(n, i + 1))
-        gen = (x[n - 1 - j, i - j] for j in J)
-        model.add_linear_constraint(
-            poi.quicksum(gen),
-            poi.ConstraintSense.LessEqual,
-            1.0,
-        )
+    for i in range(N):
+        # Row and column
+        model.add_linear_constraint(poi.quicksum(x[i, :]), poi.Eq, 1.0)
+        model.add_linear_constraint(poi.quicksum(x[:, i]), poi.Eq, 1.0)
+    flipx = np.fliplr(x)
+    for i in range(-N+1, N):
+        # Diagonal
+        model.add_linear_constraint(poi.quicksum(x.diagonal(i)), poi.Leq, 1.0)
+        # Anti-diagonal
+        model.add_linear_constraint(poi.quicksum(flipx.diagonal(i)), poi.Leq, 1.0)
 
     model.set_model_attribute(poi.ModelAttribute.Silent, True)
     model.set_model_attribute(poi.ModelAttribute.TimeLimitSec, 0.0)
