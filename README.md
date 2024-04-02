@@ -1,6 +1,8 @@
 PyOptInterface (Python Optimization Interface)
 =======
 
+[![](https://img.shields.io/pypi/v/pyoptinterface.svg?color=brightgreen)](https://pypi.org/pypi/pyoptinterface/)
+
 **PyOptInterface** is an open-source Python library to provide a unified API to construct and solve optimization models with various optimizers.
 
 The detailed documentation can be found [here](https://metab0t.github.io/PyOptInterface/).
