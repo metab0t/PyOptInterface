@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expression" href="expression.html" /><link rel="prev" title="Model" href="model.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pyoptinterface package" href="api/pyoptinterface.html" /><link rel="prev" title="Economic dispatch" href="examples/economic_dispatch.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
-        <title>Variable - PyOptInterface documentation</title>
+        <title>Developer Guide - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -157,10 +157,10 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Variable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
@@ -179,8 +179,8 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="develop.html">Developer Guide</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Developer Guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul>
@@ -225,78 +225,65 @@
           </label>
         </div>
         <article role="main">
-          <section class="tex2jax_ignore mathjax_ignore" id="variable">
-<h1>Variable<a class="headerlink" href="#variable" title="Link to this heading">#</a></h1>
-<p>Variable represents a decision variable in the optimization problem. It can be created by calling the <a class="reference internal" href="common_model_interface.html#model.add_variable" title="model.add_variable"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">add_variable</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-
-<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Continuous</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<section id="variable-attributes">
-<h2>Variable Attributes<a class="headerlink" href="#variable-attributes" title="Link to this heading">#</a></h2>
-<p>After a variable is created, we can query or modify its attributes. The following table lists the standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attributes</span></a>:</p>
-<div class="table-wrapper colwidths-given docutils container" id="id1">
-<table class="docutils align-default" id="id1">
-<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
-<colgroup>
-<col style="width: 50.0%" />
-<col style="width: 50.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Attribute name</p></th>
-<th class="head"><p>Type</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Name</p></td>
-<td><p>str</p></td>
-</tr>
-<tr class="row-odd"><td><p>LowerBound</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-even"><td><p>UpperBound</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-odd"><td><p>Domain</p></td>
-<td><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain" title="pyoptinterface.VariableDomain"><span class="xref myst py py-class">VariableDomain</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>PrimalStart</p></td>
-<td><p>float</p></td>
-</tr>
-<tr class="row-odd"><td><p>Value</p></td>
-<td><p>float</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the lower bound of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">LowerBound</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-<span class="c1"># set the upper bound of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">UpperBound</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-
-<span class="c1"># For mixed-integer programming, we can set the initial value of the variable</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">PrimalStart</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-
-<span class="c1"># get the value of the variable after optimization</span>
-<span class="n">x_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
-</pre></div>
-</div>
+          <section class="tex2jax_ignore mathjax_ignore" id="developer-guide">
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">#</a></h1>
+<p>This section is intended for developers who want to contribute to the PyOptInterface library. It provides an overview of the codebase, the development process, and the guidelines for contributing to the project.</p>
+<section id="codebase-overview">
+<h2>Codebase Overview<a class="headerlink" href="#codebase-overview" title="Link to this heading">#</a></h2>
+<p>The PyOptInterface library is a C++/Python mixed library. The core parts are implemented in C++ and exposed to Python via <a class="reference external" href="https://github.com/wjakob/nanobind">nanobind</a>. The build system is based on <a class="reference external" href="https://github.com/scikit-build/scikit-build-core">scikit-build-core</a>.</p>
+<p>The codebase is organized as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">include/pyoptinterface</span></code>: The header files of the C++ library.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lib</span></code>: The source files of the C++ library.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src</span></code>: The Python interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tests</span></code>: The test cases.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thirdparty</span></code>: The third-party dependencies.</p></li>
+</ul>
 </section>
-<section id="delete-variable">
-<h2>Delete variable<a class="headerlink" href="#delete-variable" title="Link to this heading">#</a></h2>
-<p>We can delete a variable by calling the <a class="reference internal" href="common_model_interface.html#model.delete_variable" title="model.delete_variable"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">delete_variable</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">delete_variable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<section id="development-process">
+<h2>Development Process<a class="headerlink" href="#development-process" title="Link to this heading">#</a></h2>
+<p>Supposing you want to contribute to PyOptInterface, you can follow these steps:</p>
+<p>Firstly, fork the <a class="reference external" href="https://github.com/metab0t/PyOptInterface">PyOptInterface repository</a> on GitHub and clone your forked repository to your local machine: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/&lt;your-username&gt;/PyOptInterface.git</span></code>.</p>
+<p>Next, you should set up the development environment. The third-party optimizers must be configured following the instructions in <a class="reference internal" href="getting_started.html"><span class="std std-doc">getting started</span></a>. In order to build PyOptInterface from source, you need the following dependencies:</p>
+<ul class="simple">
+<li><p>CMake</p></li>
+<li><p>A recent C++ compiler (We routinely test with GCC 10, latest MSVC and Apple Clang on the CI)</p></li>
+<li><p>Python 3.8 or later</p></li>
+<li><p>Python packages: <code class="docutils literal notranslate"><span class="pre">scikit-build-core</span></code>, can be installed by running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">scikit-build-core[pyproject]</span></code></p></li>
+</ul>
+<p>Then, you can build the project by running the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--no-build-isolation<span class="w"> </span>-ve<span class="w"> </span>.
 </pre></div>
 </div>
-<p>After a variable is deleted, it cannot be used in the model anymore, otherwise an exception will be raised.</p>
-<p>We can query whether a variable is active by calling the <a class="reference internal" href="common_model_interface.html#model.is_variable_active" title="model.is_variable_active"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">is_variable_active</span></code></span></a> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">is_active</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_variable_active</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<p>You will see a new <code class="docutils literal notranslate"><span class="pre">build</span></code> directory created in the project root. The Python package is installed in editable mode, so you can modify the source code and test the changes without reinstalling the package.</p>
+<p>After making changes to the code, you should run the test cases to ensure that everything is working as expected. You can run the test cases by executing the following command (installing <code class="docutils literal notranslate"><span class="pre">pytest</span></code> is required):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>tests
 </pre></div>
 </div>
+<p>The tests of PyOptInterface are still scarce, so you are encouraged to write new test cases for the new features you add.</p>
+<p>Finally, you can submit a pull request to the <a class="reference external" href="https://github.com/metab0t/PyOptInterface">PyOptInterface repository</a></p>
+</section>
+<section id="building-documentation">
+<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Link to this heading">#</a></h2>
+<p>The documentation of PyOptInterface is built using <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a>.</p>
+<p>Firstly, you should install the dependencies for building the documentation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
+</pre></div>
+</div>
+<p>You can build the documentation by running the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>docs
+make<span class="w"> </span>html
+</pre></div>
+</div>
+<p>The docs are built in the <code class="docutils literal notranslate"><span class="pre">docs/build/html</span></code> directory. You can open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file in a web browser to view the documentation.</p>
+</section>
+<section id="contributing-guidelines">
+<h2>Contributing Guidelines<a class="headerlink" href="#contributing-guidelines" title="Link to this heading">#</a></h2>
+<p>When contributing to PyOptInterface, please follow these guidelines:</p>
+<ul class="simple">
+<li><p>Make sure that the code is well formatted and documented. The C++ code is formatted using <a class="reference external" href="https://clang.llvm.org/docs/ClangFormat.html">clang-format</a> and the Python code is formatted using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a>.</p></li>
+<li><p>For big changes like adding interface for a new optimizer, please open a thread in <a class="reference external" href="https://github.com/metab0t/PyOptInterface/discussions"><strong>Discussion</strong></a> to discuss the design before starting the implementation.</p></li>
+</ul>
 </section>
 </section>
 
@@ -305,23 +292,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="expression.html">
+          <a class="next-page" href="api/pyoptinterface.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Expression</div>
+                <div class="title">pyoptinterface package</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="model.html">
+          <a class="prev-page" href="examples/economic_dispatch.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Model</div>
+                <div class="title">Economic dispatch</div>
                 
               </div>
             </a>
@@ -355,9 +342,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Variable</a><ul>
-<li><a class="reference internal" href="#variable-attributes">Variable Attributes</a></li>
-<li><a class="reference internal" href="#delete-variable">Delete variable</a></li>
+<li><a class="reference internal" href="#">Developer Guide</a><ul>
+<li><a class="reference internal" href="#codebase-overview">Codebase Overview</a></li>
+<li><a class="reference internal" href="#development-process">Development Process</a></li>
+<li><a class="reference internal" href="#building-documentation">Building Documentation</a></li>
+<li><a class="reference internal" href="#contributing-guidelines">Contributing Guidelines</a></li>
 </ul>
 </li>
 </ul>

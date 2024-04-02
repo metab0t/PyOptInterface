@@ -178,6 +178,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="develop.html">Developer Guide</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API docs</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pyoptinterface package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -319,7 +323,10 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
-Coefficient ranges:
+Termination status: TerminationStatusCode.OPTIMAL
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [0e+00, 0e+00]
   Bound  [1e+00, 1e+00]
@@ -358,7 +365,6 @@ Solving report
                     0 (strong br.)
                     184 (separation)
                     54 (heuristics)
-Termination status: TerminationStatusCode.OPTIMAL
 </pre></div>
 </div>
 </div>
