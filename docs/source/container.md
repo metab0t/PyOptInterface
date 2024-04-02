@@ -65,7 +65,7 @@ def f(i, j, k):
     else:
         return None
 
-td = poi.make_tupledict(I, J, K, rule=f)corresponding
+td = poi.make_tupledict(I, J, K, rule=f)
     
 print(td)
 ```
