@@ -373,7 +373,7 @@ It contains two types: <code class="docutils literal notranslate"><span class="p
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
 
-<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_sos_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_sos_constraint</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">SOSType</span><span class="o">.</span><span class="n">SOS1</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py function">

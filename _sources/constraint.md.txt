@@ -129,7 +129,7 @@ It can be added to the model using the `add_sos_constraint` method of the `Model
 N = 6
 vars = [model.add_variable(domain=poi.VariableDomain.Binary) for i in range(N)]
 
-con = model.add_sos_constraint(vars)
+con = model.add_sos_constraint(vars, poi.SOSType.SOS1)
 ```
 
 ```{py:function} model.add_sos_constraint(variables, sos_type, [weights])
