@@ -90,7 +90,6 @@ def test_evaluate():
 def test_operator():
     N = 6
     vars = [VariableIndex(i) for i in range(N)]
-    var_value_map = {v.index: float(v.index) for v in vars}
 
     exprs = [
         1,
@@ -106,36 +105,40 @@ def test_operator():
     ]
     exprs += [ExprBuilder(e) for e in exprs]
 
-    expr_values = [evaluate(e, var_value_map) for e in exprs]
+    # For two quadratic polynomials, if their values equal on more than 3 points, then thir coefficients are the same.
+    for i in (1, 2, 3, 4):
+        var_value_map = {v.index: i * float(v.index) for v in vars}
 
-    for op in [add, sub]:
+        expr_values = [evaluate(e, var_value_map) for e in exprs]
+
+        for op in [add, sub]:
+            for i, ei in enumerate(exprs):
+                for j, ej in enumerate(exprs):
+                    expr = op(ei, ej)
+                    value = evaluate(expr, var_value_map)
+                    assert value == approx(op(expr_values[i], expr_values[j]))
+
+        op = mul
         for i, ei in enumerate(exprs):
             for j, ej in enumerate(exprs):
+                total_degree = degree(ei) + degree(ej)
+                if total_degree > 2:
+                    continue
+                expr = op(ei, ej)
+                value = evaluate(expr, var_value_map)
+                # flag = value == approx(op(expr_values[i], expr_values[j]))
+                # if not flag:
+                #     k = 1
+                assert value == approx(op(expr_values[i], expr_values[j]))
+
+        op = truediv
+        for i, ei in enumerate(exprs):
+            for j, ej in enumerate(exprs):
+                if not isinstance(ej, (int, float)):
+                    continue
                 expr = op(ei, ej)
                 value = evaluate(expr, var_value_map)
                 assert value == approx(op(expr_values[i], expr_values[j]))
-
-    op = mul
-    for i, ei in enumerate(exprs):
-        for j, ej in enumerate(exprs):
-            total_degree = degree(ei) + degree(ej)
-            if total_degree > 2:
-                continue
-            expr = op(ei, ej)
-            value = evaluate(expr, var_value_map)
-            # flag = value == approx(op(expr_values[i], expr_values[j]))
-            # if not flag:
-            #     k = 1
-            assert value == approx(op(expr_values[i], expr_values[j]))
-
-    op = truediv
-    for i, ei in enumerate(exprs):
-        for j, ej in enumerate(exprs):
-            if not isinstance(ej, (int, float)):
-                continue
-            expr = op(ei, ej)
-            value = evaluate(expr, var_value_map)
-            assert value == approx(op(expr_values[i], expr_values[j]))
 
 
 def test_quicksum():
