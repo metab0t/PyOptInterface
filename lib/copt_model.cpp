@@ -10,6 +10,14 @@ namespace copt
 B(COPT_GetRetcodeMsg);
 B(COPT_CreateProb);
 B(COPT_DeleteProb);
+B(COPT_WriteMps);
+B(COPT_WriteLp);
+B(COPT_WriteCbf);
+B(COPT_WriteBin);
+B(COPT_WriteBasis);
+B(COPT_WriteSol);
+B(COPT_WriteMst);
+B(COPT_WriteParam);
 B(COPT_AddCol);
 B(COPT_DelCols);
 B(COPT_AddRow);
@@ -93,6 +101,14 @@ bool load_library(const std::string &path)
 	B(COPT_GetRetcodeMsg);
 	B(COPT_CreateProb);
 	B(COPT_DeleteProb);
+	B(COPT_WriteMps);
+	B(COPT_WriteLp);
+	B(COPT_WriteCbf);
+	B(COPT_WriteBin);
+	B(COPT_WriteBasis);
+	B(COPT_WriteSol);
+	B(COPT_WriteMst);
+	B(COPT_WriteParam);
 	B(COPT_AddCol);
 	B(COPT_DelCols);
 	B(COPT_AddRow);
@@ -249,6 +265,48 @@ void COPTModel::init(const COPTEnv &env)
 	int error = copt::COPT_CreateProb(env.m_env, &model);
 	check_error(error);
 	m_model = std::unique_ptr<copt_prob, COPTfreemodelT>(model);
+}
+
+void COPTModel::write(const std::string &filename)
+{
+	int error;
+	if (filename.ends_with(".mps"))
+	{
+		error = copt::COPT_WriteMps(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".lp"))
+	{
+		error = copt::COPT_WriteLp(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".cbf"))
+	{
+		error = copt::COPT_WriteCbf(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".bin"))
+	{
+		error = copt::COPT_WriteBin(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".bas"))
+	{
+		error = copt::COPT_WriteBasis(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".sol"))
+	{
+		error = copt::COPT_WriteSol(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".mst"))
+	{
+		error = copt::COPT_WriteMst(m_model.get(), filename.c_str());
+	}
+	else if (filename.ends_with(".par"))
+	{
+		error = copt::COPT_WriteParam(m_model.get(), filename.c_str());
+	}
+	else
+	{
+		throw std::runtime_error("Unknown file extension");
+	}
+	check_error(error);
 }
 
 VariableIndex COPTModel::add_variable(VariableDomain domain, double lb, double ub, const char *name)

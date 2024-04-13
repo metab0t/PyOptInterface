@@ -9,6 +9,7 @@ namespace highs
 
 B(Highs_create);
 B(Highs_destroy);
+B(Highs_writeModel);
 B(Highs_addCol);
 B(Highs_getNumCol);
 B(Highs_changeColIntegrality);
@@ -91,6 +92,7 @@ bool load_library(const std::string &path)
 
 	B(Highs_create);
 	B(Highs_destroy);
+	B(Highs_writeModel);
 	B(Highs_addCol);
 	B(Highs_getNumCol);
 	B(Highs_changeColIntegrality);
@@ -218,6 +220,12 @@ void POIHighsModel::init()
 	}
 	void *model = highs::Highs_create();
 	m_model = std::unique_ptr<void, HighsfreemodelT>(model);
+}
+
+void POIHighsModel::write(const std::string &filename)
+{
+	auto error = highs::Highs_writeModel(m_model.get(), filename.c_str());
+	check_error(error);
 }
 
 VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, double ub,

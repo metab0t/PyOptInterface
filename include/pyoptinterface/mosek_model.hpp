@@ -19,6 +19,8 @@ namespace mosek
 B(MSK_getcodedesc);
 B(MSK_makeemptytask);
 B(MSK_deletetask);
+B(MSK_writedata);
+B(MSK_writesolutionfile);
 B(MSK_appendvars);
 B(MSK_getnumvar);
 B(MSK_putvartype);
@@ -117,6 +119,8 @@ class MOSEKModel
 	MOSEKModel() = default;
 	MOSEKModel(const MOSEKEnv &env);
 	void init(const MOSEKEnv &env);
+
+	void write(const std::string& filename);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -MSK_INFINITY, double ub = MSK_INFINITY,

@@ -35,6 +35,7 @@ NB_MODULE(highs_model_ext, m)
 	    .def(nb::init<>())
 	    // clang-format off
 	    BIND_F(init)
+	    BIND_F(write)
 	    // clang-format on
 
 	    .def_ro("solution", &HighsModelMixin::m_solution)

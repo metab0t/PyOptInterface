@@ -15,6 +15,7 @@ namespace highs
 
 B(Highs_create);
 B(Highs_destroy);
+B(Highs_writeModel);
 B(Highs_addCol);
 B(Highs_getNumCol);
 B(Highs_changeColIntegrality);
@@ -111,6 +112,8 @@ class POIHighsModel
   public:
 	POIHighsModel();
 	void init();
+
+	void write(const std::string& filename);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -kHighsInf, double ub = kHighsInf,

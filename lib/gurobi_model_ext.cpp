@@ -36,6 +36,7 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<const GurobiEnv &>())
 	    // clang-format off
 	    BIND_F(init)
+	    BIND_F(write)
 	    // clang-format on
 
 	    .def("add_variable", &GurobiModelMixin::add_variable,

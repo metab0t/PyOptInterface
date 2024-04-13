@@ -16,6 +16,7 @@ namespace gurobi
 B(GRBnewmodel);
 B(GRBfreemodel);
 B(GRBgetenv);
+B(GRBwrite);
 B(GRBaddvar);
 B(GRBdelvars);
 B(GRBaddconstr);
@@ -105,6 +106,8 @@ class GurobiModel
 	GurobiModel() = default;
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
+
+	void write(const std::string& filename);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -GRB_INFINITY, double ub = GRB_INFINITY,

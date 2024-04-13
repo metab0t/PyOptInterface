@@ -27,6 +27,7 @@ NB_MODULE(copt_model_ext, m)
 	    .def(nb::init<const COPTEnv &>())
 	    // clang-format off
 	    BIND_F(init)
+	    BIND_F(write)
 	    // clang-format on
 
 	    .def("add_variable", &COPTModelMixin::add_variable,

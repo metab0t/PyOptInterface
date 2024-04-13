@@ -10,6 +10,8 @@ namespace mosek
 B(MSK_getcodedesc);
 B(MSK_makeemptytask);
 B(MSK_deletetask);
+B(MSK_writedata);
+B(MSK_writesolutionfile);
 B(MSK_appendvars);
 B(MSK_getnumvar);
 B(MSK_putvartype);
@@ -104,6 +106,8 @@ bool load_library(const std::string &path)
 	B(MSK_getcodedesc);
 	B(MSK_makeemptytask);
 	B(MSK_deletetask);
+	B(MSK_writedata);
+	B(MSK_writesolutionfile);
 	B(MSK_appendvars);
 	B(MSK_getnumvar);
 	B(MSK_putvartype);
@@ -297,6 +301,25 @@ void MOSEKModel::init(const MOSEKEnv &env)
 	auto error = mosek::MSK_makeemptytask(env.m_env, &model);
 	check_error(error);
 	m_model = std::unique_ptr<MSKtask, MOSEKfreemodelT>(model);
+}
+
+void MOSEKModel::write(const std::string &filename)
+{
+	bool is_solution = false;
+	if (filename.ends_with(".sol") || filename.ends_with(".bas") || filename.ends_with("int"))
+	{
+		is_solution = true;
+	}
+	MSKrescodee error;
+	if (is_solution)
+	{
+		error = mosek::MSK_writesolutionfile(m_model.get(), filename.c_str());
+	}
+	else
+	{
+		error = mosek::MSK_writedata(m_model.get(), filename.c_str());
+	}
+	check_error(error);
 }
 
 VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double ub,

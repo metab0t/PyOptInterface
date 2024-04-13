@@ -20,6 +20,14 @@ namespace copt
 B(COPT_GetRetcodeMsg);
 B(COPT_CreateProb);
 B(COPT_DeleteProb);
+B(COPT_WriteMps);
+B(COPT_WriteLp);
+B(COPT_WriteCbf);
+B(COPT_WriteBin);
+B(COPT_WriteBasis);
+B(COPT_WriteSol);
+B(COPT_WriteMst);
+B(COPT_WriteParam);
 B(COPT_AddCol);
 B(COPT_DelCols);
 B(COPT_AddRow);
@@ -120,6 +128,8 @@ class COPTModel
 	COPTModel() = default;
 	COPTModel(const COPTEnv &env);
 	void init(const COPTEnv &env);
+
+	void write(const std::string& filename);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -COPT_INFINITY, double ub = COPT_INFINITY,

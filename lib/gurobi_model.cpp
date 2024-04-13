@@ -10,6 +10,7 @@ namespace gurobi
 B(GRBnewmodel);
 B(GRBfreemodel);
 B(GRBgetenv);
+B(GRBwrite);
 B(GRBaddvar);
 B(GRBdelvars);
 B(GRBaddconstr);
@@ -87,6 +88,7 @@ bool load_library(const std::string &path)
 	B(GRBnewmodel);
 	B(GRBfreemodel);
 	B(GRBgetenv);
+	B(GRBwrite);
 	B(GRBaddvar);
 	B(GRBdelvars);
 	B(GRBaddconstr);
@@ -216,6 +218,12 @@ void GurobiModel::init(const GurobiEnv &env)
 	check_error(error);
 	m_env = gurobi::GRBgetenv(model);
 	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model);
+}
+
+void GurobiModel::write(const std::string &filename)
+{
+	int error = gurobi::GRBwrite(m_model.get(), filename.c_str());
+	check_error(error);
 }
 
 VariableIndex GurobiModel::add_variable(VariableDomain domain, double lb, double ub,
