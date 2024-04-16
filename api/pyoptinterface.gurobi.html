@@ -289,6 +289,46 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_add_lazy_constraint">
+<span class="sig-name descname"><span class="pre">cb_add_lazy_constraint</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_add_lazy_constraint" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_add_user_cut">
+<span class="sig-name descname"><span class="pre">cb_add_user_cut</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_add_user_cut" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_get_info_double">
+<span class="sig-name descname"><span class="pre">cb_get_info_double</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_get_info_double" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_get_info_int">
+<span class="sig-name descname"><span class="pre">cb_get_info_int</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_get_info_int" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_get_noderel">
+<span class="sig-name descname"><span class="pre">cb_get_noderel</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_get_noderel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_get_solution">
+<span class="sig-name descname"><span class="pre">cb_get_solution</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_get_solution" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_set_solution">
+<span class="sig-name descname"><span class="pre">cb_set_solution</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_set_solution" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.cb_submit_solution">
+<span class="sig-name descname"><span class="pre">cb_submit_solution</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.cb_submit_solution" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.delete_constraint">
 <span class="sig-name descname"><span class="pre">delete_constraint</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.delete_constraint" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -486,6 +526,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.raw_parameter_type">
 <span class="sig-name descname"><span class="pre">raw_parameter_type</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.raw_parameter_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.set_callback">
+<span class="sig-name descname"><span class="pre">set_callback</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.set_callback" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -732,6 +777,14 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_quadratic_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_quadratic_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_sos_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_sos_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_variable"><code class="docutils literal notranslate"><span class="pre">Model.add_variable</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_add_lazy_constraint"><code class="docutils literal notranslate"><span class="pre">Model.cb_add_lazy_constraint</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_add_user_cut"><code class="docutils literal notranslate"><span class="pre">Model.cb_add_user_cut</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_get_info_double"><code class="docutils literal notranslate"><span class="pre">Model.cb_get_info_double</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_get_info_int"><code class="docutils literal notranslate"><span class="pre">Model.cb_get_info_int</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_get_noderel"><code class="docutils literal notranslate"><span class="pre">Model.cb_get_noderel</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_get_solution"><code class="docutils literal notranslate"><span class="pre">Model.cb_get_solution</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_set_solution"><code class="docutils literal notranslate"><span class="pre">Model.cb_set_solution</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_submit_solution"><code class="docutils literal notranslate"><span class="pre">Model.cb_submit_solution</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.delete_constraint"><code class="docutils literal notranslate"><span class="pre">Model.delete_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.delete_variable"><code class="docutils literal notranslate"><span class="pre">Model.delete_variable</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.delete_variables"><code class="docutils literal notranslate"><span class="pre">Model.delete_variables</span></code></a></li>
@@ -772,6 +825,7 @@
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.pprint"><code class="docutils literal notranslate"><span class="pre">Model.pprint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.raw_attribute_type"><code class="docutils literal notranslate"><span class="pre">Model.raw_attribute_type</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.raw_parameter_type"><code class="docutils literal notranslate"><span class="pre">Model.raw_parameter_type</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_callback"><code class="docutils literal notranslate"><span class="pre">Model.set_callback</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_name"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_name</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.set_constraint_raw_attribute"><code class="docutils literal notranslate"><span class="pre">Model.set_constraint_raw_attribute()</span></code></a></li>
