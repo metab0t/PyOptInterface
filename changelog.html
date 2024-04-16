@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Container" href="container.html" /><link rel="prev" title="Constraint" href="constraint.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Economic dispatch" href="examples/economic_dispatch.html" /><link rel="prev" title="Benchmark" href="benchmark.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
-        <title>Objective - PyOptInterface documentation</title>
+        <title>Changelog - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -163,7 +163,7 @@
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -173,7 +173,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -226,31 +226,22 @@
           </label>
         </div>
         <article role="main">
-          <section class="tex2jax_ignore mathjax_ignore" id="objective">
-<h1>Objective<a class="headerlink" href="#objective" title="Link to this heading">#</a></h1>
-<p>The objective is a function of the variables that the optimization algorithm seeks to minimize or maximize.</p>
-<p>Currently PyOptInterface supports the following types of objective functions:</p>
+          <section class="tex2jax_ignore mathjax_ignore" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
+<section id="unreleased-change">
+<h2>Unreleased change<a class="headerlink" href="#unreleased-change" title="Link to this heading">#</a></h2>
+</section>
+<section id="id1">
+<h2>0.1.1<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Linear objective function</p></li>
-<li><p>Quadratic objective function</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">Model.write</span></code> method to write model to files</p></li>
 </ul>
-<p>The objective function is typically minimized, but it can also be maximized. The objective function is defined as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">objective</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>where <code class="docutils literal notranslate"><span class="pre">objective</span></code> is the handle of the objective function and <code class="docutils literal notranslate"><span class="pre">sense</span></code> is the optimization sense, which can be either <code class="docutils literal notranslate"><span class="pre">pyoptinterface.ObjectiveSense.Minimize</span></code> or <code class="docutils literal notranslate"><span class="pre">pyoptinterface.ObjectiveSense.Maximize</span></code>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">set_objective</span></code> function can be called multiple times to change the objective function of the model.</p>
-<section id="modify-objective-function">
-<h2>Modify objective function<a class="headerlink" href="#modify-objective-function" title="Link to this heading">#</a></h2>
-<p>The linear part of the objective function can be modified by calling the <code class="docutils literal notranslate"><span class="pre">set_objective_coefficient</span></code> method of the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">y</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
-
-<span class="c1"># modify the coefficient of the variable x</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_objective_coefficient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</pre></div>
-</div>
+</section>
+<section id="id2">
+<h2>0.1.0<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>First release on PyPI</p></li>
+</ul>
 </section>
 </section>
 
@@ -259,23 +250,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="container.html">
+          <a class="next-page" href="examples/economic_dispatch.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Container</div>
+                <div class="title">Economic dispatch</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="constraint.html">
+          <a class="prev-page" href="benchmark.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Constraint</div>
+                <div class="title">Benchmark</div>
                 
               </div>
             </a>
@@ -309,8 +300,10 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Objective</a><ul>
-<li><a class="reference internal" href="#modify-objective-function">Modify objective function</a></li>
+<li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#unreleased-change">Unreleased change</a></li>
+<li><a class="reference internal" href="#id1">0.1.1</a></li>
+<li><a class="reference internal" href="#id2">0.1.0</a></li>
 </ul>
 </li>
 </ul>

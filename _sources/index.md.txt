@@ -22,6 +22,7 @@ copt.md
 mosek.md
 highs.md
 benchmark.md
+changelog.md
 ```
 
 ```{toctree}

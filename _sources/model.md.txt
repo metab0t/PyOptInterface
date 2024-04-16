@@ -145,3 +145,17 @@ expr_value = model.get_value(x[0]*x[0])
 print(f"x[0] = {x0_value}")
 print(f"x[0]^2 = {expr_value}")
 ```
+
+## Write the model to file
+The optimization model can be written to file in LP, MPS or other formats. The `write` method of the model can be used to write the model to file:
+
+```{code-cell}
+model.write("model.lp")
+```
+
+The file format is determined by the file extension. Because we use the native IO procedure of the optimizer, their supported file formats and the content of output files may vary. Please refer to the documentation of the corresponding optimizer for more details.
+
+- COPT: [Doc](https://guide.coap.online/copt/en-doc/fileformats.html)
+- Gurobi: [Doc](https://www.gurobi.com/documentation/current/refman/c_write.html)
+- HiGHS: [Doc](https://ergo-code.github.io/HiGHS/stable/interfaces/c/#Highs_writeModel-Tuple{Any,%20Any})
+- Mosek: [Doc](https://docs.mosek.com/latest/capi/supported-file-formats.html)

@@ -173,6 +173,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
@@ -359,16 +360,14 @@ The meanings of these standard attributes are the same as <a class="reference ex
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Objective value: 0.49999999999999994
 Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
+Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [0e+00, 0e+00]
   Bound  [1e+00, 1e+00]
   RHS    [1e+00, 1e+00]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.000320, 1.000000, 0
-3, 0.000339, 0.500000, 1
+0, 0.000316, 1.000000, 0
+3, 0.000338, 0.500000, 1
 Model   status      : Optimal
 Objective value     :  5.0000000000e-01
 HiGHS run time      :          0.00
@@ -423,6 +422,29 @@ x[0]^2 = 0.24999999999999994
 </div>
 </div>
 </div>
+</section>
+<section id="write-the-model-to-file">
+<h2>Write the model to file<a class="headerlink" href="#write-the-model-to-file" title="Link to this heading">#</a></h2>
+<p>The optimization model can be written to file in LP, MPS or other formats. The <code class="docutils literal notranslate"><span class="pre">write</span></code> method of the model can be used to write the model to file:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;model.lp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Writing the model to model.lp
+</pre></div>
+</div>
+</div>
+</div>
+<p>The file format is determined by the file extension. Because we use the native IO procedure of the optimizer, their supported file formats and the content of output files may vary. Please refer to the documentation of the corresponding optimizer for more details.</p>
+<ul class="simple">
+<li><p>COPT: <a class="reference external" href="https://guide.coap.online/copt/en-doc/fileformats.html">Doc</a></p></li>
+<li><p>Gurobi: <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/c_write.html">Doc</a></p></li>
+<li><p>HiGHS: <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/interfaces/c/#Highs_writeModel-Tuple%7BAny,%20Any%7D">Doc</a></p></li>
+<li><p>Mosek: <a class="reference external" href="https://docs.mosek.com/latest/capi/supported-file-formats.html">Doc</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -486,6 +508,7 @@ x[0]^2 = 0.24999999999999994
 <li><a class="reference internal" href="#inspect-and-customize-the-model">Inspect and customize the model</a></li>
 <li><a class="reference internal" href="#solve-the-model">Solve the model</a></li>
 <li><a class="reference internal" href="#query-the-solution">Query the solution</a></li>
+<li><a class="reference internal" href="#write-the-model-to-file">Write the model to file</a></li>
 </ul>
 </li>
 </ul>
