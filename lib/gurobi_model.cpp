@@ -7,55 +7,7 @@ namespace gurobi
 {
 #define B(f) decltype(&::f) f = nullptr
 
-B(GRBnewmodel);
-B(GRBfreemodel);
-B(GRBgetenv);
-B(GRBwrite);
-B(GRBaddvar);
-B(GRBdelvars);
-B(GRBaddconstr);
-B(GRBaddqconstr);
-B(GRBaddsos);
-B(GRBdelconstrs);
-B(GRBdelqconstrs);
-B(GRBdelsos);
-B(GRBdelq);
-B(GRBsetdblattrarray);
-B(GRBaddqpterms);
-B(GRBoptimize);
-B(GRBupdatemodel);
-B(GRBgetparamtype);
-B(GRBsetintparam);
-B(GRBsetdblparam);
-B(GRBsetstrparam);
-B(GRBgetintparam);
-B(GRBgetdblparam);
-B(GRBgetstrparam);
-B(GRBgetattrinfo);
-B(GRBsetintattr);
-B(GRBsetdblattr);
-B(GRBsetstrattr);
-B(GRBgetintattr);
-B(GRBgetdblattr);
-B(GRBgetstrattr);
-B(GRBgetdblattrarray);
-B(GRBgetdblattrlist);
-B(GRBsetintattrelement);
-B(GRBsetcharattrelement);
-B(GRBsetdblattrelement);
-B(GRBsetstrattrelement);
-B(GRBgetintattrelement);
-B(GRBgetcharattrelement);
-B(GRBgetdblattrelement);
-B(GRBgetstrattrelement);
-B(GRBgetcoeff);
-B(GRBchgcoeffs);
-B(GRBgeterrormsg);
-B(GRBversion);
-B(GRBemptyenv);
-B(GRBloadenv);
-B(GRBfreeenv);
-B(GRBstartenv);
+APILIST
 
 #undef B
 
@@ -85,56 +37,7 @@ bool load_library(const std::string &path)
 		}                                                             \
 		f = ptr;                                                      \
 	}
-	B(GRBnewmodel);
-	B(GRBfreemodel);
-	B(GRBgetenv);
-	B(GRBwrite);
-	B(GRBaddvar);
-	B(GRBdelvars);
-	B(GRBaddconstr);
-	B(GRBaddqconstr);
-	B(GRBaddsos);
-	B(GRBdelconstrs);
-	B(GRBdelqconstrs);
-	B(GRBdelsos);
-	B(GRBdelq);
-	B(GRBsetdblattrarray);
-	B(GRBsetdblattr);
-	B(GRBaddqpterms);
-	B(GRBoptimize);
-	B(GRBupdatemodel);
-	B(GRBgetparamtype);
-	B(GRBsetintparam);
-	B(GRBsetdblparam);
-	B(GRBsetstrparam);
-	B(GRBgetintparam);
-	B(GRBgetdblparam);
-	B(GRBgetstrparam);
-	B(GRBgetattrinfo);
-	B(GRBsetintattr);
-	B(GRBsetdblattr);
-	B(GRBsetstrattr);
-	B(GRBgetintattr);
-	B(GRBgetdblattr);
-	B(GRBgetstrattr);
-	B(GRBgetdblattrarray);
-	B(GRBgetdblattrlist);
-	B(GRBsetintattrelement);
-	B(GRBsetcharattrelement);
-	B(GRBsetdblattrelement);
-	B(GRBsetstrattrelement);
-	B(GRBgetintattrelement);
-	B(GRBgetcharattrelement);
-	B(GRBgetdblattrelement);
-	B(GRBgetstrattrelement);
-	B(GRBgetcoeff);
-	B(GRBchgcoeffs);
-	B(GRBgeterrormsg);
-	B(GRBversion);
-	B(GRBemptyenv);
-	B(GRBloadenv);
-	B(GRBfreeenv);
-	B(GRBstartenv);
+	APILIST
 #undef B
 
 	is_loaded = true;
@@ -588,9 +491,14 @@ void GurobiModel::set_objective(const ExprBuilder &function, ObjectiveSense sens
 
 void GurobiModel::optimize()
 {
+	if (has_callback)
+	{
+		// Store the number of variables for the callback
+		m_callback_userdata.n_variables = get_model_raw_attribute_int(GRB_INT_ATTR_NUMVARS);
+	}
+	m_update_flag = 0;
 	int error = gurobi::GRBoptimize(m_model.get());
 	check_error(error);
-	m_update_flag = 0;
 }
 
 void GurobiModel::update()
@@ -1119,4 +1027,164 @@ void GurobiEnv::check_error(int error)
 	{
 		throw std::runtime_error(gurobi::GRBgeterrormsg(m_env));
 	}
+}
+
+// Callback
+int RealGurobiCallbackFunction(GRBmodel *, void *cbdata, int where, void *usrdata)
+{
+	auto real_userdata = static_cast<GurobiCallbackUserdata *>(usrdata);
+	auto model = static_cast<GurobiModelMixin *>(real_userdata->model);
+	auto &callback = real_userdata->callback;
+
+	model->m_cbdata = cbdata;
+	model->m_callback_userdata.where = where;
+	model->m_callback_userdata.cb_get_mipsol_called = false;
+	model->m_callback_userdata.cb_get_mipnoderel_called = false;
+	model->m_callback_userdata.cb_solution_called = false;
+	callback(model, where);
+
+	return 0;
+}
+
+void GurobiModel::set_callback(const GurobiCallback &callback)
+{
+	m_callback_userdata.model = this;
+	m_callback_userdata.callback = callback;
+
+	int error =
+	    gurobi::GRBsetcallbackfunc(m_model.get(), RealGurobiCallbackFunction, &m_callback_userdata);
+	check_error(error);
+
+	has_callback = true;
+}
+
+int GurobiModel::cb_get_info_int(int what)
+{
+	int retval;
+	int error = gurobi::GRBcbget(m_cbdata, m_callback_userdata.where, what, &retval);
+	check_error(error);
+	return retval;
+}
+
+double GurobiModel::cb_get_info_double(int what)
+{
+	double retval;
+	int error = gurobi::GRBcbget(m_cbdata, m_callback_userdata.where, what, &retval);
+	check_error(error);
+	return retval;
+}
+
+void GurobiModel::cb_get_info_doublearray(int what)
+{
+	int n_vars = m_callback_userdata.n_variables;
+	double *val = nullptr;
+	if (what == GRB_CB_MIPSOL_SOL)
+	{
+		m_callback_userdata.mipsol.resize(n_vars);
+		val = m_callback_userdata.mipsol.data();
+	}
+	else if (what == GRB_CB_MIPNODE_REL)
+	{
+		m_callback_userdata.mipnoderel.resize(n_vars);
+		val = m_callback_userdata.mipnoderel.data();
+	}
+	else
+	{
+		throw std::runtime_error("Invalid what for cb_get_info_doublearray");
+	}
+	int error = gurobi::GRBcbget(m_cbdata, m_callback_userdata.where, what, val);
+	check_error(error);
+}
+
+double GurobiModel::cb_get_solution(const VariableIndex &variable)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_get_mipsol_called)
+	{
+		cb_get_info_doublearray(GRB_CB_MIPSOL_SOL);
+		userdata.cb_get_mipsol_called = true;
+	}
+	auto index = _variable_index(variable);
+	return userdata.mipsol[index];
+}
+
+double GurobiModel::cb_get_noderel(const VariableIndex &variable)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_get_mipnoderel_called)
+	{
+		cb_get_info_doublearray(GRB_CB_MIPNODE_REL);
+		userdata.cb_get_mipnoderel_called = true;
+	}
+	auto index = _variable_index(variable);
+	return userdata.mipnoderel[index];
+}
+
+void GurobiModel::cb_set_solution(const VariableIndex &variable, double value)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_solution_called)
+	{
+		userdata.heuristic_solution.resize(userdata.n_variables, GRB_UNDEFINED);
+		userdata.cb_solution_called = true;
+	}
+	userdata.heuristic_solution[_variable_index(variable)] = value;
+}
+
+double GurobiModel::cb_submit_solution()
+{
+	if (!m_callback_userdata.cb_solution_called)
+	{
+		throw std::runtime_error("No solution is set in the callback!");
+	}
+	double obj;
+	int error =
+	    gurobi::GRBcbsolution(m_cbdata, m_callback_userdata.heuristic_solution.data(), &obj);
+	check_error(error);
+	return obj;
+}
+
+void GurobiModel::cb_add_lazy_constraint(const ScalarAffineFunction &function,
+                                         ConstraintSense sense, CoeffT rhs)
+{
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
+	char g_sense = gurobi_con_sense(sense);
+	double g_rhs = rhs - function.constant.value_or(0.0);
+
+	int error = gurobi::GRBcblazy(m_cbdata, numnz, cind, cval, g_sense, g_rhs);
+	check_error(error);
+}
+
+void GurobiModel::cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense,
+                                         CoeffT rhs)
+{
+	ScalarAffineFunction f(function);
+	cb_add_lazy_constraint(f, sense, rhs);
+}
+
+void GurobiModel::cb_add_user_cut(const ScalarAffineFunction &function, ConstraintSense sense,
+                                  CoeffT rhs)
+{
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
+	char g_sense = gurobi_con_sense(sense);
+	double g_rhs = rhs - function.constant.value_or(0.0);
+
+	int error = gurobi::GRBcbcut(m_cbdata, numnz, cind, cval, g_sense, g_rhs);
+	check_error(error);
+}
+
+void GurobiModel::cb_add_user_cut(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs)
+{
+	ScalarAffineFunction f(function);
+	cb_add_user_cut(f, sense, rhs);
 }

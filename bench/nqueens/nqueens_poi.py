@@ -18,7 +18,7 @@ def solve_nqueens(N):
         model.add_linear_constraint(poi.quicksum(x[i, :]), poi.Eq, 1.0)
         model.add_linear_constraint(poi.quicksum(x[:, i]), poi.Eq, 1.0)
     flipx = np.fliplr(x)
-    for i in range(-N+1, N):
+    for i in range(-N + 1, N):
         # Diagonal
         model.add_linear_constraint(poi.quicksum(x.diagonal(i)), poi.Leq, 1.0)
         # Anti-diagonal

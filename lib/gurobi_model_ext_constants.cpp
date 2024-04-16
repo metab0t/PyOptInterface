@@ -69,4 +69,81 @@ void bind_gurobi_constants(nb::module_ &m)
 	GRB.attr("MAX_STRLEN") = GRB_MAX_STRLEN;
 	GRB.attr("MAX_TAGLEN") = GRB_MAX_TAGLEN;
 	GRB.attr("MAX_CONCURRENT") = GRB_MAX_CONCURRENT;
+
+	nb::module_ Callback = GRB.def_submodule("Callback");
+
+	// Callback codes
+	Callback.attr("POLLING") = GRB_CB_POLLING;
+	Callback.attr("PRESOLVE") = GRB_CB_PRESOLVE;
+	Callback.attr("SIMPLEX") = GRB_CB_SIMPLEX;
+	Callback.attr("MIP") = GRB_CB_MIP;
+	Callback.attr("MIPSOL") = GRB_CB_MIPSOL;
+	Callback.attr("MIPNODE") = GRB_CB_MIPNODE;
+	Callback.attr("MESSAGE") = GRB_CB_MESSAGE;
+	Callback.attr("BARRIER") = GRB_CB_BARRIER;
+	Callback.attr("MULTIOBJ") = GRB_CB_MULTIOBJ;
+	Callback.attr("IIS") = GRB_CB_IIS;
+
+	Callback.attr("PRE_COLDEL") = GRB_CB_PRE_COLDEL;
+	Callback.attr("PRE_ROWDEL") = GRB_CB_PRE_ROWDEL;
+	Callback.attr("PRE_SENCHG") = GRB_CB_PRE_SENCHG;
+	Callback.attr("PRE_BNDCHG") = GRB_CB_PRE_BNDCHG;
+	Callback.attr("PRE_COECHG") = GRB_CB_PRE_COECHG;
+
+	Callback.attr("SPX_ITRCNT") = GRB_CB_SPX_ITRCNT;
+	Callback.attr("SPX_OBJVAL") = GRB_CB_SPX_OBJVAL;
+	Callback.attr("SPX_PRIMINF") = GRB_CB_SPX_PRIMINF;
+	Callback.attr("SPX_DUALINF") = GRB_CB_SPX_DUALINF;
+	Callback.attr("SPX_ISPERT") = GRB_CB_SPX_ISPERT;
+
+	Callback.attr("MIP_OBJBST") = GRB_CB_MIP_OBJBST;
+	Callback.attr("MIP_OBJBND") = GRB_CB_MIP_OBJBND;
+	Callback.attr("MIP_NODCNT") = GRB_CB_MIP_NODCNT;
+	Callback.attr("MIP_SOLCNT") = GRB_CB_MIP_SOLCNT;
+	Callback.attr("MIP_CUTCNT") = GRB_CB_MIP_CUTCNT;
+	Callback.attr("MIP_NODLFT") = GRB_CB_MIP_NODLFT;
+	Callback.attr("MIP_ITRCNT") = GRB_CB_MIP_ITRCNT;
+	Callback.attr("MIP_OPENSCENARIOS") = GRB_CB_MIP_OPENSCENARIOS;
+	Callback.attr("MIP_PHASE") = GRB_CB_MIP_PHASE;
+
+	Callback.attr("MIPSOL_SOL") = GRB_CB_MIPSOL_SOL;
+	Callback.attr("MIPSOL_OBJ") = GRB_CB_MIPSOL_OBJ;
+	Callback.attr("MIPSOL_OBJBST") = GRB_CB_MIPSOL_OBJBST;
+	Callback.attr("MIPSOL_OBJBND") = GRB_CB_MIPSOL_OBJBND;
+	Callback.attr("MIPSOL_NODCNT") = GRB_CB_MIPSOL_NODCNT;
+	Callback.attr("MIPSOL_SOLCNT") = GRB_CB_MIPSOL_SOLCNT;
+	Callback.attr("MIPSOL_OPENSCENARIOS") = GRB_CB_MIPSOL_OPENSCENARIOS;
+	Callback.attr("MIPSOL_PHASE") = GRB_CB_MIPSOL_PHASE;
+	
+	Callback.attr("MIPNODE_STATUS") = GRB_CB_MIPNODE_STATUS;
+	Callback.attr("MIPNODE_REL") = GRB_CB_MIPNODE_REL;
+	Callback.attr("MIPNODE_OBJBST") = GRB_CB_MIPNODE_OBJBST;
+	Callback.attr("MIPNODE_OBJBND") = GRB_CB_MIPNODE_OBJBND;
+	Callback.attr("MIPNODE_NODCNT") = GRB_CB_MIPNODE_NODCNT;
+	Callback.attr("MIPNODE_SOLCNT") = GRB_CB_MIPNODE_SOLCNT;
+	Callback.attr("MIPNODE_BRVAR") = GRB_CB_MIPNODE_BRVAR;
+	Callback.attr("MIPNODE_OPENSCENARIOS") = GRB_CB_MIPNODE_OPENSCENARIOS;
+	Callback.attr("MIPNODE_PHASE") = GRB_CB_MIPNODE_PHASE;
+
+	Callback.attr("MSG_STRING") = GRB_CB_MSG_STRING;
+	Callback.attr("RUNTIME") = GRB_CB_RUNTIME;
+	Callback.attr("WORK") = GRB_CB_WORK;
+
+	Callback.attr("BARRIER_ITRCNT") = GRB_CB_BARRIER_ITRCNT;
+	Callback.attr("BARRIER_PRIMOBJ") = GRB_CB_BARRIER_PRIMOBJ;
+	Callback.attr("BARRIER_DUALOBJ") = GRB_CB_BARRIER_DUALOBJ;
+	Callback.attr("BARRIER_PRIMINF") = GRB_CB_BARRIER_PRIMINF;
+	Callback.attr("BARRIER_DUALINF") = GRB_CB_BARRIER_DUALINF;
+	Callback.attr("BARRIER_COMPL") = GRB_CB_BARRIER_COMPL;
+
+	Callback.attr("MULTIOBJ_OBJCNT") = GRB_CB_MULTIOBJ_OBJCNT;
+	Callback.attr("MULTIOBJ_SOLCNT") = GRB_CB_MULTIOBJ_SOLCNT;
+	Callback.attr("MULTIOBJ_SOL") = GRB_CB_MULTIOBJ_SOL;
+
+	Callback.attr("IIS_CONSTRMIN") = GRB_CB_IIS_CONSTRMIN;
+	Callback.attr("IIS_CONSTRMAX") = GRB_CB_IIS_CONSTRMAX;
+	Callback.attr("IIS_CONSTRGUESS") = GRB_CB_IIS_CONSTRGUESS;
+	Callback.attr("IIS_BOUNDMIN") = GRB_CB_IIS_BOUNDMIN;
+	Callback.attr("IIS_BOUNDMAX") = GRB_CB_IIS_BOUNDMAX;
+	Callback.attr("IIS_BOUNDGUESS") = GRB_CB_IIS_BOUNDGUESS;
 }

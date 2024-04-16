@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/function.h>
 
 #include "pyoptinterface/gurobi_model.hpp"
 
@@ -122,11 +123,36 @@ NB_MODULE(gurobi_model_ext, m)
 	        nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModelMixin::set_objective_as_constant),
 	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
+	    .def("cb_add_lazy_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &GurobiModelMixin::cb_add_lazy_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_lazy_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &GurobiModelMixin::cb_add_lazy_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_user_cut",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &GurobiModelMixin::cb_add_user_cut),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_user_cut",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &GurobiModelMixin::cb_add_user_cut),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+
 	    // clang-format off
 	    BIND_F(optimize)
 	    BIND_F(update)
 	    BIND_F(version_string)
 	    BIND_F(get_raw_model)
+
+		BIND_F(set_callback)
+		BIND_F(cb_get_info_int)
+		BIND_F(cb_get_info_double)
+		BIND_F(cb_get_solution)
+		BIND_F(cb_get_noderel)
+		BIND_F(cb_set_solution)
+		BIND_F(cb_submit_solution)
 
 	    BIND_F(raw_parameter_type)
 	    BIND_F(set_raw_parameter_int)

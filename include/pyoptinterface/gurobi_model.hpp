@@ -9,59 +9,69 @@
 #include "pyoptinterface/solver_common.hpp"
 
 // define Gurobi C APIs
+#define APILIST               \
+	B(GRBnewmodel);           \
+	B(GRBfreemodel);          \
+	B(GRBgetenv);             \
+	B(GRBwrite);              \
+	B(GRBaddvar);             \
+	B(GRBdelvars);            \
+	B(GRBaddconstr);          \
+	B(GRBaddqconstr);         \
+	B(GRBaddsos);             \
+	B(GRBdelconstrs);         \
+	B(GRBdelqconstrs);        \
+	B(GRBdelsos);             \
+	B(GRBdelq);               \
+	B(GRBsetdblattrarray);    \
+	B(GRBaddqpterms);         \
+	B(GRBoptimize);           \
+	B(GRBupdatemodel);        \
+	B(GRBgetparamtype);       \
+	B(GRBsetintparam);        \
+	B(GRBsetdblparam);        \
+	B(GRBsetstrparam);        \
+	B(GRBgetintparam);        \
+	B(GRBgetdblparam);        \
+	B(GRBgetstrparam);        \
+	B(GRBgetattrinfo);        \
+	B(GRBsetintattr);         \
+	B(GRBsetdblattr);         \
+	B(GRBsetstrattr);         \
+	B(GRBgetintattr);         \
+	B(GRBgetdblattr);         \
+	B(GRBgetstrattr);         \
+	B(GRBgetdblattrarray);    \
+	B(GRBgetdblattrlist);     \
+	B(GRBsetintattrelement);  \
+	B(GRBsetcharattrelement); \
+	B(GRBsetdblattrelement);  \
+	B(GRBsetstrattrelement);  \
+	B(GRBgetintattrelement);  \
+	B(GRBgetcharattrelement); \
+	B(GRBgetdblattrelement);  \
+	B(GRBgetstrattrelement);  \
+	B(GRBgetcoeff);           \
+	B(GRBchgcoeffs);          \
+	B(GRBgeterrormsg);        \
+	B(GRBversion);            \
+	B(GRBsetcallbackfunc);    \
+	B(GRBcbget);              \
+	B(GRBcbproceed);          \
+	B(GRBterminate);          \
+	B(GRBcbsolution);         \
+	B(GRBcblazy);             \
+	B(GRBcbcut);              \
+	B(GRBemptyenv);           \
+	B(GRBloadenv);            \
+	B(GRBfreeenv);            \
+	B(GRBstartenv);
+
 namespace gurobi
 {
 #define B(f) extern decltype(&::f) f
 
-B(GRBnewmodel);
-B(GRBfreemodel);
-B(GRBgetenv);
-B(GRBwrite);
-B(GRBaddvar);
-B(GRBdelvars);
-B(GRBaddconstr);
-B(GRBaddqconstr);
-B(GRBaddsos);
-B(GRBdelconstrs);
-B(GRBdelqconstrs);
-B(GRBdelsos);
-B(GRBdelq);
-B(GRBsetdblattrarray);
-B(GRBaddqpterms);
-B(GRBoptimize);
-B(GRBupdatemodel);
-B(GRBgetparamtype);
-B(GRBsetintparam);
-B(GRBsetdblparam);
-B(GRBsetstrparam);
-B(GRBgetintparam);
-B(GRBgetdblparam);
-B(GRBgetstrparam);
-B(GRBgetattrinfo);
-B(GRBsetintattr);
-B(GRBsetdblattr);
-B(GRBsetstrattr);
-B(GRBgetintattr);
-B(GRBgetdblattr);
-B(GRBgetstrattr);
-B(GRBgetdblattrarray);
-B(GRBgetdblattrlist);
-B(GRBsetintattrelement);
-B(GRBsetcharattrelement);
-B(GRBsetdblattrelement);
-B(GRBsetstrattrelement);
-B(GRBgetintattrelement);
-B(GRBgetcharattrelement);
-B(GRBgetdblattrelement);
-B(GRBgetstrattrelement);
-B(GRBgetcoeff);
-B(GRBchgcoeffs);
-B(GRBgeterrormsg);
-B(GRBversion);
-B(GRBemptyenv);
-B(GRBloadenv);
-B(GRBfreeenv);
-B(GRBstartenv);
+APILIST
 
 #undef B
 
@@ -100,6 +110,25 @@ struct GRBfreemodelT
 	};
 };
 
+class GurobiModel;
+using GurobiCallback = std::function<void(GurobiModel *, int)>;
+
+struct GurobiCallbackUserdata
+{
+	void *model = nullptr;
+	GurobiCallback callback;
+	int n_variables = 0;
+	int where = 0;
+	// store result of cbget
+	bool cb_get_mipsol_called = false;
+	std::vector<double> mipsol;
+	bool cb_get_mipnoderel_called = false;
+	std::vector<double> mipnoderel;
+	// Cache for cbsolution
+	bool cb_solution_called = false;
+	std::vector<double> heuristic_solution;
+};
+
 class GurobiModel
 {
   public:
@@ -107,7 +136,7 @@ class GurobiModel
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
 
-	void write(const std::string& filename);
+	void write(const std::string &filename);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -GRB_INFINITY, double ub = GRB_INFINITY,
@@ -223,6 +252,29 @@ class GurobiModel
 
 	// Non-exported functions
 	void check_error(int error);
+
+	// Callback
+	void set_callback(const GurobiCallback &callback);
+
+	// For callback
+	bool has_callback = false;
+	void *m_cbdata = nullptr;
+	GurobiCallbackUserdata m_callback_userdata;
+
+	int cb_get_info_int(int what);
+	double cb_get_info_double(int what);
+	void cb_get_info_doublearray(int what);
+
+	double cb_get_solution(const VariableIndex &variable);
+	double cb_get_noderel(const VariableIndex &variable);
+	void cb_set_solution(const VariableIndex &variable, double value);
+	double cb_submit_solution();
+
+	void cb_add_lazy_constraint(const ScalarAffineFunction &function, ConstraintSense sense,
+	                            CoeffT rhs);
+	void cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
+	void cb_add_user_cut(const ScalarAffineFunction &function, ConstraintSense sense, CoeffT rhs);
+	void cb_add_user_cut(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
 
   private:
 	MonotoneIndexer<int> m_variable_index;
