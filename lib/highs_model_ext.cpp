@@ -102,8 +102,9 @@ NB_MODULE(highs_model_ext, m)
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&HighsModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
+		.def("optimize", &HighsModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+
 	    // clang-format off
-	    BIND_F(optimize)
 	    BIND_F(version_string)
 	    BIND_F(get_raw_model)
 

@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/function.h>
 
 #include "pyoptinterface/copt_model.hpp"
 
@@ -108,10 +109,38 @@ NB_MODULE(copt_model_ext, m)
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
+		.def("cb_add_lazy_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &COPTModelMixin::cb_add_lazy_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_lazy_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &COPTModelMixin::cb_add_lazy_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_user_cut",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	             &COPTModelMixin::cb_add_user_cut),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("cb_add_user_cut",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	             &COPTModelMixin::cb_add_user_cut),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+
+		.def("optimize", &COPTModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+
 	    // clang-format off
-	    BIND_F(optimize)
 	    BIND_F(version_string)
 	    BIND_F(get_raw_model)
+
+		BIND_F(set_callback)
+		BIND_F(cb_get_info_int)
+		BIND_F(cb_get_info_double)
+		BIND_F(cb_get_solution)
+		BIND_F(cb_get_relaxation)
+		BIND_F(cb_get_incumbent)
+		BIND_F(cb_set_solution)
+		BIND_F(cb_submit_solution)
+		BIND_F(cb_exit)
 
 	    BIND_F(raw_parameter_attribute_type)
 

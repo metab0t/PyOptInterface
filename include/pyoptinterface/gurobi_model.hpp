@@ -266,9 +266,11 @@ class GurobiModel
 	void cb_get_info_doublearray(int what);
 
 	double cb_get_solution(const VariableIndex &variable);
-	double cb_get_noderel(const VariableIndex &variable);
+	double cb_get_relaxation(const VariableIndex &variable);
 	void cb_set_solution(const VariableIndex &variable, double value);
 	double cb_submit_solution();
+
+	void cb_exit();
 
 	void cb_add_lazy_constraint(const ScalarAffineFunction &function, ConstraintSense sense,
 	                            CoeffT rhs);

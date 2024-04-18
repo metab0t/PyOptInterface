@@ -140,8 +140,9 @@ NB_MODULE(gurobi_model_ext, m)
 	             &GurobiModelMixin::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 
+		.def("optimize", &GurobiModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+
 	    // clang-format off
-	    BIND_F(optimize)
 	    BIND_F(update)
 	    BIND_F(version_string)
 	    BIND_F(get_raw_model)
@@ -150,9 +151,10 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(cb_get_info_int)
 		BIND_F(cb_get_info_double)
 		BIND_F(cb_get_solution)
-		BIND_F(cb_get_noderel)
+		BIND_F(cb_get_relaxation)
 		BIND_F(cb_set_solution)
 		BIND_F(cb_submit_solution)
+		BIND_F(cb_exit)
 
 	    BIND_F(raw_parameter_type)
 	    BIND_F(set_raw_parameter_int)

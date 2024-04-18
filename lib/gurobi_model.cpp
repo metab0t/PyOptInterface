@@ -1108,7 +1108,7 @@ double GurobiModel::cb_get_solution(const VariableIndex &variable)
 	return userdata.mipsol[index];
 }
 
-double GurobiModel::cb_get_noderel(const VariableIndex &variable)
+double GurobiModel::cb_get_relaxation(const VariableIndex &variable)
 {
 	auto &userdata = m_callback_userdata;
 	if (!userdata.cb_get_mipnoderel_called)
@@ -1158,6 +1158,11 @@ void GurobiModel::cb_add_lazy_constraint(const ScalarAffineFunction &function,
 
 	int error = gurobi::GRBcblazy(m_cbdata, numnz, cind, cval, g_sense, g_rhs);
 	check_error(error);
+}
+
+void GurobiModel::cb_exit()
+{
+	gurobi::GRBterminate(m_model.get());
 }
 
 void GurobiModel::cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense,

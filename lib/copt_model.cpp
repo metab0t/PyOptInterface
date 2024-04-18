@@ -538,6 +538,11 @@ void COPTModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
 
 void COPTModel::optimize()
 {
+	if (has_callback)
+	{
+		// Store the number of variables for the callback
+		m_callback_userdata.n_variables = get_raw_attribute_int("Cols");
+	}
 	int error = copt::COPT_Solve(m_model.get());
 	check_error(error);
 }
@@ -977,4 +982,188 @@ void COPTEnvConfig::set(const char *param_name, const char *value)
 {
 	int error = copt::COPT_SetEnvConfig(m_config, param_name, value);
 	check_error(error);
+}
+
+// Callback
+int RealCOPTCallbackFunction(copt_prob *prob, void *cbdata, int cbctx, void *userdata)
+{
+	auto real_userdata = static_cast<COPTCallbackUserdata *>(userdata);
+	auto model = static_cast<COPTModelMixin *>(real_userdata->model);
+	auto &callback = real_userdata->callback;
+
+	model->m_cbdata = cbdata;
+	model->m_callback_userdata.where = cbctx;
+	model->m_callback_userdata.cb_get_mipsol_called = false;
+	model->m_callback_userdata.cb_get_mipnoderel_called = false;
+	model->m_callback_userdata.cb_get_mipincumbent_called = false;
+	model->m_callback_userdata.cb_solution_called = false;
+	callback(model, cbctx);
+
+	return COPT_RETCODE_OK;
+}
+
+void COPTModel::set_callback(const COPTCallback &callback, int cbctx)
+{
+	m_callback_userdata.model = this;
+	m_callback_userdata.callback = callback;
+
+	int error = copt::COPT_SetCallback(m_model.get(), RealCOPTCallbackFunction, cbctx,
+	                                   &m_callback_userdata);
+	check_error(error);
+
+	has_callback = true;
+}
+
+int COPTModel::cb_get_info_int(const std::string &what)
+{
+	int retval;
+	int error = copt::COPT_GetCallbackInfo(m_cbdata, what.c_str(), &retval);
+	check_error(error);
+	return retval;
+}
+
+double COPTModel::cb_get_info_double(const std::string &what)
+{
+	double retval;
+	int error = copt::COPT_GetCallbackInfo(m_cbdata, what.c_str(), &retval);
+	check_error(error);
+	return retval;
+}
+
+void COPTModel::cb_get_info_doublearray(const std::string &what)
+{
+	int n_vars = m_callback_userdata.n_variables;
+	double *val = nullptr;
+	if (what == COPT_CBINFO_MIPCANDIDATE)
+	{
+		m_callback_userdata.mipsol.resize(n_vars);
+		val = m_callback_userdata.mipsol.data();
+	}
+	else if (what == COPT_CBINFO_RELAXSOLUTION)
+	{
+		m_callback_userdata.mipnoderel.resize(n_vars);
+		val = m_callback_userdata.mipnoderel.data();
+	}
+	else if (what == COPT_CBINFO_INCUMBENT)
+	{
+		m_callback_userdata.mipincumbent.resize(n_vars);
+		val = m_callback_userdata.mipincumbent.data();
+	}
+	else
+	{
+		throw std::runtime_error("Invalid what for cb_get_info_doublearray");
+	}
+	int error = copt::COPT_GetCallbackInfo(m_cbdata, what.c_str(), val);
+	check_error(error);
+}
+
+double COPTModel::cb_get_solution(const VariableIndex &variable)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_get_mipsol_called)
+	{
+		cb_get_info_doublearray(COPT_CBINFO_MIPCANDIDATE);
+		userdata.cb_get_mipsol_called = true;
+	}
+	auto index = _variable_index(variable);
+	return userdata.mipsol[index];
+}
+
+double COPTModel::cb_get_relaxation(const VariableIndex &variable)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_get_mipnoderel_called)
+	{
+		cb_get_info_doublearray(COPT_CBINFO_RELAXSOLUTION);
+		userdata.cb_get_mipnoderel_called = true;
+	}
+	auto index = _variable_index(variable);
+	return userdata.mipnoderel[index];
+}
+
+double COPTModel::cb_get_incumbent(const VariableIndex &variable)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_get_mipincumbent_called)
+	{
+		cb_get_info_doublearray(COPT_CBINFO_INCUMBENT);
+		userdata.cb_get_mipincumbent_called = true;
+	}
+	auto index = _variable_index(variable);
+	return userdata.mipincumbent[index];
+}
+
+void COPTModel::cb_set_solution(const VariableIndex &variable, double value)
+{
+	auto &userdata = m_callback_userdata;
+	if (!userdata.cb_solution_called)
+	{
+		userdata.heuristic_solution.resize(userdata.n_variables, COPT_UNDEFINED);
+		userdata.cb_solution_called = true;
+	}
+	userdata.heuristic_solution[_variable_index(variable)] = value;
+}
+
+double COPTModel::cb_submit_solution()
+{
+	if (!m_callback_userdata.cb_solution_called)
+	{
+		throw std::runtime_error("No solution is set in the callback!");
+	}
+	double obj;
+	int error = copt::COPT_AddCallbackSolution(m_cbdata,
+	                                           m_callback_userdata.heuristic_solution.data(), &obj);
+	check_error(error);
+	return obj;
+}
+
+void COPTModel::cb_exit()
+{
+	int error = copt::COPT_Interrupt(m_model.get());
+	check_error(error);
+}
+
+void COPTModel::cb_add_lazy_constraint(const ScalarAffineFunction &function, ConstraintSense sense,
+                                       CoeffT rhs)
+{
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
+	char g_sense = copt_con_sense(sense);
+	double g_rhs = rhs - function.constant.value_or(0.0);
+
+	int error = copt::COPT_AddCallbackLazyConstr(m_cbdata, numnz, cind, cval, g_sense, g_rhs);
+	check_error(error);
+}
+
+void COPTModel::cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense,
+                                       CoeffT rhs)
+{
+	ScalarAffineFunction f(function);
+	cb_add_lazy_constraint(f, sense, rhs);
+}
+
+void COPTModel::cb_add_user_cut(const ScalarAffineFunction &function, ConstraintSense sense,
+                                CoeffT rhs)
+{
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
+	char g_sense = copt_con_sense(sense);
+	double g_rhs = rhs - function.constant.value_or(0.0);
+
+	int error = copt::COPT_AddCallbackUserCut(m_cbdata, numnz, cind, cval, g_sense, g_rhs);
+	check_error(error);
+}
+
+void COPTModel::cb_add_user_cut(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs)
+{
+	ScalarAffineFunction f(function);
+	cb_add_user_cut(f, sense, rhs);
 }

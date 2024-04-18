@@ -13,68 +13,74 @@ extern "C"
 	int COPT_SearchParamAttr(copt_prob *prob, const char *name, int *p_type);
 }
 
-#define APILIST                  \
-	B(COPT_GetRetcodeMsg);       \
-	B(COPT_CreateProb);          \
-	B(COPT_DeleteProb);          \
-	B(COPT_WriteMps);            \
-	B(COPT_WriteLp);             \
-	B(COPT_WriteCbf);            \
-	B(COPT_WriteBin);            \
-	B(COPT_WriteBasis);          \
-	B(COPT_WriteSol);            \
-	B(COPT_WriteMst);            \
-	B(COPT_WriteParam);          \
-	B(COPT_AddCol);              \
-	B(COPT_DelCols);             \
-	B(COPT_AddRow);              \
-	B(COPT_AddQConstr);          \
-	B(COPT_AddSOSs);             \
-	B(COPT_AddCones);            \
-	B(COPT_DelRows);             \
-	B(COPT_DelQConstrs);         \
-	B(COPT_DelSOSs);             \
-	B(COPT_DelCones);            \
-	B(COPT_DelQuadObj);          \
-	B(COPT_ReplaceColObj);       \
-	B(COPT_SetObjConst);         \
-	B(COPT_SetObjSense);         \
-	B(COPT_SetQuadObj);          \
-	B(COPT_Solve);               \
-	B(COPT_SearchParamAttr);     \
-	B(COPT_SetIntParam);         \
-	B(COPT_SetDblParam);         \
-	B(COPT_GetIntParam);         \
-	B(COPT_GetDblParam);         \
-	B(COPT_GetIntAttr);          \
-	B(COPT_GetDblAttr);          \
-	B(COPT_GetColInfo);          \
-	B(COPT_GetColName);          \
-	B(COPT_SetColNames);         \
-	B(COPT_GetColType);          \
-	B(COPT_SetColType);          \
-	B(COPT_SetColLower);         \
-	B(COPT_SetColUpper);         \
-	B(COPT_GetRowInfo);          \
-	B(COPT_GetQConstrInfo);      \
-	B(COPT_GetRowName);          \
-	B(COPT_GetQConstrName);      \
-	B(COPT_SetRowNames);         \
-	B(COPT_SetQConstrNames);     \
-	B(COPT_AddMipStart);         \
-	B(COPT_GetQConstrRhs);       \
-	B(COPT_SetRowLower);         \
-	B(COPT_SetRowUpper);         \
-	B(COPT_SetQConstrRhs);       \
-	B(COPT_GetElem);             \
-	B(COPT_SetElem);             \
-	B(COPT_SetColObj);           \
-	B(COPT_GetBanner);           \
-	B(COPT_CreateEnv);           \
-	B(COPT_CreateEnvWithConfig); \
-	B(COPT_DeleteEnv);           \
-	B(COPT_CreateEnvConfig);     \
-	B(COPT_DeleteEnvConfig);     \
+#define APILIST                    \
+	B(COPT_GetRetcodeMsg);         \
+	B(COPT_CreateProb);            \
+	B(COPT_DeleteProb);            \
+	B(COPT_WriteMps);              \
+	B(COPT_WriteLp);               \
+	B(COPT_WriteCbf);              \
+	B(COPT_WriteBin);              \
+	B(COPT_WriteBasis);            \
+	B(COPT_WriteSol);              \
+	B(COPT_WriteMst);              \
+	B(COPT_WriteParam);            \
+	B(COPT_AddCol);                \
+	B(COPT_DelCols);               \
+	B(COPT_AddRow);                \
+	B(COPT_AddQConstr);            \
+	B(COPT_AddSOSs);               \
+	B(COPT_AddCones);              \
+	B(COPT_DelRows);               \
+	B(COPT_DelQConstrs);           \
+	B(COPT_DelSOSs);               \
+	B(COPT_DelCones);              \
+	B(COPT_DelQuadObj);            \
+	B(COPT_ReplaceColObj);         \
+	B(COPT_SetObjConst);           \
+	B(COPT_SetObjSense);           \
+	B(COPT_SetQuadObj);            \
+	B(COPT_Solve);                 \
+	B(COPT_SearchParamAttr);       \
+	B(COPT_SetIntParam);           \
+	B(COPT_SetDblParam);           \
+	B(COPT_GetIntParam);           \
+	B(COPT_GetDblParam);           \
+	B(COPT_GetIntAttr);            \
+	B(COPT_GetDblAttr);            \
+	B(COPT_GetColInfo);            \
+	B(COPT_GetColName);            \
+	B(COPT_SetColNames);           \
+	B(COPT_GetColType);            \
+	B(COPT_SetColType);            \
+	B(COPT_SetColLower);           \
+	B(COPT_SetColUpper);           \
+	B(COPT_GetRowInfo);            \
+	B(COPT_GetQConstrInfo);        \
+	B(COPT_GetRowName);            \
+	B(COPT_GetQConstrName);        \
+	B(COPT_SetRowNames);           \
+	B(COPT_SetQConstrNames);       \
+	B(COPT_AddMipStart);           \
+	B(COPT_GetQConstrRhs);         \
+	B(COPT_SetRowLower);           \
+	B(COPT_SetRowUpper);           \
+	B(COPT_SetQConstrRhs);         \
+	B(COPT_GetElem);               \
+	B(COPT_SetElem);               \
+	B(COPT_SetColObj);             \
+	B(COPT_GetBanner);             \
+	B(COPT_SetCallback);           \
+	B(COPT_GetCallbackInfo);       \
+	B(COPT_AddCallbackSolution);   \
+	B(COPT_AddCallbackLazyConstr); \
+	B(COPT_AddCallbackUserCut);    \
+	B(COPT_Interrupt);             \
+	B(COPT_CreateEnv);             \
+	B(COPT_CreateEnvWithConfig);   \
+	B(COPT_DeleteEnv);             \
+	B(COPT_CreateEnvConfig);       \
+	B(COPT_DeleteEnvConfig);       \
 	B(COPT_SetEnvConfig);
 
 namespace copt
@@ -123,6 +129,27 @@ struct COPTfreemodelT
 	{
 		copt::COPT_DeleteProb(&model);
 	};
+};
+
+class COPTModel;
+using COPTCallback = std::function<void(COPTModel *, int)>;
+
+struct COPTCallbackUserdata
+{
+	void *model = nullptr;
+	COPTCallback callback;
+	int n_variables = 0;
+	int where = 0;
+	// store result of cbget
+	bool cb_get_mipsol_called = false;
+	std::vector<double> mipsol;
+	bool cb_get_mipnoderel_called = false;
+	std::vector<double> mipnoderel;
+	bool cb_get_mipincumbent_called = false;
+	std::vector<double> mipincumbent;
+	// Cache for cbsolution
+	bool cb_solution_called = false;
+	std::vector<double> heuristic_solution;
 };
 
 class COPTModel
@@ -228,6 +255,32 @@ class COPTModel
 	int _checked_variable_index(const VariableIndex &variable);
 	int _constraint_index(const ConstraintIndex &constraint);
 	int _checked_constraint_index(const ConstraintIndex &constraint);
+
+	// Callback
+	void set_callback(const COPTCallback &callback, int cbctx);
+
+	// For callback
+	bool has_callback = false;
+	void *m_cbdata = nullptr;
+	COPTCallbackUserdata m_callback_userdata;
+
+	int cb_get_info_int(const std::string &what);
+	double cb_get_info_double(const std::string &what);
+	void cb_get_info_doublearray(const std::string &what);
+
+	double cb_get_solution(const VariableIndex &variable);
+	double cb_get_relaxation(const VariableIndex &variable);
+	double cb_get_incumbent(const VariableIndex &variable);
+	void cb_set_solution(const VariableIndex &variable, double value);
+	double cb_submit_solution();
+
+	void cb_exit();
+
+	void cb_add_lazy_constraint(const ScalarAffineFunction &function, ConstraintSense sense,
+	                            CoeffT rhs);
+	void cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
+	void cb_add_user_cut(const ScalarAffineFunction &function, ConstraintSense sense, CoeffT rhs);
+	void cb_add_user_cut(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
 
   private:
 	MonotoneIndexer<int> m_variable_index;
