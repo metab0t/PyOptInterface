@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pyoptinterface package" href="api/pyoptinterface.html" /><link rel="prev" title="Economic dispatch" href="examples/economic_dispatch.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Developer Guide - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,10 +227,10 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="developer-guide">
-<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">#</a></h1>
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">¶</a></h1>
 <p>This section is intended for developers who want to contribute to the PyOptInterface library. It provides an overview of the codebase, the development process, and the guidelines for contributing to the project.</p>
 <section id="codebase-overview">
-<h2>Codebase Overview<a class="headerlink" href="#codebase-overview" title="Link to this heading">#</a></h2>
+<h2>Codebase Overview<a class="headerlink" href="#codebase-overview" title="Link to this heading">¶</a></h2>
 <p>The PyOptInterface library is a C++/Python mixed library. The core parts are implemented in C++ and exposed to Python via <a class="reference external" href="https://github.com/wjakob/nanobind">nanobind</a>. The build system is based on <a class="reference external" href="https://github.com/scikit-build/scikit-build-core">scikit-build-core</a>.</p>
 <p>The codebase is organized as follows:</p>
 <ul class="simple">
@@ -242,7 +242,7 @@
 </ul>
 </section>
 <section id="development-process">
-<h2>Development Process<a class="headerlink" href="#development-process" title="Link to this heading">#</a></h2>
+<h2>Development Process<a class="headerlink" href="#development-process" title="Link to this heading">¶</a></h2>
 <p>Supposing you want to contribute to PyOptInterface, you can follow these steps:</p>
 <p>Firstly, fork the <a class="reference external" href="https://github.com/metab0t/PyOptInterface">PyOptInterface repository</a> on GitHub and clone your forked repository to your local machine: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/&lt;your-username&gt;/PyOptInterface.git</span></code>.</p>
 <p>Next, you should set up the development environment. The third-party optimizers must be configured following the instructions in <a class="reference internal" href="getting_started.html"><span class="std std-doc">getting started</span></a>. In order to build PyOptInterface from source, you need the following dependencies:</p>
@@ -265,7 +265,7 @@
 <p>Finally, you can submit a pull request to the <a class="reference external" href="https://github.com/metab0t/PyOptInterface">PyOptInterface repository</a></p>
 </section>
 <section id="building-documentation">
-<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Link to this heading">#</a></h2>
+<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Link to this heading">¶</a></h2>
 <p>The documentation of PyOptInterface is built using <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a>.</p>
 <p>Firstly, you should install the dependencies for building the documentation:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
@@ -279,7 +279,7 @@ make<span class="w"> </span>html
 <p>The docs are built in the <code class="docutils literal notranslate"><span class="pre">docs/build/html</span></code> directory. You can open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file in a web browser to view the documentation.</p>
 </section>
 <section id="contributing-guidelines">
-<h2>Contributing Guidelines<a class="headerlink" href="#contributing-guidelines" title="Link to this heading">#</a></h2>
+<h2>Contributing Guidelines<a class="headerlink" href="#contributing-guidelines" title="Link to this heading">¶</a></h2>
 <p>When contributing to PyOptInterface, please follow these guidelines:</p>
 <ul class="simple">
 <li><p>Make sure that the code is well formatted and documented. The C++ code is formatted using <a class="reference external" href="https://clang.llvm.org/docs/ClangFormat.html">clang-format</a> and the Python code is formatted using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a>.</p></li>
@@ -360,7 +360,7 @@ make<span class="w"> </span>html
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

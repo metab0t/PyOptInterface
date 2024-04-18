@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Numpy Container and N-queens Problem" href="numpy.html" /><link rel="prev" title="Objective" href="objective.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Container - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,7 +227,7 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="container">
-<h1>Container<a class="headerlink" href="#container" title="Link to this heading">#</a></h1>
+<h1>Container<a class="headerlink" href="#container" title="Link to this heading">¶</a></h1>
 <p>In our previous examples, we only use scalar variable, constraint and expression. However, in many cases, we need to handle a large number of variables, constraints and expressions.</p>
 <p>In general, PyOptInterface does not restrict the ways to store these objects. You can use a list, a dictionary, or any other data structure to store them, because PyOptInterface only requires the handle of the object to manipulate it and each handle is a compact C++ object that can be easily stored and passed around. In other words, we follow the Bring Your Own Container (BYOC) principle.</p>
 <p>However, in the context of optimization, we often needs to represent the model in a more structured way. The most classic example is <a class="reference external" href="https://ampl.com/wp-content/uploads/Chapter-5-Simple-Sets-and-Indexing-AMPL-Book.pdf"><code class="docutils literal notranslate"><span class="pre">Set</span></code></a> in AMPL, which provides a flexible way to represent multi-dimensional data with custom indexing. The concept is also widely used in other optimization modeling languages, such as <a class="reference external" href="https://jump.dev/JuMP.jl/stable/manual/containers/">JuMP</a> in Julia and <a class="reference external" href="https://pyomo.readthedocs.io/en/stable/pyomo_modeling_components/Sets.html">Pyomo</a> in Python.</p>
@@ -235,7 +235,7 @@
 <p>We will use <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> to demonstrate how to use a container to store and manipulate multi-dimensional data in PyOptInterface.</p>
 <p>Simply speaking, <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> is a derived class of Python dict where the keys represent multidimensional indices as n-tuple, and the values are typically variables, constraints or expressions.</p>
 <section id="create-a-tupledict">
-<h2>Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#create-a-tupledict" title="Link to this heading">#</a></h2>
+<h2>Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#create-a-tupledict" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">tuplelist</span></code> can be created by calling the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> constructor. The following example creates a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> with two keys:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -329,7 +329,7 @@
 </div>
 </section>
 <section id="set-get-values">
-<h2>Set/get values<a class="headerlink" href="#set-get-values" title="Link to this heading">#</a></h2>
+<h2>Set/get values<a class="headerlink" href="#set-get-values" title="Link to this heading">¶</a></h2>
 <p>Like normal dictionary in Python, the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be set or get by using the <code class="docutils literal notranslate"><span class="pre">[]</span></code> operator. The following example sets and gets the values of a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -372,7 +372,7 @@ td[4, 8]=7
 </div>
 </section>
 <section id="building-a-model-with-tupledict">
-<h2>Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#building-a-model-with-tupledict" title="Link to this heading">#</a></h2>
+<h2>Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#building-a-model-with-tupledict" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be used to store and manipulate multi-dimensional variables, constraints and expressions. Using it correctly will make building model more easily.</p>
 <p>The following example demonstrates how to use <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> to build a model:</p>
 <div class="math-wrapper docutils container">
@@ -409,19 +409,17 @@ td[4, 8]=7
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
+Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [0e+00, 0e+00]
   Bound  [0e+00, 0e+00]
   RHS    [1e+00, 1e+00]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.000577, 20.000001, 0
-100, 0.001426, 5.833334, 50
-200, 0.002571, 3.333334, 100
-300, 0.005345, 2.361111, 150
-361, 0.007938, 2.000000, 180
+0, 0.000760, 20.000001, 0
+100, 0.002086, 5.833334, 50
+200, 0.003639, 3.333334, 100
+300, 0.006647, 2.361111, 150
+361, 0.009109, 2.000000, 180
 Model   status      : Optimal
 Objective value     :  2.0000000000e+00
 HiGHS run time      :          0.01
@@ -432,7 +430,7 @@ HiGHS run time      :          0.01
 <p>Here we use two utility functions to simplify how we express the sum notation</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="quicksum">
-<span class="sig-name descname"><span class="pre">quicksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">f=None</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#quicksum" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">quicksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">f=None</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#quicksum" title="Link to this definition">¶</a></dt>
 <dd><p>Create a new expression by summing up a list of values (optionally, you can apply a function to
 each value in advance)</p>
 <dl class="myst field-list simple">
@@ -454,7 +452,7 @@ each value in advance)</p>
 <p>There is also an in-place version:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="quicksum_">
-<span class="sig-name descname"><span class="pre">quicksum_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">f=None</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#quicksum_" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">quicksum_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">f=None</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#quicksum_" title="Link to this definition">¶</a></dt>
 <dd><p>Add a list of values to an existing expression (optionally, you can apply a function to each value in advance)</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -552,7 +550,7 @@ each value in advance)</p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

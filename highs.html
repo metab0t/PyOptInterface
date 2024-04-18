@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Benchmark" href="benchmark.html" /><link rel="prev" title="Mosek" href="mosek.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>HiGHS - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,9 +227,9 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="highs">
-<h1>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">#</a></h1>
+<h1>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">¶</a></h1>
 <section id="initial-setup">
-<h2>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading">#</a></h2>
+<h2>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
@@ -238,9 +238,9 @@
 <p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#highs"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
 </section>
 <section id="the-capability-of-highs-model">
-<h2>The capability of <code class="docutils literal notranslate"><span class="pre">highs.Model</span></code><a class="headerlink" href="#the-capability-of-highs-model" title="Link to this heading">#</a></h2>
+<h2>The capability of <code class="docutils literal notranslate"><span class="pre">highs.Model</span></code><a class="headerlink" href="#the-capability-of-highs-model" title="Link to this heading">¶</a></h2>
 <section id="supported-constraints">
-<h3>Supported constraints<a class="headerlink" href="#supported-constraints" title="Link to this heading">#</a></h3>
+<h3>Supported constraints<a class="headerlink" href="#supported-constraints" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -266,7 +266,7 @@
 </div>
 </section>
 <section id="supported-model-attribute">
-<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attribute</span></a><a class="headerlink" href="#supported-model-attribute" title="Link to this heading">#</a></h3>
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attribute</span></a><a class="headerlink" href="#supported-model-attribute" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -357,7 +357,7 @@
 </div>
 </section>
 <section id="supported-variable-attribute">
-<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attribute</span></a><a class="headerlink" href="#supported-variable-attribute" title="Link to this heading">#</a></h3>
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attribute</span></a><a class="headerlink" href="#supported-variable-attribute" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -396,7 +396,7 @@
 </div>
 </section>
 <section id="supported-constraint-attribute">
-<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attribute</span></a><a class="headerlink" href="#supported-constraint-attribute" title="Link to this heading">#</a></h3>
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attribute</span></a><a class="headerlink" href="#supported-constraint-attribute" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -424,9 +424,9 @@
 </section>
 </section>
 <section id="solver-specific-operations">
-<h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">#</a></h2>
+<h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">¶</a></h2>
 <section id="parameter">
-<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">#</a></h3>
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">¶</a></h3>
 <p>For <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/options/definitions/">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
@@ -439,7 +439,7 @@
 </div>
 </section>
 <section id="information">
-<h3>Information<a class="headerlink" href="#information" title="Link to this heading">#</a></h3>
+<h3>Information<a class="headerlink" href="#information" title="Link to this heading">¶</a></h3>
 <p>HiGHS provides <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/structures/classes/HighsInfo/">information</a> for the model. We provide <code class="docutils literal notranslate"><span class="pre">model.get_raw_information(name:</span> <span class="pre">str)</span></code> method to access the value of information.</p>
 </section>
 </section>
@@ -526,7 +526,7 @@
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

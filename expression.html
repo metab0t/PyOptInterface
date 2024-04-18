@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Constraint" href="constraint.html" /><link rel="prev" title="Variable" href="variable.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Expression - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,9 +227,9 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="expression">
-<h1>Expression<a class="headerlink" href="#expression" title="Link to this heading">#</a></h1>
+<h1>Expression<a class="headerlink" href="#expression" title="Link to this heading">¶</a></h1>
 <section id="basic-expression">
-<h2>Basic expression<a class="headerlink" href="#basic-expression" title="Link to this heading">#</a></h2>
+<h2>Basic expression<a class="headerlink" href="#basic-expression" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface currently supports polynomial expressions with degree up to 2, including</p>
 <ul class="simple">
 <li><p>quadratic expression</p></li>
@@ -264,7 +264,7 @@
 </div>
 </section>
 <section id="efficient-expression-construction">
-<h2>Efficient expression construction<a class="headerlink" href="#efficient-expression-construction" title="Link to this heading">#</a></h2>
+<h2>Efficient expression construction<a class="headerlink" href="#efficient-expression-construction" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface provides a special class <code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code> to construct expressions efficiently. It is especially useful when we need to construct a large expression with many terms.</p>
 <p>It supports the following in-place assignment operations:</p>
 <ul class="simple">
@@ -307,8 +307,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 524 µs, sys: 113 µs, total: 637 µs
-Wall time: 640 µs
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 581 µs, sys: 63 µs, total: 644 µs
+Wall time: 646 µs
 </pre></div>
 </div>
 </div>
@@ -320,15 +320,15 @@ Wall time: 640 µs
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 25.3 ms, sys: 0 ns, total: 25.3 ms
-Wall time: 25.1 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 25 ms, sys: 0 ns, total: 25 ms
+Wall time: 24.8 ms
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="pretty-print-expression">
-<h2>Pretty print expression<a class="headerlink" href="#pretty-print-expression" title="Link to this heading">#</a></h2>
+<h2>Pretty print expression<a class="headerlink" href="#pretty-print-expression" title="Link to this heading">¶</a></h2>
 <p>If the names of variables are specified, We can use the <code class="docutils literal notranslate"><span class="pre">pprint</span></code> method to print the expression in a human-readable format:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -349,7 +349,7 @@ Wall time: 25.1 ms
 </div>
 </section>
 <section id="value-of-expression">
-<h2>Value of expression<a class="headerlink" href="#value-of-expression" title="Link to this heading">#</a></h2>
+<h2>Value of expression<a class="headerlink" href="#value-of-expression" title="Link to this heading">¶</a></h2>
 <p>We can use the <code class="docutils literal notranslate"><span class="pre">get_value</span></code> method to get the value of an expression after optimization:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
 <span class="n">expr_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
@@ -430,7 +430,7 @@ Wall time: 25.1 ms
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Objective" href="objective.html" /><link rel="prev" title="Expression" href="expression.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Constraint - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,7 +227,7 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="constraint">
-<h1>Constraint<a class="headerlink" href="#constraint" title="Link to this heading">#</a></h1>
+<h1>Constraint<a class="headerlink" href="#constraint" title="Link to this heading">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">Constraint</span></code> class is used to define a constraint in the optimization model. It is a subclass
 of <code class="docutils literal notranslate"><span class="pre">Expression</span></code> and has the same methods and properties as <code class="docutils literal notranslate"><span class="pre">Expression</span></code>.</p>
 <p>PyOptInterface supports the following types of constraints:</p>
@@ -252,12 +252,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-04-16 14:50:27 [INFO] checks license for COPT v7.1.0 20240204
-2024-04-16 14:50:27 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
-2024-04-16 14:50:27 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.9/x64/bin
-2024-04-16 14:50:27 [WARN] no license files in HOME folder: /home/runner/copt
-2024-04-16 14:50:27 [INFO] empty environment variable: COPT_LICENSE_DIR
-2024-04-16 14:50:27 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-04-18 18:36:41 [INFO] checks license for COPT v7.1.0 20240204
+2024-04-18 18:36:41 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2024-04-18 18:36:41 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.9/x64/bin
+2024-04-18 18:36:41 [WARN] no license files in HOME folder: /home/runner/copt
+2024-04-18 18:36:41 [INFO] empty environment variable: COPT_LICENSE_DIR
+2024-04-18 18:36:41 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
 No license found. Starting COPT with size limitations for non-commercial use
 Please apply for a license from www.shanshu.ai/copt
@@ -266,7 +266,7 @@ Please apply for a license from www.shanshu.ai/copt
 </div>
 </div>
 <section id="linear-constraint">
-<h2>Linear Constraint<a class="headerlink" href="#linear-constraint" title="Link to this heading">#</a></h2>
+<h2>Linear Constraint<a class="headerlink" href="#linear-constraint" title="Link to this heading">¶</a></h2>
 <p>It is defined as:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -291,7 +291,7 @@ Please apply for a license from www.shanshu.ai/copt
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_linear_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_linear_constraint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_linear_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>add a linear constraint to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -315,7 +315,7 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 </div>
 </section>
 <section id="quadratic-constraint">
-<h2>Quadratic Constraint<a class="headerlink" href="#quadratic-constraint" title="Link to this heading">#</a></h2>
+<h2>Quadratic Constraint<a class="headerlink" href="#quadratic-constraint" title="Link to this heading">¶</a></h2>
 <p>Like the linear constraint, it is defined as:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -341,7 +341,7 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_quadratic_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_quadratic_constraint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_quadratic_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>add a quadratic constraint to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -361,7 +361,7 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 
 </section>
 <section id="second-order-cone-constraint">
-<h2>Second-Order Cone Constraint<a class="headerlink" href="#second-order-cone-constraint" title="Link to this heading">#</a></h2>
+<h2>Second-Order Cone Constraint<a class="headerlink" href="#second-order-cone-constraint" title="Link to this heading">¶</a></h2>
 <p>It is defined as:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -383,7 +383,7 @@ class.</p>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_second_order_cone_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_second_order_cone_constraint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_second_order_cone_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>add a second order cone constraint to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -400,7 +400,7 @@ class.</p>
 
 </section>
 <section id="special-ordered-set-sos-constraint">
-<h2>Special Ordered Set (SOS) Constraint<a class="headerlink" href="#special-ordered-set-sos-constraint" title="Link to this heading">#</a></h2>
+<h2>Special Ordered Set (SOS) Constraint<a class="headerlink" href="#special-ordered-set-sos-constraint" title="Link to this heading">¶</a></h2>
 <p>SOS constraints are used to model special structures in the optimization problem.
 It contains two types: <code class="docutils literal notranslate"><span class="pre">SOS1</span></code> and <code class="docutils literal notranslate"><span class="pre">SOS2</span></code>, the details can be found in <a class="reference external" href="https://en.wikipedia.org/wiki/Special_ordered_set">Wikipedia</a>.</p>
 <p>It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_sos_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
@@ -416,7 +416,7 @@ It contains two types: <code class="docutils literal notranslate"><span class="p
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_sos_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_sos_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sos_type</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_sos_constraint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_sos_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sos_type</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_sos_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>add a special ordered set constraint to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -434,12 +434,12 @@ It contains two types: <code class="docutils literal notranslate"><span class="p
 
 </section>
 <section id="constraint-attributes">
-<h2>Constraint Attributes<a class="headerlink" href="#constraint-attributes" title="Link to this heading">#</a></h2>
+<h2>Constraint Attributes<a class="headerlink" href="#constraint-attributes" title="Link to this heading">¶</a></h2>
 <p>After a constraint is created, we can query or modify its attributes. The following table lists the
 standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attributes</span></a>:</p>
 <div class="table-wrapper colwidths-given docutils container" id="id1">
 <table class="docutils align-default" id="id1">
-<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50.0%" />
 <col style="width: 50.0%" />
@@ -469,7 +469,7 @@ standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterf
 </div>
 </section>
 <section id="delete-constraint">
-<h2>Delete constraint<a class="headerlink" href="#delete-constraint" title="Link to this heading">#</a></h2>
+<h2>Delete constraint<a class="headerlink" href="#delete-constraint" title="Link to this heading">¶</a></h2>
 <p>We can delete a constraint by calling the <code class="docutils literal notranslate"><span class="pre">delete_constraint</span></code> method of the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">delete_constraint</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
 </pre></div>
@@ -483,7 +483,7 @@ model:</p>
 </div>
 </section>
 <section id="modify-constraint">
-<h2>Modify constraint<a class="headerlink" href="#modify-constraint" title="Link to this heading">#</a></h2>
+<h2>Modify constraint<a class="headerlink" href="#modify-constraint" title="Link to this heading">¶</a></h2>
 <p>For linear and quadratic constraints, we can modify the right-hand side of a constraint by
 calling the <code class="docutils literal notranslate"><span class="pre">set_normalized_rhs</span></code> method of the model.</p>
 <p>For linear constraints, we can modify the coefficients of the linear part of the constraint by
@@ -587,7 +587,7 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

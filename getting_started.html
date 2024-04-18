@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Model" href="model.html" /><link rel="prev" title="PyOptInterface (Python Optimization Interface)" href="index.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Getting Started - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,9 +227,9 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface is available on PyPI. You can install it via pip:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span>
 </pre></div>
@@ -247,7 +247,7 @@
 <p>We will introduce how to set up the optimizers to use with PyOptInterface in this page.</p>
 </section>
 <section id="setup-of-optimizers">
-<h2>Setup of optimizers<a class="headerlink" href="#setup-of-optimizers" title="Link to this heading">#</a></h2>
+<h2>Setup of optimizers<a class="headerlink" href="#setup-of-optimizers" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface uses the <code class="docutils literal notranslate"><span class="pre">Dynamic</span> <span class="pre">Loading</span></code> technique to load the dynamic library of optimizers at runtime, so the optimizer it uses can be changed manually without recompiling the code.</p>
 <p>The set up of optimizers includes two approaches:</p>
 <ol class="arabic simple">
@@ -257,7 +257,7 @@
 <p>We will introduce the automatic detection and manual configuration in details</p>
 </section>
 <section id="automatic-detection-of-the-installation-directory-of-the-optimizers">
-<h2>Automatic detection of the installation directory of the optimizers<a class="headerlink" href="#automatic-detection-of-the-installation-directory-of-the-optimizers" title="Link to this heading">#</a></h2>
+<h2>Automatic detection of the installation directory of the optimizers<a class="headerlink" href="#automatic-detection-of-the-installation-directory-of-the-optimizers" title="Link to this heading">¶</a></h2>
 <p>The automatic detection includes three steps:</p>
 <ol class="arabic simple">
 <li><p>Environment variable set by the installer of optimizer</p></li>
@@ -313,7 +313,7 @@
 </table>
 </div>
 <section id="gurobi">
-<h3>Gurobi<a class="headerlink" href="#gurobi" title="Link to this heading">#</a></h3>
+<h3>Gurobi<a class="headerlink" href="#gurobi" title="Link to this heading">¶</a></h3>
 <p>The currently supported version is <strong>11.0.x</strong>. Other versions may work but are not tested.</p>
 <p>For Gurobi, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
@@ -323,7 +323,7 @@
 </ol>
 </section>
 <section id="copt">
-<h3>COPT<a class="headerlink" href="#copt" title="Link to this heading">#</a></h3>
+<h3>COPT<a class="headerlink" href="#copt" title="Link to this heading">¶</a></h3>
 <p>The currently supported version is <strong>7.1.x</strong>. Other versions may work but are not tested.</p>
 <p>For COPT, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
@@ -332,7 +332,7 @@
 </ol>
 </section>
 <section id="mosek">
-<h3>Mosek<a class="headerlink" href="#mosek" title="Link to this heading">#</a></h3>
+<h3>Mosek<a class="headerlink" href="#mosek" title="Link to this heading">¶</a></h3>
 <p>The currently supported version is <strong>10.1.x</strong>. Other versions may work but are not tested.</p>
 <p>For Mosek, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
@@ -342,7 +342,7 @@
 </ol>
 </section>
 <section id="highs">
-<h3>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">#</a></h3>
+<h3>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">¶</a></h3>
 <p>The currently supported version is <strong>1.7.x</strong>. Other versions may work but are not tested.</p>
 <p>For HiGHS, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
@@ -354,7 +354,7 @@
 </section>
 </section>
 <section id="manually-specifying-the-path-of-the-dynamic-library-of-optimizer">
-<h2>Manually specifying the path of the dynamic library of optimizer<a class="headerlink" href="#manually-specifying-the-path-of-the-dynamic-library-of-optimizer" title="Link to this heading">#</a></h2>
+<h2>Manually specifying the path of the dynamic library of optimizer<a class="headerlink" href="#manually-specifying-the-path-of-the-dynamic-library-of-optimizer" title="Link to this heading">¶</a></h2>
 <p>If the automatic detection fails or you want to use the optimizer in a customized location, you can manually specify the path of the dynamic library of the optimizer.</p>
 <p>We take HiGHS as an example. Whether the optimizer has been successfully loaded can be checked via the following code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
@@ -417,7 +417,7 @@
 </div>
 </section>
 <section id="let-s-build-a-simple-model-and-solve-it">
-<h2>Let’s build a simple model and solve it<a class="headerlink" href="#let-s-build-a-simple-model-and-solve-it" title="Link to this heading">#</a></h2>
+<h2>Let’s build a simple model and solve it<a class="headerlink" href="#let-s-build-a-simple-model-and-solve-it" title="Link to this heading">¶</a></h2>
 <p>After setting up the optimizers, we can build a simple model and solve it.
 As the first step, we will solve the following simple Quadratic Programming (QP) problem:</p>
 <div class="math-wrapper docutils container">
@@ -492,8 +492,8 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
   Bound  [0e+00, 0e+00]
   RHS    [1e+00, 1e+00]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.000355, 2.000000, 0
-3, 0.000376, 0.666667, 1
+0, 0.000475, 2.000000, 0
+3, 0.000518, 0.666667, 1
 Model   status      : Optimal
 Objective value     :  6.6666666667e-01
 HiGHS run time      :          0.00
@@ -614,7 +614,7 @@ obj =  0.6666666666666667
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

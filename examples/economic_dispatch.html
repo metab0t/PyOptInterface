@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Developer Guide" href="../develop.html" /><link rel="prev" title="Changelog" href="../changelog.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Economic dispatch - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
@@ -227,11 +227,11 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="economic-dispatch">
-<h1>Economic dispatch<a class="headerlink" href="#economic-dispatch" title="Link to this heading">#</a></h1>
+<h1>Economic dispatch<a class="headerlink" href="#economic-dispatch" title="Link to this heading">¶</a></h1>
 <p>Economic dispatch is a classic optimization problem in power systems. It is used to determine the optimal power output of a set of generators to meet the demand at the lowest cost. The problem can be formulated as a linear programming problem or a quadratic programming problem depending on the formulation used to model the economic cost.</p>
 <p>In this example, we will show how to use PyOptInterface to solve an economic dispatch problem using the quadratic programming formulation.</p>
 <section id="problem-formulation">
-<h2>Problem Formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">#</a></h2>
+<h2>Problem Formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">¶</a></h2>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -244,7 +244,7 @@
 <p>We consider a system with <span class="math notranslate nohighlight">\(N_G\)</span> generators and <span class="math notranslate nohighlight">\(N_D\)</span> demands. The decision variables are the power output of the generators <span class="math notranslate nohighlight">\(P_{i,t}\)</span> for <span class="math notranslate nohighlight">\(i=1,\ldots,N_G\)</span> and <span class="math notranslate nohighlight">\(t=1,\ldots,T\)</span>. The objective function is the total cost of the generators, which is the sum of the quadratic cost, the linear cost, and the constant cost. The first constraint ensures that the total power output of the generators meets the demand. The second and third constraints are the power output limits of the generators. The last constraint is the ramping limits of the generators.</p>
 </section>
 <section id="implementation">
-<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">¶</a></h2>
 <p>Firstly, we need to create a model object. We will use the HiGHS solver in this example because it is an excellent open-source solver and supports quadratic programming problems. You need to read the <a class="reference internal" href="../highs.html#initial-setup"><span class="std std-ref">installation guide</span></a> to install the HiGHS solver manually and set the path to shared library of HiGHS as described in the guide.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -352,20 +352,20 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.OPTIMAL
-Objective value:  12684.0
-Coefficient ranges:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [1e+00, 2e+00]
   Bound  [5e+01, 1e+02]
   RHS    [2e+01, 2e+02]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.000999, 14328.520470, 0
-83, 0.001713, 12684.020880, 0
+0, 0.001737, 14328.520470, 0
+83, 0.002545, 12684.020880, 0
 Model   status      : Optimal
 Simplex   iterations: 63
 Objective value     :  1.2684000000e+04
 HiGHS run time      :          0.00
+TerminationStatusCode.OPTIMAL
+Objective value:  12684.0
 </pre></div>
 </div>
 </div>
@@ -399,7 +399,7 @@ HiGHS run time      :          0.00
 </div>
 </section>
 <section id="change-the-load-and-solve-the-model-again">
-<h2>Change the load and solve the model again<a class="headerlink" href="#change-the-load-and-solve-the-model-again" title="Link to this heading">#</a></h2>
+<h2>Change the load and solve the model again<a class="headerlink" href="#change-the-load-and-solve-the-model-again" title="Link to this heading">¶</a></h2>
 <p>We can change the load and solve the model again without creating a new model from scratch by modifying the right-hand side of the power balance constraint.</p>
 <p>For example, we increase the load and solve the model again.</p>
 <div class="cell docutils container">
@@ -422,20 +422,20 @@ HiGHS run time      :          0.00
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.OPTIMALCoefficient ranges:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [1e+00, 2e+00]
   Bound  [5e+01, 1e+02]
   RHS    [2e+01, 2e+02]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.003195, 15430.247505, 0
-100, 0.004497, 13893.192877, 5
-151, 0.005031, 13740.236517, 10
+0, 0.004083, 15430.247505, 0
+100, 0.005444, 13893.192877, 5
+151, 0.006042, 13740.236517, 10
 Model   status      : Optimal
 Simplex   iterations: 86
 Objective value     :  1.3740213571e+04
 HiGHS run time      :          0.01
-
+TerminationStatusCode.OPTIMAL
 Objective value:  13740.213571429404
 [[100.         100.         100.         100.         100.
   100.         100.         100.         100.         100.
@@ -530,7 +530,7 @@ Objective value:  13740.213571429404
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

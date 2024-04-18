@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Variable" href="variable.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Model - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,11 +227,11 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="model">
-<h1>Model<a class="headerlink" href="#model" title="Link to this heading">#</a></h1>
+<h1>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h1>
 <p>Model is the central class of the PyOptInterface package. It provides the interface to the solver and the user. The user can add variables, constraints and the objective function to the model. The model can be solved and the solution can be queried.</p>
 <p>In this document we will only discuss the common interface of the model. For solver-specific interface, please refer to the documentation of the corresponding solver.</p>
 <section id="create-a-model">
-<h2>Create a model<a class="headerlink" href="#create-a-model" title="Link to this heading">#</a></h2>
+<h2>Create a model<a class="headerlink" href="#create-a-model" title="Link to this heading">¶</a></h2>
 <p>A model is a concrete instance tied to a specific solver. To create a model, we need to import the corresponding module and call the constructor of the model class. For example, to create a HiGHS model, we can do:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -252,13 +252,13 @@
 </div>
 </section>
 <section id="inspect-and-customize-the-model">
-<h2>Inspect and customize the model<a class="headerlink" href="#inspect-and-customize-the-model" title="Link to this heading">#</a></h2>
+<h2>Inspect and customize the model<a class="headerlink" href="#inspect-and-customize-the-model" title="Link to this heading">¶</a></h2>
 <p>We can query and modify the parameters of the model to manipulate the behavior of the underlying solver.</p>
 <p>Like the design in <code class="docutils literal notranslate"><span class="pre">JuMP.jl</span></code>, we define a small subset of parameters that are common to all solvers. They are defined as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">pyoptinterface.ModelAttribute</span></a> enum class.
 The meanings of these standard attributes are the same as <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Model-attributes">Model attributes</a> and <a class="reference external" href="https://jump.dev/JuMP.jl/stable/moi/reference/models/#Optimizer-attributes">Optimizer attributes</a> in MathOptInterface.jl.</p>
 <div class="table-wrapper colwidths-given docutils container" id="id1">
 <table class="docutils align-default" id="id1">
-<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<caption><span class="caption-text"><strong>Standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attributes</span></a></strong></span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50.0%" />
 <col style="width: 50.0%" />
@@ -358,16 +358,16 @@ The meanings of these standard attributes are the same as <a class="reference ex
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Objective value: 0.49999999999999994
-Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
 Coefficient ranges:
   Matrix [1e+00, 1e+00]
   Cost   [0e+00, 0e+00]
   Bound  [1e+00, 1e+00]
   RHS    [1e+00, 1e+00]
 Iteration, Runtime, ObjVal, NullspaceDim
-0, 0.000318, 1.000000, 0
-3, 0.000337, 0.500000, 1
+0, 0.000659, 1.000000, 0
+3, 0.000704, 0.500000, 1
+Objective value: 0.49999999999999994
 Model   status      : Optimal
 Objective value     :  5.0000000000e-01
 HiGHS run time      :          0.00
@@ -386,14 +386,14 @@ HiGHS run time      :          0.00
 </div>
 </section>
 <section id="solve-the-model">
-<h2>Solve the model<a class="headerlink" href="#solve-the-model" title="Link to this heading">#</a></h2>
+<h2>Solve the model<a class="headerlink" href="#solve-the-model" title="Link to this heading">¶</a></h2>
 <p>We can solve the model by calling the <code class="docutils literal notranslate"><span class="pre">optimize</span></code> method of the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
 <section id="query-the-solution">
-<h2>Query the solution<a class="headerlink" href="#query-the-solution" title="Link to this heading">#</a></h2>
+<h2>Query the solution<a class="headerlink" href="#query-the-solution" title="Link to this heading">¶</a></h2>
 <p>We can query the termination status of the model after optimization by query the <code class="docutils literal notranslate"><span class="pre">TerminationStatus</span></code> attribute of the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -424,7 +424,7 @@ x[0]^2 = 0.24999999999999994
 </div>
 </section>
 <section id="write-the-model-to-file">
-<h2>Write the model to file<a class="headerlink" href="#write-the-model-to-file" title="Link to this heading">#</a></h2>
+<h2>Write the model to file<a class="headerlink" href="#write-the-model-to-file" title="Link to this heading">¶</a></h2>
 <p>The optimization model can be written to file in LP, MPS or other formats. The <code class="docutils literal notranslate"><span class="pre">write</span></code> method of the model can be used to write the model to file:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -521,7 +521,7 @@ x[0]^2 = 0.24999999999999994
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

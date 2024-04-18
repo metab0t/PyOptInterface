@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Getting Started" href="getting_started.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,12 +227,12 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="pyoptinterface-python-optimization-interface">
-<h1>PyOptInterface (Python Optimization Interface)<a class="headerlink" href="#pyoptinterface-python-optimization-interface" title="Link to this heading">#</a></h1>
+<h1>PyOptInterface (Python Optimization Interface)<a class="headerlink" href="#pyoptinterface-python-optimization-interface" title="Link to this heading">¶</a></h1>
 <p><a class="reference external" href="https://pypi.org/pypi/pyoptinterface/"><img alt="" src="https://img.shields.io/pypi/v/pyoptinterface.svg?color=brightgreen" /></a></p>
 <p><strong>PyOptInterface</strong> is an open-source Python library to provide a unified API to construct and solve optimization models with various optimizers.</p>
 <p>The detailed documentation can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/">here</a>.</p>
 <section id="key-features-compared-with-other-modeling-interfaces">
-<h2>Key features compared with other modeling interfaces<a class="headerlink" href="#key-features-compared-with-other-modeling-interfaces" title="Link to this heading">#</a></h2>
+<h2>Key features compared with other modeling interfaces<a class="headerlink" href="#key-features-compared-with-other-modeling-interfaces" title="Link to this heading">¶</a></h2>
 <p>It is designed as a very thin wrapper of native C API of optimizers and attempts to provide common abstractions of an algebraic modelling environment including model, variable, constraint and expression with the least overhead of performance.</p>
 <p>The key features of PyOptInterface include:</p>
 <ul class="simple">
@@ -243,11 +243,11 @@
 </ul>
 </section>
 <section id="benchmark">
-<h2>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">#</a></h2>
+<h2>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">¶</a></h2>
 <p>The benchmark comparing PyOptInterface with some other modeling interfaces can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/benchmark.html">here</a>. PyOptInterface is among the fastest modeling interfaces in terms of model construction time.</p>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface is available on PyPI. You can install it via pip:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span>
 </pre></div>
@@ -264,7 +264,7 @@
 <p>It will install a full-featured binary version of HiGHS optimizer via <a class="reference external" href="http://github.com/metab0t/highsbox">highsbox</a>, which can be used with PyOptInterface.</p>
 </section>
 <section id="what-kind-of-problems-can-pyoptinterface-solve">
-<h2>What kind of problems can PyOptInterface solve?<a class="headerlink" href="#what-kind-of-problems-can-pyoptinterface-solve" title="Link to this heading">#</a></h2>
+<h2>What kind of problems can PyOptInterface solve?<a class="headerlink" href="#what-kind-of-problems-can-pyoptinterface-solve" title="Link to this heading">¶</a></h2>
 <p>It currently supports the following problem types:</p>
 <ul class="simple">
 <li><p>Linear Programming (LP)</p></li>
@@ -278,7 +278,7 @@
 </ul>
 </section>
 <section id="what-optimizers-does-pyoptinterface-support">
-<h2>What optimizers does PyOptInterface support?<a class="headerlink" href="#what-optimizers-does-pyoptinterface-support" title="Link to this heading">#</a></h2>
+<h2>What optimizers does PyOptInterface support?<a class="headerlink" href="#what-optimizers-does-pyoptinterface-support" title="Link to this heading">¶</a></h2>
 <p>It currently supports the following optimizers:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://shanshu.ai/copt">COPT</a> ( Commercial )</p></li>
@@ -288,7 +288,7 @@
 </ul>
 </section>
 <section id="short-example">
-<h2>Short Example<a class="headerlink" href="#short-example" title="Link to this heading">#</a></h2>
+<h2>Short Example<a class="headerlink" href="#short-example" title="Link to this heading">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
 <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
 
@@ -317,7 +317,7 @@
 </div>
 </section>
 <section id="license">
-<h2>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
 <p>PyOptInterface is licensed under MPL-2.0 License.</p>
 <p>It uses <a class="reference external" href="https://github.com/wjakob/nanobind">nanobind</a>, <a class="reference external" href="https://github.com/fmtlib/fmt">fmtlib</a> and <a class="reference external" href="https://github.com/martinus/unordered_dense">martinus/unordered_dense</a> as dependencies.</p>
 <p>The design of PyOptInterface is inspired by <a class="reference external" href="https://jump.dev">JuMP.jl</a>.</p>
@@ -326,7 +326,7 @@ ecosystem, which is licensed under MIT License.</p>
 <p>The header files in <code class="docutils literal notranslate"><span class="pre">thirdparty/solvers</span></code> directory are from the corresponding distribution of optimizers and are licensed under their own licenses.</p>
 </section>
 <section id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">#</a></h2>
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
 <ul>
@@ -368,7 +368,7 @@ ecosystem, which is licensed under MIT License.</p>
 </div>
 </section>
 <section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h2>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -446,10 +446,12 @@ ecosystem, which is licensed under MIT License.</p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

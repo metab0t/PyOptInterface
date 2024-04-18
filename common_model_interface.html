@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Gurobi" href="gurobi.html" /><link rel="prev" title="Building Bigger Optimization Model" href="structure.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>Common Model Interface - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -227,16 +227,16 @@
         </div>
         <article role="main">
           <section class="tex2jax_ignore mathjax_ignore" id="common-model-interface">
-<h1>Common Model Interface<a class="headerlink" href="#common-model-interface" title="Link to this heading">#</a></h1>
+<h1>Common Model Interface<a class="headerlink" href="#common-model-interface" title="Link to this heading">¶</a></h1>
 <p>Generally speaking, the following APIs are common to all optimizers except for adding constraint
 because different optimizers may support different types of constraints.</p>
 <section id="model">
-<h2>Model<a class="headerlink" href="#model" title="Link to this heading">#</a></h2>
+<h2>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h2>
 <section id="get-set-model-attributes">
-<h3>Get/set model attributes<a class="headerlink" href="#get-set-model-attributes" title="Link to this heading">#</a></h3>
+<h3>Get/set model attributes<a class="headerlink" href="#get-set-model-attributes" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_model_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_model_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_model_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>set the value of a model attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -250,7 +250,7 @@ because different optimizers may support different types of constraints.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_model_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_model_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_model_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>get the value of a model attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -265,12 +265,12 @@ because different optimizers may support different types of constraints.</p>
 </section>
 </section>
 <section id="variable">
-<h2>Variable<a class="headerlink" href="#variable" title="Link to this heading">#</a></h2>
+<h2>Variable<a class="headerlink" href="#variable" title="Link to this heading">¶</a></h2>
 <section id="add-a-variable-to-the-model">
-<h3>Add a variable to the model<a class="headerlink" href="#add-a-variable-to-the-model" title="Link to this heading">#</a></h3>
+<h3>Add a variable to the model<a class="headerlink" href="#add-a-variable-to-the-model" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_variable">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variable" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variable" title="Link to this definition">¶</a></dt>
 <dd><p>add a variable to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -290,10 +290,10 @@ continuous</p></li>
 
 </section>
 <section id="add-multi-dimensional-variables-to-the-model-as">
-<h3>Add multi-dimensional variables to the model as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.tupledict</span></code></a><a class="headerlink" href="#add-multi-dimensional-variables-to-the-model-as" title="Link to this heading">#</a></h3>
+<h3>Add multi-dimensional variables to the model as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.tupledict</span></code></a><a class="headerlink" href="#add-multi-dimensional-variables-to-the-model-as" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_variables">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*coords</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variables" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*coords</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variables" title="Link to this definition">¶</a></dt>
 <dd><p>add a multi-dimensional variable to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -317,10 +317,10 @@ continuous</p></li>
 
 </section>
 <section id="get-set-variable-attributes">
-<h3>Get/set variable attributes<a class="headerlink" href="#get-set-variable-attributes" title="Link to this heading">#</a></h3>
+<h3>Get/set variable attributes<a class="headerlink" href="#get-set-variable-attributes" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_variable_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_variable_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_variable_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>set the value of a variable attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -335,7 +335,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_variable_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_variable_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_variable_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>get the value of a variable attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -352,10 +352,10 @@ continuous</p></li>
 
 </section>
 <section id="delete-variable">
-<h3>Delete variable<a class="headerlink" href="#delete-variable" title="Link to this heading">#</a></h3>
+<h3>Delete variable<a class="headerlink" href="#delete-variable" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.delete_variable">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">delete_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.delete_variable" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">delete_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.delete_variable" title="Link to this definition">¶</a></dt>
 <dd><p>delete a variable from the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -366,7 +366,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.is_variable_active">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">is_variable_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.is_variable_active" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">is_variable_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.is_variable_active" title="Link to this definition">¶</a></dt>
 <dd><p>query whether a variable is active</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -384,12 +384,12 @@ continuous</p></li>
 </section>
 </section>
 <section id="expression">
-<h2>Expression<a class="headerlink" href="#expression" title="Link to this heading">#</a></h2>
+<h2>Expression<a class="headerlink" href="#expression" title="Link to this heading">¶</a></h2>
 <section id="get-the-value-of-an-expression-including-variable">
-<h3>Get the value of an expression (including variable)<a class="headerlink" href="#get-the-value-of-an-expression-including-variable" title="Link to this heading">#</a></h3>
+<h3>Get the value of an expression (including variable)<a class="headerlink" href="#get-the-value-of-an-expression-including-variable" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_value">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr_or_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_value" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr_or_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_value" title="Link to this definition">¶</a></dt>
 <dd><p>get the value of an expression or a variable after optimization</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -406,10 +406,10 @@ continuous</p></li>
 
 </section>
 <section id="pretty-print-expression-including-variable">
-<h3>Pretty print expression (including variable)<a class="headerlink" href="#pretty-print-expression-including-variable" title="Link to this heading">#</a></h3>
+<h3>Pretty print expression (including variable)<a class="headerlink" href="#pretty-print-expression-including-variable" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.pprint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">pprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr_or_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.pprint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">pprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr_or_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.pprint" title="Link to this definition">¶</a></dt>
 <dd><p>pretty print an expression in a human-readable format</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -427,9 +427,9 @@ continuous</p></li>
 </section>
 </section>
 <section id="constraint">
-<h2>Constraint<a class="headerlink" href="#constraint" title="Link to this heading">#</a></h2>
+<h2>Constraint<a class="headerlink" href="#constraint" title="Link to this heading">¶</a></h2>
 <section id="add-a-constraint-to-the-model">
-<h3>Add a constraint to the model<a class="headerlink" href="#add-a-constraint-to-the-model" title="Link to this heading">#</a></h3>
+<h3>Add a constraint to the model<a class="headerlink" href="#add-a-constraint-to-the-model" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="constraint.html#model.add_linear_constraint" title="model.add_linear_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code></a></p></li>
 <li><p><a class="reference internal" href="constraint.html#model.add_quadratic_constraint" title="model.add_quadratic_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_quadratic_constraint</span></code></a></p></li>
@@ -438,10 +438,10 @@ continuous</p></li>
 </ul>
 </section>
 <section id="get-set-constraint-attributes">
-<h3>Get/set constraint attributes<a class="headerlink" href="#get-set-constraint-attributes" title="Link to this heading">#</a></h3>
+<h3>Get/set constraint attributes<a class="headerlink" href="#get-set-constraint-attributes" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_constraint_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_constraint_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_constraint_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>set the value of a constraint attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -456,7 +456,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_constraint_attribute">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_constraint_attribute" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_constraint_attribute" title="Link to this definition">¶</a></dt>
 <dd><p>get the value of a constraint attribute</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -473,10 +473,10 @@ continuous</p></li>
 
 </section>
 <section id="delete-constraint">
-<h3>Delete constraint<a class="headerlink" href="#delete-constraint" title="Link to this heading">#</a></h3>
+<h3>Delete constraint<a class="headerlink" href="#delete-constraint" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.delete_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">delete_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.delete_constraint" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">delete_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.delete_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>delete a constraint from the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -487,7 +487,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.is_constraint_active">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">is_constraint_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.is_constraint_active" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">is_constraint_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.is_constraint_active" title="Link to this definition">¶</a></dt>
 <dd><p>query whether a constraint is active</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -504,10 +504,10 @@ continuous</p></li>
 
 </section>
 <section id="modify-constraint">
-<h3>Modify constraint<a class="headerlink" href="#modify-constraint" title="Link to this heading">#</a></h3>
+<h3>Modify constraint<a class="headerlink" href="#modify-constraint" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_normalized_rhs">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_rhs" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_rhs" title="Link to this definition">¶</a></dt>
 <dd><p>set the right-hand side of a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -521,7 +521,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_normalized_rhs">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_rhs" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_rhs" title="Link to this definition">¶</a></dt>
 <dd><p>get the right-hand side of a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -535,7 +535,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_normalized_coefficient">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_coefficient" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_normalized_coefficient" title="Link to this definition">¶</a></dt>
 <dd><p>set the coefficient of a variable in a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -550,7 +550,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_normalized_coefficient">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_coefficient" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_normalized_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_normalized_coefficient" title="Link to this definition">¶</a></dt>
 <dd><p>get the coefficient of a variable in a normalized constraint</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -568,12 +568,12 @@ continuous</p></li>
 </section>
 </section>
 <section id="objective">
-<h2>Objective<a class="headerlink" href="#objective" title="Link to this heading">#</a></h2>
+<h2>Objective<a class="headerlink" href="#objective" title="Link to this heading">¶</a></h2>
 <section id="set-the-objective-function">
-<h3>Set the objective function<a class="headerlink" href="#set-the-objective-function" title="Link to this heading">#</a></h3>
+<h3>Set the objective function<a class="headerlink" href="#set-the-objective-function" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_objective">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">sense=pyoptinterface.ObjectiveSense.Minimize</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">sense=pyoptinterface.ObjectiveSense.Minimize</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective" title="Link to this definition">¶</a></dt>
 <dd><p>set the objective function of the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -587,10 +587,10 @@ continuous</p></li>
 
 </section>
 <section id="modify-the-linear-part-of-the-objective-function">
-<h3>Modify the linear part of the objective function<a class="headerlink" href="#modify-the-linear-part-of-the-objective-function" title="Link to this heading">#</a></h3>
+<h3>Modify the linear part of the objective function<a class="headerlink" href="#modify-the-linear-part-of-the-objective-function" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.set_objective_coefficient">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective_coefficient" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">set_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.set_objective_coefficient" title="Link to this definition">¶</a></dt>
 <dd><p>modify the coefficient of a variable in the linear part of the objective function</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -604,7 +604,7 @@ continuous</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_objective_coefficient">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_objective_coefficient" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.get_objective_coefficient" title="Link to this definition">¶</a></dt>
 <dd><p>get the coefficient of a variable in the linear part of the objective function</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -761,7 +761,7 @@ continuous</p></li>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
