@@ -84,8 +84,6 @@ jobs:
             ls -l $HiGHS_HOME
           CIBW_ENVIRONMENT_MACOS: >
             MACOSX_DEPLOYMENT_TARGET=10.14
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: ""
-          CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
           CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
         with:
           package-dir: .
