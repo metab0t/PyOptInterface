@@ -258,6 +258,7 @@
     <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="n">GRB</span><span class="o">.</span><span class="n">Callback</span><span class="o">.</span><span class="n">MIPSOL</span><span class="p">:</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cb_get_info</span><span class="p">(</span><span class="n">GRB</span><span class="o">.</span><span class="n">Callback</span><span class="o">.</span><span class="n">MIPSOL_OBJ</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">cb_exit</span><span class="p">()</span>
             
 <span class="k">def</span> <span class="nf">cb_copt</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">where</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="n">COPT</span><span class="o">.</span><span class="n">CBCONTEXT_MIPSOL</span><span class="p">:</span>
