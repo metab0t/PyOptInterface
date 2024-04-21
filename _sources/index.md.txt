@@ -17,6 +17,7 @@ container.md
 numpy.md
 structure.md
 common_model_interface.md
+callback.md
 gurobi.md
 copt.md
 mosek.md
