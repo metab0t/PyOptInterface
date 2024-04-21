@@ -125,8 +125,9 @@ struct GurobiCallbackUserdata
 	bool cb_get_mipnoderel_called = false;
 	std::vector<double> mipnoderel;
 	// Cache for cbsolution
-	bool cb_solution_called = false;
+	bool cb_set_solution_called = false;
 	std::vector<double> heuristic_solution;
+	bool cb_requires_submit_solution = false;
 };
 
 class GurobiModel

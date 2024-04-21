@@ -996,8 +996,14 @@ int RealCOPTCallbackFunction(copt_prob *prob, void *cbdata, int cbctx, void *use
 	model->m_callback_userdata.cb_get_mipsol_called = false;
 	model->m_callback_userdata.cb_get_mipnoderel_called = false;
 	model->m_callback_userdata.cb_get_mipincumbent_called = false;
-	model->m_callback_userdata.cb_solution_called = false;
+	model->m_callback_userdata.cb_set_solution_called = false;
+	model->m_callback_userdata.cb_requires_submit_solution = false;
 	callback(model, cbctx);
+
+	if (model->m_callback_userdata.cb_requires_submit_solution)
+	{
+		model->cb_submit_solution();
+	}
 
 	return COPT_RETCODE_OK;
 }
@@ -1096,17 +1102,18 @@ double COPTModel::cb_get_incumbent(const VariableIndex &variable)
 void COPTModel::cb_set_solution(const VariableIndex &variable, double value)
 {
 	auto &userdata = m_callback_userdata;
-	if (!userdata.cb_solution_called)
+	if (!userdata.cb_set_solution_called)
 	{
 		userdata.heuristic_solution.resize(userdata.n_variables, COPT_UNDEFINED);
-		userdata.cb_solution_called = true;
+		userdata.cb_set_solution_called = true;
 	}
 	userdata.heuristic_solution[_variable_index(variable)] = value;
+	m_callback_userdata.cb_requires_submit_solution = true;
 }
 
 double COPTModel::cb_submit_solution()
 {
-	if (!m_callback_userdata.cb_solution_called)
+	if (!m_callback_userdata.cb_set_solution_called)
 	{
 		throw std::runtime_error("No solution is set in the callback!");
 	}
@@ -1114,6 +1121,7 @@ double COPTModel::cb_submit_solution()
 	int error = copt::COPT_AddCallbackSolution(m_cbdata,
 	                                           m_callback_userdata.heuristic_solution.data(), &obj);
 	check_error(error);
+	m_callback_userdata.cb_requires_submit_solution = false;
 	return obj;
 }
 

@@ -1040,8 +1040,14 @@ int RealGurobiCallbackFunction(GRBmodel *, void *cbdata, int where, void *usrdat
 	model->m_callback_userdata.where = where;
 	model->m_callback_userdata.cb_get_mipsol_called = false;
 	model->m_callback_userdata.cb_get_mipnoderel_called = false;
-	model->m_callback_userdata.cb_solution_called = false;
+	model->m_callback_userdata.cb_set_solution_called = false;
+	model->m_callback_userdata.cb_requires_submit_solution = false;
 	callback(model, where);
+
+	if (model->m_callback_userdata.cb_requires_submit_solution)
+	{
+		model->cb_submit_solution();
+	}
 
 	return 0;
 }
@@ -1123,17 +1129,18 @@ double GurobiModel::cb_get_relaxation(const VariableIndex &variable)
 void GurobiModel::cb_set_solution(const VariableIndex &variable, double value)
 {
 	auto &userdata = m_callback_userdata;
-	if (!userdata.cb_solution_called)
+	if (!userdata.cb_set_solution_called)
 	{
 		userdata.heuristic_solution.resize(userdata.n_variables, GRB_UNDEFINED);
-		userdata.cb_solution_called = true;
+		userdata.cb_set_solution_called = true;
 	}
 	userdata.heuristic_solution[_variable_index(variable)] = value;
+	m_callback_userdata.cb_requires_submit_solution = true;
 }
 
 double GurobiModel::cb_submit_solution()
 {
-	if (!m_callback_userdata.cb_solution_called)
+	if (!m_callback_userdata.cb_set_solution_called)
 	{
 		throw std::runtime_error("No solution is set in the callback!");
 	}
@@ -1141,6 +1148,7 @@ double GurobiModel::cb_submit_solution()
 	int error =
 	    gurobi::GRBcbsolution(m_cbdata, m_callback_userdata.heuristic_solution.data(), &obj);
 	check_error(error);
+	m_callback_userdata.cb_requires_submit_solution = false;
 	return obj;
 }
 

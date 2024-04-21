@@ -442,6 +442,51 @@ constraint_attribute_set_func_map = {
     ),
 }
 
+callback_info_typemap = {
+    GRB.Callback.RUNTIME: float,
+    GRB.Callback.WORK: float,
+    GRB.Callback.PRE_COLDEL: int,
+    GRB.Callback.PRE_ROWDEL: int,
+    GRB.Callback.PRE_SENCHG: int,
+    GRB.Callback.PRE_BNDCHG: int,
+    GRB.Callback.PRE_COECHG: int,
+    GRB.Callback.SPX_ITRCNT: float,
+    GRB.Callback.SPX_OBJVAL: float,
+    GRB.Callback.SPX_PRIMINF: float,
+    GRB.Callback.SPX_DUALINF: float,
+    GRB.Callback.SPX_ISPERT: int,
+    GRB.Callback.MIP_OBJBST: float,
+    GRB.Callback.MIP_OBJBND: float,
+    GRB.Callback.MIP_NODCNT: float,
+    GRB.Callback.MIP_SOLCNT: int,
+    GRB.Callback.MIP_CUTCNT: int,
+    GRB.Callback.MIP_NODLFT: float,
+    GRB.Callback.MIP_ITRCNT: float,
+    GRB.Callback.MIP_OPENSCENARIOS: int,
+    GRB.Callback.MIP_PHASE: int,
+    GRB.Callback.MIPSOL_OBJ: float,
+    GRB.Callback.MIPSOL_OBJBST: float,
+    GRB.Callback.MIPSOL_OBJBND: float,
+    GRB.Callback.MIPSOL_NODCNT: float,
+    GRB.Callback.MIPSOL_SOLCNT: int,
+    GRB.Callback.MIPSOL_OPENSCENARIOS: int,
+    GRB.Callback.MIPSOL_PHASE: int,
+    GRB.Callback.MIPNODE_STATUS: int,
+    GRB.Callback.MIPNODE_OBJBST: float,
+    GRB.Callback.MIPNODE_OBJBND: float,
+    GRB.Callback.MIPNODE_NODCNT: float,
+    GRB.Callback.MIPNODE_SOLCNT: int,
+    GRB.Callback.MIPNODE_OPENSCENARIOS: int,
+    GRB.Callback.MIPNODE_PHASE: int,
+    GRB.Callback.MIPNODE_REL: float,
+    GRB.Callback.BARRIER_ITRCNT: int,
+    GRB.Callback.BARRIER_PRIMOBJ: float,
+    GRB.Callback.BARRIER_DUALOBJ: float,
+    GRB.Callback.BARRIER_PRIMINF: float,
+    GRB.Callback.BARRIER_DUALINF: float,
+    GRB.Callback.BARRIER_COMPL: float,
+}
+
 
 class Env(RawEnv):
     def set_raw_parameter(self, param_name: str, value):
@@ -666,3 +711,14 @@ class Model(RawModel):
         }
         set_function = set_function_map[param_type]
         set_function(constraint, name, value)
+
+    def cb_get_info(self, what):
+        cb_info_type = callback_info_typemap.get(what, None)
+        if cb_info_type is None:
+            raise ValueError(f"Unknown callback info type: {what}")
+        if cb_info_type == int:
+            return self.cb_get_info_int(what)
+        elif cb_info_type == float:
+            return self.cb_get_info_double(what)
+        else:
+            raise ValueError(f"Unknown callback info type: {what}")

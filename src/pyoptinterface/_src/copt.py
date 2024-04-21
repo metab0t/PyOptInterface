@@ -333,6 +333,15 @@ constraint_attribute_set_func_map = {
     ),
 }
 
+callback_info_typemap = {
+    "BestObj": float,
+    "BestBnd": float,
+    "HasIncumbent": int,
+    "MipCandObj": float,
+    "RelaxSolObj": float,
+    "NodeStatus": int,
+}
+
 
 class Model(RawModel):
     def __init__(self, env=None):
@@ -501,3 +510,14 @@ class Model(RawModel):
                 self.add_mip_start(variables, values)
                 mip_start.clear()
         super().optimize()
+
+    def cb_get_info(self, what):
+        cb_info_type = callback_info_typemap.get(what, None)
+        if cb_info_type is None:
+            raise ValueError(f"Unknown callback info type: {what}")
+        if cb_info_type == int:
+            return self.cb_get_info_int(what)
+        elif cb_info_type == float:
+            return self.cb_get_info_double(what)
+        else:
+            raise ValueError(f"Unknown callback info type: {what}")
