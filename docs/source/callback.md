@@ -31,6 +31,7 @@ def cb_gurobi(model, where):
     if where == GRB.Callback.MIPSOL:
         obj = model.cb_get_info(GRB.Callback.MIPSOL_OBJ)
         if obj < 10:
+            model.cb_exit()
             
 def cb_copt(model, where):
     if where == COPT.CBCONTEXT_MIPSOL:
