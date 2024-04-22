@@ -2,6 +2,9 @@
 
 ## Unreleased change
 
+## 0.2.1
+- Fix the DLL search paths on Windows
+
 ## 0.2.0
 - Supports callback for Gurobi and COPT
 - Release GIL when calling `model.optimize()`
