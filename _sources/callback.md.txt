@@ -77,7 +77,7 @@ In order to help users to migrate code using gurobipy and/or coptpy to PyOptInte
 | coptpy                                         | PyOptInterface                                          |
 | ---------------------------------------------- | ------------------------------------------------------- |
 | `model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)` | `model.set_callback(cb, COPT.CBCONTEXT_MIPSOL)`         |
-| `CallbackBase.getInfo(COPT.CBInfo.BestBnd)`    | `model.cb_get_info(COPT.CBInfo.BestBnd)`                |
+| `CallbackBase.getInfo(COPT.CbInfo.BestBnd)`    | `model.cb_get_info(COPT.CbInfo.BestBnd)`                |
 | `CallbackBase.getSolution(var)`                | `model.cb_get_solution(var)`                            |
 | `CallbackBase.getRelaxSol(var)`                | `model.cb_get_relaxation(var)`                          |
 | `CallbackBase.getIncumbent(var)`               | `model.cb_get_incumbent(var)`                           |
