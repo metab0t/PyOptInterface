@@ -30,8 +30,14 @@ class DynamicLibrary
 	bool try_load(const char *library)
 	{
 #if defined(_MSC_VER)
-		handle = static_cast<void *>(LoadLibraryExA(
-		    library, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR));
+		handle = static_cast<void *>(LoadLibraryA(library));
+
+		if (handle == nullptr)
+		{
+			handle = static_cast<void *>(LoadLibraryExA(library, NULL,
+			                                            LOAD_LIBRARY_SEARCH_DEFAULT_DIRS |
+			                                                LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR));
+		}
 
 #else
 		handle = dlopen(library, RTLD_NOW);
