@@ -271,7 +271,8 @@ enum class ConstraintSense
 {
 	LessEqual,
 	GreaterEqual,
-	Equal
+	Equal,
+	Within
 };
 
 struct ConstraintIndex

@@ -168,7 +168,7 @@ class POIHighsModel
 	std::int64_t get_raw_info_int64(const char *info_name);
 	double get_raw_info_double(const char *info_name);
 
-	// Accessing information of problem
+	// Accessing information of m_problem
 	std::string get_variable_name(const VariableIndex &variable);
 	void set_variable_name(const VariableIndex &variable, const char *name);
 	VariableDomain get_variable_type(const VariableIndex &variable);

@@ -26,6 +26,8 @@ from pyoptinterface._src.tupledict import (
 
 from pyoptinterface._src.aml import make_nd_variable, quicksum, quicksum_
 
+from pyoptinterface._src.nlcore_ext import sqrt, sin, cos, exp, log
+
 # Alias of ConstraintSense
 Eq = ConstraintSense.Equal
 """Alias of `ConstraintSense.Equal` for equality constraints.
@@ -35,6 +37,9 @@ Leq = ConstraintSense.LessEqual
 """
 Geq = ConstraintSense.GreaterEqual
 """Alias of `ConstraintSense.GreaterEqual` for greater-than-or-equal-to constraints.
+"""
+In = ConstraintSense.Within
+"""Alias of `ConstraintSense.Within` for range constraints.
 """
 
 __all__ = [
@@ -57,7 +62,9 @@ __all__ = [
     "make_tupledict",
     "make_nd_variable",
     "quicksum",
+    "quicksum_",
     "Eq",
     "Leq",
     "Geq",
+    "In"
 ]

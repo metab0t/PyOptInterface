@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(thirdparty/fmt)
+add_subdirectory(thirdparty/cppad)
 
 set(POI_INSTALL_DIR pyoptinterface/_src)
 
@@ -37,6 +38,13 @@ target_sources(core PRIVATE
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)
 
+add_library(nlcore STATIC)
+target_sources(nlcore PRIVATE
+  include/pyoptinterface/nlcore.hpp
+  lib/nlcore.cpp
+)
+target_link_libraries(nlcore PUBLIC core cppad)
+
 # Build Python extensions
 find_package(Python ${PYTHON_VERSION}
   REQUIRED COMPONENTS Interpreter Development.Module
@@ -54,6 +62,16 @@ nanobind_add_module(
 )
 target_link_libraries(core_ext PUBLIC core)
 install(TARGETS core_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+nanobind_add_module(
+  nlcore_ext
+
+  STABLE_ABI NB_STATIC
+
+  lib/nlcore_ext.cpp
+)
+target_link_libraries(nlcore_ext PUBLIC nlcore)
+install(TARGETS nlcore_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # Solvers
 
@@ -134,6 +152,24 @@ lib/highs_model_ext_constants.cpp
 )
 target_link_libraries(highs_model_ext PUBLIC highs_model)
 install(TARGETS highs_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+# IPOPT
+add_library(ipopt_model STATIC)
+target_sources(ipopt_model PRIVATE
+  include/pyoptinterface/ipopt_model.hpp
+  lib/ipopt_model.cpp
+)
+target_link_libraries(ipopt_model PUBLIC nlcore)
+
+nanobind_add_module(
+  ipopt_model_ext
+
+  STABLE_ABI NB_STATIC
+
+  lib/ipopt_model_ext.cpp
+)
+target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
+install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 set(ENABLE_TEST_MAIN OFF CACHE BOOL "Enable test c++ function with a main.cpp")
 if(ENABLE_TEST_MAIN)

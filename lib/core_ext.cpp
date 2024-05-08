@@ -22,7 +22,8 @@ NB_MODULE(core_ext, m)
 	nb::enum_<ConstraintSense>(m, "ConstraintSense")
 	    .value("LessEqual", ConstraintSense::LessEqual)
 	    .value("Equal", ConstraintSense::Equal)
-	    .value("GreaterEqual", ConstraintSense::GreaterEqual);
+	    .value("GreaterEqual", ConstraintSense::GreaterEqual)
+	    .value("Within", ConstraintSense::Within);
 
 	// ConstraintType
 	nb::enum_<ConstraintType>(m, "ConstraintType")
