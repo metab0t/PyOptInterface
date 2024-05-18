@@ -87,6 +87,20 @@ y_val = model.get_value(y)
 # 1.0
 ```
 
+## Citation
+If you use PyOptInterface in your research, please consider citing [the following paper](https://arxiv.org/abs/2405.10130):
+
+```bibtex
+@misc{yang2024pyoptinterface,
+      title={PyOptInterface: Design and implementation of an efficient modeling language for mathematical optimization}, 
+      author={Yue Yang and Chenhui Lin and Luo Xu and Wenchuan Wu},
+      year={2024},
+      eprint={2405.10130},
+      archivePrefix={arXiv},
+      primaryClass={cs.MS}
+}
+```
+
 ## License
 PyOptInterface is licensed under MPL-2.0 License.
 
