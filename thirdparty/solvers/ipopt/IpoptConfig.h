@@ -28,6 +28,8 @@
 /* Define to 1 if Ipopt index type is int64_t */
 /* #undef IPOPT_INT64 */
 
+#ifdef _MSC_VER
+
 /* Library Visibility Attribute */
 #define IPOPTAMPLINTERFACELIB_EXPORT __declspec(dllimport)
 
@@ -36,6 +38,14 @@
 
 /* Library Visibility Attribute */
 #define SIPOPTLIB_EXPORT __declspec(dllimport)
+
+#else
+
+#define IPOPTAMPLINTERFACELIB_EXPORT
+#define IPOPTLIB_EXPORT
+#define SIPOPTLIB_EXPORT
+
+#endif
 
 /** type corresponding to integers in Fortran
  * @deprecated Use ipindex instead.
