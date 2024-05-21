@@ -301,6 +301,10 @@ struct ConstantDelta
 {
 	double c;
 	size_t yi;
+	ConstantDelta() = default;
+	ConstantDelta(double c_, size_t yi_) : c(c_), yi(yi_)
+	{
+	}
 };
 
 struct AffineDelta
@@ -308,6 +312,10 @@ struct AffineDelta
 	double c;
 	size_t xi;
 	size_t yi;
+	AffineDelta() = default;
+	AffineDelta(double c_, size_t xi_, size_t yi_) : c(c_), xi(xi_), yi(yi_)
+	{
+	}
 };
 
 size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
