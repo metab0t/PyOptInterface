@@ -507,7 +507,8 @@ size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
 		std::swap(x1, x2);
 
 	size_t hessian_index;
-	auto iter = m_hessian_index_map.find(VariablePair(x1, x2));
+	VariablePair varpair(x1, x2);
+	auto iter = m_hessian_index_map.find(varpair);
 	if (iter != m_hessian_index_map.end())
 	{
 		hessian_index = iter->second;
@@ -515,7 +516,7 @@ size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
 	else
 	{
 		hessian_index = m_hessian_nnz;
-		m_hessian_index_map[VariablePair(x1, x2)] = m_hessian_nnz;
+		m_hessian_index_map[varpair] = m_hessian_nnz;
 		m_hessian_rows.push_back(x1);
 		m_hessian_cols.push_back(x2);
 		m_hessian_nnz += 1;
