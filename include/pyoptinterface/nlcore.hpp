@@ -362,9 +362,8 @@ struct LinearQuadraticModel
 	                               Hashmap<VariablePair, size_t> &m_hessian_index_map,
 	                               HessianSparsityType hessian_sparsity_type);
 
-#ifdef _MSC_VER
 #define restrict __restrict
-#endif
+
 	void eval_objective(const double *restrict x, double *restrict y);
 
 	void eval_objective_gradient(const double *restrict x, double *restrict grad);
