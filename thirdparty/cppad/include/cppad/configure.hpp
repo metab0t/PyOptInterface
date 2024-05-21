@@ -287,7 +287,7 @@ CPPAD_HAS_TMPNAM_S
 If true, tmpnam_s works in C++ on this system.
 {xrst_spell_off}
 {xrst_code hpp} */
-# define CPPAD_HAS_TMPNAM_S 1
+# define CPPAD_HAS_TMPNAM_S 0
 /* {xrst_code}
 {xrst_spell_on}
 
