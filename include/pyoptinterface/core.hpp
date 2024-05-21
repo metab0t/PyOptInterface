@@ -97,6 +97,11 @@ struct VariablePair
 
 	bool operator==(const VariablePair &x) const;
 	bool operator<(const VariablePair &x) const;
+
+	VariablePair() = default;
+	VariablePair(IndexT v1, IndexT v2) : var_1(v1), var_2(v2)
+	{
+	}
 };
 
 template <>
@@ -123,25 +128,25 @@ struct ExprBuilder
 	ExprBuilder(const ScalarAffineFunction &a);
 	ExprBuilder(const ScalarQuadraticFunction &q);
 
-	ExprBuilder& operator+=(CoeffT c);
-	ExprBuilder& operator+=(const VariableIndex &v);
-	ExprBuilder& operator+=(const ScalarAffineFunction &a);
-	ExprBuilder& operator+=(const ScalarQuadraticFunction &q);
-	ExprBuilder& operator+=(const ExprBuilder &t);
+	ExprBuilder &operator+=(CoeffT c);
+	ExprBuilder &operator+=(const VariableIndex &v);
+	ExprBuilder &operator+=(const ScalarAffineFunction &a);
+	ExprBuilder &operator+=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator+=(const ExprBuilder &t);
 
-	ExprBuilder& operator-=(CoeffT c);
-	ExprBuilder& operator-=(const VariableIndex &v);
-	ExprBuilder& operator-=(const ScalarAffineFunction &a);
-	ExprBuilder& operator-=(const ScalarQuadraticFunction &q);
-	ExprBuilder& operator-=(const ExprBuilder &t);
+	ExprBuilder &operator-=(CoeffT c);
+	ExprBuilder &operator-=(const VariableIndex &v);
+	ExprBuilder &operator-=(const ScalarAffineFunction &a);
+	ExprBuilder &operator-=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator-=(const ExprBuilder &t);
 
-	ExprBuilder& operator*=(CoeffT c);
-	ExprBuilder& operator*=(const VariableIndex &v);
-	ExprBuilder& operator*=(const ScalarAffineFunction &a);
-	ExprBuilder& operator*=(const ScalarQuadraticFunction &q);
-	ExprBuilder& operator*=(const ExprBuilder &t);
+	ExprBuilder &operator*=(CoeffT c);
+	ExprBuilder &operator*=(const VariableIndex &v);
+	ExprBuilder &operator*=(const ScalarAffineFunction &a);
+	ExprBuilder &operator*=(const ScalarQuadraticFunction &q);
+	ExprBuilder &operator*=(const ExprBuilder &t);
 
-	ExprBuilder& operator/=(CoeffT c);
+	ExprBuilder &operator/=(CoeffT c);
 
 	bool empty() const;
 	int degree() const;

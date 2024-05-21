@@ -10,6 +10,9 @@ struct NLConstraintIndex
 	IndexT dim;
 
 	NLConstraintIndex() = default;
+	NLConstraintIndex(IndexT v, IndexT d) : index(v), dim(d)
+	{
+	}
 };
 
 static const std::string opt_options = "no_compare_op no_conditional_skip no_cumulative_sum_op";
