@@ -28,7 +28,7 @@
 /* Define to 1 if Ipopt index type is int64_t */
 /* #undef IPOPT_INT64 */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 
 /* Library Visibility Attribute */
 #define IPOPTAMPLINTERFACELIB_EXPORT __declspec(dllimport)
