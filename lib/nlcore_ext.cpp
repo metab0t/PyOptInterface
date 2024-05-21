@@ -99,12 +99,7 @@ NB_MODULE(nlcore_ext, m)
 	    .def("Range", &ADFun::Range)
 	    .def("size_dyn_ind", &ADFun::size_dyn_ind)
 	    .def("optimize", &ADFun::optimize)
-	    .def("function_name_set", &ADFun::function_name_set)
-	    .def("to_csrc", [](ADFun &f) {
-		    std::ostringstream out;
-		    f.to_csrc(out, "double");
-		    return out.str();
-	    });
+	    .def("function_name_set", &ADFun::function_name_set);
 
 	nb::enum_<HessianSparsityType>(m, "HessianSparsityType")
 	    .value("Full", HessianSparsityType::Full)

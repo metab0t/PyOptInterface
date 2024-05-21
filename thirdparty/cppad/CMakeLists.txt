@@ -5,7 +5,6 @@ project(CPPAD CXX)
 file(GLOB CPPAD_HEADERS include/cppad/*.hpp)
 set(CPPAD_SOURCES
 src/cpp_graph_op.cpp
-src/csrc_writer.cpp
 src/temp_file.cpp
 )
 

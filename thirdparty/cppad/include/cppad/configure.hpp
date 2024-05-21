@@ -332,7 +332,7 @@ CPPAD_C_COMPILER_MSVC_FLAGS
 If true, the C complier uses the same flags as ``cl``
 {xrst_spell_off}
 {xrst_code hpp} */
-# define CPPAD_C_COMPILER_MSVC_FLAGS 1
+# define CPPAD_C_COMPILER_MSVC_FLAGS 0
 /* {xrst_code}
 {xrst_spell_on}
 

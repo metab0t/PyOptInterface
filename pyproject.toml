@@ -31,7 +31,6 @@ build-dir = "build/{wheel_tag}"
 cmake.build-type = "Release"
 
 [tool.scikit-build.cmake.define]
-ENABLE_GUROBI_CXX = "OFF"
 PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.8" }
 CMAKE_FIND_DEBUG_MODE = "OFF"
 ENABLE_TEST_MAIN = "OFF"
