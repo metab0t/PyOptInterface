@@ -323,6 +323,21 @@ NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
 
 NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
                                                 const std::vector<VariableIndex> &xs,
+                                                const std::vector<double> &ps,
+                                                ConstraintSense sense,
+                                                const std::vector<double> &rhss)
+{
+	std::vector<ParameterIndex> real_ps;
+	real_ps.reserve(ps.size());
+	for (auto p : ps)
+	{
+		real_ps.push_back(add_parameter(p));
+	}
+	return add_nl_constraint(k, xs, real_ps, sense, rhss);
+}
+
+NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
+                                                const std::vector<VariableIndex> &xs,
                                                 ConstraintSense sense,
                                                 const std::vector<double> &rhss)
 {
@@ -356,6 +371,19 @@ NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
 	return nlcon;
 }
 
+NLConstraintIndex IpoptModel::add_nl_constraint(
+    const FunctionIndex &k, const std::vector<VariableIndex> &xs, const std::vector<double> &ps,
+    ConstraintSense sense, const std::vector<double> &lbs, const std::vector<double> &ubs)
+{
+	std::vector<ParameterIndex> real_ps;
+	real_ps.reserve(ps.size());
+	for (auto p : ps)
+	{
+		real_ps.push_back(add_parameter(p));
+	}
+	return add_nl_constraint(k, xs, real_ps, sense, lbs, ubs);
+}
+
 NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
                                                 const std::vector<VariableIndex> &xs,
                                                 ConstraintSense sense,
@@ -375,6 +403,19 @@ void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const Fu
 	assert(ny == dim);
 
 	m_function_model.add_nl_constraint(k, xs, ps, constraint.index);
+}
+
+void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
+                                   const std::vector<VariableIndex> &xs,
+                                   const std::vector<double> &ps)
+{
+	std::vector<ParameterIndex> real_ps;
+	real_ps.reserve(ps.size());
+	for (auto p : ps)
+	{
+		real_ps.push_back(add_parameter(p));
+	}
+	add_nl_expression(constraint, k, xs, real_ps);
 }
 
 void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,

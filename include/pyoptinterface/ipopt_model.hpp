@@ -98,12 +98,21 @@ struct IpoptModel
 	                                    const std::vector<ParameterIndex> &ps,
 	                                    ConstraintSense sense, const std::vector<double> &rhss);
 	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
+	                                    const std::vector<VariableIndex> &xs,
+	                                    const std::vector<double> &ps,
+	                                    ConstraintSense sense, const std::vector<double> &rhss);
+	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
 	                                    const std::vector<VariableIndex> &xs, ConstraintSense sense,
 	                                    const std::vector<double> &rhss);
 
 	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
 	                                    const std::vector<VariableIndex> &xs,
 	                                    const std::vector<ParameterIndex> &ps,
+	                                    ConstraintSense sense, const std::vector<double> &lbs,
+	                                    const std::vector<double> &ubs);
+	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
+	                                    const std::vector<VariableIndex> &xs,
+	                                    const std::vector<double> &ps,
 	                                    ConstraintSense sense, const std::vector<double> &lbs,
 	                                    const std::vector<double> &ubs);
 	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
@@ -114,7 +123,10 @@ struct IpoptModel
 	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
 	                       const std::vector<VariableIndex> &xs,
 	                       const std::vector<ParameterIndex> &ps);
-	void add_nl_expression(const NLConstraintIndex &constraint,const FunctionIndex &k,
+	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
+	                       const std::vector<VariableIndex> &xs,
+	                       const std::vector<double> &ps);
+	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
 	                       const std::vector<VariableIndex> &xs);
 
 	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,

@@ -126,6 +126,11 @@ NB_MODULE(ipopt_model_ext, m)
 	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
+	                           const std::vector<double> &, ConstraintSense,
+	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
+	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("rhs"))
+	    .def("add_nl_constraint",
+	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           ConstraintSense, const std::vector<double> &,
 	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
 	         nb::arg("f"), nb::arg("x"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
@@ -136,11 +141,23 @@ NB_MODULE(ipopt_model_ext, m)
 	             &IpoptModel::add_nl_constraint),
 	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("lb"),
 	         nb::arg("ub"))
+	    .def("add_nl_constraint",
+	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
+	                           const std::vector<double> &, ConstraintSense,
+	                           const std::vector<double> &, const std::vector<double> &>(
+	             &IpoptModel::add_nl_constraint),
+	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("lb"),
+	         nb::arg("ub"))
 
 	    .def("add_nl_expression",
 	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
 	                           const std::vector<VariableIndex> &,
 	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_expression),
+	         nb::arg("constraint"), nb::arg("f"), nb::arg("x"), nb::arg("p"))
+	    .def("add_nl_expression",
+	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
+	                           const std::vector<VariableIndex> &, const std::vector<double> &>(
+	             &IpoptModel::add_nl_expression),
 	         nb::arg("constraint"), nb::arg("f"), nb::arg("x"), nb::arg("p"))
 	    .def("add_nl_expression",
 	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
