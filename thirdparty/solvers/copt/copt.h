@@ -21,7 +21,7 @@ extern "C" {
 
 #define COPT_VERSION_MAJOR                      7
 #define COPT_VERSION_MINOR                      1
-#define COPT_VERSION_TECHNICAL                  1
+#define COPT_VERSION_TECHNICAL                  3
 
 
 /*
@@ -546,6 +546,7 @@ int COPT_CALL COPT_GetIndicator(copt_prob *prob,
 
 int COPT_CALL COPT_GetElem(copt_prob *prob, int iCol, int iRow, double *p_elem);
 int COPT_CALL COPT_SetElem(copt_prob *prob, int iCol, int iRow, double newElem);
+int COPT_CALL COPT_SetElems(copt_prob *prob, int nelem, const int *cols, const int *rows, const double *elems);
 
 int COPT_CALL COPT_GetPSDElem(copt_prob *prob, int iCol, int iRow, int *p_idx);
 int COPT_CALL COPT_SetPSDElem(copt_prob *prob, int iCol, int iRow, int newIdx);

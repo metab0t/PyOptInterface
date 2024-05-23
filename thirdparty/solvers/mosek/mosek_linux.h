@@ -23,8 +23,8 @@
 #include <stdint.h>
 
 #define MSK_VERSION_MAJOR    10
-#define MSK_VERSION_MINOR    1
-#define MSK_VERSION_REVISION 28
+#define MSK_VERSION_MINOR    2
+#define MSK_VERSION_REVISION 0
 #define MSK_VERSION_STATE    ""
 
 #define MSK_INFINITY 1.0e30
