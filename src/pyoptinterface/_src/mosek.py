@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import logging
 
-from .mosek_model_ext import RawModel, Env, Enum, load_library, is_library_loaded
+from .mosek_model_ext import RawModel, Env, Enum, load_library
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,

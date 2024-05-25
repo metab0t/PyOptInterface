@@ -87,10 +87,9 @@ ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_expr(
 	return get_base()->add_quadratic_constraint(f, sense, rhs, name);
 }
 
-template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ScalarAffineFunction &function)
+template <typename T>
+double get_affine_expression_value(T *model, const ScalarAffineFunction &function)
 {
-	T *model = get_base();
 	auto N = function.size();
 	double value = 0.0;
 	for (auto i = 0; i < N; ++i)
@@ -102,9 +101,15 @@ double CommercialSolverMixin<T>::get_expression_value(const ScalarAffineFunction
 }
 
 template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ScalarQuadraticFunction &function)
+double CommercialSolverMixin<T>::get_expression_value(const ScalarAffineFunction &function)
 {
 	T *model = get_base();
+	return ::get_affine_expression_value<T>(model, function);
+}
+
+template <typename T>
+double get_quadratic_expression_value(T *model, const ScalarQuadraticFunction &function)
+{
 	auto N = function.size();
 	double value = 0.0;
 	for (auto i = 0; i < N; ++i)
@@ -125,16 +130,22 @@ double CommercialSolverMixin<T>::get_expression_value(const ScalarQuadraticFunct
 	}
 	if (function.affine_part)
 	{
-		auto affine_value = get_expression_value(function.affine_part.value());
+		auto affine_value = ::get_affine_expression_value(model, function.affine_part.value());
 		value += affine_value;
 	}
 	return value;
 }
 
 template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ExprBuilder &function)
+double CommercialSolverMixin<T>::get_expression_value(const ScalarQuadraticFunction &function)
 {
 	T *model = get_base();
+	return ::get_quadratic_expression_value<T>(model, function);
+}
+
+template <typename T>
+double get_expression_builder_value(T *model, const ExprBuilder &function)
+{
 	double value = 0.0;
 	for (const auto &[varpair, coef] : function.quadratic_terms)
 	{
@@ -161,10 +172,15 @@ double CommercialSolverMixin<T>::get_expression_value(const ExprBuilder &functio
 }
 
 template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ScalarAffineFunction &function,
-                                                        int precision)
+double CommercialSolverMixin<T>::get_expression_value(const ExprBuilder &function)
 {
 	T *model = get_base();
+	return ::get_expression_builder_value<T>(model, function);
+}
+
+template <typename T>
+std::string pprint_affine_expression(T *model, const ScalarAffineFunction &function, int precision)
+{
 	auto N = function.size();
 	std::vector<std::string> terms;
 	terms.reserve(N + 1);
@@ -192,10 +208,17 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ScalarAffineFuncti
 }
 
 template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ScalarQuadraticFunction &function,
+std::string CommercialSolverMixin<T>::pprint_expression(const ScalarAffineFunction &function,
                                                         int precision)
 {
 	T *model = get_base();
+	return ::pprint_affine_expression<T>(model, function, precision);
+}
+
+template <typename T>
+std::string pprint_quadratic_expression(T *model, const ScalarQuadraticFunction &function,
+                                        int precision)
+{
 	auto N = function.size();
 	std::vector<std::string> terms;
 	terms.reserve(N + 1);
@@ -226,15 +249,22 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ScalarQuadraticFun
 	}
 	if (function.affine_part)
 	{
-		terms.push_back(pprint_expression(function.affine_part.value(), precision));
+		terms.push_back(::pprint_affine_expression(model, function.affine_part.value(), precision));
 	}
 	return fmt::format("{}", fmt::join(terms, "+"));
 }
 
 template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &function, int precision)
+std::string CommercialSolverMixin<T>::pprint_expression(const ScalarQuadraticFunction &function,
+                                                        int precision)
 {
 	T *model = get_base();
+	return ::pprint_quadratic_expression<T>(model, function, precision);
+}
+
+template <typename T>
+std::string pprint_expression_builder(T *model, const ExprBuilder &function, int precision)
+{
 	std::vector<std::string> terms;
 	terms.reserve(function.quadratic_terms.size() + function.affine_terms.size() + 1);
 
@@ -280,6 +310,13 @@ std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &funct
 		terms.push_back(fmt::format("{:.{}g}", function.constant_term.value(), precision));
 	}
 	return fmt::format("{}", fmt::join(terms, "+"));
+}
+
+template <CommercialSolverConstraint T>
+std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &function, int precision)
+{
+	T *model = get_base();
+	return ::pprint_expression_builder<T>(model, function, precision);
 }
 
 template <CommercialSolverConstraint T>

@@ -39,56 +39,87 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def_ro("m_function_model", &IpoptModel::m_function_model)
 	    .def_ro("m_status", &IpoptModel::m_status)
 	    .def("add_variable", &IpoptModel::add_variable, nb::arg("lb") = -INFINITY,
-	         nb::arg("ub") = INFINITY, nb::arg("start") = 0.0)
-	    .def("change_variable_lb", &IpoptModel::change_variable_lb)
-	    .def("change_variable_ub", &IpoptModel::change_variable_ub)
-	    .def("change_variable_bounds", &IpoptModel::change_variable_bounds, nb::arg("variable"),
+	         nb::arg("ub") = INFINITY, nb::arg("start") = 0.0, nb::arg("name") = "")
+	    .def("get_variable_lb", &IpoptModel::get_variable_lb)
+	    .def("get_variable_ub", &IpoptModel::get_variable_ub)
+	    .def("set_variable_lb", &IpoptModel::set_variable_lb)
+	    .def("set_variable_ub", &IpoptModel::set_variable_ub)
+	    .def("set_variable_bounds", &IpoptModel::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
-	    .def("get_variable_value", &IpoptModel::get_variable_value)
+
+	    .def("get_variable_start", &IpoptModel::get_variable_start)
+	    .def("set_variable_start", &IpoptModel::set_variable_start)
+
+	    .def("get_variable_name", &IpoptModel::get_variable_name)
+	    .def("set_variable_name", &IpoptModel::set_variable_name)
+
+	    .def("get_value", nb::overload_cast<const VariableIndex &>(&IpoptModel::get_variable_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarAffineFunction &>(&IpoptModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&IpoptModel::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ExprBuilder &>(&IpoptModel::get_expression_value))
+
+	    .def("pprint", &IpoptModel::pprint_variable)
+	    .def("pprint",
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&IpoptModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+	    .def(
+	        "pprint",
+	        nb::overload_cast<const ScalarQuadraticFunction &, int>(&IpoptModel::pprint_expression),
+	        nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&IpoptModel::pprint_expression),
+	         nb::arg("expr"), nb::arg("precision") = 4)
+
 	    .def("add_parameter", &IpoptModel::add_parameter, nb::arg("value") = 0.0)
 	    .def("set_parameter", &IpoptModel::set_parameter)
 
+	    .def("get_obj_value", &IpoptModel::get_obj_value)
+	    .def("get_constraint_primal", &IpoptModel::get_constraint_primal)
+	    .def("get_constraint_dual", &IpoptModel::get_constraint_dual)
+
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, CoeffT>(
-	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, CoeffT,
+	                           const char *>(&IpoptModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT>(
+	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def(
+	        "add_linear_constraint",
+	        nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, CoeffT, const char *>(
+	            &IpoptModel::add_linear_constraint),
+	        nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, CoeffT>(
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT, const char *>(
 	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT>(
-	             &IpoptModel::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT>(
-	             &IpoptModel::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
+	                           const char *>(&IpoptModel::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT, CoeffT>(
-	             &IpoptModel::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT, CoeffT,
+	                           const char *>(&IpoptModel::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModel::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT>(
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT, const char *>(
 	             &IpoptModel::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 
 	    .def("add_objective",
 	         nb::overload_cast<const ExprBuilder &>(&IpoptModel::add_objective<ExprBuilder>))
@@ -99,9 +130,16 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("add_objective",
 	         nb::overload_cast<const VariableIndex &>(&IpoptModel::add_objective<VariableIndex>))
 	    .def("add_objective", nb::overload_cast<const double &>(&IpoptModel::add_objective<double>))
-	    .def("add_objective",
+
+	    .def("add_nl_objective",
+	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &>(
+	             &IpoptModel::add_nl_objective))
+	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_objective))
+	    .def("add_nl_objective",
+	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
+	                           const std::vector<double> &>(&IpoptModel::add_nl_objective))
 
 	    .def("register_function", &IpoptModel::register_function)
 
@@ -118,54 +156,54 @@ NB_MODULE(ipopt_model_ext, m)
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           ConstraintSense, const std::vector<double> &>(
 	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("f"), nb::arg("var"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<ParameterIndex> &, ConstraintSense,
 	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<double> &, ConstraintSense,
 	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("rhs"))
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           ConstraintSense, const std::vector<double> &,
 	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
+	         nb::arg("f"), nb::arg("var"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<ParameterIndex> &, ConstraintSense,
 	                           const std::vector<double> &, const std::vector<double> &>(
 	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("lb"),
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("lb"),
 	         nb::arg("ub"))
 	    .def("add_nl_constraint",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<double> &, ConstraintSense,
 	                           const std::vector<double> &, const std::vector<double> &>(
 	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("x"), nb::arg("p"), nb::arg("sense"), nb::arg("lb"),
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("lb"),
 	         nb::arg("ub"))
 
 	    .def("add_nl_expression",
 	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
 	                           const std::vector<VariableIndex> &,
 	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("x"), nb::arg("p"))
+	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"), nb::arg("param"))
 	    .def("add_nl_expression",
 	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
 	                           const std::vector<VariableIndex> &, const std::vector<double> &>(
 	             &IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("x"), nb::arg("p"))
+	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"), nb::arg("param"))
 	    .def("add_nl_expression",
 	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
 	                           const std::vector<VariableIndex> &>(&IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("x"))
+	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"))
 
-	    .def("optimize", &IpoptModel::optimize)
-	    .def("set_option_int", &IpoptModel::set_option_int)
-	    .def("set_option_num", &IpoptModel::set_option_num)
-	    .def("set_option_str", &IpoptModel::set_option_str);
+	    .def("optimize", &IpoptModel::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("set_raw_option_int", &IpoptModel::set_raw_option_int)
+	    .def("set_raw_option_double", &IpoptModel::set_raw_option_double)
+	    .def("set_raw_option_string", &IpoptModel::set_raw_option_string);
 }

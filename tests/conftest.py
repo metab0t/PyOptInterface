@@ -1,33 +1,26 @@
 import pytest
 
 model_interface_dict = {}
-try:
-    import pyoptinterface.gurobi as gurobi
 
+import pyoptinterface.gurobi as gurobi
+
+if gurobi.is_library_loaded():
     model_interface_dict["gurobi"] = gurobi.Model
-except Exception:
-    pass
 
-try:
-    import pyoptinterface.copt as copt
+import pyoptinterface.copt as copt
 
+if copt.is_library_loaded():
     model_interface_dict["copt"] = copt.Model
-except Exception:
-    pass
 
-try:
-    import pyoptinterface.mosek as mosek
+import pyoptinterface.mosek as mosek
 
+if mosek.is_library_loaded():
     model_interface_dict["mosek"] = mosek.Model
-except Exception:
-    pass
 
-try:
-    import pyoptinterface.highs as highs
+import pyoptinterface.highs as highs
 
+if highs.is_library_loaded():
     model_interface_dict["highs"] = highs.Model
-except Exception:
-    pass
 
 
 @pytest.fixture(params=model_interface_dict.keys())

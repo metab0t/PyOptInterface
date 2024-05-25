@@ -7,6 +7,8 @@ from .nlcore_ext import (
 
 from typing import Union, Iterable, Optional
 
+# Trace the Python function to construct an ADFun object in CppAD
+
 
 def trace_adfun_impl(
     f,
@@ -36,11 +38,15 @@ def trace_adfun_impl(
         ay = f(ax, ap)
     else:
         ay = f(ax)
-    ny = len(ay)
-    if isinstance(ay, dict):
-        ay_ = advec(y for y in ay.values())
+    if isinstance(ay, a_double):
+        ny = 1
+        ay_ = advec([ay])
     else:
-        ay_ = advec(y for y in ay)
+        ny = len(ay)
+        if isinstance(ay, dict):
+            ay_ = advec(y for y in ay.values())
+        else:
+            ay_ = advec(y for y in ay)
     adf = ADFun()
     adf.Dependent(ax_, ay_)
     adf.optimize("no_compare_op no_conditional_skip no_cumulative_sum_op")

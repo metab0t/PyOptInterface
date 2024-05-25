@@ -4,7 +4,7 @@ import types
 from pathlib import Path
 import logging
 
-from .copt_model_ext import RawModel, Env, COPT, load_library, is_library_loaded
+from .copt_model_ext import RawModel, Env, COPT, load_library
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,

@@ -1,8 +1,14 @@
 #include "pyoptinterface/ipopt_model.hpp"
+#include "pyoptinterface/solver_common.hpp"
 
 #include "fmt/core.h"
 #include "fmt/ranges.h"
 #include "pyoptinterface/dylib.hpp"
+
+static bool is_name_empty(const char *name)
+{
+	return name == nullptr || name[0] == '\0';
+}
 
 namespace ipopt
 {
@@ -55,35 +61,114 @@ IpoptModel::IpoptModel()
 	}
 }
 
-VariableIndex IpoptModel::add_variable(double lb, double ub, double start)
+VariableIndex IpoptModel::add_variable(double lb, double ub, double start, const char *name)
 {
 	VariableIndex vi(n_variables);
 	m_var_lb.push_back(lb);
 	m_var_ub.push_back(ub);
 	m_var_init.push_back(start);
 	n_variables += 1;
+
+	if (!is_name_empty(name))
+	{
+		m_var_names.emplace(vi.index, name);
+	}
+
 	return vi;
 }
 
-void IpoptModel::change_variable_lb(const VariableIndex &variable, double lb)
+double IpoptModel::get_variable_lb(const VariableIndex &variable)
+{
+	return m_var_lb[variable.index];
+}
+
+double IpoptModel::get_variable_ub(const VariableIndex &variable)
+{
+	return m_var_ub[variable.index];
+}
+
+void IpoptModel::set_variable_lb(const VariableIndex &variable, double lb)
 {
 	m_var_lb[variable.index] = lb;
 }
 
-void IpoptModel::change_variable_ub(const VariableIndex &variable, double ub)
+void IpoptModel::set_variable_ub(const VariableIndex &variable, double ub)
 {
 	m_var_ub[variable.index] = ub;
 }
 
-void IpoptModel::change_variable_bounds(const VariableIndex &variable, double lb, double ub)
+void IpoptModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
 {
 	m_var_lb[variable.index] = lb;
 	m_var_ub[variable.index] = ub;
+}
+
+double IpoptModel::get_variable_start(const VariableIndex &variable)
+{
+	return m_var_init[variable.index];
+}
+
+void IpoptModel::set_variable_start(const VariableIndex &variable, double start)
+{
+	m_var_init[variable.index] = start;
 }
 
 double IpoptModel::get_variable_value(const VariableIndex &variable)
 {
 	return m_result.x[variable.index];
+}
+
+double IpoptModel::get_expression_value(const ScalarAffineFunction &function)
+{
+	return ::get_affine_expression_value(this, function);
+}
+
+double IpoptModel::get_expression_value(const ScalarQuadraticFunction &function)
+{
+	return ::get_quadratic_expression_value(this, function);
+}
+
+double IpoptModel::get_expression_value(const ExprBuilder &function)
+{
+	return ::get_expression_builder_value(this, function);
+}
+
+std::string IpoptModel::get_variable_name(const VariableIndex &variable)
+{
+	auto iter = m_var_names.find(variable.index);
+	if (iter != m_var_names.end())
+	{
+		return iter->second;
+	}
+	else
+	{
+		return fmt::format("x{}", variable.index);
+	}
+}
+
+void IpoptModel::set_variable_name(const VariableIndex &variable, const std::string &name)
+{
+	m_var_names[variable.index] = name;
+}
+
+std::string IpoptModel::pprint_variable(const VariableIndex &variable)
+{
+	return get_variable_name(variable);
+}
+
+std::string IpoptModel::pprint_expression(const ScalarAffineFunction &function, int precision)
+{
+	return ::pprint_affine_expression(this, function, precision);
+}
+
+std::string IpoptModel::pprint_expression(const ScalarQuadraticFunction &function, int precision)
+{
+	return ::pprint_quadratic_expression(this, function, precision);
+}
+
+std::string IpoptModel::pprint_expression(const ExprBuilder &function, int precision)
+{
+	return ::pprint_expression_builder(this, function, precision);
 }
 
 ParameterIndex IpoptModel::add_parameter(double value)
@@ -96,8 +181,24 @@ void IpoptModel::set_parameter(const ParameterIndex &parameter, double value)
 	m_function_model.set_parameter(parameter, value);
 }
 
+double IpoptModel::get_obj_value()
+{
+	return m_result.obj_val;
+}
+
+double IpoptModel::get_constraint_primal(IndexT index)
+{
+	return m_result.g[index];
+}
+
+double IpoptModel::get_constraint_dual(IndexT index)
+{
+	return m_result.mult_g[index];
+}
+
 ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
-                                                  ConstraintSense sense, double rhs)
+                                                  ConstraintSense sense, double rhs,
+                                                  const char *name)
 {
 	double lb = -INFINITY;
 	double ub = INFINITY;
@@ -114,11 +215,12 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 		lb = rhs;
 		ub = rhs;
 	}
-	return add_linear_constraint(f, ConstraintSense::Within, lb, ub);
+	return add_linear_constraint(f, ConstraintSense::Within, lb, ub, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
-                                                  ConstraintSense sense, double lb, double ub)
+                                                  ConstraintSense sense, double lb, double ub,
+                                                  const char *name)
 {
 	if (sense != ConstraintSense::Within)
 	{
@@ -130,35 +232,42 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 	m_con_lb.push_back(lb);
 	m_con_ub.push_back(ub);
 	n_constraints += 1;
+
+	if (!is_name_empty(name))
+	{
+		m_con_names.emplace(con.index, name);
+	}
+
 	return con;
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                  double rhs)
+                                                  double rhs, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                  double lb, double ub)
+                                                  double lb, double ub, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
-                                                  double rhs)
+                                                  double rhs, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
-                                                  double lb, double ub)
+                                                  double lb, double ub, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
-                                                     ConstraintSense sense, double rhs)
+                                                     ConstraintSense sense, double rhs,
+                                                     const char *name)
 {
 	double lb = -INFINITY;
 	double ub = INFINITY;
@@ -179,11 +288,12 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	{
 		throw std::runtime_error("'Within' constraint sense must have both LB and UB");
 	}
-	return add_quadratic_constraint(f, ConstraintSense::Within, lb, ub);
+	return add_quadratic_constraint(f, ConstraintSense::Within, lb, ub, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
-                                                     ConstraintSense sense, double lb, double ub)
+                                                     ConstraintSense sense, double lb, double ub,
+                                                     const char *name)
 {
 	if (sense != ConstraintSense::Within)
 	{
@@ -195,19 +305,25 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	m_con_lb.push_back(lb);
 	m_con_ub.push_back(ub);
 	n_constraints += 1;
+
+	if (!is_name_empty(name))
+	{
+		m_con_names.emplace(con.index, name);
+	}
+
 	return con;
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                     double rhs)
+                                                     double rhs, const char *name)
 {
-	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, rhs);
+	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, rhs, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                     double lb, double ub)
+                                                     double lb, double ub, const char *name)
 {
-	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, lb, ub);
+	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, lb, ub, name);
 }
 
 FunctionIndex IpoptModel::register_function(ADFunD &f, const std::string &name)
@@ -425,10 +541,28 @@ void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const Fu
 	add_nl_expression(constraint, k, xs, ps);
 }
 
+void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs)
+{
+	std::vector<ParameterIndex> ps;
+	add_nl_objective(k, xs, ps);
+}
+
 void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
                                   const std::vector<ParameterIndex> &ps)
 {
 	m_function_model.add_nl_objective(k, xs, ps);
+}
+
+void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
+                                  const std::vector<double> &ps)
+{
+	std::vector<ParameterIndex> real_ps;
+	real_ps.reserve(ps.size());
+	for (auto p : ps)
+	{
+		real_ps.push_back(add_parameter(p));
+	}
+	add_nl_objective(k, xs, real_ps);
 }
 
 static bool eval_f(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data)
@@ -568,17 +702,17 @@ void IpoptModel::optimize()
 	                             m_result.mult_x_L.data(), m_result.mult_x_U.data(), (void *)this);
 }
 
-void IpoptModel::set_option_int(const std::string &name, int value)
+void IpoptModel::set_raw_option_int(const std::string &name, int value)
 {
 	m_options_int[name] = value;
 }
 
-void IpoptModel::set_option_num(const std::string &name, double value)
+void IpoptModel::set_raw_option_double(const std::string &name, double value)
 {
 	m_options_num[name] = value;
 }
 
-void IpoptModel::set_option_str(const std::string &name, const std::string &value)
+void IpoptModel::set_raw_option_string(const std::string &name, const std::string &value)
 {
 	m_options_str[name] = value;
 }

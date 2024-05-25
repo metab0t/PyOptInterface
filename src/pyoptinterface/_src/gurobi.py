@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import logging
 
-from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library, is_library_loaded
+from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,

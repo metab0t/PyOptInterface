@@ -51,7 +51,7 @@ NB_MODULE(nlcore_ext, m)
 	m.def("exp", [](const a_double &x) { return CppAD::exp(x); });
 	m.def("log", [](const a_double &x) { return CppAD::log(x); });
 
-	nb::bind_vector<advec>(m, "advec");
+	nb::bind_vector<advec, nb::rv_policy::reference_internal>(m, "advec");
 
 	m.def("Independent", nb::overload_cast<advec &>(&CppAD::Independent<advec>), nb::arg("x"));
 	m.def("Independent", nb::overload_cast<advec &, advec &>(&CppAD::Independent<advec>),
@@ -78,8 +78,8 @@ NB_MODULE(nlcore_ext, m)
 	    .def(
 	        "__iter__",
 	        [](cpp_graph &g) {
-		        return nb::make_iterator(nb::type<cpp_graph>(), "item_iterator", g.begin(),
-		                                 g.end());
+		        return nb::make_iterator<nb::rv_policy::reference_internal>(
+		            nb::type<cpp_graph>(), "item_iterator", g.begin(), g.end());
 	        },
 	        nb::keep_alive<0, 1>())
 	    .def_prop_ro("n_dynamic_ind", [](cpp_graph &g) { return g.n_dynamic_ind_get(); })
@@ -201,7 +201,8 @@ NB_MODULE(nlcore_ext, m)
 	    .def_ro("index", &NLConstraintIndex::index)
 	    .def_ro("dim", &NLConstraintIndex::dim);
 
-	nb::bind_vector<std::vector<NonlinearFunction>>(m, "nlfunctionvec");
+	nb::bind_vector<std::vector<NonlinearFunction>, nb::rv_policy::reference_internal>(
+	    m, "nlfunctionvec");
 
 	nb::class_<NonlinearFunctionModel>(m, "NonlinearFunctionModel")
 	    .def(nb::init<>())

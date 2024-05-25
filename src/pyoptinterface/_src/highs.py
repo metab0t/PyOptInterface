@@ -9,7 +9,6 @@ from .highs_model_ext import (
     HighsSolutionStatus,
     Enum,
     load_library,
-    is_library_loaded,
 )
 from .attributes import (
     VariableAttribute,
@@ -338,7 +337,7 @@ class Model(RawModel):
         )
 
     def number_of_constraints(self, type: ConstraintType):
-        if type not in {ConstraintType.Linear, ConstraintType.Quadratic}:
+        if type not in {ConstraintType.Linear}:
             raise ValueError(f"Unknown constraint type: {type}")
         return self.getnumrow()
 
