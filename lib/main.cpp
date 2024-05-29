@@ -5,6 +5,8 @@
 #include "pyoptinterface/mosek_model.hpp"
 #include "pyoptinterface/highs_model.hpp"
 
+#include <chrono>
+
 struct MapIndexer
 {
 	Hashmap<IndexT, int> map;
@@ -152,9 +154,9 @@ auto test_chunkedbv() -> void
 		fmt::print("added={}\n", x);
 	}
 
-	//auto M = 2;
-	//auto x = cbv.add_indices(M);
-	//fmt::print("added={}\n", x);
+	// auto M = 2;
+	// auto x = cbv.add_indices(M);
+	// fmt::print("added={}\n", x);
 
 	for (int i = 0; i < N - 1; i++)
 	{
@@ -182,8 +184,8 @@ auto test_gurobi() -> void
 	// ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
 
 	expr.clear();
-	expr.add(x);
-	expr.add(y);
+	expr += (x);
+	expr += (y);
 	model.set_objective(expr, ObjectiveSense::Minimize);
 
 	model.optimize();
@@ -201,7 +203,7 @@ void bench()
 	ExprBuilder expr;
 	for (const auto &v : x)
 	{
-		expr.add(v);
+		expr += (v);
 	}
 	ScalarAffineFunction saf(expr);
 
@@ -223,14 +225,14 @@ auto test_copt() -> void
 	ExprBuilder expr;
 	for (const auto &v : x)
 	{
-		expr.add(v);
+		expr += (v);
 	}
 	auto con = model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N);
 
 	ExprBuilder obj;
 	for (const auto &v : x)
 	{
-		obj.add(v * v);
+		obj += (v * v);
 	}
 	model.set_objective(obj, ObjectiveSense::Minimize);
 	model.set_raw_parameter_int("Logging", 0);
@@ -267,7 +269,7 @@ auto test_mosek() -> void
 	ExprBuilder obj;
 	for (const auto &v : x)
 	{
-		obj.add(v * v);
+		obj += (v * v);
 	}
 	model.set_objective(obj, ObjectiveSense::Minimize);
 	model.enable_log();
@@ -298,14 +300,14 @@ auto test_highs() -> void
 	ExprBuilder obj;
 	for (const auto &v : x)
 	{
-		obj.add(v * v);
+		obj += (v * v);
 	}
 	model.set_objective(obj, ObjectiveSense::Minimize);
 
 	ExprBuilder expr;
 	for (const auto &v : x)
 	{
-		expr.add(v);
+		expr += (v);
 	}
 	auto con =
 	    model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N / 2.0, "con1");
@@ -318,21 +320,46 @@ auto test_highs() -> void
 
 auto test_highs_capi() -> void
 {
-	void *highs = Highs_create();
+	void *highs = highs::Highs_create();
 
 	double c[] = {0.0, 1.0, 0.0};
 	double lower[] = {0, 0, 0};
 	double upper[] = {1.0, 1.0, 1.0};
 
-	Highs_addCols(highs, 3, c, lower, upper, 0, nullptr, nullptr, nullptr);
+	// highs::Highs_addCols(highs, 3, c, lower, upper, 0, nullptr, nullptr, nullptr);
 
-	auto hessian_nz = Highs_getHessianNumNz(highs);
-	Highs_run(highs);
-	hessian_nz = Highs_getHessianNumNz(highs);
+	auto hessian_nz = highs::Highs_getHessianNumNz(highs);
+	highs::Highs_run(highs);
+	hessian_nz = highs::Highs_getHessianNumNz(highs);
+}
+
+void debug_highs(int N)
+{
+	auto start = std::chrono::high_resolution_clock::now();
+
+	HighsModelMixin model;
+	for (auto i = 0; i < N; i++)
+	{
+		model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr);
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	fmt::print("N={}, time={} milliseconds\n", N, duration.count());
+}
+
+void test_highs_add_variable()
+{
+	std::vector<int> Ns{100, 1000, 5000, 10000};
+
+	for (const auto& N : Ns)
+	{
+		debug_highs(N);
+	}
 }
 
 auto main() -> int
 {
-	test_gurobi();
+	test_highs_add_variable();
 	return 0;
 }

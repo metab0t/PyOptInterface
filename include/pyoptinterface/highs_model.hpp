@@ -16,11 +16,9 @@
 	B(Highs_addCol);                \
 	B(Highs_getNumCol);             \
 	B(Highs_changeColIntegrality);  \
-	B(Highs_passColName);           \
 	B(Highs_deleteColsBySet);       \
 	B(Highs_addRow);                \
 	B(Highs_getNumRow);             \
-	B(Highs_passRowName);           \
 	B(Highs_deleteRowsBySet);       \
 	B(Highs_passHessian);           \
 	B(Highs_changeColsCostByRange); \
@@ -50,11 +48,9 @@
 	B(Highs_getInfoType);           \
 	B(Highs_getInt64InfoValue);     \
 	B(Highs_getDoubleInfoValue);    \
-	B(Highs_getColName);            \
 	B(Highs_getColIntegrality);     \
 	B(Highs_changeColsBoundsBySet); \
 	B(Highs_getColsBySet);          \
-	B(Highs_getRowName);            \
 	B(Highs_getObjectiveSense);     \
 	B(Highs_getObjectiveValue);     \
 	B(Highs_getColsByRange);        \
@@ -217,12 +213,19 @@ class POIHighsModel
 	// So we need to keep track of binary variables
 	Hashset<IndexT> binary_variables;
 
+	// Store the names internally because use HiGHS API to set them is very expensive
+	Hashmap<IndexT, std::string> m_var_names, m_con_names;
+
 	/* Highs part */
 	std::unique_ptr<void, HighsfreemodelT> m_model;
 
   public:
 	// cache the solution
 	POIHighsSolution m_solution;
+	// cache the number of variable and constraints because querying them via HiGHS API is very
+	// expensive
+	HighsInt m_n_variables = 0;
+	HighsInt m_n_constraints = 0;
 };
 
 using HighsModelMixin = CommercialSolverMixin<POIHighsModel>;

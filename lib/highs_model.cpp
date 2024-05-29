@@ -140,9 +140,7 @@ VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, doub
 	auto error = highs::Highs_addCol(m_model.get(), 0.0, lb, ub, 0, nullptr, nullptr);
 	check_error(error);
 
-	auto column = highs::Highs_getNumCol(m_model.get());
-	// 0-based indexing
-	column -= 1;
+	auto column = m_n_variables;
 
 	if (domain != VariableDomain::Continuous)
 	{
@@ -155,12 +153,16 @@ VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, doub
 		check_error(error);
 	}
 
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
 	if (name)
 	{
-		error = highs::Highs_passColName(m_model.get(), column, name);
-		check_error(error);
+		m_var_names.insert({variable.index, name});
 	}
 
+	m_n_variables++;
 	return variable;
 }
 
@@ -177,6 +179,9 @@ void POIHighsModel::delete_variable(const VariableIndex &variable)
 
 	m_variable_index.delete_index(variable.index);
 	binary_variables.erase(variable.index);
+
+	m_n_variables--;
+	m_var_names.erase(variable.index);
 }
 
 void POIHighsModel::delete_variables(const Vector<VariableIndex> &variables)
@@ -203,7 +208,9 @@ void POIHighsModel::delete_variables(const Vector<VariableIndex> &variables)
 	for (int i = 0; i < n_variables; i++)
 	{
 		m_variable_index.delete_index(variables[i].index);
+		m_var_names.erase(variables[i].index);
 	}
+	m_n_variables -= columns.size();
 }
 
 bool POIHighsModel::is_variable_active(const VariableIndex &variable)
@@ -231,7 +238,7 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
                                                      const char *name)
 {
 	IndexT index = m_linear_constraint_index.add_index();
-	ConstraintIndex constraint_index(ConstraintType::Linear, index);
+	ConstraintIndex constraint(ConstraintType::Linear, index);
 
 	AffineFunctionPtrForm<HighsInt, HighsInt, double> ptr_form;
 	ptr_form.make(this, function);
@@ -259,20 +266,20 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 	auto error = highs::Highs_addRow(m_model.get(), lb, ub, numnz, cind, cval);
 	check_error(error);
 
-	HighsInt row = highs::Highs_getNumRow(m_model.get());
-	// 0-based indexing
-	row -= 1;
+	HighsInt row = m_n_constraints;
+
 	if (name != nullptr && name[0] == '\0')
 	{
 		name = nullptr;
 	}
 	if (name)
 	{
-		error = highs::Highs_passRowName(m_model.get(), row, name);
-		check_error(error);
+		m_con_names.insert({constraint.index, name});
 	}
 
-	return constraint_index;
+	m_n_constraints++;
+
+	return constraint;
 }
 
 ConstraintIndex POIHighsModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
@@ -294,6 +301,7 @@ void POIHighsModel::delete_constraint(const ConstraintIndex &constraint)
 	check_error(error);
 
 	m_linear_constraint_index.delete_index(constraint.index);
+	m_con_names.erase(constraint.index);
 }
 
 bool POIHighsModel::is_constraint_active(const ConstraintIndex &constraint)
@@ -301,14 +309,12 @@ bool POIHighsModel::is_constraint_active(const ConstraintIndex &constraint)
 	return m_linear_constraint_index.has_index(constraint.index);
 }
 
-// #define private public
-// #include "Highs.h"
 void POIHighsModel::_set_affine_objective(const ScalarAffineFunction &function,
                                           ObjectiveSense sense, bool clear_quadratic)
 {
 	HighsInt error;
 
-	HighsInt n_variables = highs::Highs_getNumCol(m_model.get());
+	HighsInt n_variables = m_n_variables;
 	if (clear_quadratic)
 	{
 		// First delete all quadratic terms
@@ -316,9 +322,6 @@ void POIHighsModel::_set_affine_objective(const ScalarAffineFunction &function,
 		error =
 		    highs::Highs_passHessian(m_model.get(), n_variables, 0, kHighsHessianFormatTriangular,
 		                             colstarts.data(), nullptr, nullptr);
-
-		// HighsModel &model = ((Highs *)m_model.get())->model_;
-		// auto &hessian = model.hessian_;
 
 		check_error(error);
 	}
@@ -358,7 +361,7 @@ void POIHighsModel::set_objective(const ScalarQuadraticFunction &function, Objec
 
 	// Add quadratic term
 	int numqnz = function.size();
-	HighsInt n_variables = highs::Highs_getNumCol(m_model.get());
+	HighsInt n_variables = m_n_variables;
 	if (numqnz > 0)
 	{
 		CSCMatrix<HighsInt, HighsInt, double> csc;
@@ -432,8 +435,8 @@ void POIHighsModel::optimize()
 	x.dual_solution_status = kHighsSolutionStatusNone;
 	x.has_dual_ray = false;
 	x.has_primal_ray = false;
-	auto numCols = highs::Highs_getNumCols(model);
-	auto numRows = highs::Highs_getNumRows(model);
+	auto numCols = m_n_variables;
+	auto numRows = m_n_constraints;
 	x.model_status = highs::Highs_getModelStatus(model);
 
 	HighsInt status;
@@ -604,18 +607,20 @@ double POIHighsModel::get_raw_info_double(const char *info_name)
 
 std::string POIHighsModel::get_variable_name(const VariableIndex &variable)
 {
-	auto column = _checked_variable_index(variable);
-	char name[kHighsMaximumStringLength];
-	auto error = highs::Highs_getColName(m_model.get(), column, name);
-	check_error(error);
-	return std::string(name);
+	auto iter = m_var_names.find(variable.index);
+	if (iter != m_var_names.end())
+	{
+		return iter->second;
+	}
+	else
+	{
+		return fmt::format("x{}", variable.index);
+	}
 }
 
 void POIHighsModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
-	auto column = _checked_variable_index(variable);
-	auto error = highs::Highs_passColName(m_model.get(), column, name);
-	check_error(error);
+	m_var_names[variable.index] = name;
 }
 
 VariableDomain POIHighsModel::get_variable_type(const VariableIndex &variable)
@@ -702,18 +707,20 @@ void POIHighsModel::set_variable_upper_bound(const VariableIndex &variable, doub
 
 std::string POIHighsModel::get_constraint_name(const ConstraintIndex &constraint)
 {
-	auto row = _checked_constraint_index(constraint);
-	char name[kHighsMaximumStringLength];
-	auto error = highs::Highs_getRowName(m_model.get(), row, name);
-	check_error(error);
-	return std::string(name);
+	auto iter = m_con_names.find(constraint.index);
+	if (iter != m_con_names.end())
+	{
+		return iter->second;
+	}
+	else
+	{
+		return fmt::format("con{}", constraint.index);
+	}
 }
 
 void POIHighsModel::set_constraint_name(const ConstraintIndex &constraint, const char *name)
 {
-	auto row = _checked_constraint_index(constraint);
-	auto error = highs::Highs_passRowName(m_model.get(), row, name);
-	check_error(error);
+	m_con_names[constraint.index] = name;
 }
 
 double POIHighsModel::get_constraint_primal(const ConstraintIndex &constraint)
@@ -805,7 +812,7 @@ void POIHighsModel::set_primal_start(const Vector<VariableIndex> &variables,
 	if (numnz == 0)
 		return;
 
-	auto numcol = highs::Highs_getNumCol(m_model.get());
+	auto numcol = m_n_variables;
 	if (numcol == 0)
 		return;
 

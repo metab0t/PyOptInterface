@@ -339,10 +339,10 @@ class Model(RawModel):
     def number_of_constraints(self, type: ConstraintType):
         if type not in {ConstraintType.Linear}:
             raise ValueError(f"Unknown constraint type: {type}")
-        return self.getnumrow()
+        return self.m_n_constraints
 
     def number_of_variables(self):
-        return self.getnumcol()
+        return self.m_n_variables
 
     def get_model_attribute(self, attribute: ModelAttribute):
         def e(attribute):

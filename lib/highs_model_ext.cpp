@@ -33,6 +33,8 @@ NB_MODULE(highs_model_ext, m)
 #define BIND_F(f) .def(#f, &HighsModelMixin::f)
 	nb::class_<HighsModelMixin, POIHighsModel>(m, "RawModel")
 	    .def(nb::init<>())
+	    .def_ro("m_n_variables", &HighsModelMixin::m_n_variables)
+	    .def_ro("m_n_constraints", &HighsModelMixin::m_n_constraints)
 	    // clang-format off
 	    BIND_F(init)
 	    BIND_F(write)
