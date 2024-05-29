@@ -333,54 +333,59 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintSense">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintSense</span></span><a class="headerlink" href="#pyoptinterface.ConstraintSense" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintSense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.ConstraintSense" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintSense.Equal">
-<span class="sig-name descname"><span class="pre">Equal</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.Equal</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.Equal" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Equal</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.Equal" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintSense.GreaterEqual">
-<span class="sig-name descname"><span class="pre">GreaterEqual</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.GreaterEqual</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.GreaterEqual" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GreaterEqual</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.GreaterEqual" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintSense.LessEqual">
-<span class="sig-name descname"><span class="pre">LessEqual</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.LessEqual</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.LessEqual" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">LessEqual</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.LessEqual" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ConstraintSense.Within">
+<span class="sig-name descname"><span class="pre">Within</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pyoptinterface.ConstraintSense.Within" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintType</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.ConstraintType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Cone">
-<span class="sig-name descname"><span class="pre">Cone</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.Cone</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Cone" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Cone</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Cone" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Linear">
-<span class="sig-name descname"><span class="pre">Linear</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.Linear</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Linear" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Linear</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Linear" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Quadratic">
-<span class="sig-name descname"><span class="pre">Quadratic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.Quadratic</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Quadratic" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Quadratic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.Quadratic" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SOS">
-<span class="sig-name descname"><span class="pre">SOS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintType.SOS</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SOS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pyoptinterface.Eq">
-<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Eq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.Equal</span></em><a class="headerlink" href="#pyoptinterface.Eq" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Eq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ConstraintSense.Equal</span></em><a class="headerlink" href="#pyoptinterface.Eq" title="Link to this definition">¶</a></dt>
 <dd><p>Alias of <cite>ConstraintSense.Equal</cite> for equality constraints.</p>
 </dd></dl>
 
@@ -442,13 +447,19 @@
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pyoptinterface.Geq">
-<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Geq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.GreaterEqual</span></em><a class="headerlink" href="#pyoptinterface.Geq" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Geq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ConstraintSense.GreaterEqual</span></em><a class="headerlink" href="#pyoptinterface.Geq" title="Link to this definition">¶</a></dt>
 <dd><p>Alias of <cite>ConstraintSense.GreaterEqual</cite> for greater-than-or-equal-to constraints.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="pyoptinterface.In">
+<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">In</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ConstraintSense.Within</span></em><a class="headerlink" href="#pyoptinterface.In" title="Link to this definition">¶</a></dt>
+<dd><p>Alias of <cite>ConstraintSense.Within</cite> for range constraints.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="pyoptinterface.Leq">
-<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Leq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ConstraintSense.LessEqual</span></em><a class="headerlink" href="#pyoptinterface.Leq" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">Leq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ConstraintSense.LessEqual</span></em><a class="headerlink" href="#pyoptinterface.Leq" title="Link to this definition">¶</a></dt>
 <dd><p>Alias of <cite>ConstraintSense.LessEqual</cite> for less-than-or-equal-to constraints.</p>
 </dd></dl>
 
@@ -555,16 +566,16 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.ObjectiveSense">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ObjectiveSense</span></span><a class="headerlink" href="#pyoptinterface.ObjectiveSense" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ObjectiveSense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.ObjectiveSense" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ObjectiveSense.Maximize">
-<span class="sig-name descname"><span class="pre">Maximize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ObjectiveSense.Maximize</span></em><a class="headerlink" href="#pyoptinterface.ObjectiveSense.Maximize" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Maximize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyoptinterface.ObjectiveSense.Maximize" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ObjectiveSense.Minimize">
-<span class="sig-name descname"><span class="pre">Minimize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.ObjectiveSense.Minimize</span></em><a class="headerlink" href="#pyoptinterface.ObjectiveSense.Minimize" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Minimize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyoptinterface.ObjectiveSense.Minimize" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -627,16 +638,16 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.SOSType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">SOSType</span></span><a class="headerlink" href="#pyoptinterface.SOSType" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">SOSType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.SOSType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.SOSType.SOS1">
-<span class="sig-name descname"><span class="pre">SOS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.SOSType.SOS1</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS1" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SOS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS1" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.SOSType.SOS2">
-<span class="sig-name descname"><span class="pre">SOS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.SOSType.SOS2</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS2" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SOS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyoptinterface.SOSType.SOS2" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -669,7 +680,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarAffineFunction.constant">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constant</span></span><a class="headerlink" href="#pyoptinterface.ScalarAffineFunction.constant" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; Optional[float]</p>
+<dd><p>(self) -&gt; float | None</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -712,7 +723,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="pyoptinterface.ScalarQuadraticFunction.affine_part">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">affine_part</span></span><a class="headerlink" href="#pyoptinterface.ScalarQuadraticFunction.affine_part" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; Optional[pyoptinterface._src.core_ext.ScalarAffineFunction]</p>
+<dd><p>(self) -&gt; pyoptinterface._src.core_ext.ScalarAffineFunction | None</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -924,26 +935,26 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.VariableDomain">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">VariableDomain</span></span><a class="headerlink" href="#pyoptinterface.VariableDomain" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">VariableDomain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.VariableDomain" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.VariableDomain.Binary">
-<span class="sig-name descname"><span class="pre">Binary</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.VariableDomain.Binary</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Binary" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Binary</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Binary" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.VariableDomain.Continuous">
-<span class="sig-name descname"><span class="pre">Continuous</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.VariableDomain.Continuous</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Continuous" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Continuous</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Continuous" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.VariableDomain.Integer">
-<span class="sig-name descname"><span class="pre">Integer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.VariableDomain.Integer</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Integer" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Integer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.Integer" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.VariableDomain.SemiContinuous">
-<span class="sig-name descname"><span class="pre">SemiContinuous</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">pyoptinterface._src.core_ext.VariableDomain.SemiContinuous</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.SemiContinuous" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SemiContinuous</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pyoptinterface.VariableDomain.SemiContinuous" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -973,6 +984,11 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyoptinterface.quicksum">
 <span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">quicksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.quicksum" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyoptinterface.quicksum_">
+<span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">quicksum_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyoptinterface.ExprBuilder" title="pyoptinterface._src.core_ext.ExprBuilder"><span class="pre">ExprBuilder</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.quicksum_" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
@@ -1095,6 +1111,7 @@
 <li><a class="reference internal" href="#pyoptinterface.ConstraintSense.Equal"><code class="docutils literal notranslate"><span class="pre">ConstraintSense.Equal</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintSense.GreaterEqual"><code class="docutils literal notranslate"><span class="pre">ConstraintSense.GreaterEqual</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintSense.LessEqual"><code class="docutils literal notranslate"><span class="pre">ConstraintSense.LessEqual</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ConstraintSense.Within"><code class="docutils literal notranslate"><span class="pre">ConstraintSense.Within</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType"><code class="docutils literal notranslate"><span class="pre">ConstraintType</span></code></a><ul>
@@ -1119,6 +1136,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.Geq"><code class="docutils literal notranslate"><span class="pre">Geq</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.In"><code class="docutils literal notranslate"><span class="pre">In</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.Leq"><code class="docutils literal notranslate"><span class="pre">Leq</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ModelAttribute"><code class="docutils literal notranslate"><span class="pre">ModelAttribute</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.ModelAttribute.BarrierIterations"><code class="docutils literal notranslate"><span class="pre">ModelAttribute.BarrierIterations</span></code></a></li>
@@ -1241,6 +1259,7 @@
 <li><a class="reference internal" href="#pyoptinterface.make_nd_variable"><code class="docutils literal notranslate"><span class="pre">make_nd_variable()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.make_tupledict"><code class="docutils literal notranslate"><span class="pre">make_tupledict()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.quicksum"><code class="docutils literal notranslate"><span class="pre">quicksum()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.quicksum_"><code class="docutils literal notranslate"><span class="pre">quicksum_()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.tupledict"><code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.tupledict.clean"><code class="docutils literal notranslate"><span class="pre">tupledict.clean()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.tupledict.select"><code class="docutils literal notranslate"><span class="pre">tupledict.select()</span></code></a></li>
