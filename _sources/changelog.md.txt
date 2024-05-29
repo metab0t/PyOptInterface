@@ -2,6 +2,9 @@
 
 ## Unreleased change
 
+## 0.2.2
+- Fix the performance issue with HiGHS optimizer
+
 ## 0.2.1
 - Fix the DLL search paths on Windows
 
