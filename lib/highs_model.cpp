@@ -302,6 +302,8 @@ void POIHighsModel::delete_constraint(const ConstraintIndex &constraint)
 
 	m_linear_constraint_index.delete_index(constraint.index);
 	m_con_names.erase(constraint.index);
+
+	m_n_constraints--;
 }
 
 bool POIHighsModel::is_constraint_active(const ConstraintIndex &constraint)

@@ -19,6 +19,9 @@ def test_simple_opt(model_interface):
         conexpr, poi.ConstraintSense.GreaterEqual, 10.0, name="con1"
     )
 
+    assert model.number_of_variables() == 2
+    assert model.number_of_constraints(poi.ConstraintType.Linear) == 1
+
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
@@ -39,7 +42,9 @@ def test_simple_opt(model_interface):
     assert model.pprint(conexpr) == "1*x+1*y"
 
     model.delete_constraint(con1)
+    assert model.number_of_constraints(poi.ConstraintType.Linear) == 0
     con2 = model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 20.0)
+    assert model.number_of_constraints(poi.ConstraintType.Linear) == 1
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert status == poi.TerminationStatusCode.OPTIMAL
