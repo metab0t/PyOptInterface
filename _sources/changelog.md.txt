@@ -2,6 +2,9 @@
 
 ## Unreleased change
 
+## 0.2.3
+- Fix a bug when deleting constraint in HiGHS
+
 ## 0.2.2
 - Fix the performance issue with HiGHS optimizer
 
