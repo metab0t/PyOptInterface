@@ -40,7 +40,9 @@ def detected_libraries():
     }[platform.system()]
 
     # Environment
-    home = os.environ.get("MOSEK_10_1_BINDIR", None)
+    home = os.environ.get("MOSEK_10_2_BINDIR", None)
+    if home is None:
+        home = os.environ.get("MOSEK_10_1_BINDIR", None)
     if home and os.path.exists(home):
         dir = Path(home)
         for path in dir.glob(suffix_pattern):
@@ -76,7 +78,7 @@ def detected_libraries():
     default_libname = {
         "Linux": "libmosek64.so",
         "Darwin": "libmosek64.dylib",
-        "Windows": "mosek64_10_1.dll",
+        "Windows": "mosek64_10_2.dll",
     }[platform.system()]
     libs.append(default_libname)
 

@@ -1,4 +1,4 @@
-Gurobi = "11.0.1"
-COPT = "7.1.1"
-MOSEK = "10.1.22"
+Gurobi = "11.0.2"
+COPT = "7.1.3"
+MOSEK = "10.2.0"
 HiGHS = "1.7.0"

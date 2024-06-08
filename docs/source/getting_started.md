@@ -79,10 +79,10 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/copt71/lib`
     - `/opt/copt71/lib`
 *   - Mosek
-    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin`
-    - `/opt/mosek/10.1/tools/platform/linux64x86/bin`
-    - `/opt/mosek/10.1/tools/platform/osxaarch64/bin`
-    - `/opt/mosek/10.1/tools/platform/osx64x86/bin`
+    - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin`
+    - `/opt/mosek/10.2/tools/platform/linux64x86/bin`
+    - `/opt/mosek/10.2/tools/platform/osxaarch64/bin`
+    - `/opt/mosek/10.2/tools/platform/osx64x86/bin`
 *   - HiGHS
     - `D:\highs\bin`
     - `/opt/highs/lib`
@@ -110,12 +110,12 @@ For COPT, the automatic detection looks for the following things in order:
 
 ### Mosek
 
-The currently supported version is **10.1.x**. Other versions may work but are not tested.
+The currently supported version is **10.2.x**. Other versions may work but are not tested.
 
 For Mosek, the automatic detection looks for the following things in order:
-1. The environment variable `MOSEK_10_1_BINDIR` set by the installer of Mosek
+1. The environment variable `MOSEK_10_2_BINDIR` set by the installer of Mosek
 2. The installation of `mosek` PyPI package
-3. `mosek64_10_1.dll`/`libmosek64.so`/`libmosek64.dylib` in the system loadable path
+3. `mosek64_10_2.dll`/`libmosek64.so`/`libmosek64.dylib` in the system loadable path
 
 ### HiGHS
 
@@ -181,10 +181,10 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/copt71/lib/libcopt.dylib`
     - `/opt/copt71/lib/libcopt.dylib`
 *   - Mosek
-    - `C:\Program Files\Mosek\10.1\tools\platform\win64x86\bin\mosek64_10_1.dll`
-    - `/opt/mosek/10.1/tools/platform/linux64x86/bin/libmosek64.so`
-    - `/opt/mosek/10.1/tools/platform/osxaarch64/bin/libmosek64.dylib`
-    - `/opt/mosek/10.1/tools/platform/osx64x86/bin/libmosek64.dylib`
+    - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin\mosek64_10_1.dll`
+    - `/opt/mosek/10.2/tools/platform/linux64x86/bin/libmosek64.so`
+    - `/opt/mosek/10.2/tools/platform/osxaarch64/bin/libmosek64.dylib`
+    - `/opt/mosek/10.2/tools/platform/osx64x86/bin/libmosek64.dylib`
 *   - HiGHS
     - `D:\highs\bin\highs.dll`
     - `/opt/highs/lib/libhighs.so`

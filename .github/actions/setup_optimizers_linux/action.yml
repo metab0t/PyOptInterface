@@ -24,7 +24,6 @@ runs:
       shell: bash
       run: |
         mkdir -p ~/installers
-        mkdir -p ~/highs
 
     - name: Cache Installers
       id: cache-installers-linux
@@ -41,9 +40,9 @@ runs:
       shell: bash
       name: Download Installers
       run: |
-        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.0/linux64/CardinalOptimizer-7.1.0-lnx64.tar.gz
-        curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.1.22/mosektoolslinux64x86.tar.bz2
+        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.2_linux64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.3/linux64/CardinalOptimizer-7.1.3-lnx64.tar.gz
+        curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
 
     - name: Setup Gurobi Installation
       shell: bash
@@ -99,11 +98,11 @@ runs:
         tar jxf ~/installers/mosek.tar.bz2 -C ~/
         ls ~/mosek
         # set environment variables
-        export MOSEK_10_1_BINDIR="${HOME}/mosek/10.1/tools/platform/linux64x86/bin"
-        echo "MOSEK_10_1_BINDIR=${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
-        echo "PATH=${PATH}:${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
-        echo $MOSEK_10_1_BINDIR
+        export MOSEK_10_2_BINDIR="${HOME}/mosek/10.2/tools/platform/linux64x86/bin"
+        echo "MOSEK_10_2_BINDIR=${MOSEK_10_1_BINDIR}" >> $GITHUB_ENV
+        echo "PATH=${PATH}:${MOSEK_10_2_BINDIR}" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MOSEK_10_2_BINDIR}" >> $GITHUB_ENV
+        echo $MOSEK_10_2_BINDIR
 
         # setup license using secrets
         echo "$MOSEK_LICENSE" > ~/mosek.lic
@@ -113,29 +112,3 @@ runs:
       shell: bash
       run: |
         msktestlic
-
-    - name: Download HiGHS artifact from my own build
-      uses: dawidd6/action-download-artifact@v3
-      with:
-        # GitHub token, a Personal Access Token with `public_repo` scope
-        github_token: ${{inputs.GITHUB_TOKEN}}
-        workflow: build.yml
-        repo: metab0t/highs_autobuild
-        path: /home/runner/highs
-        name: highs-artifact-Linux-X64
-
-    - name: Setup HiGHS Installation
-      shell: bash
-      run: |
-        ls ~/highs
-        chmod -R +xr ~/highs
-        # set environment variables
-        export HiGHS_HOME="${HOME}/highs"
-        echo "HiGHS_HOME=${HiGHS_HOME}" >> $GITHUB_ENV
-        echo "PATH=${PATH}:${HiGHS_HOME}/bin" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HiGHS_HOME}/lib" >> $GITHUB_ENV
-        echo $HiGHS_HOME
-    - name: Test HiGHS
-      shell: bash
-      run: |
-        highs --version

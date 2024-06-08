@@ -35,7 +35,6 @@ runs:
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Force -Path "D:\installers"
-        New-Item -ItemType Directory -Force -Path "D:\highs"
 
     - name: Cache Installers
       id: cache-installers-windows
@@ -52,9 +51,9 @@ runs:
       shell: pwsh
       name: Download Installers
       run: |
-        curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.0/win64/CardinalOptimizer-7.1.0-win64.zip
-        curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.1.22/moseksetupwin64x86.msi
+        curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.2-win64.msi
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.3/win64/CardinalOptimizer-7.1.3-win64.zip
+        curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
 
     - name: Setup Gurobi Installation
       shell: pwsh
@@ -107,13 +106,13 @@ runs:
         MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
       run: |
         lessmsi x D:\installers\mosek.msi "D:\" msktestlic.exe
-        lessmsi x D:\installers\mosek.msi "D:\" mosek64_10_1.dll mosek64_10_1.lib tbb12.dll svml_dispmd.dll
+        lessmsi x D:\installers\mosek.msi "D:\" mosek64_10_2.dll mosek64_10_2.lib tbb12.dll svml_dispmd.dll
         lessmsi x D:\installers\mosek.msi "D:\" mosek.h
-        ls D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86
+        ls D:\SourceDir\PFiles\Mosek\10.2\tools\platform\win64x86
         # set environment variables
-        echo "MOSEK_10_1_BINDIR=D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\SourceDir\PFiles\Mosek\10.1\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
-        echo $env:MOSEK_10_1_BINDIR
+        echo "MOSEK_10_2_BINDIR=D:\SourceDir\PFiles\Mosek\10.2\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
+        echo "PATH=$env:PATH;D:\SourceDir\PFiles\Mosek\10.2\tools\platform\win64x86\bin" >> $env:GITHUB_ENV
+        echo $env:MOSEK_10_2_BINDIR
 
         # setup license using secrets
         echo $env:MOSEK_LICENSE > D:\mosek.lic
@@ -123,26 +122,3 @@ runs:
       shell: pwsh
       run: |
         msktestlic
-
-    - name: Download HiGHS artifact from my own build
-      uses: dawidd6/action-download-artifact@v3
-      with:
-        # GitHub token, a Personal Access Token with `public_repo` scope
-        github_token: ${{inputs.GITHUB_TOKEN}}
-        workflow: build.yml
-        repo: metab0t/highs_autobuild
-        path: D:\highs
-        name: highs-artifact-Windows-X64
-
-    - name: Setup HiGHS Installation
-      shell: pwsh
-      run: |
-        ls D:\highs
-        # set environment variables
-        echo "HiGHS_HOME=D:\highs" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\highs\bin" >> $env:GITHUB_ENV
-        echo $env:HiGHS_HOME
-    - name: Test HiGHS
-      shell: pwsh
-      run: |
-        highs --version
