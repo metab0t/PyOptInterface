@@ -40,8 +40,8 @@ runs:
       shell: bash
       name: Download Installers
       run: |
-        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.2_linux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.3/linux64/CardinalOptimizer-7.1.3-lnx64.tar.gz
+        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.0/linux64/CardinalOptimizer-7.1.0-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
 
     - name: Setup Gurobi Installation
