@@ -24,6 +24,7 @@ NB_MODULE(ipopt_model_ext, m)
 	    .value("Restoration_Failed", ApplicationReturnStatus::Restoration_Failed)
 	    .value("Error_In_Step_Computation", ApplicationReturnStatus::Error_In_Step_Computation)
 	    .value("Maximum_CpuTime_Exceeded", ApplicationReturnStatus::Maximum_CpuTime_Exceeded)
+	    .value("Maximum_WallTime_Exceeded", ApplicationReturnStatus::Maximum_WallTime_Exceeded)
 	    .value("Not_Enough_Degrees_Of_Freedom",
 	           ApplicationReturnStatus::Not_Enough_Degrees_Of_Freedom)
 	    .value("Invalid_Problem_Definition", ApplicationReturnStatus::Invalid_Problem_Definition)

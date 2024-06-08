@@ -26,7 +26,29 @@ from pyoptinterface._src.tupledict import (
 
 from pyoptinterface._src.aml import make_nd_variable, quicksum, quicksum_
 
-from pyoptinterface._src.nlcore_ext import sqrt, sin, cos, exp, log
+from pyoptinterface._src.nlcore_ext import (
+    abs,
+    acos,
+    acosh,
+    asin,
+    asinh,
+    atan,
+    atanh,
+    cos,
+    cosh,
+    erf,
+    erfc,
+    exp,
+    expm1,
+    log1p,
+    log,
+    pow,
+    sin,
+    sinh,
+    sqrt,
+    tan,
+    tanh,
+)
 
 # Alias of ConstraintSense
 Eq = ConstraintSense.Equal

@@ -205,17 +205,46 @@ def create_indirect_load_store(module: ir.Module):
     builder.ret_void()
 
 
+op2name = {
+    graph_op.abs: "fabs",
+    graph_op.acos: "acos",
+    graph_op.acosh: "acosh",
+    graph_op.asin: "asin",
+    graph_op.asinh: "asinh",
+    graph_op.atan: "atan",
+    graph_op.atanh: "atanh",
+    graph_op.cos: "cos",
+    graph_op.cosh: "cosh",
+    graph_op.erf: "erf",
+    graph_op.erfc: "erfc",
+    graph_op.exp: "exp",
+    graph_op.expm1: "expm1",
+    graph_op.log1p: "log1p",
+    graph_op.log: "log",
+    graph_op.pow: "pow",
+    graph_op.sin: "sin",
+    graph_op.sinh: "sinh",
+    graph_op.sqrt: "sqrt",
+    graph_op.tan: "tan",
+    graph_op.tanh: "tanh"
+}
+
+math_ops = set(op2name.keys())
+
+binary_ops = set([graph_op.pow])
+
 def create_llvmir_basic_functions(module: ir.Module):
     create_azmul(module)
     create_sign(module)
     create_direct_load_store(module)
     create_indirect_load_store(module)
 
-    sqrt = ir.Function(module, ir.FunctionType(D, [D]), name="sqrt")
-    sin = ir.Function(module, ir.FunctionType(D, [D]), name="sin")
-    cos = ir.Function(module, ir.FunctionType(D, [D]), name="cos")
-    exp = ir.Function(module, ir.FunctionType(D, [D]), name="exp")
-    log = ir.Function(module, ir.FunctionType(D, [D]), name="log")
+    for (op, op_name) in op2name.items():
+        if op in binary_ops:
+            func_type = ir.FunctionType(D, [D, D])
+        else:
+            func_type = ir.FunctionType(D, [D])
+        ir.Function(module, func_type, name=op_name)
 
     # sin = module.declare_intrinsic('llvm.sin', [D])
     # cos = module.declare_intrinsic('llvm.cos', [D])
@@ -319,11 +348,13 @@ def generate_llvmir_from_graph(
 
     # sin = module.get_global("llvm.sin.f64")
     # cos = module.get_global("llvm.cos.f64")
-    sqrt = module.get_global("sqrt")
-    sin = module.get_global("sin")
-    cos = module.get_global("cos")
-    exp = module.get_global("exp")
-    log = module.get_global("log")
+    math_functions = dict()
+    for op_name in op2name.values():
+        op_function = module.get_global(op_name)
+        if op_function is None:
+            raise ValueError(f"Math function {op_name} not found in module")
+        math_functions[op_name] = op_function
+
     azmul = module.get_global("azmul")
     sign = module.get_global("sign")
     load_direct = module.get_global("load_direct")
@@ -403,7 +434,7 @@ def generate_llvmir_from_graph(
         return val
 
     for iter in graph_obj:
-        op_enum = iter.op_enum
+        op = iter.op_enum
         n_result = iter.n_result
         arg_node = iter.arg_node
 
@@ -414,31 +445,30 @@ def generate_llvmir_from_graph(
         if len(arg_node) == 2:
             arg2 = get_node_value(arg_node[1])
 
-        if op_enum == graph_op.add:
+        if op == graph_op.add:
             ret_val = builder.fadd(arg1, arg2)
-        elif op_enum == graph_op.sub:
+        elif op == graph_op.sub:
             ret_val = builder.fsub(arg1, arg2)
-        elif op_enum == graph_op.mul:
+        elif op == graph_op.mul:
             ret_val = builder.fmul(arg1, arg2)
-        elif op_enum == graph_op.div:
+        elif op == graph_op.div:
             ret_val = builder.fdiv(arg1, arg2)
-        elif op_enum == graph_op.sqrt:
-            ret_val = builder.call(sqrt, [arg1])
-        elif op_enum == graph_op.sin:
-            ret_val = builder.call(sin, [arg1])
-        elif op_enum == graph_op.cos:
-            ret_val = builder.call(cos, [arg1])
-        elif op_enum == graph_op.exp:
-            ret_val = builder.call(exp, [arg1])
-        elif op_enum == graph_op.log:
-            ret_val = builder.call(log, [arg1])
-        elif op_enum == graph_op.azmul:
+        elif op == graph_op.azmul:
             ret_val = builder.fmul(arg1, arg2)
             # ret_val = builder.call(azmul, [arg1, arg2])
-        elif op_enum == graph_op.neg:
+        elif op == graph_op.neg:
             ret_val = builder.fneg(arg1)
+        elif op == graph_op.sign:
+            ret_val = builder.call(sign, [arg1])
+        elif op in math_ops:
+            op_name = op2name[op]
+            op_function = math_functions[op_name]
+            if op in binary_ops:
+                ret_val = builder.call(op_function, [arg1, arg2])
+            else:
+                ret_val = builder.call(op_function, [arg1])
         else:
-            raise ValueError(f"Unknown op_enum: {op_enum}")
+            raise ValueError(f"Unknown op_enum: {op}")
 
         ret_val.name = f"v[{result_node}]"
         v_dict[result_node] = ret_val

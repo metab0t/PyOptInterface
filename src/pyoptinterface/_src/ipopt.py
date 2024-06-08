@@ -10,6 +10,9 @@ from .codegen_llvm import create_llvmir_basic_functions, generate_llvmir_from_gr
 from .jit_llvm import LLJITCompiler
 from .tracefun import trace_adfun
 
+from .core_ext import ConstraintIndex
+from .nlcore_ext import NLConstraintIndex
+
 from .attributes import (
     VariableAttribute,
     ConstraintAttribute,
@@ -282,13 +285,33 @@ model_attribute_set_func_map = {
     ),
 }
 
+
+def get_constraint_primal(model, constraint):
+    if isinstance(constraint, ConstraintIndex):
+        return model.get_constraint_primal(constraint.index)
+    elif isinstance(constraint, NLConstraintIndex):
+        index = constraint.index
+        dim = constraint.dim
+        values = [model.get_constraint_primal(index + i) for i in range(dim)]
+        return values
+    
+    raise ValueError(f"Unknown constraint type: {type(constraint)}")
+
+def get_constraint_dual(model, constraint):
+    if isinstance(constraint, ConstraintIndex):
+        return model.get_constraint_dual(constraint.index)
+    elif isinstance(constraint, NLConstraintIndex):
+        index = constraint.index
+        dim = constraint.dim
+        values = [model.get_constraint_dual(index + i) for i in range(dim)]
+        return values
+    
+    raise ValueError(f"Unknown constraint type: {type(constraint)}")
+
+
 constraint_attribute_get_func_map = {
-    ConstraintAttribute.Primal: lambda model, constraint: model.get_constraint_primal(
-        constraint
-    ),
-    ConstraintAttribute.Dual: lambda model, constraint: model.get_constraint_dual(
-        constraint
-    ),
+    ConstraintAttribute.Primal: get_constraint_primal,
+    ConstraintAttribute.Dual: get_constraint_dual,
 }
 
 constraint_attribute_set_func_map = {}
@@ -332,8 +355,8 @@ class Model(RawModel):
 
         super().optimize()
 
-    def register_function(self, f, /, x, name, p=()):
-        adfun = trace_adfun(f, x, p)
+    def register_function(self, f, /, var, name, param=()):
+        adfun = trace_adfun(f, var, param)
         return super().register_function(adfun, name)
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):

@@ -318,19 +318,28 @@ auto test_highs() -> void
 	model.optimize();
 }
 
-auto test_highs_capi() -> void
+auto debug_highs_passname(int N) -> void
 {
 	void *highs = highs::Highs_create();
+	
+	auto start = std::chrono::high_resolution_clock::now();
 
-	double c[] = {0.0, 1.0, 0.0};
-	double lower[] = {0, 0, 0};
-	double upper[] = {1.0, 1.0, 1.0};
+	HighsModelMixin model;
+	for (auto i = 0; i < N; i++)
+	{
+		highs::Highs_addCol(highs, 0.0, 0.0, 0.0, 0, nullptr, nullptr);
 
-	// highs::Highs_addCols(highs, 3, c, lower, upper, 0, nullptr, nullptr, nullptr);
+		auto col = highs::Highs_getNumCol(highs);
 
-	auto hessian_nz = highs::Highs_getHessianNumNz(highs);
-	highs::Highs_run(highs);
-	hessian_nz = highs::Highs_getHessianNumNz(highs);
+		assert(col == i + 1);
+
+		auto name = fmt::format("x{}", i);
+		highs::Highs_passColName(highs, i, name.c_str());
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	fmt::print("N={}, time={} milliseconds\n", N, duration.count());
 }
 
 void debug_highs(int N)
@@ -350,16 +359,18 @@ void debug_highs(int N)
 
 void test_highs_add_variable()
 {
-	std::vector<int> Ns{100, 1000, 5000, 10000};
+	std::vector<int> Ns{1000, 10000, 100000, 1000000};
 
 	for (const auto& N : Ns)
 	{
-		debug_highs(N);
+		debug_highs_passname(N);
 	}
 }
 
 auto main() -> int
 {
+	highs::load_library("E:\\HiGHS\\install\\bin\\highs.dll");
+
 	test_highs_add_variable();
 	return 0;
 }

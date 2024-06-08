@@ -8,6 +8,7 @@
 namespace nb = nanobind;
 
 #include "pyoptinterface/nlcore.hpp"
+#include "cppad/utility/pow_int.hpp"
 
 using a_double = CppAD::AD<double>;
 using advec = std::vector<a_double>;
@@ -44,12 +45,6 @@ NB_MODULE(nlcore_ext, m)
 	    .def(nb::self -= double())
 	    .def(nb::self *= double())
 	    .def(nb::self /= double());
-
-	m.def("sqrt", [](const a_double &x) { return CppAD::sqrt(x); });
-	m.def("sin", [](const a_double &x) { return CppAD::sin(x); });
-	m.def("cos", [](const a_double &x) { return CppAD::cos(x); });
-	m.def("exp", [](const a_double &x) { return CppAD::exp(x); });
-	m.def("log", [](const a_double &x) { return CppAD::log(x); });
 
 	nb::bind_vector<advec, nb::rv_policy::reference_internal>(m, "advec");
 
@@ -128,6 +123,31 @@ NB_MODULE(nlcore_ext, m)
 	m.def("jacobian_hessian_sparsity", &jacobian_hessian_sparsity<double>);
 	m.def("sparse_jacobian", &sparse_jacobian<double>);
 	m.def("sparse_hessian", &sparse_hessian<double>);
+
+	m.def("abs", [](const a_double &x) { return CppAD::abs(x); });
+	m.def("acos", [](const a_double &x) { return CppAD::acos(x); });
+	m.def("acosh", [](const a_double &x) { return CppAD::acosh(x); });
+	m.def("asin", [](const a_double &x) { return CppAD::asin(x); });
+	m.def("asinh", [](const a_double &x) { return CppAD::asinh(x); });
+	m.def("atan", [](const a_double &x) { return CppAD::atan(x); });
+	m.def("atanh", [](const a_double &x) { return CppAD::atanh(x); });
+	m.def("cos", [](const a_double &x) { return CppAD::cos(x); });
+	m.def("cosh", [](const a_double &x) { return CppAD::cosh(x); });
+	m.def("erf", [](const a_double &x) { return CppAD::erf(x); });
+	m.def("erfc", [](const a_double &x) { return CppAD::erfc(x); });
+	m.def("exp", [](const a_double &x) { return CppAD::exp(x); });
+	m.def("expm1", [](const a_double &x) { return CppAD::expm1(x); });
+	m.def("log1p", [](const a_double &x) { return CppAD::log1p(x); });
+	m.def("log", [](const a_double &x) { return CppAD::log(x); });
+	m.def("pow", [](const a_double &x, const int &y) { return CppAD::pow(x, y); });
+	m.def("pow", [](const a_double &x, const double &y) { return CppAD::pow(x, y); });
+	m.def("pow", [](const double &x, const a_double &y) { return CppAD::pow(x, y); });
+	m.def("pow", [](const a_double &x, const a_double &y) { return CppAD::pow(x, y); });
+	m.def("sin", [](const a_double &x) { return CppAD::sin(x); });
+	m.def("sinh", [](const a_double &x) { return CppAD::sinh(x); });
+	m.def("sqrt", [](const a_double &x) { return CppAD::sqrt(x); });
+	m.def("tan", [](const a_double &x) { return CppAD::tan(x); });
+	m.def("tanh", [](const a_double &x) { return CppAD::tanh(x); });
 
 	nb::enum_<graph_op_enum>(m, "graph_op")
 	    .value("abs", graph_op_enum::abs_graph_op)
