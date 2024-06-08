@@ -226,12 +226,13 @@ op2name = {
     graph_op.sinh: "sinh",
     graph_op.sqrt: "sqrt",
     graph_op.tan: "tan",
-    graph_op.tanh: "tanh"
+    graph_op.tanh: "tanh",
 }
 
 math_ops = set(op2name.keys())
 
 binary_ops = set([graph_op.pow])
+
 
 def create_llvmir_basic_functions(module: ir.Module):
     create_azmul(module)
@@ -239,7 +240,7 @@ def create_llvmir_basic_functions(module: ir.Module):
     create_direct_load_store(module)
     create_indirect_load_store(module)
 
-    for (op, op_name) in op2name.items():
+    for op, op_name in op2name.items():
         if op in binary_ops:
             func_type = ir.FunctionType(D, [D, D])
         else:

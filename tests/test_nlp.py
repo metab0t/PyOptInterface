@@ -4,17 +4,15 @@ import pytest
 import pyoptinterface as poi
 from pyoptinterface import ipopt
 
-IPOPT_PATH = r"D:\Ipopt\bin\ipopt-3.dll"
-
-if not ipopt.load_library(IPOPT_PATH):
+if not ipopt.is_library_loaded():
     exit(1)
 
 
 def test_ipopt():
     model = ipopt.Model()
 
-    x = model.add_variable(lb=0.0, ub=10.0, start=0.8)
-    y = model.add_variable(lb=0.0, ub=10.0, start=0.5)
+    x = model.add_variable(lb=0.1, ub=10.0, start=0.8)
+    y = model.add_variable(lb=0.1, ub=10.0, start=0.5)
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
@@ -93,7 +91,7 @@ def test_ipopt():
             if f == poi.acosh:
                 v = f(x + 1)
             elif f == poi.pow:
-                v = f(x, x)
+                v = f(x, 2)
             else:
                 v = f(x)
             values.append(v)
@@ -103,7 +101,9 @@ def test_ipopt():
     all_nlfuncs_f = model.register_function(all_nlfuncs, var=["x"], name="all_nlfuncs")
     N = len(nl_funcs)
     B = 1e10
-    all_nlfuncs_con = model.add_nl_constraint(all_nlfuncs_f, [x], poi.In, lb=[-B] * N, ub=[B] * N)
+    all_nlfuncs_con = model.add_nl_constraint(
+        all_nlfuncs_f, [x], poi.In, lb=[-B] * N, ub=[B] * N
+    )
 
     model.optimize()
 
@@ -120,19 +120,17 @@ def test_ipopt():
     obj_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
     assert obj_value == pytest.approx(math.exp(x_value) + math.exp(y_value))
 
-    con_values = model.get_constraint_attribute(all_nlfuncs_con, poi.ConstraintAttribute.Primal)
-    
+    con_values = model.get_constraint_attribute(
+        all_nlfuncs_con, poi.ConstraintAttribute.Primal
+    )
+
     correct_con_values = []
     for f in py_funcs:
         if f == math.acosh:
             v = f(x_value + 1)
         elif f == math.pow:
-            v = f(x_value, x_value)
+            v = f(x_value, 2)
         else:
             v = f(x_value)
         correct_con_values.append(v)
     assert con_values == pytest.approx(correct_con_values)
-
-
-if __name__ == "__main__":
-    test_ipopt()

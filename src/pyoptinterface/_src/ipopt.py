@@ -1,9 +1,11 @@
 from io import StringIO
 import types
+import logging
+import platform
 
 from llvmlite import ir
 
-from .ipopt_model_ext import RawModel, ApplicationReturnStatus
+from .ipopt_model_ext import RawModel, ApplicationReturnStatus, load_library
 from .codegen_c import generate_csrc_prelude, generate_csrc_from_graph
 from .jit_c import TCCJITCompiler
 from .codegen_llvm import create_llvmir_basic_functions, generate_llvmir_from_graph
@@ -27,6 +29,33 @@ from .solver_common import (
     _direct_set_entity_attribute,
 )
 from .aml import make_nd_variable
+
+
+def detected_libraries():
+    libs = []
+
+    # default names
+    default_libnames = {
+        "Linux": ["libipopt.so"],
+        "Darwin": ["libpopt.dylib"],
+        "Windows": ["ipopt-3.dll", "ipopt.dll", "libipopt-3.dll", "libipopt.dll"],
+    }[platform.system()]
+    libs.extend(default_libnames)
+
+    return libs
+
+
+def autoload_library():
+    libs = detected_libraries()
+    for lib in libs:
+        ret = load_library(lib)
+        if ret:
+            logging.info(f"Loaded IPOPT library: {lib}")
+            return True
+    return False
+
+
+autoload_library()
 
 
 def compile_functions_c(backend: RawModel, jit_compiler: TCCJITCompiler):
@@ -294,8 +323,9 @@ def get_constraint_primal(model, constraint):
         dim = constraint.dim
         values = [model.get_constraint_primal(index + i) for i in range(dim)]
         return values
-    
+
     raise ValueError(f"Unknown constraint type: {type(constraint)}")
+
 
 def get_constraint_dual(model, constraint):
     if isinstance(constraint, ConstraintIndex):
@@ -305,7 +335,7 @@ def get_constraint_dual(model, constraint):
         dim = constraint.dim
         values = [model.get_constraint_dual(index + i) for i in range(dim)]
         return values
-    
+
     raise ValueError(f"Unknown constraint type: {type(constraint)}")
 
 
