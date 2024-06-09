@@ -43,7 +43,7 @@ jobs:
 
       - name: Install python deps
         run: |
-          python -m pip install pytest numpy highsbox
+          python -m pip install pytest numpy highsbox llvmlite tccbox
 
       - name: Build
         # We need to use gcc-10 to support c++ concepts
