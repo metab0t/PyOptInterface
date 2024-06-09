@@ -4,11 +4,11 @@ import pytest
 import pyoptinterface as poi
 from pyoptinterface import ipopt
 
-if not ipopt.is_library_loaded():
-    exit(1)
-
 
 def test_ipopt():
+    if not ipopt.is_library_loaded():
+        pytest.skip("Ipopt library is not loaded")
+
     model = ipopt.Model()
 
     x = model.add_variable(lb=0.1, ub=10.0, start=0.8)
