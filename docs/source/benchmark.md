@@ -38,7 +38,7 @@ All code to run the benchmarks is available at [https://github.com/metab0t/PyOpt
 
 :::
 
-Recently, there are a lot of requests to test the performance of PyOptInterface compared with [linopy]([https://gith](https://github.com/PyPSA/linopy) and [cvxpy](https://github.com/cvxpy/cvxpy), so we prepare a [benchmark](https://github.com/metab0t/PyOptInterface/blob/master/bench/bench_linopy_cvxpy.py).
+Recently, there are a lot of requests to test the performance of PyOptInterface compared with [linopy](https://github.com/PyPSA/linopy) and [cvxpy](https://github.com/cvxpy/cvxpy), so we prepare a [benchmark](https://github.com/metab0t/PyOptInterface/blob/master/bench/bench_linopy_cvxpy.py).
 
 This is the result of benchmark, where the performance of PyOptInterface exceeds linopy and cvxpy significantly.
 
