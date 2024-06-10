@@ -134,3 +134,46 @@ def test_ipopt():
             v = f(x_value)
         correct_con_values.append(v)
     assert con_values == pytest.approx(correct_con_values)
+
+
+def test_nlp_param():
+    if not ipopt.is_library_loaded():
+        pytest.skip("Ipopt library is not loaded")
+
+    model = ipopt.Model()
+
+    N = 10
+    xs = []
+    for i in range(N):
+        x = model.add_variable(lb=0.0, ub=10.0, start=1.0)
+        xs.append(x)
+
+    def obj(vars):
+        return poi.exp(vars[0])
+
+    obj_f = model.register_function(obj, var=1, name="obj")
+
+    for i in range(N):
+        model.add_nl_objective(obj_f, [xs[i]])
+
+    def con(vars, params):
+        x = vars[0]
+        p = params[0]
+        return x * (p + 1) * (p + 1)
+
+    con_f = model.register_function(con, var=1, param=1, name="con")
+
+    for i in range(N):
+        model.add_nl_constraint(con_f, [xs[i]], [i], poi.Geq, [1.0])
+
+    model.optimize()
+
+    assert (
+        model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+        == poi.TerminationStatusCode.LOCALLY_SOLVED
+    )
+
+    x_values = [model.get_value(x) for x in xs]
+    correct_x_values = [1.0 / (i + 1) / (i + 1) for i in range(N)]
+
+    assert x_values == pytest.approx(correct_x_values)
