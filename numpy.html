@@ -306,24 +306,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pyoptinterface/_src/highs.py:286,</span> in <span class="ni">Model.__init__</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">285</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">286</span>     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">288</span>     <span class="bp">self</span><span class="o">.</span><span class="n">mip_start_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">VariableIndex</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">290</span>     <span class="bp">self</span><span class="o">.</span><span class="n">add_variables</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">make_nd_variable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-
-<span class="ne">RuntimeError</span>: HiGHS library is not loaded
-</pre></div>
-</div>
-</div>
 </div>
 <p>Then we create a 2-dimensional variable <code class="docutils literal notranslate"><span class="pre">x</span></code> with shape <span class="math notranslate nohighlight">\(N \times N\)</span> to represent the placement of queens. Each element of <code class="docutils literal notranslate"><span class="pre">x</span></code> is a binary variable that indicates whether a queen is placed at the corresponding position. We use <code class="docutils literal notranslate"><span class="pre">object</span></code> as the data type of <code class="docutils literal notranslate"><span class="pre">x</span></code> to store the binary variables. The following code snippet creates the variables:</p>
 <div class="cell docutils container">
@@ -334,6 +316,11 @@
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
         <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.0 (git hash: 50670fd): Copyright (c) 2024 HiGHS under MIT licence terms
 </pre></div>
 </div>
 </div>
@@ -363,6 +350,50 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+00]
+Presolving model
+42 rows, 64 cols, 252 nonzeros  0s
+42 rows, 64 cols, 270 nonzeros  0s
+Objective function is integral with scale 1
+
+Solving MIP model with:
+   42 rows
+   64 cols (64 binary, 0 integer, 0 implied int., 0 continuous)
+   270 nonzeros
+
+        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
+         0       0         0   0.00%   0               inf                  inf        0      0      6        29     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      0
+  Dual bound        0
+  Gap               0% (tolerance: 0.01%)
+  Solution status   feasible
+                    0 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.07 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     267 (total)
+                    0 (strong br.)
+                    184 (separation)
+                    54 (heuristics)
+Termination status: TerminationStatusCode.OPTIMAL
+</pre></div>
+</div>
+</div>
 </div>
 <p>The solution can be obtained and visualized by the following code:</p>
 <div class="cell docutils container">
@@ -371,6 +402,18 @@
 <span class="n">x_value</span> <span class="o">=</span> <span class="n">get_v</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">x_value</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[0 0 1 0 0 0 0 0]
+ [1 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 1 0]
+ [0 0 0 0 1 0 0 0]
+ [0 0 0 0 0 0 0 1]
+ [0 1 0 0 0 0 0 0]
+ [0 0 0 1 0 0 0 0]
+ [0 0 0 0 0 1 0 0]]
 </pre></div>
 </div>
 </div>
