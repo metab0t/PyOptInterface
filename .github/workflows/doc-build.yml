@@ -47,6 +47,7 @@ jobs:
       - name: Build documentation
         run: |
           pip install -r docs/requirements.txt
+          pip install highsbox
           cd docs
           make html
           cd ..
