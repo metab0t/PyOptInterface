@@ -456,6 +456,53 @@
 </tbody>
 </table>
 </div>
+<p>Recently, there are a lot of requests to test the performance of PyOptInterface compared with [linopy](<a class="reference external" href="https://github.com/PyPSA/linopy">https://gith</a> and <a class="reference external" href="https://github.com/cvxpy/cvxpy">cvxpy</a>, so we prepare a <a class="reference external" href="https://github.com/metab0t/PyOptInterface/blob/master/bench/bench_linopy_cvxpy.py">benchmark</a>.</p>
+<p>This is the result of benchmark, where the performance of PyOptInterface exceeds linopy and cvxpy significantly.</p>
+<div class="table-wrapper colwidths-auto docutils container" id="id3">
+<table class="docutils align-center" id="id3">
+<caption><span class="caption-text">Time (second) to generate and solve a linear programming model with Gurobi optimizer.</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>N</p></th>
+<th class="head"><p>Variables</p></th>
+<th class="head"><p>PyOptInterface</p></th>
+<th class="head"><p>linopy</p></th>
+<th class="head"><p>cvxpy</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>100</p></td>
+<td><p>20000</p></td>
+<td><p>0.112849</p></td>
+<td><p>0.422408</p></td>
+<td><p>0.373407</p></td>
+</tr>
+<tr class="row-odd"><td><p>200</p></td>
+<td><p>80000</p></td>
+<td><p>0.294830</p></td>
+<td><p>1.118702</p></td>
+<td><p>1.575949</p></td>
+</tr>
+<tr class="row-even"><td><p>300</p></td>
+<td><p>180000</p></td>
+<td><p>0.710237</p></td>
+<td><p>2.462809</p></td>
+<td><p>4.038862</p></td>
+</tr>
+<tr class="row-odd"><td><p>400</p></td>
+<td><p>320000</p></td>
+<td><p>1.256276</p></td>
+<td><p>4.535225</p></td>
+<td><p>8.687895</p></td>
+</tr>
+<tr class="row-even"><td><p>500</p></td>
+<td><p>500000</p></td>
+<td><p>2.189127</p></td>
+<td><p>8.243707</p></td>
+<td><p>18.941519</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
         </article>
