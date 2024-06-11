@@ -56,3 +56,15 @@ def test_tupledict_select():
     # Test select with key and value
     assert list(td.select(1, 2, with_key=True)) == [((1, 2), "a")]
     assert list(td.select(2, WILDCARD, with_key=True)) == [((2, 2), "c"), ((2, 3), "d")]
+
+
+def test_tupledict_map():
+    td = tupledict([((i, i + 1), i) for i in range(10)])
+
+    td_m = td.map(lambda x: x**2)
+
+    assert isinstance(td_m, tupledict)
+
+    assert list(td_m.values()) == [i**2 for i in range(10)]
+
+    assert list(td_m.keys()) == list(td.keys())

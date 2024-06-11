@@ -104,6 +104,9 @@ class tupledict(dict):
     def clean(self):
         self.__select_cache = None
 
+    def map(self, func):
+        return tupledict((k, func(v)) for k, v in self.items())
+
 
 def flatten_tuple(t):
     # (1, (2, 3), (4, 5)) -> (1, 2, 3, 4, 5)
