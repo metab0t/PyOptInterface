@@ -76,3 +76,25 @@ Gurobi supports a lot of [attributes](https://www.gurobi.com/documentation/curre
 - Model attribute: `model.get_model_raw_attribute(name: str)` and `model.set_model_raw_attribute(name: str, value: Any)`
 - Variable attribute: `model.get_variable_raw_attribute(variable, name: str)` and `model.set_variable_raw_attribute(variable, name: str, value: Any)`
 - Constraint attribute: `model.get_constraint_raw_attribute(constraint, name: str)` and `model.set_constraint_raw_attribute(constraint, name: str, value: Any)`
+
+We also provide `gurobi.GRB` to contain all the constants in `gurobipy.GRB`.
+
+For model status:
+```python
+status = model.get_model_raw_attribute(gurobi.GRB.Attr.Status)
+
+if status == gurobi.GRB.OPTIMAL:
+    ...
+elif status == gurobi.GRB.INFEASIBLE:
+    ...
+```
+
+For reduced cost of a variable:
+```python
+rc = model.get_variable_raw_attribute(variable, gurobi.GRB.Attr.RC)
+```
+
+For right-hand side value of a constraint:
+```python
+rhs = model.get_constraint_raw_attribute(constraint, gurobi.GRB.Attr.RHS)
+```
