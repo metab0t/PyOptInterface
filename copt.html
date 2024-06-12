@@ -519,6 +519,19 @@
 <li><p>Information of variable: <code class="docutils literal notranslate"><span class="pre">model.get_variable_info(variable,</span> <span class="pre">name:</span> <span class="pre">str)</span></code></p></li>
 <li><p>Information of constraint: <code class="docutils literal notranslate"><span class="pre">model.get_constraint_info(constraint,</span> <span class="pre">name:</span> <span class="pre">str)</span></code></p></li>
 </ul>
+<p>We also provide <code class="docutils literal notranslate"><span class="pre">copt.COPT</span></code> to contain all the constants in <code class="docutils literal notranslate"><span class="pre">coptpy.COPT</span></code>.</p>
+<p>For number of variables (columns) in the problem:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_attribute</span><span class="p">(</span><span class="n">copt</span><span class="o">.</span><span class="n">COPT</span><span class="o">.</span><span class="n">Attr</span><span class="o">.</span><span class="n">Cols</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For reduced cost of a variable:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_info</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">copt</span><span class="o">.</span><span class="n">COPT</span><span class="o">.</span><span class="n">Info</span><span class="o">.</span><span class="n">RedCost</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For upper bound of a constraint:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ub</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_info</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">copt</span><span class="o">.</span><span class="n">COPT</span><span class="o">.</span><span class="n">Info</span><span class="o">.</span><span class="n">UB</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 </section>

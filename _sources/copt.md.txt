@@ -68,3 +68,20 @@ COPT provides [information](https://guide.coap.online/copt/en-doc/information.ht
 
 - Information of variable: `model.get_variable_info(variable, name: str)`
 - Information of constraint: `model.get_constraint_info(constraint, name: str)`
+
+We also provide `copt.COPT` to contain all the constants in `coptpy.COPT`.
+
+For number of variables (columns) in the problem:
+```python
+cols = model.get_raw_attribute(copt.COPT.Attr.Cols)
+```
+
+For reduced cost of a variable:
+```python
+rc = model.get_variable_info(variable, copt.COPT.Info.RedCost)
+```
+
+For upper bound of a constraint:
+```python
+ub = model.get_constraint_info(constraint, copt.COPT.Info.UB)
+```
