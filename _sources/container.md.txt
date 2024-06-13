@@ -121,6 +121,15 @@ subset_values = list(td.select("*", 2, 1))
 subset_kv_iterator = td.select(1, "*", "*", with_key=True)
 ```
 
+## Apply a function to values with `map` method
+`tupledict` provides a `map` method to apply a function to each value in the `tupledict`. The following example applies a function to each value in the `tupledict`:
+
+```{code-cell}
+td = poi.make_tupledict(range(3), range(2), rule=lambda i, j: i+j)
+td_new = td.map(lambda x: x*x)
+td, td_new
+```
+
 ## Building a model with `tupledict`
 `tupledict` can be used to store and manipulate multi-dimensional variables, constraints and expressions. Using it correctly will make building model more easily.
 
@@ -156,6 +165,8 @@ obj = poi.quicksum(x.values(), lambda x: x*x)
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
 model.optimize()
+
+x_value = x.map(model.get_value)
 ```
 
 Here we use two utility functions to simplify how we express the sum notation

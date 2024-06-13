@@ -435,6 +435,25 @@ td[4, 8]=7
 </div>
 </div>
 </section>
+<section id="apply-a-function-to-values-with-map-method">
+<h2>Apply a function to values with <code class="docutils literal notranslate"><span class="pre">map</span></code> method<a class="headerlink" href="#apply-a-function-to-values-with-map-method" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tupledict</span></code> provides a <code class="docutils literal notranslate"><span class="pre">map</span></code> method to apply a function to each value in the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>. The following example applies a function to each value in the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">td</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">make_tupledict</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">)</span>
+<span class="n">td_new</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">td</span><span class="p">,</span> <span class="n">td_new</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>({(0, 0): 0, (0, 1): 1, (1, 0): 1, (1, 1): 2, (2, 0): 2, (2, 1): 3},
+ {(0, 0): 0, (0, 1): 1, (1, 0): 1, (1, 1): 4, (2, 0): 4, (2, 1): 9})
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="building-a-model-with-tupledict">
 <h2>Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code><a class="headerlink" href="#building-a-model-with-tupledict" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">tupledict</span></code> can be used to store and manipulate multi-dimensional variables, constraints and expressions. Using it correctly will make building model more easily.</p>
@@ -468,6 +487,8 @@ td[4, 8]=7
 <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ObjectiveSense</span><span class="o">.</span><span class="n">Minimize</span><span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+
+<span class="n">x_value</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -598,6 +619,7 @@ each value in advance)</p>
 <li><a class="reference internal" href="#">Container</a><ul>
 <li><a class="reference internal" href="#create-a-tupledict">Create a <code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a></li>
 <li><a class="reference internal" href="#set-get-values">Set/get values</a></li>
+<li><a class="reference internal" href="#apply-a-function-to-values-with-map-method">Apply a function to values with <code class="docutils literal notranslate"><span class="pre">map</span></code> method</a></li>
 <li><a class="reference internal" href="#building-a-model-with-tupledict">Building a model with <code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a><ul>
 <li><a class="reference internal" href="#quicksum"><code class="docutils literal notranslate"><span class="pre">quicksum()</span></code></a></li>
 <li><a class="reference internal" href="#quicksum_"><code class="docutils literal notranslate"><span class="pre">quicksum_()</span></code></a></li>
