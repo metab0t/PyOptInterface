@@ -330,42 +330,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="k">class</span> <span class="nc">OptModel</span><span class="p">:</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">autoload_library</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs_model_ext</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">load_library</span><span class="p">,</span> <span class="n">is_library_loaded</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;Enum&quot;</span><span class="p">,</span> <span class="s2">&quot;autoload_library&quot;</span><span class="p">,</span> <span class="s2">&quot;load_library&quot;</span><span class="p">,</span> <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">]</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">types</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">.highs_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">RawModel</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">HighsSolutionStatus</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">Enum</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="n">load_library</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="kn">from</span> <span class="nn">.attributes</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">VariableAttribute</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">ConstraintAttribute</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">TerminationStatusCode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="kn">from</span> <span class="nn">.core_ext</span> <span class="kn">import</span> <span class="n">ConstraintType</span><span class="p">,</span> <span class="n">VariableIndex</span>
-
-<span class="ne">ImportError</span>: ModuleNotFoundError: No module named &#39;core_ext&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>Then we can define small functions to declare the variables and constraints and add them to the model. We take the N-queens problem as an example.</p>
 <div class="cell docutils container">
@@ -419,6 +383,51 @@
 <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Termination status:&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.1 (git hash: 43329e5): Copyright (c) 2024 HiGHS under MIT licence terms
+Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+00]
+Presolving model
+42 rows, 64 cols, 252 nonzeros  0s
+42 rows, 64 cols, 270 nonzeros  0s
+Objective function is integral with scale 1
+
+Solving MIP model with:
+   42 rows
+   64 cols (64 binary, 0 integer, 0 implied int., 0 continuous)
+   270 nonzeros
+
+        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
+         0       0         0   0.00%   0               inf                  inf        0      0      6        29     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      0
+  Dual bound        0
+  Gap               0% (tolerance: 0.01%)
+  Solution status   feasible
+                    0 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.07 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     267 (total)
+                    0 (strong br.)
+                    184 (separation)
+                    54 (heuristics)
+Termination status: TerminationStatusCode.OPTIMAL
 </pre></div>
 </div>
 </div>

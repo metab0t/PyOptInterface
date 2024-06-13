@@ -316,41 +316,15 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">copt</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">model</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-06-13 16:31:04 [INFO] checks license for COPT v7.1.0 20240204
+2024-06-13 16:31:04 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2024-06-13 16:31:04 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.9/x64/bin
+2024-06-13 16:31:04 [WARN] no license files in HOME folder: /home/runner/copt
+2024-06-13 16:31:04 [INFO] empty environment variable: COPT_LICENSE_DIR
+2024-06-13 16:31:04 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">copt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.copt</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">autoload_library</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.copt_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">EnvConfig</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">Env</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">is_library_loaded</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="s2">&quot;Model&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="s2">&quot;EnvConfig&quot;</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span>     <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="p">]</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">copt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">logging</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">.copt_model_ext</span> <span class="kn">import</span> <span class="n">RawModel</span><span class="p">,</span> <span class="n">Env</span><span class="p">,</span> <span class="n">COPT</span><span class="p">,</span> <span class="n">load_library</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="kn">from</span> <span class="nn">.attributes</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">VariableAttribute</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">ConstraintAttribute</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="n">TerminationStatusCode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="kn">from</span> <span class="nn">.core_ext</span> <span class="kn">import</span> <span class="n">ConstraintType</span><span class="p">,</span> <span class="n">VariableIndex</span><span class="p">,</span> <span class="n">ObjectiveSense</span>
-
-<span class="ne">ImportError</span>: ModuleNotFoundError: No module named &#39;core_ext&#39;
+No license found. Starting COPT with size limitations for non-commercial use
+Please apply for a license from www.shanshu.ai/copt
 </pre></div>
 </div>
 </div>
