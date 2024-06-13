@@ -8,8 +8,8 @@ namespace nb = nanobind;
 
 NB_MODULE(ipopt_model_ext, m)
 {
-	m.import_("core_ext");
-	m.import_("nlcore_ext");
+	m.import_("pyoptinterface._src.core_ext");
+	m.import_("pyoptinterface._src.nlcore_ext");
 
 	m.def("is_library_loaded", &ipopt::is_library_loaded);
 	m.def("load_library", &ipopt::load_library);

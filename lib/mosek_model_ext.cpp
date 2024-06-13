@@ -10,7 +10,7 @@ extern void bind_mosek_constants(nb::module_ &m);
 
 NB_MODULE(mosek_model_ext, m)
 {
-	m.import_("core_ext");
+	m.import_("pyoptinterface._src.core_ext");
 
 	m.def("is_library_loaded", &mosek::is_library_loaded);
 	m.def("load_library", &mosek::load_library);

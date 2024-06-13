@@ -10,7 +10,7 @@ extern void bind_highs_constants(nb::module_ &m);
 
 NB_MODULE(highs_model_ext, m)
 {
-	m.import_("core_ext");
+	m.import_("pyoptinterface._src.core_ext");
 
 	m.def("is_library_loaded", &highs::is_library_loaded);
 	m.def("load_library", &highs::load_library);
