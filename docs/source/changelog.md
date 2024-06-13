@@ -2,6 +2,10 @@
 
 ## Unreleased change
 
+## 0.2.4
+- Add `map` method for `tupledict` class
+- Add type stubs for C++ extension modules 
+
 ## 0.2.3
 - Fix a bug when deleting constraint in HiGHS
 
