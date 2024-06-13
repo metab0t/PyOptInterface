@@ -363,6 +363,12 @@ struct LinearQuadraticModel
 		lq_objective += expr;
 	}
 
+	template <typename T>
+	void set_objective(const T &expr)
+	{
+		lq_objective = expr;
+	}
+
 	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
 	                                std::vector<size_t> &m_jacobian_cols);
 	void analyze_dense_gradient_structure();
@@ -408,6 +414,8 @@ struct NonlinearFunctionModel
 
 	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
 	                      const std::vector<ParameterIndex> &ps);
+
+	void clear_nl_objective();
 
 	void analyze_active_functions();
 

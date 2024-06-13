@@ -8,6 +8,9 @@ namespace nb = nanobind;
 
 NB_MODULE(ipopt_model_ext, m)
 {
+	m.import_("core_ext");
+	m.import_("nlcore_ext");
+
 	m.def("is_library_loaded", &ipopt::is_library_loaded);
 	m.def("load_library", &ipopt::load_library);
 
@@ -122,15 +125,22 @@ NB_MODULE(ipopt_model_ext, m)
 	             &IpoptModel::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
 
-	    .def("add_objective",
-	         nb::overload_cast<const ExprBuilder &>(&IpoptModel::add_objective<ExprBuilder>))
-	    .def("add_objective", nb::overload_cast<const ScalarQuadraticFunction &>(
-	                              &IpoptModel::add_objective<ScalarQuadraticFunction>))
-	    .def("add_objective", nb::overload_cast<const ScalarAffineFunction &>(
-	                              &IpoptModel::add_objective<ScalarAffineFunction>))
-	    .def("add_objective",
-	         nb::overload_cast<const VariableIndex &>(&IpoptModel::add_objective<VariableIndex>))
-	    .def("add_objective", nb::overload_cast<const double &>(&IpoptModel::add_objective<double>))
+	    .def("add_objective", &IpoptModel::add_objective<ExprBuilder>)
+	    .def("add_objective", &IpoptModel::add_objective<ScalarQuadraticFunction>)
+	    .def("add_objective", &IpoptModel::add_objective<ScalarAffineFunction>)
+	    .def("add_objective", &IpoptModel::add_objective<VariableIndex>)
+	    .def("add_objective", &IpoptModel::add_objective<double>)
+
+	    .def("set_objective", &IpoptModel::set_objective<ExprBuilder>, nb::arg("expr"),
+	         nb::arg("clear_nl") = false)
+	    .def("set_objective", &IpoptModel::set_objective<ScalarQuadraticFunction>, nb::arg("expr"),
+	         nb::arg("clear_nl") = false)
+	    .def("set_objective", &IpoptModel::set_objective<ScalarAffineFunction>, nb::arg("expr"),
+	         nb::arg("clear_nl") = false)
+	    .def("set_objective", &IpoptModel::set_objective<VariableIndex>, nb::arg("expr"),
+	         nb::arg("clear_nl") = false)
+	    .def("set_objective", &IpoptModel::set_objective<double>, nb::arg("expr"),
+	         nb::arg("clear_nl") = false)
 
 	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &>(
@@ -141,6 +151,8 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
 	                           const std::vector<double> &>(&IpoptModel::add_nl_objective))
+
+	    .def("clear_nl_objective", &IpoptModel::clear_nl_objective)
 
 	    .def("register_function", &IpoptModel::register_function)
 

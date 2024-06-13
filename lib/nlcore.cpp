@@ -477,6 +477,14 @@ void NonlinearFunctionModel::add_nl_objective(const FunctionIndex &k,
 	inst_vec.push_back(inst);
 }
 
+void NonlinearFunctionModel::clear_nl_objective()
+{
+	for (auto &inst_vec : objective_function_instances)
+	{
+		inst_vec.clear();
+	}
+}
+
 size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
                            Hashmap<size_t, size_t> &grad_index_map)
 {

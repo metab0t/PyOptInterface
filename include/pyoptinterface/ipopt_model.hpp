@@ -59,7 +59,7 @@ struct IpoptModel
 
 	double get_variable_start(const VariableIndex &variable);
 	void set_variable_start(const VariableIndex &variable, double start);
-	
+
 	std::string get_variable_name(const VariableIndex &variable);
 	void set_variable_name(const VariableIndex &variable, const std::string &name);
 
@@ -110,6 +110,16 @@ struct IpoptModel
 		m_lq_model.add_objective(expr);
 	}
 
+	template <typename T>
+	void set_objective(const T &expr, bool clear_nl = false)
+	{
+		m_lq_model.set_objective(expr);
+		if (clear_nl)
+		{
+			clear_nl_objective();
+		}
+	}
+
 	FunctionIndex register_function(ADFunD &f, const std::string &name);
 
 	NLConstraintIndex add_empty_nl_constraint(int dim, ConstraintSense sense,
@@ -158,6 +168,8 @@ struct IpoptModel
 	                      const std::vector<ParameterIndex> &ps);
 	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
 	                      const std::vector<double> &ps);
+
+	void clear_nl_objective();
 
 	void optimize();
 

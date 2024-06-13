@@ -11,6 +11,8 @@ extern void bind_gurobi_constants(nb::module_ &m);
 
 NB_MODULE(gurobi_model_ext, m)
 {
+	m.import_("core_ext");
+
 	m.def("is_library_loaded", &gurobi::is_library_loaded);
 	m.def("load_library", &gurobi::load_library);
 

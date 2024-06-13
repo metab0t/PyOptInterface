@@ -565,6 +565,11 @@ void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<Vari
 	add_nl_objective(k, xs, real_ps);
 }
 
+void IpoptModel::clear_nl_objective()
+{
+	m_function_model.clear_nl_objective();
+}
+
 static bool eval_f(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data)
 {
 	IpoptModel &model = *static_cast<IpoptModel *>(user_data);

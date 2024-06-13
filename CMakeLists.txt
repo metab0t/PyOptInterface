@@ -171,6 +171,63 @@ nanobind_add_module(
 target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
+# stub
+nanobind_add_stub(
+  core_ext_stub
+  INSTALL_TIME
+  MODULE core_ext
+  OUTPUT ${POI_INSTALL_DIR}/core_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  nlcore_ext_stub
+  INSTALL_TIME
+  MODULE nlcore_ext
+  OUTPUT ${POI_INSTALL_DIR}/nlcore_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  gurobi_model_ext_stub
+  INSTALL_TIME
+  MODULE gurobi_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/gurobi_model_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  copt_model_ext_stub
+  INSTALL_TIME
+  MODULE copt_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/copt_model_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  mosek_model_ext_stub
+  INSTALL_TIME
+  MODULE mosek_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/mosek_model_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  highs_model_ext_stub
+  INSTALL_TIME
+  MODULE highs_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/highs_model_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
+nanobind_add_stub(
+  ipopt_model_ext_stub
+  INSTALL_TIME
+  MODULE ipopt_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/ipopt_model_ext.pyi
+  PYTHON_PATH ${POI_INSTALL_DIR}
+)
+
 set(ENABLE_TEST_MAIN OFF CACHE BOOL "Enable test c++ function with a main.cpp")
 if(ENABLE_TEST_MAIN)
   add_executable(test_main lib/main.cpp)

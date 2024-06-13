@@ -11,6 +11,8 @@ extern void bind_copt_constants(nb::module_ &m);
 
 NB_MODULE(copt_model_ext, m)
 {
+	m.import_("core_ext");
+
 	m.def("is_library_loaded", &copt::is_library_loaded);
 	m.def("load_library", &copt::load_library);
 
