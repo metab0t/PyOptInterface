@@ -319,6 +319,40 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">autoload_library</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs_model_ext</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">load_library</span><span class="p">,</span> <span class="n">is_library_loaded</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;Enum&quot;</span><span class="p">,</span> <span class="s2">&quot;autoload_library&quot;</span><span class="p">,</span> <span class="s2">&quot;load_library&quot;</span><span class="p">,</span> <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">]</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">types</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">.highs_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">RawModel</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">HighsSolutionStatus</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">Enum</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="n">load_library</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="kn">from</span> <span class="nn">.attributes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">VariableAttribute</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">ConstraintAttribute</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">TerminationStatusCode</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="kn">from</span> <span class="nn">.core_ext</span> <span class="kn">import</span> <span class="n">ConstraintType</span><span class="p">,</span> <span class="n">VariableIndex</span>
+
+<span class="ne">ImportError</span>: ModuleNotFoundError: No module named &#39;core_ext&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <p>Then, we need to create new variables in the model to represent the power output of the generators. We will use the <a class="reference internal" href="../common_model_interface.html#model.add_variables" title="model.add_variables"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">add_variables</span></code></span></a> method to add multidimensional variables to the model.</p>
 <div class="cell docutils container">
@@ -334,11 +368,6 @@
 <span class="n">Rdn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
 
 <span class="n">P</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_G</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.1 (git hash: 43329e5): Copyright (c) 2024 HiGHS under MIT licence terms
 </pre></div>
 </div>
 </div>
@@ -415,26 +444,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [1e+00, 2e+00]
-  Bound  [5e+01, 1e+02]
-  RHS    [2e+01, 2e+02]
-  Iteration        Objective     NullspaceDim
-          0         14328.52                0      0.00s
-        100        12722.021                1      0.00s
-        108        12684.021                0      0.00s
-Model   status      : Optimal
-Simplex   iterations: 63
-QP ASM    iterations: 108
-Objective value     :  1.2684000000e+04
-HiGHS run time      :          0.00
-TerminationStatusCode.OPTIMAL
-Objective value:  12684.0
-</pre></div>
-</div>
-</div>
 </div>
 <p>The optimal value of decision variables can be queried via <code class="docutils literal notranslate"><span class="pre">get_value</span></code> function.</p>
 <div class="cell docutils container">
@@ -446,19 +455,6 @@ Objective value:  12684.0
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N_G</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
 
 <span class="n">P_value</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[100., 100., 100., 100., 100., 100., 100., 100., 100., 100., 100.,
-        100., 100., 100., 100., 100., 100., 100., 100., 100., 100., 100.,
-        100., 100.],
-       [ 70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,
-         70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,  70.,
-         70.,  70.],
-       [ 50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,
-         50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,  50.,
-         50.,  50.]])
 </pre></div>
 </div>
 </div>
@@ -484,41 +480,6 @@ Objective value:  12684.0
 <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N_G</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">P_value</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [1e+00, 2e+00]
-  Bound  [5e+01, 1e+02]
-  RHS    [2e+01, 2e+02]
-  Iteration        Objective     NullspaceDim
-          0        15430.248                0      0.00s
-        100        14091.031                3      0.00s
-        169        13740.237               10      0.01s
-Model   status      : Optimal
-Simplex   iterations: 86
-QP ASM    iterations: 169
-Objective value     :  1.3740213571e+04
-HiGHS run time      :          0.01
-TerminationStatusCode.OPTIMAL
-Objective value:  13740.213571429404
-[[100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.         100.
-  100.         100.         100.         100.        ]
- [ 70.          71.          72.          73.          74.
-   75.          76.          77.          78.          79.
-   80.          81.          82.          83.          83.71423796
-   84.28566633  84.85709469  85.42852306  85.99995143  86.5713798
-   87.14280816  87.71423653  88.2856649   88.85709327]
- [ 50.          50.          50.          50.          50.
-   50.          50.          50.          50.          50.
-   50.          50.          50.          50.          50.28576204
-   50.71433367  51.14290531  51.57147694  52.00004857  52.4286202
-   52.85719184  53.28576347  53.7143351   54.14290673]]
 </pre></div>
 </div>
 </div>

@@ -306,6 +306,40 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">autoload_library</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.highs_model_ext</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">load_library</span><span class="p">,</span> <span class="n">is_library_loaded</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;Enum&quot;</span><span class="p">,</span> <span class="s2">&quot;autoload_library&quot;</span><span class="p">,</span> <span class="s2">&quot;load_library&quot;</span><span class="p">,</span> <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">]</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">highs</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">types</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">.highs_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">RawModel</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">HighsSolutionStatus</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">Enum</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="n">load_library</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="kn">from</span> <span class="nn">.attributes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">VariableAttribute</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">ConstraintAttribute</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">TerminationStatusCode</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="kn">from</span> <span class="nn">.core_ext</span> <span class="kn">import</span> <span class="n">ConstraintType</span><span class="p">,</span> <span class="n">VariableIndex</span>
+
+<span class="ne">ImportError</span>: ModuleNotFoundError: No module named &#39;core_ext&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <p>You can replace <code class="docutils literal notranslate"><span class="pre">highs</span></code> with the name of the solver you want to use. The available solvers includes <code class="docutils literal notranslate"><span class="pre">copt</span></code>, <code class="docutils literal notranslate"><span class="pre">gurobi</span></code>, <code class="docutils literal notranslate"><span class="pre">highs</span></code> and <code class="docutils literal notranslate"><span class="pre">mosek</span></code>.</p>
 <p>Most commercial solvers require a <code class="docutils literal notranslate"><span class="pre">Environment</span></code>-like object to be initialized before creating a model in order to manage the license.</p>
@@ -421,24 +455,6 @@ The meanings of these standard attributes are the same as <a class="reference ex
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.1 (git hash: 43329e5): Copyright (c) 2024 HiGHS under MIT licence terms
-Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [0e+00, 0e+00]
-  Bound  [1e+00, 1e+00]
-  RHS    [1e+00, 1e+00]
-  Iteration        Objective     NullspaceDim
-          0                1                0      0.00s
-          2       0.50000002                1      0.00s
-Model   status      : Optimal
-QP ASM    iterations: 2
-Objective value     :  5.0000000000e-01
-HiGHS run time      :          0.00
-Objective value: 0.49999999999999994
-</pre></div>
-</div>
-</div>
 </div>
 <p>Besides the standard attributes, we can also set/get the solver-specific attributes by calling the <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code>/<code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> method of the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gurobi</span>
@@ -480,12 +496,6 @@ Objective value: 0.49999999999999994
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x[0] = 0.49999999999999994
-x[0]^2 = 0.24999999999999994
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="write-the-model-to-file">
@@ -494,11 +504,6 @@ x[0]^2 = 0.24999999999999994
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;model.lp&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Writing the model to model.lp
 </pre></div>
 </div>
 </div>
