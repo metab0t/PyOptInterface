@@ -143,7 +143,9 @@ JacobianHessianSparsityPattern jacobian_hessian_sparsity(CppAD::ADFun<Base> &f,
 // [p, x] -> jacobian
 template <typename Base>
 CppAD::ADFun<Base> sparse_jacobian(const CppAD::ADFun<Base> &f,
-                                   const sparsity_pattern_t &pattern_jac)
+                                   const sparsity_pattern_t &pattern_jac,
+                                   const std::vector<double> &x_values,
+                                   const std::vector<double> &p_values)
 {
 	using CppAD::AD;
 	using CppAD::ADFun;
@@ -153,12 +155,24 @@ CppAD::ADFun<Base> sparse_jacobian(const CppAD::ADFun<Base> &f,
 	size_t ny = f.Range();
 	size_t np = f.size_dyn_ind();
 	std::vector<AD<Base>> apx(np + nx), ax(nx), ap(np);
+	for (size_t i = 0; i < np; i++)
+	{
+		apx[i] = p_values[i];
+	}
+	for (size_t i = 0; i < nx; i++)
+	{
+		apx[np + i] = x_values[i];
+	}
 	ADFun<AD<Base>, Base> af = f.base2ad();
 	Independent(apx);
 	for (size_t i = 0; i < np; i++)
+	{
 		ap[i] = apx[i];
+	}
 	for (size_t i = 0; i < nx; i++)
+	{
 		ax[i] = apx[np + i];
+	}
 	af.new_dynamic(ap);
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<AD<Base>>> subset(pattern_jac);
 	CppAD::sparse_jac_work work;
@@ -177,7 +191,9 @@ CppAD::ADFun<Base> sparse_jacobian(const CppAD::ADFun<Base> &f,
 template <typename Base>
 CppAD::ADFun<Base> sparse_hessian(const CppAD::ADFun<Base> &f,
                                   const sparsity_pattern_t &pattern_hes,
-                                  const sparsity_pattern_t &pattern_subset)
+                                  const sparsity_pattern_t &pattern_subset,
+                                  const std::vector<double> &x_values,
+                                  const std::vector<double> &p_values)
 {
 	using CppAD::AD;
 	using CppAD::ADFun;
@@ -188,14 +204,32 @@ CppAD::ADFun<Base> sparse_hessian(const CppAD::ADFun<Base> &f,
 	size_t np = f.size_dyn_ind();
 	size_t nw = ny;
 	std::vector<AD<Base>> apwx(np + nw + nx), ax(nx), ap(np), aw(nw);
+	for (size_t i = 0; i < np; i++)
+	{
+		apwx[i] = p_values[i];
+	}
+	for (size_t i = 0; i < nw; i++)
+	{
+		apwx[np + i] = 1.0;
+	}
+	for (size_t i = 0; i < nx; i++)
+	{
+		apwx[np + nw + i] = x_values[i];
+	}
 	ADFun<AD<Base>, Base> af = f.base2ad();
 	Independent(apwx);
 	for (size_t i = 0; i < np; i++)
+	{
 		ap[i] = apwx[i];
+	}
 	for (size_t i = 0; i < nw; i++)
+	{
 		aw[i] = apwx[np + i];
+	}
 	for (size_t i = 0; i < nx; i++)
+	{
 		ax[i] = apwx[np + nw + i];
+	}
 	af.new_dynamic(ap);
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<AD<Base>>> subset(pattern_subset);
 	CppAD::sparse_hes_work work;
@@ -242,6 +276,8 @@ struct NonlinearFunction
 	std::vector<size_t> m_hessian_rows, m_hessian_cols;
 	size_t m_hessian_nnz = 0;
 
+	bool has_jacobian = false;
+	bool has_hessian = false;
 	cpp_graph f_graph, jacobian_graph, hessian_graph;
 
 	union {
@@ -261,7 +297,8 @@ struct NonlinearFunction
 		hessian_funcptr_noparam nop;
 	} hessian_eval;
 
-	NonlinearFunction(ADFunD &f_, const std::string &name_);
+	void init(ADFunD &f_, const std::string &name_, const std::vector<double> &x_values,
+	          const std::vector<double> &p_values);
 
 	void assign_evaluators(uintptr_t fp, uintptr_t jp, uintptr_t ajp, uintptr_t hp);
 };
@@ -406,7 +443,9 @@ struct NonlinearFunctionModel
 	ParameterIndex add_parameter(double value = 0.0);
 	void set_parameter(const ParameterIndex &parameter, double value);
 
-	FunctionIndex register_function(ADFunD &f, const std::string &name);
+	FunctionIndex register_function(ADFunD &f, const std::string &name,
+	                                const std::vector<double> &x_values,
+	                                const std::vector<double> &p_values);
 
 	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
 	                                    const std::vector<VariableIndex> &xs,

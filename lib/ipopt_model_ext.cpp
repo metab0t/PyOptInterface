@@ -112,7 +112,7 @@ NB_MODULE(ipopt_model_ext, m)
 	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
 	                           const char *>(&IpoptModel::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
+	    .def("add_quadratic_constraint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT, CoeffT,
 	                           const char *>(&IpoptModel::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
@@ -144,17 +144,21 @@ NB_MODULE(ipopt_model_ext, m)
 
 	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &>(
-	             &IpoptModel::add_nl_objective))
+	             &IpoptModel::add_nl_objective),
+	         nb::arg("f"), nb::arg("var"))
 	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_objective))
+	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_objective),
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"))
 	    .def("add_nl_objective",
 	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<double> &>(&IpoptModel::add_nl_objective))
+	                           const std::vector<double> &>(&IpoptModel::add_nl_objective),
+	         nb::arg("f"), nb::arg("var"), nb::arg("param"))
 
 	    .def("clear_nl_objective", &IpoptModel::clear_nl_objective)
 
-	    .def("register_function", &IpoptModel::register_function)
+	    .def("_register_function", &IpoptModel::register_function, nb::arg("f"), nb::arg("name"),
+	         nb::arg("var"), nb::arg("param"))
 
 	    .def("add_empty_nl_constraint",
 	         nb::overload_cast<int, ConstraintSense, const std::vector<double> &>(

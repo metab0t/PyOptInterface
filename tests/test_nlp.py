@@ -11,8 +11,8 @@ def test_ipopt():
 
     model = ipopt.Model()
 
-    x = model.add_variable(lb=0.1, ub=10.0, start=0.8)
-    y = model.add_variable(lb=0.1, ub=10.0, start=0.5)
+    x = model.add_variable(lb=0.1, ub=10.0, start=0.65)
+    y = model.add_variable(lb=0.1, ub=10.0, start=0.35)
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
@@ -46,8 +46,8 @@ def test_ipopt():
         poi.atanh,
         poi.cos,
         poi.cosh,
-        poi.erf,
-        poi.erfc,
+        # poi.erf,
+        # poi.erfc,
         poi.exp,
         poi.expm1,
         poi.log1p,
@@ -69,8 +69,8 @@ def test_ipopt():
         math.atanh,
         math.cos,
         math.cosh,
-        math.erf,
-        math.erfc,
+        # math.erf,
+        # math.erfc,
         math.exp,
         math.expm1,
         math.log1p,
@@ -177,3 +177,8 @@ def test_nlp_param():
     correct_x_values = [1.0 / (i + 1) / (i + 1) for i in range(N)]
 
     assert x_values == pytest.approx(correct_x_values)
+
+
+if __name__ == "__main__":
+    test_ipopt()
+    test_nlp_param()

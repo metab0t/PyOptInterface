@@ -326,10 +326,11 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, Const
 	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, lb, ub, name);
 }
 
-FunctionIndex IpoptModel::register_function(ADFunD &f, const std::string &name)
+FunctionIndex IpoptModel::register_function(ADFunD &f, const std::string &name,
+                                            const std::vector<double> &x_values,
+                                            const std::vector<double> &p_values)
 {
-	auto fi = m_function_model.register_function(f, name);
-	return fi;
+	return m_function_model.register_function(f, name, x_values, p_values);
 }
 
 NLConstraintIndex IpoptModel::add_empty_nl_constraint(int dim, ConstraintSense sense,

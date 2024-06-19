@@ -1,19 +1,22 @@
 #include "pyoptinterface/nlcore.hpp"
 
-NonlinearFunction::NonlinearFunction(ADFunD &f, const std::string &name_)
+void NonlinearFunction::init(ADFunD &f_, const std::string &name_,
+                             const std::vector<double> &x_values,
+                             const std::vector<double> &p_values)
 {
-	nx = f.Domain();
-	np = f.size_dyn_ind();
+	nx = f_.Domain();
+	np = f_.size_dyn_ind();
+	assert(x_values.size() == nx);
+	assert(p_values.size() == np);
+
 	has_parameter = np > 0;
-	ny = f.Range();
+	ny = f_.Range();
 	name = name_;
 
-	f.to_graph(f_graph);
+	f_.to_graph(f_graph);
 
-	auto sparsity = jacobian_hessian_sparsity(f, HessianSparsityType::Upper);
-
-	ADFunD jacobian = sparse_jacobian(f, sparsity.jacobian);
-	ADFunD hessian = sparse_hessian(f, sparsity.hessian, sparsity.reduced_hessian);
+	auto sparsity = jacobian_hessian_sparsity(f_, HessianSparsityType::Upper);
+	// printf("jacobian_hessian_sparsity success\n");
 
 	{
 		auto &pattern = sparsity.jacobian;
@@ -39,8 +42,20 @@ NonlinearFunction::NonlinearFunction(ADFunD &f, const std::string &name_)
 		m_hessian_nnz = pattern.nnz();
 	}
 
-	jacobian.to_graph(jacobian_graph);
-	hessian.to_graph(hessian_graph);
+	if (m_jacobian_nnz > 0)
+	{
+		has_jacobian = true;
+		ADFunD jacobian = sparse_jacobian(f_, sparsity.jacobian, x_values, p_values);
+		jacobian.to_graph(jacobian_graph);
+	}
+
+	if (m_hessian_nnz > 0)
+	{
+		has_hessian = true;
+		ADFunD hessian =
+		    sparse_hessian(f_, sparsity.hessian, sparsity.reduced_hessian, x_values, p_values);
+		hessian.to_graph(hessian_graph);
+	}
 }
 
 void NonlinearFunction::assign_evaluators(uintptr_t fp, uintptr_t jp, uintptr_t ajp, uintptr_t hp)
@@ -48,16 +63,28 @@ void NonlinearFunction::assign_evaluators(uintptr_t fp, uintptr_t jp, uintptr_t 
 	if (has_parameter)
 	{
 		f_eval.p = (f_funcptr)fp;
-		jacobian_eval.p = (jacobian_funcptr)jp;
-		grad_eval.p = (additive_grad_funcptr)ajp;
-		hessian_eval.p = (hessian_funcptr)hp;
+		if (has_jacobian)
+		{
+			jacobian_eval.p = (jacobian_funcptr)jp;
+			grad_eval.p = (additive_grad_funcptr)ajp;
+		}
+		if (has_hessian)
+		{
+			hessian_eval.p = (hessian_funcptr)hp;
+		}
 	}
 	else
 	{
 		f_eval.nop = (f_funcptr_noparam)fp;
-		jacobian_eval.nop = (jacobian_funcptr_noparam)jp;
-		grad_eval.nop = (additive_grad_funcptr_noparam)ajp;
-		hessian_eval.nop = (hessian_funcptr_noparam)hp;
+		if (has_jacobian)
+		{
+			jacobian_eval.nop = (jacobian_funcptr_noparam)jp;
+			grad_eval.nop = (additive_grad_funcptr_noparam)ajp;
+		}
+		if (has_hessian)
+		{
+			hessian_eval.nop = (hessian_funcptr_noparam)hp;
+		}
 	}
 }
 
@@ -398,11 +425,14 @@ void NonlinearFunctionModel::set_parameter(const ParameterIndex &parameter, doub
 	p[parameter.index] = value;
 }
 
-FunctionIndex NonlinearFunctionModel::register_function(ADFunD &f, const std::string &name)
+FunctionIndex NonlinearFunctionModel::register_function(ADFunD &f, const std::string &name,
+                                                        const std::vector<double> &x_values,
+                                                        const std::vector<double> &p_values)
 {
 	FunctionIndex idx;
 	idx.index = nl_functions.size();
-	NonlinearFunction kernel(f, name);
+	NonlinearFunction kernel;
+	kernel.init(f, name, x_values, p_values);
 	nl_functions.push_back(kernel);
 	constraint_function_instances.emplace_back();
 	objective_function_instances.emplace_back();
@@ -749,6 +779,9 @@ void NonlinearFunctionModel::eval_objective_gradient(const double *x, double *gr
 	for (auto k : active_objective_function_indices)
 	{
 		auto &kernel = nl_functions[k];
+		if (!kernel.has_jacobian)
+			continue;
+
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = objective_function_instances[k];
 
@@ -815,8 +848,12 @@ void NonlinearFunctionModel::eval_constraint_jacobian(const double *x, double *j
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_functions[k];
+		if (!kernel.has_jacobian)
+			continue;
+
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = constraint_function_instances[k];
+
 		if (has_parameter)
 		{
 			for (const auto &inst : inst_vec)
@@ -848,6 +885,9 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_functions[k];
+		if (!kernel.has_hessian)
+			continue;
+
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = constraint_function_instances[k];
 		if (has_parameter)
@@ -881,6 +921,9 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 	for (auto k : active_objective_function_indices)
 	{
 		auto &kernel = nl_functions[k];
+		if (!kernel.has_hessian)
+			continue;
+
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = objective_function_instances[k];
 		if (has_parameter)

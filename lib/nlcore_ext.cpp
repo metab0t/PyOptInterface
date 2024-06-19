@@ -19,6 +19,79 @@ using graph_op_enum = CppAD::graph::graph_op_enum;
 NB_MAKE_OPAQUE(advec);
 NB_MAKE_OPAQUE(std::vector<NonlinearFunction>);
 
+struct cpp_graph_cursor
+{
+	size_t op_index = 0;
+	size_t arg_index = 0;
+};
+
+graph_op_enum cursor_op(cpp_graph &graph, cpp_graph_cursor &cursor)
+{
+	return graph.operator_vec_get(cursor.op_index);
+}
+
+size_t cursor_n_arg(cpp_graph &graph, cpp_graph_cursor &cursor)
+{
+	auto op = cursor_op(graph, cursor);
+
+	size_t n_arg = 0;
+
+	switch (op)
+	{
+	// unary operators
+	case graph_op_enum::abs_graph_op:
+	case graph_op_enum::acos_graph_op:
+	case graph_op_enum::acosh_graph_op:
+	case graph_op_enum::asin_graph_op:
+	case graph_op_enum::asinh_graph_op:
+	case graph_op_enum::atan_graph_op:
+	case graph_op_enum::atanh_graph_op:
+	case graph_op_enum::cos_graph_op:
+	case graph_op_enum::cosh_graph_op:
+	case graph_op_enum::erf_graph_op:
+	case graph_op_enum::erfc_graph_op:
+	case graph_op_enum::exp_graph_op:
+	case graph_op_enum::expm1_graph_op:
+	case graph_op_enum::log1p_graph_op:
+	case graph_op_enum::log_graph_op:
+	case graph_op_enum::neg_graph_op:
+	case graph_op_enum::sign_graph_op:
+	case graph_op_enum::sin_graph_op:
+	case graph_op_enum::sinh_graph_op:
+	case graph_op_enum::sqrt_graph_op:
+	case graph_op_enum::tan_graph_op:
+	case graph_op_enum::tanh_graph_op:
+		n_arg = 1;
+		break;
+
+	// binary operators
+	case graph_op_enum::add_graph_op:
+	case graph_op_enum::azmul_graph_op:
+	case graph_op_enum::div_graph_op:
+	case graph_op_enum::mul_graph_op:
+	case graph_op_enum::pow_graph_op:
+	case graph_op_enum::sub_graph_op:
+		n_arg = 2;
+		break;
+
+	default: {
+		std::string op_name = CppAD::local::graph::op_enum2name[op];
+		auto message = "Unknown graph_op: " + op_name;
+		throw std::runtime_error(message);
+	}
+	break;
+	}
+
+	return n_arg;
+}
+
+void advance_graph_cursor(cpp_graph &graph, cpp_graph_cursor &cursor)
+{
+	auto n_arg = cursor_n_arg(graph, cursor);
+	cursor.arg_index += n_arg;
+	cursor.op_index++;
+}
+
 NB_MODULE(nlcore_ext, m)
 {
 	nb::class_<a_double>(m, "a_double")
@@ -57,37 +130,53 @@ NB_MODULE(nlcore_ext, m)
 	      nb::overload_cast<advec &, size_t, bool, advec &>(&CppAD::Independent<advec>),
 	      nb::arg("x"), nb::arg("abort_op_index"), nb::arg("record_compare"), nb::arg("dynamic"));
 
-	using cpp_graph_iter_value = cpp_graph::const_iterator::value_type;
-	nb::class_<cpp_graph_iter_value>(m, "cpp_graph_iter")
-	    .def_ro("op_enum", &cpp_graph_iter_value::op_enum)
-	    .def_ro("n_result", &cpp_graph_iter_value::n_result)
-	    .def_prop_ro("arg_node", [](const cpp_graph_iter_value &value) {
-		    nb::list result;
-		    for (auto i : (*value.arg_node_ptr))
-			    result.append(nb::int_(i));
-		    return result;
-	    });
+	nb::class_<cpp_graph_cursor>(m, "cpp_graph_cursor")
+	    .def(nb::init<>())
+	    .def_ro("op_index", &cpp_graph_cursor::op_index)
+	    .def_ro("arg_index", &cpp_graph_cursor::arg_index);
+
+	// This function is called by the first use of the cpp_graph constructor
+	// But this extension module might be used without initializing its own operator info
+	// For example, a graph is created by ipopt_model_ext and calls graph.print() in this module
+	// We will call this function on the Python side
+	m.def("initialize_cpp_graph_operator_info", []() { CppAD::local::graph::set_operator_info(); });
 
 	nb::class_<cpp_graph>(m, "cpp_graph")
-	    .def(nb::init<>())
-	    .def(
-	        "__iter__",
-	        [](cpp_graph &g) {
-		        return nb::make_iterator<nb::rv_policy::reference_internal>(
-		            nb::type<cpp_graph>(), "item_iterator", g.begin(), g.end());
-	        },
-	        nb::keep_alive<0, 1>())
 	    .def_prop_ro("n_dynamic_ind", [](cpp_graph &g) { return g.n_dynamic_ind_get(); })
 	    .def_prop_ro("n_variable_ind", [](cpp_graph &g) { return g.n_variable_ind_get(); })
 	    .def_prop_ro("n_constant", [](cpp_graph &g) { return g.constant_vec_size(); })
 	    .def_prop_ro("n_dependent", [](cpp_graph &g) { return g.dependent_vec_size(); })
 	    .def_prop_ro("n_operator", [](cpp_graph &g) { return g.operator_vec_size(); })
+	    .def_prop_ro("n_operator_arg", [](cpp_graph &g) { return g.operator_arg_size(); })
 	    .def("constant_vec_get", &cpp_graph::constant_vec_get)
-	    .def("dependent_vec_get", &cpp_graph::dependent_vec_get);
+	    .def("dependent_vec_get", &cpp_graph::dependent_vec_get)
+	    .def("__str__",
+	         [](cpp_graph &g) {
+		         std::ostringstream oss;
+		         g.print(oss);
+		         return oss.str();
+	         })
+	    .def("get_cursor_op", &cursor_op)
+	    .def("get_cursor_n_arg", &cursor_n_arg)
+	    .def("get_cursor_args",
+	         [](cpp_graph &graph, cpp_graph_cursor &cursor) {
+		         auto n_arg = cursor_n_arg(graph, cursor);
+		         nb::list args;
+		         for (size_t i = 0; i < n_arg; i++)
+		         {
+			         auto arg = graph.operator_arg_get(cursor.arg_index + i);
+			         args.append(nb::int_(arg));
+		         }
+		         return args;
+	         })
+	    .def("next_cursor", &advance_graph_cursor);
 
 	nb::class_<ADFun>(m, "ADFun")
 	    .def(nb::init<>())
 	    .def(nb::init<advec &, advec &>())
+	    .def_prop_ro("nx", [](const ADFun &f) { return f.Domain(); })
+	    .def_prop_ro("ny", [](const ADFun &f) { return f.Range(); })
+	    .def_prop_ro("np", [](const ADFun &f) { return f.size_dyn_ind(); })
 	    .def("Dependent", nb::overload_cast<const advec &, const advec &>(&ADFun::Dependent<advec>))
 	    .def("to_graph", &ADFun::to_graph)
 	    .def("Domain", &ADFun::Domain)
@@ -193,11 +282,12 @@ NB_MODULE(nlcore_ext, m)
 
 	// Bind nonlinear core part
 	nb::class_<NonlinearFunction>(m, "NonlinearFunction")
-	    .def(nb::init<ADFunD &, const std::string &>())
 	    .def_ro("name", &NonlinearFunction::name)
 	    .def_ro("nx", &NonlinearFunction::nx)
 	    .def_ro("np", &NonlinearFunction::np)
 	    .def_ro("ny", &NonlinearFunction::ny)
+	    .def_ro("has_jacobian", &NonlinearFunction::has_jacobian)
+	    .def_ro("has_hessian", &NonlinearFunction::has_hessian)
 	    .def_ro("f_graph", &NonlinearFunction::f_graph)
 	    .def_ro("jacobian_graph", &NonlinearFunction::jacobian_graph)
 	    .def_ro("hessian_graph", &NonlinearFunction::hessian_graph)
@@ -226,5 +316,7 @@ NB_MODULE(nlcore_ext, m)
 
 	nb::class_<NonlinearFunctionModel>(m, "NonlinearFunctionModel")
 	    .def(nb::init<>())
-	    .def_ro("nl_functions", &NonlinearFunctionModel::nl_functions);
+	    .def_ro("nl_functions", &NonlinearFunctionModel::nl_functions)
+	    .def("register_function", &NonlinearFunctionModel::register_function, nb::arg("f"),
+	         nb::arg("name"), nb::arg("var"), nb::arg("param"));
 }

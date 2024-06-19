@@ -120,7 +120,9 @@ struct IpoptModel
 		}
 	}
 
-	FunctionIndex register_function(ADFunD &f, const std::string &name);
+	FunctionIndex register_function(ADFunD &f, const std::string &name,
+	                                const std::vector<double> &x_values,
+	                                const std::vector<double> &p_values);
 
 	NLConstraintIndex add_empty_nl_constraint(int dim, ConstraintSense sense,
 	                                          const std::vector<double> &rhss);

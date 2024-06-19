@@ -99,7 +99,7 @@ CPPAD_PACKAGE_STRING
 cppad-yyyymmdd as a C string where yyyy is year, mm is month, and dd is day.
 {xrst_spell_off}
 {xrst_code hpp} */
-# define CPPAD_PACKAGE_STRING "cppad-20240323"
+# define CPPAD_PACKAGE_STRING "cppad-20240602"
 /* {xrst_code}
 {xrst_spell_on}
 

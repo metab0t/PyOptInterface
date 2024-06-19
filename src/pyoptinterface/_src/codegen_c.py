@@ -2,6 +2,7 @@ from .nlcore_ext import (
     cpp_graph,
     graph_op,
 )
+from .cpp_graph_iter import cpp_graph_iterator
 
 from typing import IO
 
@@ -22,6 +23,7 @@ op2name = {
     graph_op.log1p: "log1p",
     graph_op.log: "log",
     graph_op.pow: "pow",
+    graph_op.sign: "sign",
     graph_op.sin: "sin",
     graph_op.sinh: "sinh",
     graph_op.sqrt: "sqrt",
@@ -84,7 +86,7 @@ extern float_point_t sign(float_point_t x);
 
 def generate_csrc_from_graph(
     io: IO[str],
-    graph_obj: cpp_graph,
+    graph_obj,
     name: str,
     np: int = 0,
     hessian_lagrange: bool = False,
@@ -116,7 +118,7 @@ def generate_csrc_from_graph(
     # [1 + n_dynamic_ind + n_variable_ind + n_constant, ...) -> v[...]
 
     n_node = 0
-    for graph_iter in graph_obj:
+    for graph_iter in cpp_graph_iterator(graph_obj):
         n_node += graph_iter.n_result
 
     has_parameter = np > 0
@@ -234,29 +236,32 @@ void {name}(
 
     infix_operators = set(["+", "-", "*", "/"])
 
-    for iter in graph_obj:
-        op_enum = iter.op_enum
+    for iter in cpp_graph_iterator(graph_obj):
+        op = iter.op
         n_result = iter.n_result
-        arg_node = iter.arg_node
+        args = iter.args
 
         assert n_result == 1
-        op_name = op2name.get(op_enum, None)
+        op_name = op2name.get(op, None)
         if op_name is None:
-            raise ValueError(f"Unknown op_enum: {op_enum}")
+            message = f"Unknown name for op_enum: {op}\n"
+            debug_context = f"name: {name}\nfull graph:\n{str(graph_obj)}"
+            raise ValueError(message + debug_context)
 
-        n_arg = len(arg_node)
+        n_arg = len(args)
         if n_arg == 1:
-            arg1 = get_node_name(arg_node[0])
+            arg1 = get_node_name(args[0])
             io.write(f"    v[{result_node}] = {op_name}({arg1});\n")
         elif n_arg == 2:
-            arg1 = get_node_name(arg_node[0])
-            arg2 = get_node_name(arg_node[1])
+            arg1 = get_node_name(args[0])
+            arg2 = get_node_name(args[1])
             if op_name in infix_operators:
                 io.write(f"    v[{result_node}] = {arg1} {op_name} {arg2};\n")
             else:
                 io.write(f"    v[{result_node}] = {op_name}({arg1}, {arg2});\n")
         else:
-            raise ValueError(f"Unknown n_arg: {n_arg} for op_enum: {op_enum}")
+            message = f"Unknown n_arg: {n_arg} for op_enum: {op}\n"
+            raise ValueError(message)
 
         result_node += n_result
 

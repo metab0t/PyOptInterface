@@ -9,7 +9,26 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(thirdparty/fmt)
 add_subdirectory(thirdparty/cppad)
 
-set(POI_INSTALL_DIR pyoptinterface/_src)
+set(POI_INSTALL_DIR ${SKBUILD_PLATLIB_DIR}/pyoptinterface/_src)
+
+# install the DLL of cppad
+if(MSVC)
+    install(TARGETS cppad_thread_alloc RUNTIME DESTINATION ${POI_INSTALL_DIR})
+else()
+    install(TARGETS cppad_thread_alloc LIBRARY DESTINATION ${POI_INSTALL_DIR})
+endif()
+
+# we need to ensure all shared libraries can look up its own directory to load other shared libraries
+# this is very important for CppAD users because we extract its thread_alloc as a shared library
+function(set_rpath target)
+    if(APPLE)
+        set(CMAKE_MACOSX_RPATH 1)
+        set_target_properties(${target} PROPERTIES INSTALL_RPATH "@loader_path")
+    elseif(UNIX)
+        set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN")
+    elseif(WIN32)
+    endif()
+endfunction()
 
 if(MSVC)
     # Add /MP flag for multi-processor compilation
@@ -171,61 +190,58 @@ nanobind_add_module(
 target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
+# Set RPATH
+set_rpath(nlcore_ext)
+set_rpath(ipopt_model_ext)
+
 # stub
 nanobind_add_stub(
   core_ext_stub
   INSTALL_TIME
-  MODULE core_ext
+  MODULE pyoptinterface._src.core_ext
   OUTPUT ${POI_INSTALL_DIR}/core_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   nlcore_ext_stub
   INSTALL_TIME
-  MODULE nlcore_ext
+  MODULE pyoptinterface._src.nlcore_ext
   OUTPUT ${POI_INSTALL_DIR}/nlcore_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   gurobi_model_ext_stub
   INSTALL_TIME
-  MODULE gurobi_model_ext
+  MODULE pyoptinterface._src.gurobi_model_ext
   OUTPUT ${POI_INSTALL_DIR}/gurobi_model_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   copt_model_ext_stub
   INSTALL_TIME
-  MODULE copt_model_ext
+  MODULE pyoptinterface._src.copt_model_ext
   OUTPUT ${POI_INSTALL_DIR}/copt_model_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   mosek_model_ext_stub
   INSTALL_TIME
-  MODULE mosek_model_ext
+  MODULE pyoptinterface._src.mosek_model_ext
   OUTPUT ${POI_INSTALL_DIR}/mosek_model_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   highs_model_ext_stub
   INSTALL_TIME
-  MODULE highs_model_ext
+  MODULE pyoptinterface._src.highs_model_ext
   OUTPUT ${POI_INSTALL_DIR}/highs_model_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 nanobind_add_stub(
   ipopt_model_ext_stub
   INSTALL_TIME
-  MODULE ipopt_model_ext
+  MODULE pyoptinterface._src.ipopt_model_ext
   OUTPUT ${POI_INSTALL_DIR}/ipopt_model_ext.pyi
-  PYTHON_PATH ${POI_INSTALL_DIR}
 )
 
 set(ENABLE_TEST_MAIN OFF CACHE BOOL "Enable test c++ function with a main.cpp")

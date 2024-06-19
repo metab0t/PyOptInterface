@@ -52,9 +52,9 @@ def trace_adfun_impl(
     adf.optimize("no_compare_op no_conditional_skip no_cumulative_sum_op")
 
     # check
-    assert adf.Domain() == nx
-    assert adf.Range() == ny
-    assert adf.size_dyn_ind() == np
+    assert adf.nx == nx
+    assert adf.ny == ny
+    assert adf.np == np
 
     return adf
 

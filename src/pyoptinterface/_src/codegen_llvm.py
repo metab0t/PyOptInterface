@@ -2,6 +2,7 @@ from .nlcore_ext import (
     cpp_graph,
     graph_op,
 )
+from .cpp_graph_iter import cpp_graph_iterator
 from llvmlite import ir
 
 D = ir.DoubleType()
@@ -254,7 +255,7 @@ def create_llvmir_basic_functions(module: ir.Module):
 # Define graph to LLVM IR translation function
 def generate_llvmir_from_graph(
     module: ir.Module,
-    graph_obj: cpp_graph,
+    graph_obj,
     name: str,
     np: int = 0,
     hessian_lagrange: bool = False,
@@ -271,7 +272,7 @@ def generate_llvmir_from_graph(
     n_dependent = graph_obj.n_dependent
 
     n_node = 0
-    for graph_iter in graph_obj:
+    for graph_iter in cpp_graph_iterator(graph_obj):
         n_node += graph_iter.n_result
 
     has_parameter = np > 0
@@ -434,17 +435,17 @@ def generate_llvmir_from_graph(
             val = v_val
         return val
 
-    for iter in graph_obj:
-        op = iter.op_enum
+    for iter in cpp_graph_iterator(graph_obj):
+        op = iter.op
         n_result = iter.n_result
-        arg_node = iter.arg_node
+        args = iter.args
 
         assert n_result == 1
-        assert len(arg_node) <= 2
+        assert len(args) <= 2
 
-        arg1 = get_node_value(arg_node[0])
-        if len(arg_node) == 2:
-            arg2 = get_node_value(arg_node[1])
+        arg1 = get_node_value(args[0])
+        if len(args) == 2:
+            arg2 = get_node_value(args[1])
 
         if op == graph_op.add:
             ret_val = builder.fadd(arg1, arg2)

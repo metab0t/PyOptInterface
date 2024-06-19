@@ -13,7 +13,9 @@ from .jit_llvm import LLJITCompiler
 from .tracefun import trace_adfun
 
 from .core_ext import ConstraintIndex
-from .nlcore_ext import NLConstraintIndex
+from .nlcore_ext import NLConstraintIndex, initialize_cpp_graph_operator_info
+
+initialize_cpp_graph_operator_info()
 
 from .attributes import (
     VariableAttribute,
@@ -77,41 +79,45 @@ def compile_functions_c(backend: RawModel, jit_compiler: TCCJITCompiler):
             indirect_x=True,
             indirect_p=True,
         )
-        jacobian_name = name + "_jacobian"
-        generate_csrc_from_graph(
-            io,
-            function.jacobian_graph,
-            jacobian_name,
-            np=function.np,
-            indirect_x=True,
-            indirect_p=True,
-        )
-        gradient_name = name + "_gradient"
-        generate_csrc_from_graph(
-            io,
-            function.jacobian_graph,
-            gradient_name,
-            np=function.np,
-            indirect_x=True,
-            indirect_p=True,
-            indirect_y=True,
-            add_y=True,
-        )
-        hessian_name = name + "_hessian"
-        generate_csrc_from_graph(
-            io,
-            function.hessian_graph,
-            hessian_name,
-            np=function.np,
-            hessian_lagrange=True,
-            nw=function.ny,
-            indirect_x=True,
-            indirect_p=True,
-            indirect_y=True,
-            add_y=True,
-        )
+        if function.has_jacobian:
+            jacobian_name = name + "_jacobian"
+            generate_csrc_from_graph(
+                io,
+                function.jacobian_graph,
+                jacobian_name,
+                np=function.np,
+                indirect_x=True,
+                indirect_p=True,
+            )
+            gradient_name = name + "_gradient"
+            generate_csrc_from_graph(
+                io,
+                function.jacobian_graph,
+                gradient_name,
+                np=function.np,
+                indirect_x=True,
+                indirect_p=True,
+                indirect_y=True,
+                add_y=True,
+            )
+        if function.has_hessian:
+            hessian_name = name + "_hessian"
+            generate_csrc_from_graph(
+                io,
+                function.hessian_graph,
+                hessian_name,
+                np=function.np,
+                hessian_lagrange=True,
+                nw=function.ny,
+                indirect_x=True,
+                indirect_p=True,
+                indirect_y=True,
+                add_y=True,
+            )
 
     csrc = io.getvalue()
+
+    jit_compiler.source_code = csrc
 
     jit_compiler.compile_string(csrc.encode())
 
@@ -123,9 +129,12 @@ def compile_functions_c(backend: RawModel, jit_compiler: TCCJITCompiler):
         hessian_name = name + "_hessian"
 
         f_ptr = jit_compiler.get_symbol(f_name.encode())
-        jacobian_ptr = jit_compiler.get_symbol(jacobian_name.encode())
-        gradient_ptr = jit_compiler.get_symbol(gradient_name.encode())
-        hessian_ptr = jit_compiler.get_symbol(hessian_name.encode())
+        jacobian_ptr = gradient_ptr = hessian_ptr = 0
+        if function.has_jacobian:
+            jacobian_ptr = jit_compiler.get_symbol(jacobian_name.encode())
+            gradient_ptr = jit_compiler.get_symbol(gradient_name.encode())
+        if function.has_hessian:
+            hessian_ptr = jit_compiler.get_symbol(hessian_name.encode())
 
         function.assign_evaluators(f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr)
 
@@ -150,39 +159,41 @@ def compile_functions_llvm(backend: RawModel, jit_compiler: LLJITCompiler):
             indirect_x=True,
             indirect_p=True,
         )
-        jacobian_name = name + "_jacobian"
-        generate_llvmir_from_graph(
-            module,
-            function.jacobian_graph,
-            jacobian_name,
-            np=function.np,
-            indirect_x=True,
-            indirect_p=True,
-        )
-        gradient_name = name + "_gradient"
-        generate_llvmir_from_graph(
-            module,
-            function.jacobian_graph,
-            gradient_name,
-            np=function.np,
-            indirect_x=True,
-            indirect_p=True,
-            indirect_y=True,
-            add_y=True,
-        )
-        hessian_name = name + "_hessian"
-        generate_llvmir_from_graph(
-            module,
-            function.hessian_graph,
-            hessian_name,
-            np=function.np,
-            hessian_lagrange=True,
-            nw=function.ny,
-            indirect_x=True,
-            indirect_p=True,
-            indirect_y=True,
-            add_y=True,
-        )
+        if function.has_jacobian:
+            jacobian_name = name + "_jacobian"
+            generate_llvmir_from_graph(
+                module,
+                function.jacobian_graph,
+                jacobian_name,
+                np=function.np,
+                indirect_x=True,
+                indirect_p=True,
+            )
+            gradient_name = name + "_gradient"
+            generate_llvmir_from_graph(
+                module,
+                function.jacobian_graph,
+                gradient_name,
+                np=function.np,
+                indirect_x=True,
+                indirect_p=True,
+                indirect_y=True,
+                add_y=True,
+            )
+        if function.has_hessian:
+            hessian_name = name + "_hessian"
+            generate_llvmir_from_graph(
+                module,
+                function.hessian_graph,
+                hessian_name,
+                np=function.np,
+                hessian_lagrange=True,
+                nw=function.ny,
+                indirect_x=True,
+                indirect_p=True,
+                indirect_y=True,
+                add_y=True,
+            )
 
         export_functions.extend([f_name, jacobian_name, gradient_name, hessian_name])
 
@@ -196,9 +207,12 @@ def compile_functions_llvm(backend: RawModel, jit_compiler: LLJITCompiler):
         hessian_name = name + "_hessian"
 
         f_ptr = jit_compiler.get_symbol(f_name)
-        jacobian_ptr = jit_compiler.get_symbol(jacobian_name)
-        gradient_ptr = jit_compiler.get_symbol(gradient_name)
-        hessian_ptr = jit_compiler.get_symbol(hessian_name)
+        jacobian_ptr = gradient_ptr = hessian_ptr = 0
+        if function.has_jacobian:
+            jacobian_ptr = jit_compiler.get_symbol(jacobian_name)
+            gradient_ptr = jit_compiler.get_symbol(gradient_name)
+        if function.has_hessian:
+            hessian_ptr = jit_compiler.get_symbol(hessian_name)
 
         function.assign_evaluators(f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr)
 
@@ -351,6 +365,7 @@ class Model(RawModel):
     def __init__(self):
         super().__init__()
 
+        self.n_nl_functions = 0
         self.jit_compiler = None
         self.add_variables = types.MethodType(make_nd_variable, self)
 
@@ -385,9 +400,24 @@ class Model(RawModel):
 
         super().optimize()
 
-    def register_function(self, f, /, var, name, param=()):
+    def register_function(
+        self, f, /, var, param=(), var_values=None, param_values=None, name=None
+    ):
         adfun = trace_adfun(f, var, param)
-        return super().register_function(adfun, name)
+        nx = adfun.nx
+        if var_values is not None:
+            assert len(var_values) == nx
+        else:
+            var_values = [(i + 1) / (nx + 1) for i in range(nx)]
+        np = adfun.np
+        if param_values is not None:
+            assert len(param_values) == np
+        else:
+            param_values = [(i + 1) / (np + 1) for i in range(np)]
+        if name is None:
+            name = f"nlfunction_{self.n_nl_functions}"
+        self.n_nl_functions += 1
+        return super()._register_function(adfun, name, var_values, param_values)
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):

@@ -16,6 +16,7 @@ class LLJITCompiler:
 
     def compile_module(self, module: ir.Module, export_functions: List[str] = []):
         ir_str = str(module)
+        self.source_code = ir_str
         builder = binding.JITLibraryBuilder().add_ir(ir_str).add_current_process()
         for f in export_functions:
             builder.export_symbol(f)
