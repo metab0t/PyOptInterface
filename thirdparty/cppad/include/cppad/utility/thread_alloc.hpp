@@ -16,6 +16,8 @@
     #else
         #define THREAD_ALLOC_DLL_API __declspec(dllimport)
     #endif
+#else
+    #define THREAD_ALLOC_DLL_API
 #endif
 
 # ifdef _MSC_VER
