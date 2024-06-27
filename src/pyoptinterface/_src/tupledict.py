@@ -119,7 +119,7 @@ def flatten_tuple(t):
 
 
 def make_tupledict(*coords: Iterable, rule):
-    kvs = []
+    d = {}
     assert len(coords) > 0
     for coord in product(*coords):
         # (1, (2, 3), (4, 5)) -> (1, 2, 3, 4, 5)
@@ -128,5 +128,5 @@ def make_tupledict(*coords: Iterable, rule):
         if len(coord) == 1:
             coord = coord[0]
         if value is not None:
-            kvs.append((coord, value))
-    return tupledict(kvs)
+            d[coord] = value
+    return tupledict(d)
