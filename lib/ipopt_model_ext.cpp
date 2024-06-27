@@ -219,7 +219,7 @@ NB_MODULE(ipopt_model_ext, m)
 	                           const std::vector<VariableIndex> &>(&IpoptModel::add_nl_expression),
 	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"))
 
-	    .def("optimize", &IpoptModel::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("_optimize", &IpoptModel::optimize, nb::call_guard<nb::gil_scoped_release>())
 	    .def("set_raw_option_int", &IpoptModel::set_raw_option_int)
 	    .def("set_raw_option_double", &IpoptModel::set_raw_option_double)
 	    .def("set_raw_option_string", &IpoptModel::set_raw_option_string);

@@ -397,8 +397,7 @@ class Model(RawModel):
         elif jit_engine == "LLVM":
             self.jit_compiler = LLJITCompiler()
             compile_functions_llvm(self, self.jit_compiler)
-
-        super().optimize()
+        super()._optimize()
 
     def register_function(
         self, f, /, var, param=(), var_values=None, param_values=None, name=None
