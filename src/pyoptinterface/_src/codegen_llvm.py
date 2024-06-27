@@ -435,6 +435,8 @@ def generate_llvmir_from_graph(
             val = v_val
         return val
 
+    arithmetic_flags = ("fast",)
+
     for iter in cpp_graph_iterator(graph_obj):
         op = iter.op
         n_result = iter.n_result
@@ -448,18 +450,18 @@ def generate_llvmir_from_graph(
             arg2 = get_node_value(args[1])
 
         if op == graph_op.add:
-            ret_val = builder.fadd(arg1, arg2)
+            ret_val = builder.fadd(arg1, arg2, flags=arithmetic_flags)
         elif op == graph_op.sub:
-            ret_val = builder.fsub(arg1, arg2)
+            ret_val = builder.fsub(arg1, arg2, flags=arithmetic_flags)
         elif op == graph_op.mul:
-            ret_val = builder.fmul(arg1, arg2)
+            ret_val = builder.fmul(arg1, arg2, flags=arithmetic_flags)
         elif op == graph_op.div:
-            ret_val = builder.fdiv(arg1, arg2)
+            ret_val = builder.fdiv(arg1, arg2, flags=arithmetic_flags)
         elif op == graph_op.azmul:
-            ret_val = builder.fmul(arg1, arg2)
+            ret_val = builder.fmul(arg1, arg2, flags=arithmetic_flags)
             # ret_val = builder.call(azmul, [arg1, arg2])
         elif op == graph_op.neg:
-            ret_val = builder.fneg(arg1)
+            ret_val = builder.fneg(arg1, flags=arithmetic_flags)
         elif op == graph_op.sign:
             ret_val = builder.call(sign, [arg1])
         elif op in math_ops:
