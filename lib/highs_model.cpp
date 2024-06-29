@@ -125,10 +125,6 @@ void POIHighsModel::write(const std::string &filename)
 VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, double ub,
                                           const char *name)
 {
-	if (name != nullptr && name[0] == '\0')
-	{
-		name = nullptr;
-	}
 	IndexT index = m_variable_index.add_index();
 	VariableIndex variable(index);
 
