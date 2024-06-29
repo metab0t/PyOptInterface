@@ -2,6 +2,10 @@
 
 ## Unreleased change
 
+## 0.2.5
+- Fix `add_linear_constraint` of HiGHS optimizer to consider the constant term in expression correctly
+- Make `make_tupledict` slightly faster
+
 ## 0.2.4
 - Add `map` method for `tupledict` class
 - Add type stubs for C++ extension modules 
