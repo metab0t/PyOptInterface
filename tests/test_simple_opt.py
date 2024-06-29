@@ -16,7 +16,7 @@ def test_simple_opt(model_interface):
 
     conexpr = x + y
     con1 = model.add_linear_constraint(
-        conexpr, poi.ConstraintSense.GreaterEqual, 10.0, name="con1"
+        conexpr - 10.0, poi.ConstraintSense.GreaterEqual, 0.0, name="con1"
     )
 
     assert model.number_of_variables() == 2

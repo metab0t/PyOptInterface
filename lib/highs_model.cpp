@@ -249,17 +249,18 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 
 	double lb = -kHighsInf;
 	double ub = kHighsInf;
+	double g_rhs = rhs - function.constant.value_or(0.0);
 	switch (sense)
 	{
 	case ConstraintSense::LessEqual:
-		ub = rhs;
+		ub = g_rhs;
 		break;
 	case ConstraintSense::GreaterEqual:
-		lb = rhs;
+		lb = g_rhs;
 		break;
 	case ConstraintSense::Equal:
-		lb = rhs;
-		ub = rhs;
+		lb = g_rhs;
+		ub = g_rhs;
 		break;
 	}
 
