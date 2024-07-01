@@ -6,18 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 # Linux: -fPIC
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_subdirectory(thirdparty/fmt)
-add_subdirectory(thirdparty/cppad)
-
-set(POI_INSTALL_DIR ${SKBUILD_PLATLIB_DIR}/pyoptinterface/_src)
-
-# install the DLL of cppad
-if(MSVC)
-    install(TARGETS cppad_thread_alloc RUNTIME DESTINATION ${POI_INSTALL_DIR})
-else()
-    install(TARGETS cppad_thread_alloc LIBRARY DESTINATION ${POI_INSTALL_DIR})
-endif()
-
 # we need to ensure all shared libraries can look up its own directory to load other shared libraries
 # this is very important for CppAD users because we extract its thread_alloc as a shared library
 function(set_rpath target)
@@ -33,6 +21,7 @@ endfunction()
 if(MSVC)
     # Add /MP flag for multi-processor compilation
     add_compile_options(/MP)
+    add_compile_options(/utf-8)
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64")
         # use AVX2
         add_compile_options(/arch:AVX2)
@@ -43,6 +32,17 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         # add_compile_options(-march=haswell)
     endif()
+endif()
+
+add_subdirectory(thirdparty/fmt)
+add_subdirectory(thirdparty/cppad)
+
+set(POI_INSTALL_DIR ${SKBUILD_PLATLIB_DIR}/pyoptinterface/_src)
+# install the DLL of cppad
+if(MSVC)
+    install(TARGETS cppad_thread_alloc RUNTIME DESTINATION ${POI_INSTALL_DIR})
+else()
+    install(TARGETS cppad_thread_alloc LIBRARY DESTINATION ${POI_INSTALL_DIR})
 endif()
 
 add_library(core STATIC)

@@ -6,6 +6,7 @@
 #include <numeric>
 #include <span>
 #include "fmt/format.h"
+#include "fmt/ranges.h"
 #include "pyoptinterface/core.hpp"
 
 template <typename CommercialSolverT>
