@@ -264,6 +264,7 @@ enum class ConstraintType
 	Quadratic,
 	SOS,
 	Cone,
+	COPT_ExpCone
 };
 
 enum class SOSType

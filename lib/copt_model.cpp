@@ -362,7 +362,7 @@ ConstraintIndex COPTModel::add_sos_constraint(const Vector<VariableIndex> &varia
 }
 
 ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
-                                                            const char *name)
+                                                            const char *name, bool rotated)
 {
 	IndexT index = m_cone_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Cone, index);
@@ -374,12 +374,55 @@ ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<Variabl
 		ind_v[i] = _checked_variable_index(variables[i]);
 	}
 
-	int coneType[] = {COPT_CONE_QUAD};
+	int cone = COPT_CONE_QUAD;
+	if (rotated)
+	{
+		cone = COPT_CONE_RQUAD;
+	}
+
+	int coneType[] = {cone};
 	int coneBeg[] = {0};
 	int coneCnt[] = {N};
 	int *coneIdx = ind_v.data();
 
 	int error = copt::COPT_AddCones(m_model.get(), 1, coneType, coneBeg, coneCnt, coneIdx);
+	check_error(error);
+
+	// COPT does not support name for cone constraints
+
+	return constraint_index;
+}
+
+ConstraintIndex COPTModel::add_exp_cone_constraint(const Vector<VariableIndex> &variables,
+                                                   const char *name, bool dual)
+{
+	IndexT index = m_exp_cone_constraint_index.add_index();
+	ConstraintIndex constraint_index(ConstraintType::COPT_ExpCone, index);
+
+	int N = variables.size();
+	if (N != 3)
+	{
+		throw std::runtime_error("Exponential cone constraint must have 3 variables");
+	}
+
+	std::vector<int> ind_v(N);
+	for (int i = 0; i < N; i++)
+	{
+		ind_v[i] = _checked_variable_index(variables[i]);
+	}
+
+	int cone = COPT_EXPCONE_PRIMAL;
+	if (dual)
+	{
+		cone = COPT_EXPCONE_DUAL;
+	}
+
+	int coneType[] = {cone};
+	int coneBeg[] = {0};
+	int coneCnt[] = {N};
+	int *coneIdx = ind_v.data();
+
+	int error = copt::COPT_AddExpCones(m_model.get(), 1, coneType, coneIdx);
 	check_error(error);
 
 	// COPT does not support name for cone constraints
@@ -411,6 +454,10 @@ void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 			m_cone_constraint_index.delete_index(constraint.index);
 			error = copt::COPT_DelCones(m_model.get(), 1, &constraint_row);
 			break;
+		case ConstraintType::COPT_ExpCone:
+			m_exp_cone_constraint_index.delete_index(constraint.index);
+			error = copt::COPT_DelExpCones(m_model.get(), 1, &constraint_row);
+			break;
 		default:
 			throw std::runtime_error("Unknown constraint type");
 		}
@@ -430,6 +477,8 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_sos_constraint_index.has_index(constraint.index);
 	case ConstraintType::Cone:
 		return m_cone_constraint_index.has_index(constraint.index);
+	case ConstraintType::COPT_ExpCone:
+		return m_exp_cone_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}
@@ -909,6 +958,8 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_sos_constraint_index.get_index(constraint.index);
 	case ConstraintType::Cone:
 		return m_cone_constraint_index.get_index(constraint.index);
+	case ConstraintType::COPT_ExpCone:
+		return m_exp_cone_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}

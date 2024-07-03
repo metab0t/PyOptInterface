@@ -84,7 +84,9 @@ NB_MODULE(mosek_model_ext, m)
 	             &MOSEKModelMixin::add_quadratic_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_second_order_cone_constraint", &MOSEKModelMixin::add_second_order_cone_constraint,
-	         nb::arg("variables"), nb::arg("name") = "")
+	         nb::arg("variables"), nb::arg("name") = "", nb::arg("rotated") = false)
+	    .def("add_exp_cone_constraint", &MOSEKModelMixin::add_exp_cone_constraint,
+	         nb::arg("variables"), nb::arg("name") = "", nb::arg("dual") = false)
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)

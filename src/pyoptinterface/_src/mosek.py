@@ -360,15 +360,6 @@ class Model(RawModel):
 
         self.add_variables = types.MethodType(make_nd_variable, self)
 
-    def add_second_order_cone_constraint(
-        self, cone_variables, name="", use_bridge=False
-    ):
-        if use_bridge:
-            con = bridge_soc_quadratic_constraint(self, cone_variables, name)
-        else:
-            con = super().add_second_order_cone_constraint(cone_variables, name)
-        return con
-
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):
         if settable:

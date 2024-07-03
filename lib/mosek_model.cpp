@@ -472,14 +472,9 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	return constraint_index;
 }
 
-ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
-                                                             const char *name)
+std::vector<MSKint64t> MOSEKModel::add_variables_as_afe(const Vector<VariableIndex> &variables)
 {
 	auto N = variables.size();
-
-	IndexT index = m_acc_index.size();
-	m_acc_index.push_back(true);
-	ConstraintIndex constraint_index(ConstraintType::Cone, index);
 
 	// afe part
 	MSKint64t numafe;
@@ -507,13 +502,26 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 	                                    vals.data());
 	check_error(error);
 
+	return afe_index;
+}
+
+ConstraintIndex MOSEKModel::add_variables_in_cone_constraint(const Vector<VariableIndex> &variables,
+                                                             MSKint64t domain_index,
+                                                             const char *name)
+{
+	auto N = variables.size();
+
+	IndexT index = m_acc_index.size();
+	m_acc_index.push_back(true);
+	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+
+	// afe part
+	std::vector<MSKint64t> afe_index = add_variables_as_afe(variables);
+
 	// domain part
-	MSKint64t domain_index;
-	error = mosek::MSK_appendquadraticconedomain(m_model.get(), N, &domain_index);
-	check_error(error);
 
 	// add acc
-	error = mosek::MSK_appendacc(m_model.get(), domain_index, N, afe_index.data(), nullptr);
+	auto error = mosek::MSK_appendacc(m_model.get(), domain_index, N, afe_index.data(), nullptr);
 	check_error(error);
 
 	// set name
@@ -528,6 +536,56 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 	}
 
 	return constraint_index;
+}
+
+ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+                                                             const char *name, bool rotated)
+{
+	auto N = variables.size();
+
+	// domain part
+	MSKint64t domain_index;
+	MSKrescodee error;
+	if (rotated)
+	{
+		error = mosek::MSK_appendrquadraticconedomain(m_model.get(), N, &domain_index);
+	}
+	else
+	{
+		error = mosek::MSK_appendquadraticconedomain(m_model.get(), N, &domain_index);
+	}
+	check_error(error);
+
+	auto con = add_variables_in_cone_constraint(variables, domain_index, name);
+
+	return con;
+}
+
+ConstraintIndex MOSEKModel::add_exp_cone_constraint(const Vector<VariableIndex> &variables,
+                                                    const char *name, bool dual)
+{
+	auto N = variables.size();
+	if (N != 3)
+	{
+		throw std::runtime_error("Exponential cone constraint must have 3 variables");
+	}
+
+	// domain part
+	MSKint64t domain_index;
+	MSKrescodee error;
+	if (dual)
+	{
+		error = mosek::MSK_appenddualexpconedomain(m_model.get(), &domain_index);
+	}
+	else
+	{
+		error = mosek::MSK_appendprimalexpconedomain(m_model.get(), &domain_index);
+	}
+	check_error(error);
+
+	auto con = add_variables_in_cone_constraint(variables, domain_index, name);
+
+	return con;
 }
 
 void MOSEKModel::delete_constraint(const ConstraintIndex &constraint)

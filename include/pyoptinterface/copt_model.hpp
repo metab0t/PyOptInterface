@@ -31,10 +31,12 @@ extern "C"
 	B(COPT_AddQConstr);            \
 	B(COPT_AddSOSs);               \
 	B(COPT_AddCones);              \
+	B(COPT_AddExpCones);           \
 	B(COPT_DelRows);               \
 	B(COPT_DelQConstrs);           \
 	B(COPT_DelSOSs);               \
 	B(COPT_DelCones);              \
+	B(COPT_DelExpCones);           \
 	B(COPT_DelQuadObj);            \
 	B(COPT_ReplaceColObj);         \
 	B(COPT_SetObjConst);           \
@@ -183,7 +185,10 @@ class COPTModel
 
 	// x[0]^2 >= x[1]^2 + x[2]^2 + ... + x[n-1]^2
 	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
-	                                                 const char *name);
+	                                                 const char *name, bool rotated = false);
+
+	ConstraintIndex add_exp_cone_constraint(const Vector<VariableIndex> &variables,
+	                                        const char *name, bool dual = false);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
@@ -293,6 +298,8 @@ class COPTModel
 	MonotoneIndexer<int> m_sos_constraint_index;
 
 	MonotoneIndexer<int> m_cone_constraint_index;
+
+	MonotoneIndexer<int> m_exp_cone_constraint_index;
 
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;

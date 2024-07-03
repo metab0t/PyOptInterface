@@ -21,7 +21,7 @@ extern "C" {
 
 #define COPT_VERSION_MAJOR                      7
 #define COPT_VERSION_MINOR                      1
-#define COPT_VERSION_TECHNICAL                  3
+#define COPT_VERSION_TECHNICAL                  4
 
 
 /*
@@ -58,6 +58,10 @@ extern "C" {
 /* Cone types */
 #define COPT_CONE_QUAD                          1
 #define COPT_CONE_RQUAD                         2
+
+/* Exponential cone types */
+#define COPT_EXPCONE_PRIMAL                     3
+#define COPT_EXPCONE_DUAL                       4
 
 /* API function return code */
 #define COPT_RETCODE_OK                         0
@@ -202,6 +206,7 @@ extern "C" {
 #define COPT_INTATTR_INTS                       "Ints"
 #define COPT_INTATTR_SOSS                       "Soss"
 #define COPT_INTATTR_CONES                      "Cones"
+#define COPT_INTATTR_EXPCONES                   "ExpCones"
 #define COPT_INTATTR_QCONSTRS                   "QConstrs"
 #define COPT_INTATTR_PSDCONSTRS                 "PSDConstrs"
 #define COPT_INTATTR_LMICONSTRS                 "LMIConstrs"
@@ -407,6 +412,11 @@ int COPT_CALL COPT_AddCones(copt_prob *prob,
     const int         *coneCnt,
     const int         *coneIdx);
 
+int COPT_CALL COPT_AddExpCones(copt_prob *prob,
+    int               nAddCone,
+    const int         *coneType,
+    const int         *coneIdx);
+
 int COPT_CALL COPT_AddQConstr(copt_prob *prob,
     int               nRowMatCnt,
     const int         *rowMatIdx,
@@ -495,6 +505,14 @@ int COPT_CALL COPT_GetCones(copt_prob *prob,
     int               nElemSize,
     int               *pReqSize);
 
+int COPT_CALL COPT_GetExpCones(copt_prob *prob,
+    int               nCone,
+    const int         *list,
+    int               *coneType,
+    int               *coneIdx,
+    int               nElemSize,
+    int               *pReqSize);
+
 int COPT_CALL COPT_GetQConstr(copt_prob *prob,
     int               qConstrIdx,
     int               *qMatRow,
@@ -559,6 +577,7 @@ int COPT_CALL COPT_DelPSDCols(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelRows(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelSOSs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelCones(copt_prob *prob, int num, const int *list);
+int COPT_CALL COPT_DelExpCones(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelQConstrs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelPSDConstrs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelLMIConstrs(copt_prob *prob, int num, const int *list);

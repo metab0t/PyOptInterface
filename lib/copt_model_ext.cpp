@@ -85,7 +85,9 @@ NB_MODULE(copt_model_ext, m)
 	             &COPTModelMixin::add_quadratic_constraint_from_expr),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_second_order_cone_constraint", &COPTModelMixin::add_second_order_cone_constraint,
-	         nb::arg("variables"), nb::arg("name") = "")
+	         nb::arg("variables"), nb::arg("name") = "", nb::arg("rotated") = false)
+	    .def("add_exp_cone_constraint", &COPTModelMixin::add_exp_cone_constraint,
+	         nb::arg("variables"), nb::arg("name") = "", nb::arg("dual") = false)
 	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
 	                                   &COPTModelMixin::add_sos_constraint))
 	    .def("add_sos_constraint",
@@ -111,7 +113,7 @@ NB_MODULE(copt_model_ext, m)
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
-		.def("cb_add_lazy_constraint",
+	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &COPTModelMixin::cb_add_lazy_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
@@ -128,7 +130,7 @@ NB_MODULE(copt_model_ext, m)
 	             &COPTModelMixin::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 
-		.def("optimize", &COPTModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("optimize", &COPTModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
 
 	    // clang-format off
 	    BIND_F(version_string)
