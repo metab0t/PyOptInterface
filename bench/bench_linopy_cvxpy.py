@@ -3,16 +3,16 @@ from numpy import arange
 import numpy as np
 import pandas as pd
 
-from linopy import Model
+import linopy
 
 import pyoptinterface as poi
-from pyoptinterface import gurobi
+from pyoptinterface import copt, gurobi, highs
 
 import cvxpy
 
 
 def create_linopy_model(N):
-    m = Model()
+    m = linopy.Model()
     x = m.add_variables(coords=[arange(N), arange(N)])
     y = m.add_variables(coords=[arange(N), arange(N)])
     m.add_constraints(x - y >= arange(N))
@@ -32,8 +32,8 @@ def create_cvxpy_model(N):
     return cvxpy.Problem(objective, constraints)
 
 
-def create_poi_model(N):
-    m = gurobi.Model()
+def create_poi_model(Model, N):
+    m = Model()
     x = m.add_variables(range(N), range(N))
     y = m.add_variables(range(N), range(N))
     for i in range(N):
@@ -47,36 +47,44 @@ def create_poi_model(N):
     return m
 
 
-def bench(N):
+def bench(N, solver_name):
     results = {}
 
     t0 = time.time()
-    model = create_poi_model(N)
-    model.optimize()
-    t1 = time.time()
-    results["n_variables"] = 2 * N * N
-    results["poi"] = t1 - t0
+    Model = {
+        "copt": copt.Model,
+        "gurobi": gurobi.Model,
+        "highs": highs.Model,
+    }.get(solver_name, None)
+    if Model:
+        model = create_poi_model(Model, N)
+        model.optimize()
+        t1 = time.time()
+        results["n_variables"] = 2 * N * N
+        results["poi"] = t1 - t0
 
     t0 = time.time()
     model = create_linopy_model(N)
-    model.solve(solver_name="gurobi", io_api="direct")
+    model.solve(solver_name=solver_name, io_api="lp")
     t1 = time.time()
     results["linopy"] = t1 - t0
 
     t0 = time.time()
-    model = create_cvxpy_model(N)
-    model.solve(solver=cvxpy.GUROBI)
-    t1 = time.time()
-    results["cvxpy"] = t1 - t0
+    solver = {"gurobi": cvxpy.GUROBI, "copt": cvxpy.COPT}.get(solver_name, None)
+    if solver:
+        model = create_cvxpy_model(N)
+        model.solve(solver=cvxpy.GUROBI)
+        t1 = time.time()
+        results["cvxpy"] = t1 - t0
 
     return results
 
 
-def main():
+def main(solver_name="gurobi"):
     Ns = range(100, 501, 100)
     results = []
     for N in Ns:
-        results.append(bench(N))
+        results.append(bench(N, solver_name))
     # create a DataFrame
     df = pd.DataFrame(results, index=Ns)
 
@@ -85,4 +93,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # solver_name can be "copt", "gurobi", "highs"
+    main("highs")
