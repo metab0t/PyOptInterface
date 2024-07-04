@@ -102,7 +102,7 @@ For Gurobi, the automatic detection looks for the following things in order:
 
 ### COPT
 
-The currently supported version is **7.1.x**. Other versions may work but are not tested.
+The currently supported version is **7.1.4** and newer. Other versions may work but are not tested.
 
 For COPT, the automatic detection looks for the following things in order:
 1. The environment variable `COPT_HOME` set by the installer of COPT
