@@ -1,7 +1,11 @@
 # Changelog
 
 ## Unreleased change
-- Add rotated second-order cone and exponential cone support for COPT and Mosek
+
+## 0.2.6
+- Add rotated second-order cone support for COPT, Gurobi and Mosek
+- Add exponential cone support for COPT and Mosek
+- Requires COPT version >= 7.1.4 to support exponential cone
 
 ## 0.2.5
 - Fix `add_linear_constraint` of HiGHS optimizer to consider the constant term in expression correctly
