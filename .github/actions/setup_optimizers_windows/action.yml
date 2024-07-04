@@ -52,7 +52,7 @@ runs:
       name: Download Installers
       run: |
         curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.0/win64/CardinalOptimizer-7.1.0-win64.zip
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.4/win64/CardinalOptimizer-7.1.4-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
 
     - name: Setup Gurobi Installation

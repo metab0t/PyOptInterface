@@ -49,7 +49,7 @@ runs:
       name: Download Universal Installers
       run: |
         curl -L -o ~/installers/gurobi.pkg https://packages.gurobi.com/11.0/gurobi11.0.0_macos_universal2.pkg
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.0/osx64/CardinalOptimizer-7.1.0-universal_mac.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.4/osx64/CardinalOptimizer-7.1.4-universal_mac.tar.gz
 
     - if: ${{ (steps.cache-installers-macos.outputs.cache-hit != 'true') && (inputs.ARCH == 'X64') }}
       shell: bash
