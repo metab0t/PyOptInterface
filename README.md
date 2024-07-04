@@ -51,6 +51,7 @@ It currently supports the following problem types:
 - Mixed-Integer Quadratically Constrained Quadratic Programming (MIQCQP)
 - Second-Order Cone Programming (SOCP)
 - Mixed-Integer Second-Order Cone Programming (MISOCP)
+- Exponential Cone Programming
 
 ## What optimizers does PyOptInterface support?
 It currently supports the following optimizers:
