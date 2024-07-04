@@ -316,12 +316,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-07-04 01:50:26 [INFO] checks license for COPT v7.1.4 20240627
-2024-07-04 01:50:26 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
-2024-07-04 01:50:26 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.9/x64/bin
-2024-07-04 01:50:26 [WARN] no license files in HOME folder: /home/runner/copt
-2024-07-04 01:50:26 [INFO] empty environment variable: COPT_LICENSE_DIR
-2024-07-04 01:50:26 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-07-04 02:29:44 [INFO] checks license for COPT v7.1.4 20240627
+2024-07-04 02:29:44 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2024-07-04 02:29:44 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.9/x64/bin
+2024-07-04 02:29:44 [WARN] no license files in HOME folder: /home/runner/copt
+2024-07-04 02:29:44 [INFO] empty environment variable: COPT_LICENSE_DIR
+2024-07-04 02:29:44 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
 No license found. Starting COPT with size limitations for non-commercial use
 Please apply for a license from www.shanshu.ai/copt
@@ -445,15 +445,59 @@ class.</p>
 </div>
 </div>
 </div>
+<p>Some optimizers (COPT, Mosek) support another form of second-order cone constraint called as rotated second-order cone constraint, which is defined as:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+variables=(t_{1},t_{2},x) \in \mathbb{R}^{N} : 2 t_1 t_2 \ge \lVert x \rVert_2
+\]</div>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_second_order_cone_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_second_order_cone_constraint" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotated=False</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_second_order_cone_constraint" title="Link to this definition">¶</a></dt>
 <dd><p>add a second order cone constraint to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variables</strong> – the variables of the constraint, can be a list of variables</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
+<li><p><strong>rotated</strong> (<em>bool</em>) – whether the constraint is a rotated second-order cone constraint, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the handle of the constraint</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="exponential-cone-constraint">
+<h2>Exponential Cone Constraint<a class="headerlink" href="#exponential-cone-constraint" title="Link to this heading">¶</a></h2>
+<p>It is defined as:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+variables=(t,s,r) \in \mathbb{R}^{3} : t \ge s \exp(\frac{r}{s}), s \ge 0
+\]</div>
+</div>
+<p>The dual form is:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+variables=(t,s,r) \in \mathbb{R}^{3} : t \ge -r \exp(\frac{s}{r} - 1), r \le 0
+\]</div>
+</div>
+<p>Currently, only COPT(after 7.1.4), Mosek support exponential cone constraint. It can be added to the model using the <code class="docutils literal notranslate"><span class="pre">add_exp_cone_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.add_exp_cone_constraint">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_exp_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dual=False</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_exp_cone_constraint" title="Link to this definition">¶</a></dt>
+<dd><p>add a second order cone constraint to the model</p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> – the variables of the constraint, can be a list of variables</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
+<li><p><strong>dual</strong> (<em>bool</em>) – whether the constraint is dual form of exponential cone, optional</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -630,6 +674,10 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 </li>
 <li><a class="reference internal" href="#second-order-cone-constraint">Second-Order Cone Constraint</a><ul>
 <li><a class="reference internal" href="#model.add_second_order_cone_constraint"><code class="docutils literal notranslate"><span class="pre">model.add_second_order_cone_constraint()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exponential-cone-constraint">Exponential Cone Constraint</a><ul>
+<li><a class="reference internal" href="#model.add_exp_cone_constraint"><code class="docutils literal notranslate"><span class="pre">model.add_exp_cone_constraint()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#special-ordered-set-sos-constraint">Special Ordered Set (SOS) Constraint</a><ul>

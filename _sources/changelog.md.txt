@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased change
+- Add rotated second-order cone and exponential cone support for COPT and Mosek
 
 ## 0.2.5
 - Fix `add_linear_constraint` of HiGHS optimizer to consider the constant term in expression correctly

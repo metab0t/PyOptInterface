@@ -33,6 +33,8 @@ model = mosek.Model(env)
     - ✅
 *   - <project:#model.add_second_order_cone_constraint>
     - ✅
+*   - <project:#model.add_exp_cone_constraint>
+    - ✅
 *   - <project:#model.add_sos_constraint>
     - ❌
 
