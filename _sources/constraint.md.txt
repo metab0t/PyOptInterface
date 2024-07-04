@@ -115,7 +115,7 @@ vars = [model.add_variable() for i in range(N)]
 con = model.add_second_order_cone_constraint(vars)
 ```
 
-Some optimizers (COPT, Mosek) support another form of second-order cone constraint called as rotated second-order cone constraint, which is defined as:
+There is another form of second-order cone constraint called as rotated second-order cone constraint, which is defined as:
 
 $$
 variables=(t_{1},t_{2},x) \in \mathbb{R}^{N} : 2 t_1 t_2 \ge \lVert x \rVert_2^2
