@@ -194,7 +194,7 @@ def get_terminationstatus(model):
     elif model_status == Enum.kHighsModelStatusOptimal:
         return TerminationStatusCode.OPTIMAL
     elif model_status == Enum.kHighsModelStatusInfeasible:
-        return TerminationStatusCode.Infeasible
+        return TerminationStatusCode.INFEASIBLE
     elif model_status == Enum.kHighsModelStatusUnboundedOrInfeasible:
         return TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED
     elif model_status == Enum.kHighsModelStatusUnbounded:
@@ -206,7 +206,7 @@ def get_terminationstatus(model):
     elif model_status == Enum.kHighsModelStatusTimeLimit:
         return TerminationStatusCode.TIME_LIMIT
     elif model_status == Enum.kHighsModelStatusIterationLimit:
-        return TerminationStatusCode.IterationLimit
+        return TerminationStatusCode.ITERATION_LIMIT
     elif model_status == Enum.kHighsModelStatusUnknown:
         return TerminationStatusCode.OTHER_ERROR
     else:
