@@ -2,6 +2,9 @@
 
 ## Unreleased change
 
+## 0.2.7
+- Fix bugs in HiGHS termination status
+
 ## 0.2.6
 - Add rotated second-order cone support for COPT, Gurobi and Mosek
 - Add exponential cone support for COPT and Mosek
