@@ -441,8 +441,9 @@ struct CSCMatrix
 		numnz = f_numnz;
 		numcol = i_numcol;
 
-		std::vector<IDXT> rows(numnz); // Row indices
-		std::vector<IDXT> cols(numnz); // Column indices
+		std::vector<IDXT> rows(numnz);   // Row indices
+		std::vector<IDXT> cols(numnz);   // Column indices
+		std::vector<VALT> values(numnz); // Values
 		for (int i = 0; i < numnz; ++i)
 		{
 			auto v1 = model->_variable_index(function.variable_1s[i]);
@@ -475,20 +476,14 @@ struct CSCMatrix
 
 			rows[i] = v1;
 			cols[i] = v2;
-		}
-		std::span<const VALT> values;
-		std::vector<VALT> values_storage;
-		if constexpr (std::is_same_v<VALT, CoeffT>)
-		{
-			values = function.coefficients;
-		}
-		else
-		{
-			values_storage.resize(numnz);
-			for (int i = 0; i < numnz; ++i)
+
+			auto coef = function.coefficients[i];
+			if (v1 != v2)
 			{
-				values_storage[i] = function.coefficients[i];
+				// Non-diagonal element, should multiply by 0.5
+				coef *= 0.5;
 			}
+			values[i] = coef;
 		}
 
 		// Sorting based on column indices

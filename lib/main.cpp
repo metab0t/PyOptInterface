@@ -334,7 +334,7 @@ auto debug_highs_passname(int N) -> void
 		assert(col == i + 1);
 
 		auto name = fmt::format("x{}", i);
-		highs::Highs_passColName(highs, i, name.c_str());
+		// highs::Highs_passColName(highs, i, name.c_str());
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
@@ -367,10 +367,21 @@ void test_highs_add_variable()
 	}
 }
 
+void test_highs_qp()
+{
+	HighsModelMixin model;
+
+	auto x = model.add_variable();
+	auto y = model.add_variable();
+
+	model.set_objective(x * y, ObjectiveSense::Minimize);
+	model.optimize();
+}
+
 auto main() -> int
 {
-	highs::load_library("E:\\HiGHS\\install\\bin\\highs.dll");
+	highs::load_library("E:\\HiGHS\\build\\bin\\Release\\highs.dll");
 
-	test_highs_add_variable();
+	test_highs_qp();
 	return 0;
 }

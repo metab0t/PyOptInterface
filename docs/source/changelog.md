@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased change
+- Fix bugs in HiGHS and MOSEK when the quadratic objective function contains nondiagonal terms
 
 ## 0.2.7
 - Fix bugs in HiGHS termination status

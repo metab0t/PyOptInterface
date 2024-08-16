@@ -76,11 +76,18 @@ void QuadraticFunctionPtrForm<MSKint32t, MSKint32t, MSKrealt>::make<MOSEKModel>(
 	row = row_storage.data();
 	col = col_storage.data();
 
-	// MOSEK has 1/2 * x^T @ Q @ x, so we need to multiply the coefficient by 2
+	// MOSEK has 1/2 * x^T @ Q @ x, so we need to multiply the coefficient by 2 for diagonal terms
 	value_storage.resize(numnz);
 	for (int i = 0; i < numnz; ++i)
 	{
-		value_storage[i] = 2.0 * function.coefficients[i];
+		if (function.variable_1s[i] == function.variable_2s[i])
+		{
+			value_storage[i] = 2 * function.coefficients[i];
+		}
+		else
+		{
+			value_storage[i] = function.coefficients[i];
+		}
 	}
 	value = value_storage.data();
 }

@@ -364,7 +364,7 @@ void POIHighsModel::set_objective(const ScalarQuadraticFunction &function, Objec
 	if (numqnz > 0)
 	{
 		CSCMatrix<HighsInt, HighsInt, double> csc;
-		csc.make(this, function, n_variables, HessianTriangular::Upper);
+		csc.make(this, function, n_variables, HessianTriangular::Lower);
 
 		// Highs optimizes 0.5 * x' * Q * x
 		// so the coefficient must be multiplied by 2.0
