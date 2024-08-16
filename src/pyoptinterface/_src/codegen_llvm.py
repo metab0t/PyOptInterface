@@ -1,5 +1,4 @@
 from .nlcore_ext import (
-    cpp_graph,
     graph_op,
 )
 from .cpp_graph_iter import cpp_graph_iterator

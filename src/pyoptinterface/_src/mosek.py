@@ -21,7 +21,6 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
-from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_nd_variable
 
 
