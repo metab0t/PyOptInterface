@@ -36,12 +36,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.2
         env:
           # Select wheels
+          CIBW_BUILD: "*-manylinux_x86_64 *-manylinux_aarch64"
           CIBW_SKIP: "cp36-* cp37-* pp*"
           CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
-        with:
-          package-dir: .
-          output-dir: wheelhouse
-          config-file: "{package}/pyproject.toml"
 
       - name: Build wheels (non Linux)
         if: matrix.os != 'ubuntu-latest'
