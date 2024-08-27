@@ -31,7 +31,7 @@ jobs:
         with:
           platforms: all
 
-      - name: Build wheels (non Linux)
+      - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.2
         env:
           CIBW_ENVIRONMENT_MACOS: >
