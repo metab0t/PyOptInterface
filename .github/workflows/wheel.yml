@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up QEMU
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         uses: docker/setup-qemu-action@v3
         with:
           platforms: all
@@ -38,9 +38,6 @@ jobs:
           # Select wheels
           CIBW_BUILD: "*-manylinux_x86_64 *-manylinux_aarch64"
           CIBW_SKIP: "cp36-* cp37-* pp*"
-          # use manylinux2014
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
           CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
         with:
           package-dir: .
@@ -55,23 +52,6 @@ jobs:
           CIBW_BUILD: "*-win_amd64 *-macosx_x86_64 *-macosx_arm64"
           CIBW_SKIP: "cp36-* cp37-* pp* cp38-macosx_arm64"
           CIBW_ARCHS: "native"
-          CIBW_ENVIRONMENT_MACOS: >
-            MACOSX_DEPLOYMENT_TARGET=10.14
-          CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
-        with:
-          package-dir: .
-          output-dir: wheelhouse
-          config-file: "{package}/pyproject.toml"
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.2
-        env:
-          # Select wheels
-          CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
-          CIBW_SKIP: "cp36-* cp37-* pp* cp38-macosx_arm64"
-          CIBW_ARCHS: "native"
-          # use manylinux2014
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ENVIRONMENT_MACOS: >
             MACOSX_DEPLOYMENT_TARGET=10.14
           CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
