@@ -329,14 +329,12 @@ void ExprBuilder::_add_quadratic_term(IndexT i, IndexT j, CoeffT coeff)
 	{
 		std::swap(i, j);
 	}
-	auto it = quadratic_terms.find({i, j});
-	if (it == quadratic_terms.end())
+	VariablePair vp{i, j};
+	auto ret = quadratic_terms.emplace(vp, coeff);
+	if (!ret.second)
 	{
-		quadratic_terms.insert({{i, j}, coeff});
-	}
-	else
-	{
-		it->second += coeff;
+		auto &iter = ret.first;
+		iter->second += coeff;
 	}
 }
 void ExprBuilder::_set_quadratic_coef(IndexT i, IndexT j, CoeffT coeff)
@@ -345,14 +343,12 @@ void ExprBuilder::_set_quadratic_coef(IndexT i, IndexT j, CoeffT coeff)
 	{
 		std::swap(i, j);
 	}
-	auto it = quadratic_terms.find({i, j});
-	if (it == quadratic_terms.end())
+	VariablePair vp{i, j};
+	auto ret = quadratic_terms.emplace(vp, coeff);
+	if (!ret.second)
 	{
-		quadratic_terms.insert({{i, j}, coeff});
-	}
-	else
-	{
-		it->second = coeff;
+		auto &iter = ret.first;
+		iter->second = coeff;
 	}
 }
 void ExprBuilder::add_quadratic_term(const VariableIndex &i, const VariableIndex &j, CoeffT coeff)
@@ -366,26 +362,20 @@ void ExprBuilder::set_quadratic_coef(const VariableIndex &i, const VariableIndex
 
 void ExprBuilder::_add_affine_term(IndexT i, CoeffT coeff)
 {
-	auto it = affine_terms.find(i);
-	if (it == affine_terms.end())
+	auto ret = affine_terms.emplace(i, coeff);
+	if (!ret.second)
 	{
-		affine_terms.insert({i, coeff});
-	}
-	else
-	{
-		it->second += coeff;
+		auto &iter = ret.first;
+		iter->second += coeff;
 	}
 }
 void ExprBuilder::_set_affine_coef(IndexT i, CoeffT coeff)
 {
-	auto it = affine_terms.find(i);
-	if (it == affine_terms.end())
+	auto ret = affine_terms.emplace(i, coeff);
+	if (!ret.second)
 	{
-		affine_terms.insert({i, coeff});
-	}
-	else
-	{
-		it->second = coeff;
+		auto &iter = ret.first;
+		iter->second = coeff;
 	}
 }
 void ExprBuilder::add_affine_term(const VariableIndex &i, CoeffT coeff)
