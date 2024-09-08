@@ -44,7 +44,7 @@ runs:
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
 
-    - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }} && (inputs.ARCH == 'X64') }}
+    - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }} && ${{ inputs.ARCH == 'X64' }}
       shell: bash
       name: Download Installers
       run: |
@@ -52,7 +52,7 @@ runs:
         curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.1.4/linux64/CardinalOptimizer-7.1.4-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
 
-    - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }} && (inputs.ARCH == 'ARM64') }}
+    - if: ${{ steps.cache-installers-linux.outputs.cache-hit != 'true' }} && ${{ inputs.ARCH == 'arm64' }}
       shell: bash
       name: Download Installers
       run: |
@@ -66,7 +66,7 @@ runs:
       env:
         GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
       run: |
-        tar xfvz ~/installers/gurobi.tar.gz -C ~/
+        tar xfz ~/installers/gurobi.tar.gz -C ~/
         # set environment variables
         export GUROBI_HOME="${HOME}/gurobi1100/linux64"
         if [[ ${{ inputs.ARCH }} == "ARM64" ]]; then
