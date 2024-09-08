@@ -72,11 +72,11 @@ runs:
         if [[ ${{ inputs.ARCH }} == "ARM64" ]]; then
           export GUROBI_HOME="${HOME}/gurobi1100/armlinux64"
         fi
-        ls $GUROBI_HOME
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${GUROBI_HOME}/bin" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib" >> $GITHUB_ENV
         echo $GUROBI_HOME
+        ls $GUROBI_HOME
 
         # setup license using secrets
         echo "$GUROBI_WLS" > ~/gurobi.lic
