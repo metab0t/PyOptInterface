@@ -44,3 +44,5 @@ manylinux-x86_64-image = "quay.io/pypa/manylinux2014_x86_64"
 manylinux-aarch64-image = "quay.io/pypa/manylinux2014_aarch64"
 [tool.cibuildwheel.linux]
 archs = ["x86_64", "aarch64"]
+[tool.cibuildwheel.macos]
+macos-deployment-target = "10.14"
