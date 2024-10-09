@@ -337,6 +337,11 @@
 <span class="n">x_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The most common operation is to set the bounds of the variable. We can use the <a class="reference internal" href="common_model_interface.html#model.set_variable_bounds" title="model.set_variable_bounds"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">set_variable_bounds</span></code></span></a> method of the model to set the lower and upper bounds of the variable at the same time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="delete-variable">
 <h2>Delete variable<a class="headerlink" href="#delete-variable" title="Link to this heading">¶</a></h2>

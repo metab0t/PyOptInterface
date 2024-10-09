@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add `model.set_variable_bounds(variable, lb, ub)` to make it easier to change variable bounds
+
 ## 0.2.8
 - Fix bugs in HiGHS and MOSEK when the quadratic objective function contains nondiagonal terms
 

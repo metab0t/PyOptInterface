@@ -93,6 +93,17 @@ query whether a variable is active
 :rtype: bool
 ```
 
+### Modify the bounds of variable
+
+```{py:function} model.set_variable_bounds(var, lb, ub)
+
+set the lower and upper bounds of a variable
+
+:param var: the handle of the variable
+:param float lb: the new lower bound value
+:param float ub: the new upper bound value
+```
+
 ## Expression
 
 ### Get the value of an expression (including variable)
