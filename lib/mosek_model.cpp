@@ -373,6 +373,22 @@ std::string MOSEKModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_name(variable);
 }
 
+void MOSEKModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
+{
+	auto column = _checked_variable_index(variable);
+	MSKboundkeye bk;
+	if (lb == ub)
+	{
+		bk = MSK_BK_FX;
+	}
+	else
+	{
+		bk = MSK_BK_RA;
+	}
+	auto error = mosek::MSK_putvarbound(m_model.get(), column, bk, lb, ub);
+	check_error(error);
+}
+
 ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                   ConstraintSense sense, CoeffT rhs,
                                                   const char *name)

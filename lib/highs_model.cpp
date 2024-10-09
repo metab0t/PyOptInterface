@@ -229,6 +229,13 @@ std::string POIHighsModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_name(variable);
 }
 
+void POIHighsModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
+{
+	auto column = _checked_variable_index(variable);
+	auto error = highs::Highs_changeColsBoundsBySet(m_model.get(), 1, &column, &lb, &ub);
+	check_error(error);
+}
+
 ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                      ConstraintSense sense, CoeffT rhs,
                                                      const char *name)

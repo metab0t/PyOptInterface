@@ -47,6 +47,13 @@ model.set_variable_attribute(x, poi.VariableAttribute.PrimalStart, 0.5)
 x_value = model.get_variable_attribute(x, poi.VariableAttribute.Value)
 ```
 
+The most common operation is to set the bounds of the variable. We can use the [`set_variable_bounds`](#model.set_variable_bounds) method of the model to set the lower and upper bounds of the variable at the same time:
+
+```python
+x = model.add_variable(name="x")
+model.set_variable_bounds(x, 0.0, 1.0)
+```
+
 ## Delete variable
 We can delete a variable by calling the [`delete_variable`](#model.delete_variable) method of the model:
 

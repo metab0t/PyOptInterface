@@ -6,7 +6,8 @@ def test_simple_opt(model_interface):
     model = model_interface
 
     x = model.add_variable(lb=0.0, ub=20.0)
-    y = model.add_variable(lb=8.0, ub=20.0)
+    y = model.add_variable()
+    model.set_variable_bounds(y, 8.0, 20.0)
 
     model.set_variable_attribute(x, poi.VariableAttribute.Name, "x")
     model.set_variable_attribute(y, poi.VariableAttribute.Name, "y")

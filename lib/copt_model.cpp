@@ -259,6 +259,16 @@ std::string COPTModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_name(variable);
 }
 
+void COPTModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
+{
+	auto column = _checked_variable_index(variable);
+	int error;
+	error = copt::COPT_SetColLower(m_model.get(), 1, &column, &lb);
+	check_error(error);
+	error = copt::COPT_SetColUpper(m_model.get(), 1, &column, &ub);
+	check_error(error);
+}
+
 ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                  ConstraintSense sense, CoeffT rhs,
                                                  const char *name)

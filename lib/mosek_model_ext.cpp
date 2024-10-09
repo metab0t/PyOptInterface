@@ -40,6 +40,8 @@ NB_MODULE(mosek_model_ext, m)
 	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
+	    .def("set_variable_bounds", &MOSEKModelMixin::set_variable_bounds, nb::arg("variable"),
+	         nb::arg("lb"), nb::arg("ub"))
 
 	    .def("get_value",
 	         nb::overload_cast<const VariableIndex &>(&MOSEKModelMixin::get_variable_value))

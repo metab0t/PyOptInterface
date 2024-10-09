@@ -122,6 +122,7 @@ class POIHighsModel
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
 	std::string pprint_variable(const VariableIndex &variable);
+	void set_variable_bounds(const VariableIndex &variable, double lb, double ub);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs,

@@ -1,5 +1,5 @@
 from typing import IO
-from path import Path
+from pathlib import Path
 
 import gurobipy as gp
 

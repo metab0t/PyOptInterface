@@ -147,6 +147,7 @@ class GurobiModel
 	bool is_variable_active(const VariableIndex &variable);
 	double get_variable_value(const VariableIndex &variable);
 	std::string pprint_variable(const VariableIndex &variable);
+	void set_variable_bounds(const VariableIndex &variable, double lb, double ub);
 
 	void set_variable_name(const VariableIndex &variable, const char *name);
 	void set_constraint_name(const ConstraintIndex &constraint, const char *name);

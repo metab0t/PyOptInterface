@@ -210,6 +210,17 @@ std::string GurobiModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME);
 }
 
+void GurobiModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
+{
+	auto column = _checked_variable_index(variable);
+	int error;
+	error = gurobi::GRBsetdblattrelement(m_model.get(), GRB_DBL_ATTR_LB, column, lb);
+	check_error(error);
+	error = gurobi::GRBsetdblattrelement(m_model.get(), GRB_DBL_ATTR_UB, column, ub);
+	check_error(error);
+	m_update_flag |= m_attribute_update;
+}
+
 void GurobiModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
 	set_variable_raw_attribute_string(variable, GRB_STR_ATTR_VARNAME, name);
