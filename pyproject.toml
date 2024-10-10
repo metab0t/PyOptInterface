@@ -34,3 +34,15 @@ cmake.build-type = "Release"
 PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.8" }
 CMAKE_FIND_DEBUG_MODE = "OFF"
 ENABLE_TEST_MAIN = "OFF"
+
+[tool.cibuildwheel]
+test-command = 'python -c "import pyoptinterface as poi; print(dir(poi))"'
+build = "*-manylinux_x86_64 *-manylinux_aarch64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
+skip = "cp36-* cp37-* pp* cp38-macosx_arm64"
+archs = "native"
+manylinux-x86_64-image = "quay.io/pypa/manylinux2014_x86_64"
+manylinux-aarch64-image = "quay.io/pypa/manylinux2014_aarch64"
+[tool.cibuildwheel.linux]
+archs = ["x86_64", "aarch64"]
+[tool.cibuildwheel.macos]
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.14" }
