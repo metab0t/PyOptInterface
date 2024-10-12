@@ -546,18 +546,17 @@ size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
 
 	size_t hessian_index;
 	VariablePair varpair(x1, x2);
-	auto iter = m_hessian_index_map.find(varpair);
-	if (iter != m_hessian_index_map.end())
-	{
-		hessian_index = iter->second;
-	}
-	else
+	auto [iter, inserted] = m_hessian_index_map.emplace(varpair, m_hessian_nnz);
+	if (inserted)
 	{
 		hessian_index = m_hessian_nnz;
-		m_hessian_index_map[varpair] = m_hessian_nnz;
 		m_hessian_rows.push_back(x1);
 		m_hessian_cols.push_back(x2);
 		m_hessian_nnz += 1;
+	}
+	else
+	{
+		hessian_index = iter->second;
 	}
 	return hessian_index;
 }
