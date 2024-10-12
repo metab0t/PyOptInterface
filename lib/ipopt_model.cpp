@@ -668,11 +668,13 @@ void IpoptModel::optimize()
 {
 	// analyze structure
 	m_function_model.analyze_active_functions();
+	m_function_model.analyze_constraint_components();
 	m_function_model.analyze_dense_gradient_structure();
 	m_function_model.analyze_jacobian_structure(m_jacobian_nnz, m_jacobian_rows, m_jacobian_cols);
 	m_function_model.analyze_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,
 	                                           HessianSparsityType::Lower);
 
+	m_lq_model.analyze_constraint_components();
 	m_lq_model.analyze_dense_gradient_structure();
 	m_lq_model.analyze_jacobian_structure(m_jacobian_nnz, m_jacobian_rows, m_jacobian_cols);
 	m_lq_model.analyze_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,

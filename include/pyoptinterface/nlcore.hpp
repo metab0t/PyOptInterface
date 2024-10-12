@@ -367,9 +367,11 @@ struct LinearQuadraticModel
 {
 	std::vector<ScalarAffineFunction> linear_constraints;
 	std::vector<size_t> linear_constraint_indices;
+	std::vector<size_t> linear_constraint_for_each_mapper;
 
 	std::vector<ScalarQuadraticFunction> quadratic_constraints;
 	std::vector<size_t> quadratic_constraint_indices;
+	std::vector<size_t> quadratic_constraint_for_each_mapper;
 
 	ExprBuilder lq_objective;
 	std::vector<size_t> lq_objective_hessian_indices;
@@ -404,6 +406,7 @@ struct LinearQuadraticModel
 		lq_objective = expr;
 	}
 
+	void analyze_constraint_components();
 	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
 	                                std::vector<size_t> &m_jacobian_cols);
 	void analyze_dense_gradient_structure();
@@ -427,13 +430,28 @@ struct LinearQuadraticModel
 	                             const double *restrict lambda, double *restrict hessian);
 };
 
+struct ConstraintNonlinearFunctionComponent
+{
+	int i_function;
+	size_t i_instance;
+};
+
 struct NonlinearFunctionModel
 {
 	std::vector<NonlinearFunction> nl_functions;
 	std::vector<FunctionInstances> constraint_function_instances;
-	std::vector<size_t> active_constraint_function_indices;
+	std::vector<int> active_constraint_function_indices;
 	std::vector<FunctionInstances> objective_function_instances;
-	std::vector<size_t> active_objective_function_indices;
+	std::vector<int> active_objective_function_indices;
+
+	// For constraint constraint_component_indices[i]
+	// constraint_components[j1...j2] are the indices of the nonlinear functions
+	// j1 = constraint_component_offsets[i]
+	// j2 = constraint_component_offsets[i + 1]
+	std::vector<ConstraintNonlinearFunctionComponent> constraint_components;
+	std::vector<size_t> constraint_component_indices;
+	std::vector<size_t> constraint_component_offsets;
+	std::vector<size_t> constraint_component_for_each_mapper;
 
 	std::vector<double> p;
 
@@ -454,6 +472,8 @@ struct NonlinearFunctionModel
 	void clear_nl_objective();
 
 	void analyze_active_functions();
+
+	void analyze_constraint_components();
 
 	// renumber all nonlinear constraints from 0 and collect their indices
 	void analyze_compact_constraint_index(size_t &n_nlcon, std::vector<size_t> &ys);

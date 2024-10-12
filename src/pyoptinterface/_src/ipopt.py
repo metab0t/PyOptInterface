@@ -78,6 +78,7 @@ def compile_functions_c(backend: RawModel, jit_compiler: TCCJITCompiler):
             np=function.np,
             indirect_x=True,
             indirect_p=True,
+            add_y=True,
         )
         if function.has_jacobian:
             jacobian_name = name + "_jacobian"
@@ -157,6 +158,7 @@ def compile_functions_llvm(backend: RawModel, jit_compiler: LLJITCompiler):
             np=function.np,
             indirect_x=True,
             indirect_p=True,
+            add_y=True,
         )
         if function.has_jacobian:
             jacobian_name = name + "_jacobian"

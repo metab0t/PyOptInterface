@@ -101,6 +101,16 @@ void LinearQuadraticModel::add_quadratic_constraint(const ScalarQuadraticFunctio
 	quadratic_constraint_indices.push_back(y);
 }
 
+void LinearQuadraticModel::analyze_constraint_components()
+{
+	linear_constraint_for_each_mapper.resize(linear_constraints.size());
+	std::iota(linear_constraint_for_each_mapper.begin(), linear_constraint_for_each_mapper.end(),
+	          0);
+	quadratic_constraint_for_each_mapper.resize(quadratic_constraints.size());
+	std::iota(quadratic_constraint_for_each_mapper.begin(),
+	          quadratic_constraint_for_each_mapper.end(), 0);
+}
+
 void LinearQuadraticModel::analyze_jacobian_structure(size_t &m_jacobian_nnz,
                                                       std::vector<size_t> &m_jacobian_rows,
                                                       std::vector<size_t> &m_jacobian_cols)
@@ -224,7 +234,6 @@ void LinearQuadraticModel::analyze_sparse_gradient_structure(size_t &gradient_nn
 			else
 			{
 				size_t grad_index = add_gradient_column(x1, gradient_nnz, gradient_cols);
-				;
 				gradient_linear_terms.emplace_back(c, x2, grad_index);
 				grad_index = add_gradient_column(x2, gradient_nnz, gradient_cols);
 				gradient_linear_terms.emplace_back(c, x1, grad_index);
@@ -334,48 +343,49 @@ void LinearQuadraticModel::eval_objective_gradient(const double *restrict x, dou
 
 void LinearQuadraticModel::eval_constraint(const double *restrict x, double *restrict con)
 {
+	auto policy = std::execution::par_unseq;
 	// linear and quadratic part
-	for (size_t i = 0; i < linear_constraints.size(); i++)
-	{
-		auto &f = linear_constraints[i];
-		auto N = f.size();
-		auto row = linear_constraint_indices[i];
-		double sum = 0.0;
-		for (size_t j = 0; j < N; j++)
-		{
-			sum += f.coefficients[j] * x[f.variables[j]];
-		}
-		if (f.constant)
-		{
-			sum += f.constant.value();
-		}
-		con[row] += sum;
-	}
-	for (size_t i = 0; i < quadratic_constraints.size(); i++)
-	{
-		auto &f = quadratic_constraints[i];
-		auto N = f.size();
-		auto row = quadratic_constraint_indices[i];
-		double sum = 0.0;
-		for (size_t j = 0; j < N; j++)
-		{
-			sum += f.coefficients[j] * x[f.variable_1s[j]] * x[f.variable_2s[j]];
-		}
-		if (f.affine_part)
-		{
-			ScalarAffineFunction &af = f.affine_part.value();
-			auto N = af.size();
-			for (size_t j = 0; j < N; j++)
-			{
-				sum += af.coefficients[j] * x[af.variables[j]];
-			}
-			if (af.constant)
-			{
-				sum += af.constant.value();
-			}
-		}
-		con[row] += sum;
-	}
+	std::for_each(policy, linear_constraint_for_each_mapper.begin(),
+	              linear_constraint_for_each_mapper.end(), [&](const auto &i) {
+		              auto &f = linear_constraints[i];
+		              auto N = f.size();
+		              auto row = linear_constraint_indices[i];
+		              double sum = 0.0;
+		              for (size_t j = 0; j < N; j++)
+		              {
+			              sum += f.coefficients[j] * x[f.variables[j]];
+		              }
+		              if (f.constant)
+		              {
+			              sum += f.constant.value();
+		              }
+		              con[row] = sum;
+	              });
+	std::for_each(policy, quadratic_constraint_for_each_mapper.begin(),
+	              quadratic_constraint_for_each_mapper.end(), [&](const auto &i) {
+		              auto &f = quadratic_constraints[i];
+		              auto N = f.size();
+		              auto row = quadratic_constraint_indices[i];
+		              double sum = 0.0;
+		              for (size_t j = 0; j < N; j++)
+		              {
+			              sum += f.coefficients[j] * x[f.variable_1s[j]] * x[f.variable_2s[j]];
+		              }
+		              if (f.affine_part)
+		              {
+			              ScalarAffineFunction &af = f.affine_part.value();
+			              auto N = af.size();
+			              for (size_t j = 0; j < N; j++)
+			              {
+				              sum += af.coefficients[j] * x[af.variables[j]];
+			              }
+			              if (af.constant)
+			              {
+				              sum += af.constant.value();
+			              }
+		              }
+		              con[row] = sum;
+	              });
 }
 
 void LinearQuadraticModel::eval_constraint_jacobian(const double *restrict x,
@@ -638,6 +648,56 @@ void NonlinearFunctionModel::analyze_active_functions()
 	}
 }
 
+void NonlinearFunctionModel::analyze_constraint_components()
+{
+	// categorize nonlinear functions by their constraint indices
+	Hashmap<size_t, std::vector<ConstraintNonlinearFunctionComponent>>
+	    constraint_function_components_map;
+
+	auto N_components = 0;
+	for (auto k : active_constraint_function_indices)
+	{
+		auto &kernel = nl_functions[k];
+		auto &inst_vec = constraint_function_instances[k];
+		N_components += inst_vec.size();
+
+		for (auto i = 0; i < inst_vec.size(); i++)
+		{
+			const auto &inst = inst_vec[i];
+			auto &i_contraint = inst.y_start;
+
+			ConstraintNonlinearFunctionComponent component{k, (size_t)i};
+
+			auto [iter, inserted] = constraint_function_components_map.emplace(
+			    i_contraint, std::vector<ConstraintNonlinearFunctionComponent>{component});
+
+			if (!inserted)
+			{
+				iter->second.push_back(component);
+			}
+		}
+	}
+
+	constraint_components.reserve(N_components);
+
+	auto N_constraints = constraint_function_components_map.size();
+	constraint_component_indices.reserve(N_constraints);
+	constraint_component_offsets.reserve(N_constraints + 1);
+
+	constraint_component_offsets.push_back(0);
+	for (auto &[constraint_index, components] : constraint_function_components_map)
+	{
+		constraint_component_indices.push_back(constraint_index);
+		constraint_components.insert(constraint_components.end(), components.begin(),
+		                             components.end());
+		constraint_component_offsets.push_back(constraint_components.size());
+	}
+
+	constraint_component_for_each_mapper.resize(N_constraints);
+	std::iota(constraint_component_for_each_mapper.begin(),
+	          constraint_component_for_each_mapper.end(), 0);
+}
+
 void NonlinearFunctionModel::analyze_compact_constraint_index(size_t &n_nlcon,
                                                               std::vector<size_t> &ys)
 {
@@ -866,33 +926,38 @@ void NonlinearFunctionModel::eval_objective_gradient(const double *x, double *gr
 void NonlinearFunctionModel::eval_constraint(const double *x, double *con)
 {
 	double *p = this->p.data();
-	for (auto k : active_constraint_function_indices)
-	{
-		auto &kernel = nl_functions[k];
-		bool has_parameter = kernel.has_parameter;
-		auto &inst_vec = constraint_function_instances[k];
-		if (has_parameter)
-		{
-			for (const auto &inst : inst_vec)
-			{
-				auto &x_indices = inst.xs;
-				double *y = con + inst.eval_y_start;
 
-				auto &p_indices = inst.ps;
-				kernel.f_eval.p(x, p, y, x_indices.data(), p_indices.data());
-			}
-		}
-		else
-		{
-			for (const auto &inst : inst_vec)
-			{
-				auto &x_indices = inst.xs;
-				double *y = con + inst.eval_y_start;
+	auto policy = std::execution::par_unseq;
+	std::for_each(policy, constraint_component_for_each_mapper.begin(),
+	              constraint_component_for_each_mapper.end(), [&](const auto &i) {
+		              auto j1 = constraint_component_offsets[i];
+		              auto j2 = constraint_component_offsets[i + 1];
 
-				kernel.f_eval.nop(x, y, x_indices.data());
-			}
-		}
-	}
+		              auto constraint_index = constraint_component_indices[i];
+		              double *y = con + constraint_index;
+
+		              for (auto j = j1; j < j2; j++)
+		              {
+			              const auto &nonlinear_function_component = constraint_components[j];
+			              auto k = nonlinear_function_component.i_function;
+			              auto l = nonlinear_function_component.i_instance;
+
+			              auto &kernel = nl_functions[k];
+			              auto &inst = constraint_function_instances[k][l];
+
+			              auto &x_indices = inst.xs;
+
+			              if (kernel.has_parameter)
+			              {
+				              auto &p_indices = inst.ps;
+				              kernel.f_eval.p(x, p, y, x_indices.data(), p_indices.data());
+			              }
+			              else
+			              {
+				              kernel.f_eval.nop(x, y, x_indices.data());
+			              }
+		              }
+	              });
 }
 
 void NonlinearFunctionModel::eval_constraint_jacobian(const double *x, double *jacobian)
