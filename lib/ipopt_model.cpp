@@ -626,16 +626,40 @@ static bool eval_h(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipin
 	IpoptModel &model = *static_cast<IpoptModel *>(user_data);
 	if (iRow != nullptr)
 	{
-		auto &rows = model.m_hessian_rows;
-		auto &cols = model.m_hessian_cols;
-		std::copy(rows.begin(), rows.end(), iRow);
-		std::copy(cols.begin(), cols.end(), jCol);
+		if (model.if_compact_hessian)
+		{
+			auto &rows = model.m_hessian_rows_compact;
+			auto &cols = model.m_hessian_cols_compact;
+			std::copy(rows.begin(), rows.end(), iRow);
+			std::copy(cols.begin(), cols.end(), jCol);
+		}
+		else
+		{
+			auto &rows = model.m_hessian_rows;
+			auto &cols = model.m_hessian_cols;
+			std::copy(rows.begin(), rows.end(), iRow);
+			std::copy(cols.begin(), cols.end(), jCol);
+		}
 	}
 	else
 	{
 		std::fill(values, values + nele_hess, 0.0);
-		model.m_function_model.eval_lagrangian_hessian(x, &obj_factor, lambda, values);
-		model.m_lq_model.eval_lagrangian_hessian(x, &obj_factor, lambda, values);
+
+		if (model.if_compact_hessian)
+		{
+			double *hessian_buffer = model.m_hessian_buffer.data();
+			model.m_function_model.eval_lagrangian_hessian(x, &obj_factor, lambda, hessian_buffer);
+			model.m_lq_model.eval_lagrangian_hessian(x, &obj_factor, lambda, hessian_buffer);
+
+			// compact the Hessian
+			accumulate_duplicate_values(model.m_hessian_buffer, model.m_hessian_permute_indices,
+			                            model.m_hessian_permute_offsets, values);
+		}
+		else
+		{
+			model.m_function_model.eval_lagrangian_hessian(x, &obj_factor, lambda, values);
+			model.m_lq_model.eval_lagrangian_hessian(x, &obj_factor, lambda, values);
+		}
 	}
 	return true;
 }
@@ -647,12 +671,26 @@ void IpoptModel::optimize()
 	m_function_model.analyze_dense_gradient_structure();
 	m_function_model.analyze_jacobian_structure(m_jacobian_nnz, m_jacobian_rows, m_jacobian_cols);
 	m_function_model.analyze_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-	                                           m_hessian_index_map, HessianSparsityType::Lower);
+	                                           HessianSparsityType::Lower);
 
 	m_lq_model.analyze_dense_gradient_structure();
 	m_lq_model.analyze_jacobian_structure(m_jacobian_nnz, m_jacobian_rows, m_jacobian_cols);
 	m_lq_model.analyze_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-	                                     m_hessian_index_map, HessianSparsityType::Lower);
+	                                     HessianSparsityType::Lower);
+
+	// compress the nonzeros of Hessian
+	if (if_compact_hessian)
+	{
+		preprocess_duplicate_indices_2d(m_hessian_rows, m_hessian_cols, m_hessian_rows_compact,
+		                                m_hessian_cols_compact, m_hessian_permute_indices,
+		                                m_hessian_permute_offsets);
+		m_hessian_nnz_compact = m_hessian_rows_compact.size();
+		m_hessian_buffer.resize(m_hessian_nnz);
+	}
+	else
+	{
+		m_hessian_nnz_compact = m_hessian_nnz;
+	}
 
 	/*fmt::print("Problem has {} variables and {} constraints\n", n_variables, n_constraints);
 	fmt::print("Jacobian has {} nonzeros\n", m_jacobian_nnz);
@@ -662,10 +700,10 @@ void IpoptModel::optimize()
 	fmt::print("Hessian rows : {}\n", m_hessian_rows);
 	fmt::print("Hessian cols : {}\n", m_hessian_cols);*/
 
-	auto problem_ptr =
-	    ipopt::CreateIpoptProblem(n_variables, m_var_lb.data(), m_var_ub.data(), n_constraints,
-	                              m_con_lb.data(), m_con_ub.data(), m_jacobian_nnz, m_hessian_nnz,
-	                              0, &eval_f, &eval_g, &eval_grad_f, &eval_jac_g, &eval_h);
+	auto problem_ptr = ipopt::CreateIpoptProblem(n_variables, m_var_lb.data(), m_var_ub.data(),
+	                                             n_constraints, m_con_lb.data(), m_con_ub.data(),
+	                                             m_jacobian_nnz, m_hessian_nnz_compact, 0, &eval_f,
+	                                             &eval_g, &eval_grad_f, &eval_jac_g, &eval_h);
 
 	m_problem = std::unique_ptr<IpoptProblemInfo, IpoptfreeproblemT>(problem_ptr);
 

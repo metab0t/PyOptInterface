@@ -193,9 +193,12 @@ struct IpoptModel
 	size_t m_jacobian_nnz = 0;
 	std::vector<size_t> m_jacobian_rows, m_jacobian_cols;
 
-	size_t m_hessian_nnz = 0;
+	bool if_compact_hessian = false;
+	size_t m_hessian_nnz = 0, m_hessian_nnz_compact = 0;
 	std::vector<size_t> m_hessian_rows, m_hessian_cols;
-	Hashmap<VariablePair, size_t> m_hessian_index_map;
+	std::vector<size_t> m_hessian_rows_compact, m_hessian_cols_compact;
+	std::vector<size_t> m_hessian_permute_indices, m_hessian_permute_offsets;
+	std::vector<double> m_hessian_buffer;
 
 	NonlinearFunctionModel m_function_model;
 	LinearQuadraticModel m_lq_model;

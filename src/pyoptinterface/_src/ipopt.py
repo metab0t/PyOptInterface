@@ -112,7 +112,6 @@ def compile_functions_c(backend: RawModel, jit_compiler: TCCJITCompiler):
                 indirect_x=True,
                 indirect_p=True,
                 indirect_y=True,
-                add_y=True,
             )
 
     csrc = io.getvalue()
@@ -192,7 +191,6 @@ def compile_functions_llvm(backend: RawModel, jit_compiler: LLJITCompiler):
                 indirect_x=True,
                 indirect_p=True,
                 indirect_y=True,
-                add_y=True,
             )
 
         export_functions.extend([f_name, jacobian_name, gradient_name, hessian_name])

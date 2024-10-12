@@ -358,11 +358,9 @@ struct AffineDelta
 	}
 };
 
-size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-                           Hashmap<size_t, size_t> &grad_index_map);
+size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols);
 size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
                          std::vector<size_t> &m_hessian_rows, std::vector<size_t> &m_hessian_cols,
-                         Hashmap<VariablePair, size_t> &m_hessian_index_map,
                          HessianSparsityType hessian_sparsity_type);
 
 struct LinearQuadraticModel
@@ -409,11 +407,10 @@ struct LinearQuadraticModel
 	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
 	                                std::vector<size_t> &m_jacobian_cols);
 	void analyze_dense_gradient_structure();
-	void analyze_sparse_gradient_structure(size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-	                                       Hashmap<size_t, size_t> &gradient_index_map);
+	void analyze_sparse_gradient_structure(size_t &gradient_nnz,
+	                                       std::vector<size_t> &gradient_cols);
 	void analyze_hessian_structure(size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows,
 	                               std::vector<size_t> &m_hessian_cols,
-	                               Hashmap<VariablePair, size_t> &m_hessian_index_map,
 	                               HessianSparsityType hessian_sparsity_type);
 
 #define restrict __restrict
@@ -464,11 +461,10 @@ struct NonlinearFunctionModel
 	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
 	                                std::vector<size_t> &m_jacobian_cols);
 	void analyze_dense_gradient_structure();
-	void analyze_sparse_gradient_structure(size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-	                                       Hashmap<size_t, size_t> &gradient_index_map);
+	void analyze_sparse_gradient_structure(size_t &gradient_nnz,
+	                                       std::vector<size_t> &gradient_cols);
 	void analyze_hessian_structure(size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows,
 	                               std::vector<size_t> &m_hessian_cols,
-	                               Hashmap<VariablePair, size_t> &m_hessian_index_map,
 	                               HessianSparsityType hessian_sparsity_type);
 
 	void eval_objective(const double *x, double *y);
@@ -482,3 +478,22 @@ struct NonlinearFunctionModel
 	void eval_lagrangian_hessian(const double *x, const double *sigma, const double *lambda,
 	                             double *hessian);
 };
+
+// Rows and Columns of sparse matrix may be duplicated
+// We need to eliminate the	duplicates and add them	up
+
+void preprocess_duplicate_indices_2d(const std::vector<size_t> &rows,
+                                     const std::vector<size_t> &cols,
+                                     std::vector<size_t> &unique_rows,
+                                     std::vector<size_t> &unique_cols,
+                                     std::vector<size_t> &permute_indices,
+                                     std::vector<size_t> &permute_offsets);
+
+void preprocess_duplicate_indices_1d(const std::vector<size_t> &rows,
+                                     std::vector<size_t> &unique_rows,
+                                     std::vector<size_t> &permute_indices,
+                                     std::vector<size_t> &permute_offsets);
+
+void accumulate_duplicate_values(const std::vector<double> &V,
+                                 const std::vector<size_t> &permute_indices,
+                                 const std::vector<size_t> &permute_offsets, double *result);

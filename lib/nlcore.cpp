@@ -1,3 +1,4 @@
+#include <execution>
 #include "pyoptinterface/nlcore.hpp"
 
 void NonlinearFunction::init(ADFunD &f_, const std::string &name_,
@@ -202,9 +203,8 @@ void LinearQuadraticModel::analyze_dense_gradient_structure()
 	}
 }
 
-void LinearQuadraticModel::analyze_sparse_gradient_structure(
-    size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-    Hashmap<size_t, size_t> &gradient_index_map)
+void LinearQuadraticModel::analyze_sparse_gradient_structure(size_t &gradient_nnz,
+                                                             std::vector<size_t> &gradient_cols)
 {
 	gradient_constants.clear();
 	gradient_linear_terms.clear();
@@ -218,18 +218,15 @@ void LinearQuadraticModel::analyze_sparse_gradient_structure(
 
 			if (x1 == x2)
 			{
-				size_t grad_index =
-				    add_gradient_column(x1, gradient_nnz, gradient_cols, gradient_index_map);
+				size_t grad_index = add_gradient_column(x1, gradient_nnz, gradient_cols);
 				gradient_linear_terms.emplace_back(2.0 * c, x1, grad_index);
 			}
 			else
 			{
-				size_t grad_index =
-				    add_gradient_column(x1, gradient_nnz, gradient_cols, gradient_index_map);
+				size_t grad_index = add_gradient_column(x1, gradient_nnz, gradient_cols);
 				;
 				gradient_linear_terms.emplace_back(c, x2, grad_index);
-				grad_index =
-				    add_gradient_column(x2, gradient_nnz, gradient_cols, gradient_index_map);
+				grad_index = add_gradient_column(x2, gradient_nnz, gradient_cols);
 				gradient_linear_terms.emplace_back(c, x1, grad_index);
 			}
 		}
@@ -239,16 +236,16 @@ void LinearQuadraticModel::analyze_sparse_gradient_structure(
 		auto &terms = lq_objective.affine_terms;
 		for (const auto &[x, c] : terms)
 		{
-			size_t grad_index =
-			    add_gradient_column(x, gradient_nnz, gradient_cols, gradient_index_map);
+			size_t grad_index = add_gradient_column(x, gradient_nnz, gradient_cols);
 			gradient_constants.emplace_back(c, grad_index);
 		}
 	}
 }
 
-void LinearQuadraticModel::analyze_hessian_structure(
-    size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows, std::vector<size_t> &m_hessian_cols,
-    Hashmap<VariablePair, size_t> &m_hessian_index_map, HessianSparsityType hessian_sparsity_type)
+void LinearQuadraticModel::analyze_hessian_structure(size_t &m_hessian_nnz,
+                                                     std::vector<size_t> &m_hessian_rows,
+                                                     std::vector<size_t> &m_hessian_cols,
+                                                     HessianSparsityType hessian_sparsity_type)
 {
 	// quadratic constraints
 	constraint_hessian_linear_terms.clear();
@@ -263,9 +260,8 @@ void LinearQuadraticModel::analyze_hessian_structure(
 		{
 			auto x1 = f.variable_1s[j];
 			auto x2 = f.variable_2s[j];
-			auto hessian_index =
-			    add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-			                      m_hessian_index_map, hessian_sparsity_type);
+			auto hessian_index = add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows,
+			                                       m_hessian_cols, hessian_sparsity_type);
 			double coef = f.coefficients[j];
 			if (x1 == x2)
 				coef *= 2.0;
@@ -282,9 +278,8 @@ void LinearQuadraticModel::analyze_hessian_structure(
 			auto x1 = varpair.var_1;
 			auto x2 = varpair.var_2;
 
-			size_t hessian_index =
-			    add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-			                      m_hessian_index_map, hessian_sparsity_type);
+			size_t hessian_index = add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows,
+			                                         m_hessian_cols, hessian_sparsity_type);
 			double coef = c;
 			if (x1 == x2)
 				coef *= 2.0;
@@ -387,14 +382,11 @@ void LinearQuadraticModel::eval_constraint_jacobian(const double *restrict x,
                                                     double *restrict jacobian)
 {
 	// linear and quadratic modification
-	for (const auto &constant : jacobian_constants)
-	{
-		jacobian[constant.yi] += constant.c;
-	}
-	for (const auto &linear : jacobian_linear_terms)
-	{
-		jacobian[linear.yi] += linear.c * x[linear.xi];
-	}
+	auto policy = std::execution::par_unseq;
+	std::for_each(policy, jacobian_constants.begin(), jacobian_constants.end(),
+	              [&](const auto &constant) { jacobian[constant.yi] = constant.c; });
+	std::for_each(policy, jacobian_linear_terms.begin(), jacobian_linear_terms.end(),
+	              [&](const auto &linear) { jacobian[linear.yi] = linear.c * x[linear.xi]; });
 }
 
 void LinearQuadraticModel::eval_lagrangian_hessian(const double *restrict x,
@@ -403,14 +395,13 @@ void LinearQuadraticModel::eval_lagrangian_hessian(const double *restrict x,
                                                    double *restrict hessian)
 {
 	// linear and quadratic modification
-	for (const auto &linear : constraint_hessian_linear_terms)
-	{
-		hessian[linear.yi] += lambda[linear.xi] * linear.c;
-	}
-	for (const auto &constant : objective_hessian_linear_terms)
-	{
-		hessian[constant.yi] += (*sigma) * constant.c;
-	}
+	auto policy = std::execution::par_unseq;
+	std::for_each(policy, constraint_hessian_linear_terms.begin(),
+	              constraint_hessian_linear_terms.end(),
+	              [&](const auto &linear) { hessian[linear.yi] = lambda[linear.xi] * linear.c; });
+	std::for_each(policy, objective_hessian_linear_terms.begin(),
+	              objective_hessian_linear_terms.end(),
+	              [&](const auto &constant) { hessian[constant.yi] = (*sigma) * constant.c; });
 }
 
 ParameterIndex NonlinearFunctionModel::add_parameter(double value)
@@ -515,28 +506,16 @@ void NonlinearFunctionModel::clear_nl_objective()
 	}
 }
 
-size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-                           Hashmap<size_t, size_t> &grad_index_map)
+size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols)
 {
-	size_t gradient_index;
-	auto iter = grad_index_map.find(column);
-	if (iter != grad_index_map.end())
-	{
-		gradient_index = iter->second;
-	}
-	else
-	{
-		gradient_index = gradient_nnz;
-		grad_index_map[column] = gradient_nnz;
-		gradient_cols.push_back(column);
-		gradient_nnz += 1;
-	}
+	size_t gradient_index = gradient_nnz;
+	gradient_cols.push_back(column);
+	gradient_nnz += 1;
 	return gradient_index;
 }
 
 size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
                          std::vector<size_t> &m_hessian_rows, std::vector<size_t> &m_hessian_cols,
-                         Hashmap<VariablePair, size_t> &m_hessian_index_map,
                          HessianSparsityType hessian_sparsity_type)
 {
 	if (hessian_sparsity_type == HessianSparsityType::Upper && x1 > x2)
@@ -544,21 +523,99 @@ size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
 	if (hessian_sparsity_type == HessianSparsityType::Lower && x1 < x2)
 		std::swap(x1, x2);
 
-	size_t hessian_index;
-	VariablePair varpair(x1, x2);
-	auto [iter, inserted] = m_hessian_index_map.emplace(varpair, m_hessian_nnz);
-	if (inserted)
-	{
-		hessian_index = m_hessian_nnz;
-		m_hessian_rows.push_back(x1);
-		m_hessian_cols.push_back(x2);
-		m_hessian_nnz += 1;
-	}
-	else
-	{
-		hessian_index = iter->second;
-	}
+	size_t hessian_index = m_hessian_nnz;
+	m_hessian_rows.push_back(x1);
+	m_hessian_cols.push_back(x2);
+	m_hessian_nnz += 1;
 	return hessian_index;
+}
+
+void preprocess_duplicate_indices_2d(const std::vector<size_t> &rows,
+                                     const std::vector<size_t> &cols,
+                                     std::vector<size_t> &unique_rows,
+                                     std::vector<size_t> &unique_cols,
+                                     std::vector<size_t> &permute_indices,
+                                     std::vector<size_t> &permute_offsets)
+{
+	Hashmap<VariablePair, size_t> index_map;
+	size_t current_index = 0;
+
+	std::vector<std::vector<size_t>> temp_accum_indices;
+	for (size_t i = 0; i < rows.size(); ++i)
+	{
+		auto [iter, inserted] = index_map.emplace(VariablePair(rows[i], cols[i]), current_index);
+
+		if (inserted)
+		{
+			unique_rows.push_back(rows[i]);
+			unique_cols.push_back(cols[i]);
+			temp_accum_indices.push_back(std::vector<size_t>{i});
+			++current_index;
+		}
+		else
+		{
+			temp_accum_indices[iter->second].push_back(i);
+		}
+	}
+
+	size_t offset = 0;
+	for (const auto &indices : temp_accum_indices)
+	{
+		permute_offsets.push_back(offset);
+		permute_indices.insert(permute_indices.end(), indices.begin(), indices.end());
+		offset += indices.size();
+	}
+	permute_offsets.push_back(offset);
+}
+
+void preprocess_duplicate_indices_1d(const std::vector<size_t> &rows,
+                                     std::vector<size_t> &unique_rows,
+                                     std::vector<size_t> &permute_indices,
+                                     std::vector<size_t> &permute_offsets)
+{
+	Hashmap<size_t, size_t> index_map;
+	size_t current_index = 0;
+
+	std::vector<std::vector<size_t>> temp_accum_indices;
+	for (size_t i = 0; i < rows.size(); ++i)
+	{
+		auto [iter, inserted] = index_map.emplace(rows[i], current_index);
+
+		if (inserted)
+		{
+			unique_rows.push_back(rows[i]);
+			temp_accum_indices.push_back(std::vector<size_t>{i});
+			++current_index;
+		}
+		else
+		{
+			temp_accum_indices[iter->second].push_back(i);
+		}
+	}
+
+	size_t offset = 0;
+	for (const auto &indices : temp_accum_indices)
+	{
+		permute_offsets.push_back(offset);
+		permute_indices.insert(permute_indices.end(), indices.begin(), indices.end());
+		offset += indices.size();
+	}
+	permute_offsets.push_back(offset);
+}
+
+void accumulate_duplicate_values(const std::vector<double> &V,
+                                 const std::vector<size_t> &permute_indices,
+                                 const std::vector<size_t> &permute_offsets, double *result)
+{
+	for (size_t i = 0; i < permute_offsets.size() - 1; ++i)
+	{
+		size_t start = permute_offsets[i];
+		size_t end = permute_offsets[i + 1];
+		for (size_t j = start; j < end; ++j)
+		{
+			result[i] += V[permute_indices[j]];
+		}
+	}
 }
 
 void NonlinearFunctionModel::analyze_active_functions()
@@ -654,9 +711,8 @@ void NonlinearFunctionModel::analyze_dense_gradient_structure()
 	}
 }
 
-void NonlinearFunctionModel::analyze_sparse_gradient_structure(
-    size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-    Hashmap<size_t, size_t> &gradient_index_map)
+void NonlinearFunctionModel::analyze_sparse_gradient_structure(size_t &gradient_nnz,
+                                                               std::vector<size_t> &gradient_cols)
 {
 	for (size_t k : active_objective_function_indices)
 	{
@@ -672,17 +728,17 @@ void NonlinearFunctionModel::analyze_sparse_gradient_structure(
 			for (size_t j = 0; j < kernel.m_jacobian_nnz; j++)
 			{
 				auto column = x_indices[kernel.m_jacobian_cols[j]];
-				size_t grad_index =
-				    add_gradient_column(column, gradient_nnz, gradient_cols, gradient_index_map);
+				size_t grad_index = add_gradient_column(column, gradient_nnz, gradient_cols);
 				grad_indices[j] = grad_index;
 			}
 		}
 	}
 }
 
-void NonlinearFunctionModel::analyze_hessian_structure(
-    size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows, std::vector<size_t> &m_hessian_cols,
-    Hashmap<VariablePair, size_t> &m_hessian_index_map, HessianSparsityType hessian_sparsity_type)
+void NonlinearFunctionModel::analyze_hessian_structure(size_t &m_hessian_nnz,
+                                                       std::vector<size_t> &m_hessian_rows,
+                                                       std::vector<size_t> &m_hessian_cols,
+                                                       HessianSparsityType hessian_sparsity_type)
 {
 	for (size_t k : active_constraint_function_indices)
 	{
@@ -700,9 +756,8 @@ void NonlinearFunctionModel::analyze_hessian_structure(
 				auto x1 = x_indices[kernel.m_hessian_rows[j]];
 				auto x2 = x_indices[kernel.m_hessian_cols[j]];
 
-				auto hessian_index =
-				    add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-				                      m_hessian_index_map, hessian_sparsity_type);
+				auto hessian_index = add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows,
+				                                       m_hessian_cols, hessian_sparsity_type);
 				hessian_indices[j] = hessian_index;
 			}
 		}
@@ -724,9 +779,8 @@ void NonlinearFunctionModel::analyze_hessian_structure(
 				auto x1 = x_indices[kernel.m_hessian_rows[j]];
 				auto x2 = x_indices[kernel.m_hessian_cols[j]];
 
-				auto hessian_index =
-				    add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows, m_hessian_cols,
-				                      m_hessian_index_map, hessian_sparsity_type);
+				auto hessian_index = add_hessian_index(x1, x2, m_hessian_nnz, m_hessian_rows,
+				                                       m_hessian_cols, hessian_sparsity_type);
 				hessian_indices[j] = hessian_index;
 			}
 		}
@@ -844,6 +898,7 @@ void NonlinearFunctionModel::eval_constraint(const double *x, double *con)
 void NonlinearFunctionModel::eval_constraint_jacobian(const double *x, double *jacobian)
 {
 	double *p = this->p.data();
+	auto policy = std::execution::par_unseq;
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_functions[k];
@@ -855,24 +910,22 @@ void NonlinearFunctionModel::eval_constraint_jacobian(const double *x, double *j
 
 		if (has_parameter)
 		{
-			for (const auto &inst : inst_vec)
-			{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
 				auto &x_indices = inst.xs;
 				double *j = jacobian + inst.jacobian_start;
 
 				auto &p_indices = inst.ps;
 				kernel.jacobian_eval.p(x, p, j, x_indices.data(), p_indices.data());
-			}
+			});
 		}
 		else
 		{
-			for (const auto &inst : inst_vec)
-			{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
 				auto &x_indices = inst.xs;
 				double *j = jacobian + inst.jacobian_start;
 
 				kernel.jacobian_eval.nop(x, j, x_indices.data());
-			}
+			});
 		}
 	}
 }
@@ -881,6 +934,8 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
                                                      const double *lambda, double *hessian)
 {
 	double *p = this->p.data();
+
+	auto policy = std::execution::par_unseq;
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_functions[k];
@@ -891,8 +946,7 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 		auto &inst_vec = constraint_function_instances[k];
 		if (has_parameter)
 		{
-			for (const auto &inst : inst_vec)
-			{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
 				auto &x_indices = inst.xs;
 				auto &hessian_indices = inst.hessian_indices;
 
@@ -901,19 +955,18 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 				auto &p_indices = inst.ps;
 				kernel.hessian_eval.p(x, p, w, hessian, x_indices.data(), p_indices.data(),
 				                      hessian_indices.data());
-			}
+			});
 		}
 		else
 		{
-			for (const auto &inst : inst_vec)
-			{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
 				auto &x_indices = inst.xs;
 				auto &hessian_indices = inst.hessian_indices;
 
 				const double *w = lambda + inst.y_start;
 
 				kernel.hessian_eval.nop(x, w, hessian, x_indices.data(), hessian_indices.data());
-			}
+			});
 		}
 	}
 	const double *w = sigma;
@@ -927,6 +980,14 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 		auto &inst_vec = objective_function_instances[k];
 		if (has_parameter)
 		{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
+				auto &x_indices = inst.xs;
+				auto &hessian_indices = inst.hessian_indices;
+
+				auto &p_indices = inst.ps;
+				kernel.hessian_eval.p(x, p, w, hessian, x_indices.data(), p_indices.data(),
+				                      hessian_indices.data());
+			});
 			for (const auto &inst : inst_vec)
 			{
 				auto &x_indices = inst.xs;
@@ -939,13 +1000,12 @@ void NonlinearFunctionModel::eval_lagrangian_hessian(const double *x, const doub
 		}
 		else
 		{
-			for (const auto &inst : inst_vec)
-			{
+			std::for_each(policy, inst_vec.begin(), inst_vec.end(), [&](const auto &inst) {
 				auto &x_indices = inst.xs;
 				auto &hessian_indices = inst.hessian_indices;
 
 				kernel.hessian_eval.nop(x, w, hessian, x_indices.data(), hessian_indices.data());
-			}
+			});
 		}
 	}
 }
