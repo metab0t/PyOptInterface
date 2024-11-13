@@ -28,6 +28,14 @@ pip install pyoptinterface[highs]
 
 It will install a full-featured binary version of HiGHS optimizer via [highsbox](http://github.com/metab0t/highsbox), which can be used with PyOptInterface.
 
+In order to use nonlinear programming solvers (currently we only support IPOPT), you should install extra dependencies like:
+
+```
+pip install pyoptinterface[nlp]
+```
+
+It will install the [`llvmlite`](https://github.com/numba/llvmlite) and [`tccbox`](https://github.com/metab0t/tccbox) package as the JIT compilers required by nonlinear programming.
+
 We will introduce how to set up the optimizers to use with PyOptInterface in this page.
 
 ## Setup of optimizers
@@ -119,7 +127,7 @@ For Mosek, the automatic detection looks for the following things in order:
 
 ### HiGHS
 
-The currently supported version is **1.7.x**. Other versions may work but are not tested.
+The currently supported version is **1.8.x**. Other versions may work but are not tested.
 
 For HiGHS, the automatic detection looks for the following things in order:
 1. The environment variable `HiGHS_HOME` set by the user
@@ -127,6 +135,15 @@ For HiGHS, the automatic detection looks for the following things in order:
 3. `highs.dll`/`libhighs.so`/`libhighs.dylib` in the system
 
 For HiGHS, we recommend installing the `highsbox` PyPI package, which provides a full-featured binary version of HiGHS optimizer for you.
+
+### Ipopt
+
+The currently supported version is **3.14.x**. Other versions may work but are not tested.
+
+For Ipopt, the automatic detection looks for the following things in order:
+1. `ipopt.dll`/`libipopt.so`/`libipopt.dylib` in the system, we also look for `ipopt-3.dll`/`libipopt.dll`/`libipopt-3.dll` on Windows.
+
+We recommend using the official binary from [GitHub](https://github.com/coin-or/Ipopt/releases) if you work on Windows, since compiling Ipopt on Windows from source is not an easy task.
 
 ## Manually specifying the path of the dynamic library of optimizer
 

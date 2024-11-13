@@ -51,14 +51,17 @@ It currently supports the following problem types:
 - Mixed-Integer Quadratically Constrained Quadratic Programming (MIQCQP)
 - Second-Order Cone Programming (SOCP)
 - Mixed-Integer Second-Order Cone Programming (MISOCP)
-- Exponential Cone Programming
+- Exponential Cone Programming (ECP)
+- Mixed-Integer Exponential Cone Programming (MIECP)
+- Nonlinear Programming (NLP)
 
 ## What optimizers does PyOptInterface support?
 It currently supports the following optimizers:
 - [COPT](https://shanshu.ai/copt) ( Commercial )
 - [Gurobi](https://www.gurobi.com/) ( Commercial )
-- [HiGHS](https://github.com/ERGO-Code) ( Open source )
+- [HiGHS](https://github.com/ERGO-Code/HiGHS) ( Open source )
 - [Mosek](https://www.mosek.com/) ( Commercial )
+- [Ipopt](https://github.com/coin-or/Ipopt) ( Open source )
 
 ## Short Example
 ```python
