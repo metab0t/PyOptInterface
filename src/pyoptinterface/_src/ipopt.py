@@ -39,7 +39,7 @@ def detected_libraries():
     # default names
     default_libnames = {
         "Linux": ["libipopt.so"],
-        "Darwin": ["libpopt.dylib"],
+        "Darwin": ["libipopt.dylib"],
         "Windows": ["ipopt-3.dll", "ipopt.dll", "libipopt-3.dll", "libipopt.dll"],
     }[platform.system()]
     libs.extend(default_libnames)
