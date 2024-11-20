@@ -9,7 +9,7 @@ namespace nb = nanobind;
 NB_MODULE(ipopt_model_ext, m)
 {
 	m.import_("pyoptinterface._src.core_ext");
-	m.import_("pyoptinterface._src.nlcore_ext");
+	m.import_("pyoptinterface._src.nleval_ext");
 
 	m.def("is_library_loaded", &ipopt::is_library_loaded);
 	m.def("load_library", &ipopt::load_library);
@@ -40,7 +40,6 @@ NB_MODULE(ipopt_model_ext, m)
 
 	nb::class_<IpoptModel>(m, "RawModel")
 	    .def(nb::init<>())
-	    .def_ro("m_function_model", &IpoptModel::m_function_model)
 	    .def_ro("m_status", &IpoptModel::m_status)
 	    .def("add_variable", &IpoptModel::add_variable, nb::arg("lb") = -INFINITY,
 	         nb::arg("ub") = INFINITY, nb::arg("start") = 0.0, nb::arg("name") = "")
@@ -142,82 +141,15 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("set_objective", &IpoptModel::set_objective<double>, nb::arg("expr"),
 	         nb::arg("clear_nl") = false)
 
-	    .def("add_nl_objective",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &>(
-	             &IpoptModel::add_nl_objective),
-	         nb::arg("f"), nb::arg("var"))
-	    .def("add_nl_objective",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_objective),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"))
-	    .def("add_nl_objective",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<double> &>(&IpoptModel::add_nl_objective),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"))
+	    .def("_add_nl_objective", &IpoptModel::_add_nl_objective)
 
 	    .def("clear_nl_objective", &IpoptModel::clear_nl_objective)
 
-	    .def("_register_function", &IpoptModel::register_function, nb::arg("f"), nb::arg("name"),
-	         nb::arg("var"), nb::arg("param"))
+	    .def("_register_function", &IpoptModel::_register_function)
+	    .def("_set_function_evaluator", &IpoptModel::_set_function_evaluator)
 
-	    .def("add_empty_nl_constraint",
-	         nb::overload_cast<int, ConstraintSense, const std::vector<double> &>(
-	             &IpoptModel::add_empty_nl_constraint),
-	         nb::arg("dim"), nb::arg("sense"), nb::arg("rhs"))
-	    .def("add_empty_nl_constraint",
-	         nb::overload_cast<int, ConstraintSense, const std::vector<double> &,
-	                           const std::vector<double> &>(&IpoptModel::add_empty_nl_constraint),
-	         nb::arg("dim"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
-
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           ConstraintSense, const std::vector<double> &>(
-	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("sense"), nb::arg("rhs"))
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<ParameterIndex> &, ConstraintSense,
-	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("rhs"))
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<double> &, ConstraintSense,
-	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("rhs"))
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           ConstraintSense, const std::vector<double> &,
-	                           const std::vector<double> &>(&IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"))
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<ParameterIndex> &, ConstraintSense,
-	                           const std::vector<double> &, const std::vector<double> &>(
-	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("lb"),
-	         nb::arg("ub"))
-	    .def("add_nl_constraint",
-	         nb::overload_cast<const FunctionIndex &, const std::vector<VariableIndex> &,
-	                           const std::vector<double> &, ConstraintSense,
-	                           const std::vector<double> &, const std::vector<double> &>(
-	             &IpoptModel::add_nl_constraint),
-	         nb::arg("f"), nb::arg("var"), nb::arg("param"), nb::arg("sense"), nb::arg("lb"),
-	         nb::arg("ub"))
-
-	    .def("add_nl_expression",
-	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
-	                           const std::vector<VariableIndex> &,
-	                           const std::vector<ParameterIndex> &>(&IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"), nb::arg("param"))
-	    .def("add_nl_expression",
-	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
-	                           const std::vector<VariableIndex> &, const std::vector<double> &>(
-	             &IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"), nb::arg("param"))
-	    .def("add_nl_expression",
-	         nb::overload_cast<const NLConstraintIndex &, const FunctionIndex &,
-	                           const std::vector<VariableIndex> &>(&IpoptModel::add_nl_expression),
-	         nb::arg("constraint"), nb::arg("f"), nb::arg("var"))
+	    .def("_add_nl_constraint_bounds", &IpoptModel::_add_nl_constraint_bounds)
+	    .def("_add_nl_constraint_eq", &IpoptModel::_add_nl_constraint_eq)
 
 	    .def("_optimize", &IpoptModel::optimize, nb::call_guard<nb::gil_scoped_release>())
 	    .def("set_raw_option_int", &IpoptModel::set_raw_option_int)

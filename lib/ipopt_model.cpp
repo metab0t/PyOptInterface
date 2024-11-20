@@ -4,6 +4,7 @@
 #include "fmt/core.h"
 #include "fmt/ranges.h"
 #include "pyoptinterface/dylib.hpp"
+#include <cassert>
 
 static bool is_name_empty(const char *name)
 {
@@ -326,156 +327,23 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, Const
 	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, lb, ub, name);
 }
 
-FunctionIndex IpoptModel::register_function(ADFunD &f, const std::string &name,
-                                            const std::vector<double> &x_values,
-                                            const std::vector<double> &p_values)
+FunctionIndex IpoptModel::_register_function(const AutodiffSymbolicStructure &structure)
 {
-	return m_function_model.register_function(f, name, x_values, p_values);
+	return m_function_model.register_function(structure);
 }
 
-NLConstraintIndex IpoptModel::add_empty_nl_constraint(int dim, ConstraintSense sense,
-                                                      const std::vector<double> &rhss)
+void IpoptModel::_set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator)
 {
-	NLConstraintIndex con;
-	con.index = n_constraints;
-	con.dim = dim;
-	n_constraints += dim;
-
-	auto ny = dim;
-	if (sense == ConstraintSense::LessEqual)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(-INFINITY);
-			m_con_ub.push_back(rhss[i]);
-		}
-	}
-	else if (sense == ConstraintSense::GreaterEqual)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(rhss[i]);
-			m_con_ub.push_back(INFINITY);
-		}
-	}
-	else if (sense == ConstraintSense::Equal)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(rhss[i]);
-			m_con_ub.push_back(rhss[i]);
-		}
-	}
-
-	return con;
+	m_function_model.set_function_evaluator(k, evaluator);
 }
 
-NLConstraintIndex IpoptModel::add_empty_nl_constraint(int dim, ConstraintSense sense,
-                                                      const std::vector<double> &lbs,
-                                                      const std::vector<double> &ubs)
+NLConstraintIndex IpoptModel::_add_nl_constraint_bounds(const FunctionIndex &k,
+                                                        const std::vector<VariableIndex> &xs,
+                                                        const std::vector<ParameterIndex> &ps,
+                                                        const std::vector<double> &lbs,
+                                                        const std::vector<double> &ubs)
 {
-	if (sense != ConstraintSense::Within)
-	{
-		throw std::runtime_error(
-		    "Only 'Within' constraint sense is supported when LB and UB is used together");
-	}
-
-	NLConstraintIndex con;
-	con.index = n_constraints;
-	con.dim = dim;
-	n_constraints += dim;
-
-	auto ny = dim;
-	for (size_t i = 0; i < ny; i++)
-	{
-		m_con_lb.push_back(lbs[i]);
-		m_con_ub.push_back(ubs[i]);
-	}
-
-	return con;
-}
-
-NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
-                                                const std::vector<VariableIndex> &xs,
-                                                const std::vector<ParameterIndex> &ps,
-                                                ConstraintSense sense,
-                                                const std::vector<double> &rhss)
-{
-	if (sense == ConstraintSense::Within)
-	{
-		throw std::runtime_error("'Within' constraint sense must have both LB and UB");
-	}
-
-	auto ny = m_function_model.nl_functions[k.index].ny;
-	auto nlcon = m_function_model.add_nl_constraint(k, xs, ps, n_constraints);
-	n_constraints += ny;
-
-	if (sense == ConstraintSense::LessEqual)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(-INFINITY);
-			m_con_ub.push_back(rhss[i]);
-		}
-	}
-	else if (sense == ConstraintSense::GreaterEqual)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(rhss[i]);
-			m_con_ub.push_back(INFINITY);
-		}
-	}
-	else if (sense == ConstraintSense::Equal)
-	{
-		for (size_t i = 0; i < ny; i++)
-		{
-			m_con_lb.push_back(rhss[i]);
-			m_con_ub.push_back(rhss[i]);
-		}
-	}
-
-	return nlcon;
-}
-
-NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
-                                                const std::vector<VariableIndex> &xs,
-                                                const std::vector<double> &ps,
-                                                ConstraintSense sense,
-                                                const std::vector<double> &rhss)
-{
-	std::vector<ParameterIndex> real_ps;
-	real_ps.reserve(ps.size());
-	for (auto p : ps)
-	{
-		real_ps.push_back(add_parameter(p));
-	}
-	return add_nl_constraint(k, xs, real_ps, sense, rhss);
-}
-
-NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
-                                                const std::vector<VariableIndex> &xs,
-                                                ConstraintSense sense,
-                                                const std::vector<double> &rhss)
-{
-	std::vector<ParameterIndex> ps;
-	return add_nl_constraint(k, xs, ps, sense, rhss);
-}
-
-NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
-                                                const std::vector<VariableIndex> &xs,
-                                                const std::vector<ParameterIndex> &ps,
-                                                ConstraintSense sense,
-                                                const std::vector<double> &lbs,
-                                                const std::vector<double> &ubs)
-{
-	if (sense != ConstraintSense::Within)
-	{
-		throw std::runtime_error(
-		    "Only 'Within' constraint sense is supported when LB and UB is used together");
-	}
-
-	auto ny = m_function_model.nl_functions[k.index].ny;
+	auto ny = m_function_model.nl_function_structures[k.index].ny;
 	auto nlcon = m_function_model.add_nl_constraint(k, xs, ps, n_constraints);
 	n_constraints += ny;
 
@@ -488,82 +356,18 @@ NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
 	return nlcon;
 }
 
-NLConstraintIndex IpoptModel::add_nl_constraint(
-    const FunctionIndex &k, const std::vector<VariableIndex> &xs, const std::vector<double> &ps,
-    ConstraintSense sense, const std::vector<double> &lbs, const std::vector<double> &ubs)
+NLConstraintIndex IpoptModel::_add_nl_constraint_eq(const FunctionIndex &k,
+                                                    const std::vector<VariableIndex> &xs,
+                                                    const std::vector<ParameterIndex> &ps,
+                                                    const std::vector<double> &eqs)
 {
-	std::vector<ParameterIndex> real_ps;
-	real_ps.reserve(ps.size());
-	for (auto p : ps)
-	{
-		real_ps.push_back(add_parameter(p));
-	}
-	return add_nl_constraint(k, xs, real_ps, sense, lbs, ubs);
+	return _add_nl_constraint_bounds(k, xs, ps, eqs, eqs);
 }
 
-NLConstraintIndex IpoptModel::add_nl_constraint(const FunctionIndex &k,
-                                                const std::vector<VariableIndex> &xs,
-                                                ConstraintSense sense,
-                                                const std::vector<double> &lbs,
-                                                const std::vector<double> &ubs)
-{
-	std::vector<ParameterIndex> ps;
-	return add_nl_constraint(k, xs, ps, sense, lbs, ubs);
-}
-
-void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-                                   const std::vector<VariableIndex> &xs,
+void IpoptModel::_add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
                                    const std::vector<ParameterIndex> &ps)
 {
-	auto dim = constraint.dim;
-	auto ny = m_function_model.nl_functions[k.index].ny;
-	assert(ny == dim);
-
-	m_function_model.add_nl_constraint(k, xs, ps, constraint.index);
-}
-
-void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-                                   const std::vector<VariableIndex> &xs,
-                                   const std::vector<double> &ps)
-{
-	std::vector<ParameterIndex> real_ps;
-	real_ps.reserve(ps.size());
-	for (auto p : ps)
-	{
-		real_ps.push_back(add_parameter(p));
-	}
-	add_nl_expression(constraint, k, xs, real_ps);
-}
-
-void IpoptModel::add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-                                   const std::vector<VariableIndex> &xs)
-{
-	std::vector<ParameterIndex> ps;
-	add_nl_expression(constraint, k, xs, ps);
-}
-
-void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs)
-{
-	std::vector<ParameterIndex> ps;
-	add_nl_objective(k, xs, ps);
-}
-
-void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-                                  const std::vector<ParameterIndex> &ps)
-{
 	m_function_model.add_nl_objective(k, xs, ps);
-}
-
-void IpoptModel::add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-                                  const std::vector<double> &ps)
-{
-	std::vector<ParameterIndex> real_ps;
-	real_ps.reserve(ps.size());
-	for (auto p : ps)
-	{
-		real_ps.push_back(add_parameter(p));
-	}
-	add_nl_objective(k, xs, real_ps);
 }
 
 void IpoptModel::clear_nl_objective()
@@ -654,7 +458,7 @@ void IpoptModel::optimize()
 	m_lq_model.analyze_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,
 	                                     m_hessian_index_map, HessianSparsityType::Lower);
 
-	/*fmt::print("Problem has {} variables and {} constraints\n", n_variables, n_constraints);
+	/*fmt::print("Problem has {} m_variables and {} constraints\n", n_variables, n_constraints);
 	fmt::print("Jacobian has {} nonzeros\n", m_jacobian_nnz);
 	fmt::print("Jacobian rows : {}\n", m_jacobian_rows);
 	fmt::print("Jacobian cols : {}\n", m_jacobian_cols);

@@ -3,7 +3,7 @@
 
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/core/ad_fun.hpp>
@@ -19,7 +19,6 @@ Create a C++ AD Graph Corresponding to an ADFun Object
 
 Syntax
 ******
-
 | |tab| ``cpp_graph`` *graph_obj*
 | |tab| ``ADFun`` < *Base* > *fun*
 | |tab| *fun* . ``to_graph`` ( *graph_obj* )
@@ -113,7 +112,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
    CPPAD_ASSERT_UNKNOWN( n_dynamic_ind <= n_dynamic );
    CPPAD_ASSERT_UNKNOWN( dyn_par_is.size() == n_parameter );
    CPPAD_ASSERT_UNKNOWN( n_parameter > 0 );
-   CPPAD_ASSERT_UNKNOWN( isnan( parameter[0] ) );
+   CPPAD_ASSERT_UNKNOWN( CppAD::isnan( parameter[0] ) );
    CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[0] );
    // --------------------------------------------------------------------
    // par2node
@@ -454,7 +453,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
          // --------------------------------------------------------------
          // unary or binary
          default:
-         CPPAD_ASSERT_UNKNOWN((n_arg == 1) | (n_arg == 2));
+         CPPAD_ASSERT_UNKNOWN((n_arg == 1) || (n_arg == 2));
          //
          graph_obj.operator_vec_push_back( graph_op );
          for(size_t i = 0; i < n_arg; ++i)
@@ -473,7 +472,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
       var2node[i] = 0; // invalid node value
    //
    local::play::const_sequential_iterator itr  = play_.begin();
-   local::OpCode      var_op;
+   local::op_code_var var_op;
    const              addr_t* arg;
    size_t             i_var;
    pod_vector<bool>   is_var(2);
@@ -915,7 +914,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
          // CSumOp
          case local::CSumOp:
          {  // does this case have subtraction terms
-            bool has_subtract = (arg[1] != arg[2]) | (arg[3] != arg[4]);
+            bool has_subtract = (arg[1] != arg[2]) || (arg[3] != arg[4]);
             //
             // var2node for this operator
             if( has_subtract )

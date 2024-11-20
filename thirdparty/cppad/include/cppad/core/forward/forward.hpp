@@ -2,7 +2,7 @@
 # define CPPAD_CORE_FORWARD_FORWARD_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 // documened after Forward but included here so easy to see
@@ -26,8 +26,7 @@ Multiple orders, one direction, forward mode Taylor coefficients
 
 Syntax
 ******
-
-   *yq* = *f* . ``Forward`` ( *q* , *xq* , *s*  )
+| *yq* = *f* . ``Forward`` ( *q* , *xq* , *s*  )
 
 Prototype
 *********
@@ -142,7 +141,7 @@ BaseVector ADFun<Base,RecBase>::Forward(
    );
 
    // does taylor_ need more orders or fewer directions
-   if( (cap_order_taylor_ <= q) | (num_direction_taylor_ != 1) )
+   if( (cap_order_taylor_ <= q) || (num_direction_taylor_ != 1) )
    {  if( p == 0 )
       {  // no need to copy old values during capacity_order
          num_order_taylor_ = 0;
@@ -168,20 +167,27 @@ BaseVector ADFun<Base,RecBase>::Forward(
    }
 
    // set Taylor coefficients for independent variables
+# ifndef NDEBUG
    for(j = 0; j < n; j++)
-   {  CPPAD_ASSERT_UNKNOWN( ind_taddr_[j] < num_var_tape_  );
-
+   {  // ind_taddr_[j] is index of j-th independent variable
+      CPPAD_ASSERT_UNKNOWN( ind_taddr_[j] < num_var_tape_  );
       // ind_taddr_[j] is operator taddr for j-th independent variable
       CPPAD_ASSERT_UNKNOWN( play_.GetOp( ind_taddr_[j] ) == local::InvOp );
-
-      if( p == q )
+   }
+# endif
+   if( p == q )
+   {  CPPAD_ASSERT_UNKNOWN( xq.size() == n );
+      for(j = 0; j < n; ++j)
          taylor_[ C * ind_taddr_[j] + q] = xq[j];
-      else
+   }
+   else
+   {  CPPAD_ASSERT_UNKNOWN( xq.size() == (q + 1) * n );
+      for(j = 0; j < n; ++j)
       {  for(k = 0; k <= q; k++)
             taylor_[ C * ind_taddr_[j] + k] = xq[ (q+1)*j + k];
       }
    }
-
+   //
    // evaluate the derivatives
    CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
    CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );

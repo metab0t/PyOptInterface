@@ -38,12 +38,6 @@ add_subdirectory(thirdparty/fmt)
 add_subdirectory(thirdparty/cppad)
 
 set(POI_INSTALL_DIR ${SKBUILD_PLATLIB_DIR}/pyoptinterface/_src)
-# install the DLL of cppad
-if(MSVC)
-    install(TARGETS cppad_thread_alloc RUNTIME DESTINATION ${POI_INSTALL_DIR})
-else()
-    install(TARGETS cppad_thread_alloc LIBRARY DESTINATION ${POI_INSTALL_DIR})
-endif()
 
 add_library(core STATIC)
 target_sources(core PRIVATE
@@ -57,12 +51,28 @@ target_sources(core PRIVATE
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)
 
-add_library(nlcore STATIC)
-target_sources(nlcore PRIVATE
-  include/pyoptinterface/nlcore.hpp
-  lib/nlcore.cpp
+add_library(nlexpr STATIC)
+target_sources(nlexpr PRIVATE
+  include/pyoptinterface/nlexpr.hpp
+  lib/nlexpr.cpp
 )
-target_link_libraries(nlcore PUBLIC core cppad)
+target_include_directories(nlexpr PUBLIC include thirdparty)
+target_link_libraries(nlexpr PUBLIC fmt)
+
+add_library(nleval STATIC)
+target_sources(nleval PRIVATE
+  include/pyoptinterface/nleval.hpp
+  lib/nleval.cpp
+)
+target_link_libraries(nleval PUBLIC core)
+
+add_library(cppad_interface STATIC)
+target_sources(cppad_interface PRIVATE
+  include/pyoptinterface/cppad_interface.hpp
+  lib/cppad_interface.cpp
+)
+target_include_directories(cppad_interface PUBLIC include thirdparty)
+target_link_libraries(cppad_interface PUBLIC nlexpr cppad)
 
 # Build Python extensions
 find_package(Python ${PYTHON_VERSION}
@@ -83,14 +93,34 @@ target_link_libraries(core_ext PUBLIC core)
 install(TARGETS core_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 nanobind_add_module(
-  nlcore_ext
+  nlexpr_ext
 
   STABLE_ABI NB_STATIC
 
-  lib/nlcore_ext.cpp
+  lib/nlexpr_ext.cpp
 )
-target_link_libraries(nlcore_ext PUBLIC nlcore)
-install(TARGETS nlcore_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+target_link_libraries(nlexpr_ext PUBLIC nlexpr)
+install(TARGETS nlexpr_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+nanobind_add_module(
+  nleval_ext
+
+  STABLE_ABI NB_STATIC
+
+  lib/nleval_ext.cpp
+)
+target_link_libraries(nleval_ext PUBLIC nleval)
+install(TARGETS nleval_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+nanobind_add_module(
+  cppad_interface_ext
+
+  STABLE_ABI NB_STATIC
+
+  lib/cppad_interface_ext.cpp
+)
+target_link_libraries(cppad_interface_ext PUBLIC cppad_interface)
+install(TARGETS cppad_interface_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # Solvers
 
@@ -178,7 +208,7 @@ target_sources(ipopt_model PRIVATE
   include/pyoptinterface/ipopt_model.hpp
   lib/ipopt_model.cpp
 )
-target_link_libraries(ipopt_model PUBLIC nlcore)
+target_link_libraries(ipopt_model PUBLIC nleval)
 
 nanobind_add_module(
   ipopt_model_ext
@@ -191,7 +221,7 @@ target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # Set RPATH
-set_rpath(nlcore_ext)
+# set_rpath(nlcore_ext)
 set_rpath(ipopt_model_ext)
 
 # stub
@@ -203,10 +233,24 @@ nanobind_add_stub(
 )
 
 nanobind_add_stub(
-  nlcore_ext_stub
+  nlexpr_ext_stub
   INSTALL_TIME
-  MODULE pyoptinterface._src.nlcore_ext
-  OUTPUT ${POI_INSTALL_DIR}/nlcore_ext.pyi
+  MODULE pyoptinterface._src.nlexpr_ext
+  OUTPUT ${POI_INSTALL_DIR}/nlexpr_ext.pyi
+)
+
+nanobind_add_stub(
+  nleval_ext_stub
+  INSTALL_TIME
+  MODULE pyoptinterface._src.nleval_ext
+  OUTPUT ${POI_INSTALL_DIR}/nleval_ext.pyi
+)
+
+nanobind_add_stub(
+  cppad_interface_ext_stub
+  INSTALL_TIME
+  MODULE pyoptinterface._src.cppad_interface_ext
+  OUTPUT ${POI_INSTALL_DIR}/cppad_interface_ext.pyi
 )
 
 nanobind_add_stub(

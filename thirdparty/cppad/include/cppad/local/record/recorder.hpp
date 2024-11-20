@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_RECORD_RECORDER_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <cppad/core/hash_code.hpp>
 # include <cppad/local/pod_vector.hpp>
@@ -139,9 +139,9 @@ public:
    void put_dyn_arg_vec(const pod_vector<addr_t>& arg);
 
    /// Put next operator in the operation sequence.
-   addr_t PutOp(OpCode op);
+   addr_t PutOp(op_code_var op);
    /// Put a vecad load operator in the operation sequence (special case)
-   addr_t PutLoadOp(OpCode op);
+   addr_t PutLoadOp(op_code_var op);
 
    // VecAD operations
    addr_t put_var_vecad_ind(addr_t vec_ind);
@@ -295,7 +295,7 @@ to the call.
 This index starts at zero after the default constructor.
 */
 template <class Base>
-addr_t recorder<Base>::PutOp(OpCode op)
+addr_t recorder<Base>::PutOp(op_code_var op)
 {  size_t i    = op_vec_.extend(1);
    CPPAD_ASSERT_KNOWN(
       (abort_op_index_ == 0) || (abort_op_index_ != i),
@@ -303,7 +303,7 @@ addr_t recorder<Base>::PutOp(OpCode op)
    );
    op_vec_[i]  = static_cast<opcode_t>(op);
    CPPAD_ASSERT_UNKNOWN( op_vec_.size() == i + 1 );
-   CPPAD_ASSERT_UNKNOWN( (op != LdpOp) & (op != LdvOp) );
+   CPPAD_ASSERT_UNKNOWN( (op != LdpOp) && (op != LdvOp) );
 
    // first operator should be a BeginOp and NumRes( BeginOp ) > 0
    num_var_rec_ += NumRes(op);
@@ -351,7 +351,7 @@ The return value for <code>num_var_load_rec()</code>
 increases by one after each call to this function.
 */
 template <class Base>
-addr_t recorder<Base>::PutLoadOp(OpCode op)
+addr_t recorder<Base>::PutLoadOp(op_code_var op)
 {  size_t i    = op_vec_.extend(1);
    CPPAD_ASSERT_KNOWN(
       (abort_op_index_ == 0) || (abort_op_index_ != i),
@@ -360,7 +360,7 @@ addr_t recorder<Base>::PutLoadOp(OpCode op)
    );
    op_vec_[i]  = op;
    CPPAD_ASSERT_UNKNOWN( op_vec_.size() == i + 1 );
-   CPPAD_ASSERT_UNKNOWN( (op == LdpOp) | (op == LdvOp) );
+   CPPAD_ASSERT_UNKNOWN( (op == LdpOp) || (op == LdvOp) );
 
    // first operator should be a BeginOp and NumRes( BeginOp ) > 0
    num_var_rec_ += NumRes(op);
@@ -541,7 +541,7 @@ addr_t recorder<Base>::put_con_par(const Base &par)
    // index zero is used to signify that a value is not a parameter;
    // i.e., it is a variable.
    if( all_par_vec_.size() == 0 )
-      CPPAD_ASSERT_UNKNOWN( isnan(par) );
+      CPPAD_ASSERT_UNKNOWN( CppAD::isnan(par) );
 # endif
    // ---------------------------------------------------------------------
    // check for a match with a previous parameter
@@ -553,7 +553,7 @@ addr_t recorder<Base>::put_con_par(const Base &par)
    size_t index = static_cast<size_t>( par_hash_table_[code] );
 
    // check if the old parameter matches the new one
-   if( (0 < index) & (index < all_par_vec_.size()) )
+   if( (0 < index) && (index < all_par_vec_.size()) )
    {  if( ! dyn_par_is_[index] )
          if( IdenticalEqualCon(all_par_vec_[index], par) )
             return static_cast<addr_t>( index );

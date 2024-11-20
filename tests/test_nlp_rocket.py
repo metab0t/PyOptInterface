@@ -1,5 +1,5 @@
 import pyoptinterface as poi
-from pyoptinterface import ipopt
+from pyoptinterface import ipopt, nlfunc
 
 import math
 import pytest
@@ -32,21 +32,21 @@ def rocket_model(model: ipopt.Model, nh: int):
     model.set_objective(-1.0 * h[-1])
 
     def dynamics_eq(vars):
-        h1 = vars["h1"]
-        h2 = vars["h2"]
-        v1 = vars["v1"]
-        v2 = vars["v2"]
-        m1 = vars["m1"]
-        m2 = vars["m2"]
-        T1 = vars["T1"]
-        T2 = vars["T2"]
+        h1 = vars.h1
+        h2 = vars.h2
+        v1 = vars.v1
+        v2 = vars.v2
+        m1 = vars.m1
+        m2 = vars.m2
+        T1 = vars.T1
+        T2 = vars.T2
 
-        step = vars["step"]
+        step = vars.step
 
         eq_h = h2 - h1 - 0.5 * step * (v1 + v2)
 
-        D1 = D_c * v1 * v1 * poi.exp(-h_c * (h1 - h_0)) / h_0
-        D2 = D_c * v2 * v2 * poi.exp(-h_c * (h2 - h_0)) / h_0
+        D1 = D_c * v1 * v1 * nlfunc.exp(-h_c * (h1 - h_0)) / h_0
+        D2 = D_c * v2 * v2 * nlfunc.exp(-h_c * (h2 - h_0)) / h_0
         g1 = g_0 * h_0 * h_0 / (h1 * h1)
         g2 = g_0 * h_0 * h_0 / (h2 * h2)
         dv1 = (T1 - D1) / m1 - g1
@@ -58,17 +58,22 @@ def rocket_model(model: ipopt.Model, nh: int):
 
         return [eq_h, eq_v, eq_m]
 
-    dynamic_eq_f = model.register_function(
-        dynamics_eq,
-        var=["h1", "h2", "v1", "v2", "m1", "m2", "T1", "T2", "step"],
-        name="dynamics_eq",
-    )
+    dynamic_eq_f = model.register_function(dynamics_eq)
     for i in range(nh - 1):
         model.add_nl_constraint(
             dynamic_eq_f,
-            [h[i], h[i + 1], v[i], v[i + 1], m[i], m[i + 1], T[i], T[i + 1], step],
-            poi.Eq,
-            [0.0, 0.0, 0.0],
+            vars=nlfunc.Vars(
+                h1=h[i],
+                h2=h[i + 1],
+                v1=v[i],
+                v2=v[i + 1],
+                m1=m[i],
+                m2=m[i + 1],
+                T1=T[i],
+                T2=T[i + 1],
+                step=step,
+            ),
+            eq=[0.0, 0.0, 0.0],
         )
 
     # Boundary conditions
@@ -84,7 +89,7 @@ def test_rocket():
     if not ipopt.is_library_loaded():
         pytest.skip("Ipopt library is not loaded")
     nh = 400
-    model = ipopt.Model()
+    model = ipopt.Model(jit="LLVM")
     rocket_model(model, nh)
     model.optimize()
 

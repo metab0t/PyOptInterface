@@ -2,7 +2,7 @@
 # define CPPAD_SPEED_ODE_EVALUATE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 /*
@@ -17,10 +17,8 @@ Evaluate a Function Defined in Terms of an ODE
 
 Syntax
 ******
-
-   # ``include <cppad/speed/ode_evaluate.hpp>``
-
-``ode_evaluate`` ( *x* , *p* , *fp* )
+| # ``include <cppad/speed/ode_evaluate.hpp>``
+| ``ode_evaluate`` ( *x* , *p* , *fp* )
 
 Purpose
 *******
@@ -184,7 +182,7 @@ namespace CppAD {
          "ode_evaluate: p is not zero or one"
       );
       CPPAD_ASSERT_KNOWN(
-         ((p==0) & (fp.size()==n)) || ((p==1) & (fp.size()==n*n)),
+         ((p==0) && (fp.size()==n)) || ((p==1) && (fp.size()==n*n)),
          "ode_evaluate: the size of fp is not correct"
       );
       if( p == 0 )

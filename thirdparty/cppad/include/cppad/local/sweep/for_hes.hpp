@@ -2,10 +2,13 @@
 # define CPPAD_LOCAL_SWEEP_FOR_HES_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/atom_op_info.hpp>
+# include <cppad/local/var_op/load_op.hpp>
+# include <cppad/local/var_op/store_op.hpp>
+# include <cppad/local/var_op/csum_op.hpp>
 
 /*
 {xrst_begin local_sweep_for_hes dev}
@@ -19,7 +22,6 @@ Forward Mode Hessian Sparsity Patterns
 
 Syntax
 ******
-
 | ``local::sweep::for_hes`` (
 | |tab| *play*               ,
 | |tab| *n*                  ,
@@ -44,8 +46,8 @@ and the reverse Jacobian sparsity pattern for the dependent variables,
 ``for_hes`` computes the Hessian sparsity pattern for all the independent
 variables.
 
-Tracing
-*******
+CPPAD_FOR_HES_TRACE
+*******************
 This value is either zero or one.  Zero is the normal operational value.
 If it is one, a trace of Jacobian and Hessian sparsity result for every
 operation for every ``for_hes`` sweep is printed.
@@ -105,34 +107,42 @@ rev_jac_sparse
 **************
 Is a sparsity pattern with size *numvar* by one.
 For *i* =1, ..., *numvar* ``-1`` ,
-the if the function we are computing the Hessian for has a non-zero
-derivative w.r.t. variable with index *i* ,
+the if the scalar valued function we are computing the Hessian sparsity for
+has a non-zero derivative w.r.t. variable with index *i* ,
 the set with index *i* has the element zero.
 Otherwise it has no elements.
 
 for_hes_sparse
 **************
-Is a sparsity pattern with size *n* +1+ *numvar* by *n* +1 .
-The set with index zero and the element zero are not used.
-The sets with index greater than *n*
-are used for forward Jacobian sparsity.
-The forward Hessian sparsity pattern for the variable with index *i*
-corresponds to the set with index *i* in *for_hes_sparse* .
-The number of sets in this sparsity pattern is *n* +1 and the set
-with index zero is not used.
+This is a sparsity pattern with *n* + 1 + *numvar* sets
+the end value *n* + 1 .
+On input, all of the sets are empty.
+On output, it contains the two sparsity patterns described below:
 
-On Input
-========
-For *j* =1, ..., *n* ,
-the forward Hessian sparsity pattern for the variable with index
-*i* is empty.
+Hessian Sparsity
+================
+For *j* equal 1 to *n* ,
+if *i* is in set with index *j* ,
+the Hessian may have a non-zero partial with respect to the
+independent variables with indices ( *i* - 1, *j* - 1 ) .
+Note that the index zero is not used because it corresponds to the
+phantom variable on the tape.
 
-On Output
-=========
-For *j* =1, ..., *n* ,
-the forward Hessian sparsity pattern for the independent dependent variable
-with index *j* ``-1`` is given by the set with index *j*
-in *for_hes_sparse* .
+Jacobian Sparsity
+=================
+For *k* equal 1 to *numvar* - 1 ,
+if *i* is in the set with index *n* + 1 + *k* ,
+the variable with index *k* may have a non-zero partial with resect to the
+independent variable with index *i* - 1 .
+
+Method
+======
+For *k* equal 1 to *numvar* - 1,
+the Jacobian sparsity pattern for variable with index *k* is computed using
+the previous Jacobian sparsity patterns.
+The Hessian sparsity pattern is updated using linear and non-linear
+interactions for the variable with index *k* and the previous Jacobian
+sparsity patterns.
 
 not_used_rec_base
 *****************
@@ -173,19 +183,17 @@ void for_hes(
    //
    CPPAD_ASSERT_UNKNOWN( numvar > 0 );
    //
-   // vecad_sparsity contains a sparsity pattern for each VecAD object.
-   // vecad_ind maps a VecAD index (beginning of the VecAD object)
-   // to the index for the corresponding set in vecad_sparsity.
+   // vecad_sparsity: forward Jacobian sparsity pattern for each VecAD object.
+   // vecad_ind: maps the VecAD index at beginning of the VecAD object
+   //            to the index for the corresponding set in vecad_sparsity.
    size_t num_vecad_ind   = play->num_var_vecad_ind_rec();
    size_t num_vecad_vec   = play->num_var_vecad_rec();
-   SetVector vecad_sparse;
+   SetVector vecad_sparsity;
    pod_vector<size_t> vecad_ind;
-   pod_vector<bool>   vecad_jac;
    if( num_vecad_vec > 0 )
    {  size_t length;
-      vecad_sparse.resize(num_vecad_vec, np1);
+      vecad_sparsity.resize(num_vecad_vec, np1);
       vecad_ind.extend(num_vecad_ind);
-      vecad_jac.extend(num_vecad_vec);
       size_t j  = 0;
       for(size_t i = 0; i < num_vecad_vec; i++)
       {  // length of this VecAD
@@ -197,8 +205,6 @@ void for_hes(
             vecad_ind[j+k] = num_vecad_vec;
          // start of next VecAD
          j       += length + 1;
-         // initialize this vector's reverse jacobian value
-         vecad_jac[i] = false;
       }
       CPPAD_ASSERT_UNKNOWN( j == play->num_var_vecad_ind_rec() );
    }
@@ -226,7 +232,7 @@ void for_hes(
    // skip the BeginOp at the beginning of the recording
    play::const_sequential_iterator itr = play->begin();
    // op_info
-   OpCode op;
+   op_code_var op;
    size_t i_var;
    const Addr*   arg;
    itr.op_info(op, arg, i_var);
@@ -250,22 +256,42 @@ void for_hes(
       bool include = NumRes(op) > 0;
       if( include )
          include = rev_jac_sparse.is_element(i_var, 0);
-      //
-      // operators to include even if derivative is zero
-      include |= op == EndOp;
-      include |= op == CSkipOp;
-      include |= op == CSumOp;
-      include |= op == AFunOp;
-      include |= op == FunapOp;
-      include |= op == FunavOp;
-      include |= op == FunrpOp;
-      include |= op == FunrvOp;
-      //
-      if( ! include )
-      {  if( op == InvOp )
+      switch( op )
+      {
+         // include
+         // operators that must always be included
+         case EndOp:
+         case CSkipOp:
+         case AFunOp:
+         case FunapOp:
+         case FunavOp:
+         case FunrpOp:
+         case FunrvOp:
+         case StppOp:
+         case StpvOp:
+         case StvpOp:
+         case StvvOp:
+         include = true;
+         break;
+
+         // count_independent
+         case InvOp:
+         if( ! include )
             ++count_independent;
+         break;
+
+         // itr
+         case CSumOp:
+         if( ! include )
+            itr.correct_before_increment();
+         break;
+
+         // default
+         default:
+         break;
       }
-      else switch( op )
+      //
+      if( include ) switch( op )
       {  // operators that should not occurr
          // case BeginOp
 
@@ -273,15 +299,9 @@ void for_hes(
          // and where with a fixed number of arguments and results
          case CExpOp:
          case DisOp:
-         case LdpOp:
-         case LdvOp:
          case ParOp:
          case PriOp:
          case SignOp:
-         case StppOp:
-         case StpvOp:
-         case StvpOp:
-         case StvvOp:
          break;
          // -------------------------------------------------
 
@@ -332,6 +352,28 @@ void for_hes(
          );
          break;
 
+         // ------------------------------------------------------
+         // VecAD load operators
+         case LdvOp:
+         case LdpOp:
+         var_op::load_forward_hes(
+            op, arg, num_vecad_ind, i_var, n,
+            vecad_ind, vecad_sparsity, for_hes_sparse
+         );
+         break;
+         //
+         // VecAD store operators
+         case StppOp:
+         case StpvOp:
+         case StvpOp:
+         case StvvOp:
+         var_op::store_forward_hes(op,
+            arg, num_vecad_ind, n,
+            vecad_ind, vecad_sparsity, for_hes_sparse
+         );
+         break;
+
+         // ------------------------------------------------------
          // nonlinear unary operators
          case AcosOp:
          case AsinOp:
@@ -364,6 +406,7 @@ void for_hes(
          // -------------------------------------------------
 
          case CSumOp:
+         var_op::csum_forward_hes(arg, i_var, n, for_hes_sparse);
          itr.correct_before_increment();
          break;
          // -------------------------------------------------
@@ -603,7 +646,7 @@ void for_hes(
                   j = *(++itr_2);
                }
             }
-            OpCode op_tmp = FunrvOp;
+            op_code_var op_tmp = FunrvOp;
             if( k_var == 0 )
             {  op_tmp     = FunrpOp;
                arg_tmp[0] = atom_funrp[k];

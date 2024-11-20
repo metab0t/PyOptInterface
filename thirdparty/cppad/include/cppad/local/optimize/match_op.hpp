@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_MATCH_OP_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <cppad/local/optimize/hash_code.hpp>
 // BEGIN_CPPAD_LOCAL_OPTIMIZE_NAMESPACE
@@ -18,7 +18,6 @@ Search for a Previous Operator that Matches Current Operator
 
 Syntax
 ******
-
 | *exceed_collision_limit* = ``match_op`` (
 | |tab| ``collision_limit`` ,
 | |tab| ``random_itr`` ,
@@ -185,7 +184,7 @@ bool match_op(
    CPPAD_ASSERT_UNKNOWN( current < num_op );
    //
    // op, arg, i_var
-   OpCode        op;
+   op_code_var   op;
    const addr_t* arg;
    size_t        i_var;
    random_itr.op_info(current, op, arg, i_var);
@@ -194,7 +193,7 @@ bool match_op(
    size_t num_arg = NumArg(op);
    CPPAD_ASSERT_UNKNOWN( 0 < num_arg );
    CPPAD_ASSERT_UNKNOWN(
-      (num_arg < 3) | ( (num_arg == 3) & (op == ErfOp || op == ErfcOp) )
+      (num_arg < 3) || ( (num_arg == 3) && (op == ErfOp || op == ErfcOp) )
    );
    //
    arg_is_variable(op, arg, variable);
@@ -210,7 +209,7 @@ bool match_op(
       std::numeric_limits<addr_t>::max(),
       std::numeric_limits<addr_t>::max()
    };
-   if( (op == AddvvOp) | (op == MulvvOp ) )
+   if( (op == AddvvOp) || (op == MulvvOp ) )
    {  // in special case where operator is commutative and operands are variables,
       // put lower index first so hash code does not depend on operator order
       CPPAD_ASSERT_UNKNOWN( num_arg == 2 );
@@ -241,7 +240,7 @@ bool match_op(
       CPPAD_ASSERT_UNKNOWN( candidate < current );
       CPPAD_ASSERT_UNKNOWN( op_previous[candidate] == 0 );
       //
-      OpCode        op_c;
+      op_code_var   op_c;
       const addr_t* arg_c;
       size_t        i_var_c;
       random_itr.op_info(candidate, op_c, arg_c, i_var_c);
@@ -256,7 +255,7 @@ bool match_op(
             match &= arg_match[j] == arg_c[j];
          ++j;
       }
-      if( (! match) & ( (op == AddvvOp) | (op == MulvvOp) ) )
+      if( (! match) && ( (op == AddvvOp) || (op == MulvvOp) ) )
       {  // communative so check for reverse order match
          match  = op == op_c;
          //

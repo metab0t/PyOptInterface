@@ -1,4 +1,4 @@
-from .nlcore_ext import (
+from .cppad_interface_ext import (
     graph_op,
 )
 from .cpp_graph_iter import cpp_graph_iterator
@@ -8,32 +8,30 @@ from typing import IO
 op2name = {
     graph_op.abs: "fabs",
     graph_op.acos: "acos",
-    graph_op.acosh: "acosh",
     graph_op.asin: "asin",
-    graph_op.asinh: "asinh",
     graph_op.atan: "atan",
-    graph_op.atanh: "atanh",
     graph_op.cos: "cos",
-    graph_op.cosh: "cosh",
-    graph_op.erf: "erf",
-    graph_op.erfc: "erfc",
     graph_op.exp: "exp",
-    graph_op.expm1: "expm1",
-    graph_op.log1p: "log1p",
     graph_op.log: "log",
     graph_op.pow: "pow",
     graph_op.sign: "sign",
     graph_op.sin: "sin",
-    graph_op.sinh: "sinh",
     graph_op.sqrt: "sqrt",
     graph_op.tan: "tan",
-    graph_op.tanh: "tanh",
     graph_op.add: "+",
     graph_op.sub: "-",
     graph_op.mul: "*",
     graph_op.div: "/",
     graph_op.azmul: "*",
     graph_op.neg: "-",
+}
+
+compare_ops = set([graph_op.cexp_eq, graph_op.cexp_le, graph_op.cexp_lt])
+
+compare_ops_string = {
+    graph_op.cexp_eq: "==",
+    graph_op.cexp_le: "<=",
+    graph_op.cexp_lt: "<",
 }
 
 
@@ -241,26 +239,38 @@ void {name}(
         args = iter.args
 
         assert n_result == 1
+
+        n_arg = len(args)
+
         op_name = op2name.get(op, None)
-        if op_name is None:
+        if op_name is not None:
+            if n_arg == 1:
+                arg1 = get_node_name(args[0])
+                io.write(f"    v[{result_node}] = {op_name}({arg1});\n")
+            elif n_arg == 2:
+                arg1 = get_node_name(args[0])
+                arg2 = get_node_name(args[1])
+                if op_name in infix_operators:
+                    io.write(f"    v[{result_node}] = {arg1} {op_name} {arg2};\n")
+                else:
+                    io.write(f"    v[{result_node}] = {op_name}({arg1}, {arg2});\n")
+            else:
+                message = f"Unknown n_arg: {n_arg} for op_enum: {op}\n"
+                raise ValueError(message)
+        elif op in compare_ops:
+            cmp_op = compare_ops_string[op]
+            assert n_arg == 4
+            predicate = get_node_name(args[0])
+            target = get_node_name(args[1])
+            then_value = get_node_name(args[2])
+            else_value = get_node_name(args[3])
+            io.write(
+                f"    v[{result_node}] = {predicate} {cmp_op} {target} ? {then_value} : {else_value};\n"
+            )
+        else:
             message = f"Unknown name for op_enum: {op}\n"
             debug_context = f"name: {name}\nfull graph:\n{str(graph_obj)}"
             raise ValueError(message + debug_context)
-
-        n_arg = len(args)
-        if n_arg == 1:
-            arg1 = get_node_name(args[0])
-            io.write(f"    v[{result_node}] = {op_name}({arg1});\n")
-        elif n_arg == 2:
-            arg1 = get_node_name(args[0])
-            arg2 = get_node_name(args[1])
-            if op_name in infix_operators:
-                io.write(f"    v[{result_node}] = {arg1} {op_name} {arg2};\n")
-            else:
-                io.write(f"    v[{result_node}] = {op_name}({arg1}, {arg2});\n")
-        else:
-            message = f"Unknown n_arg: {n_arg} for op_enum: {op}\n"
-            raise ValueError(message)
 
         result_node += n_result
 

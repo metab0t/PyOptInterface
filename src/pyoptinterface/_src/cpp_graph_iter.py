@@ -1,5 +1,5 @@
 from collections import namedtuple
-from .nlcore_ext import cpp_graph_cursor
+from .cppad_interface_ext import cpp_graph_cursor
 
 cpp_graph_instruction = namedtuple("cpp_graph_instruction", ["op", "args", "n_result"])
 

@@ -2,7 +2,7 @@ import math
 import pytest
 
 import pyoptinterface as poi
-from pyoptinterface import ipopt
+from pyoptinterface import ipopt, nlfunc
 
 
 def test_ipopt():
@@ -17,80 +17,58 @@ def test_ipopt():
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
     def obj(vars):
-        x = vars["x"]
-        y = vars["y"]
-        return poi.exp(x) + poi.exp(y)
+        return nlfunc.exp(vars.x) + nlfunc.exp(vars.y)
 
-    obj_f = model.register_function(obj, var=["x", "y"], name="obj")
-    model.add_nl_objective(obj_f, [x, y])
+    obj_f = model.register_function(obj)
+    model.add_nl_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
 
     def con(vars):
-        x = vars["x"]
-        y = vars["y"]
+        x = vars.x
+        y = vars.y
 
         z = x * x
         s = y * y
 
         return [z, s]
 
-    con_f = model.register_function(con, ["x", "y"], name="con")
-    model.add_nl_constraint(con_f, [x, y], poi.In, lb=[0.36, 0.04], ub=[4.0, 4.0])
+    con_f = model.register_function(con)
+    model.add_nl_constraint(
+        con_f, vars=nlfunc.Vars(x=x, y=y), lb=[0.36, 0.04], ub=[4.0, 4.0]
+    )
 
     nl_funcs = [
-        poi.abs,
-        poi.acos,
-        poi.acosh,
-        poi.asin,
-        poi.asinh,
-        poi.atan,
-        poi.atanh,
-        poi.cos,
-        poi.cosh,
-        # poi.erf,
-        # poi.erfc,
-        poi.exp,
-        poi.expm1,
-        poi.log1p,
-        poi.log,
-        poi.pow,
-        poi.sin,
-        poi.sinh,
-        poi.sqrt,
-        poi.tan,
-        poi.tanh,
+        nlfunc.abs,
+        nlfunc.acos,
+        nlfunc.asin,
+        nlfunc.atan,
+        nlfunc.cos,
+        nlfunc.exp,
+        nlfunc.log,
+        nlfunc.pow,
+        nlfunc.sin,
+        nlfunc.sqrt,
+        nlfunc.tan,
     ]
     py_funcs = [
         abs,
         math.acos,
-        math.acosh,
         math.asin,
-        math.asinh,
         math.atan,
-        math.atanh,
         math.cos,
-        math.cosh,
-        # math.erf,
-        # math.erfc,
         math.exp,
-        math.expm1,
-        math.log1p,
         math.log,
         math.pow,
         math.sin,
-        math.sinh,
         math.sqrt,
         math.tan,
-        math.tanh,
     ]
 
     def all_nlfuncs(vars):
-        x = vars["x"]
+        x = vars.x
 
         values = []
         for f in nl_funcs:
-            if f == poi.acosh:
-                v = f(x + 1)
-            elif f == poi.pow:
+            if f == nlfunc.pow:
                 v = f(x, 2)
             else:
                 v = f(x)
@@ -98,11 +76,11 @@ def test_ipopt():
 
         return values
 
-    all_nlfuncs_f = model.register_function(all_nlfuncs, var=["x"], name="all_nlfuncs")
+    all_nlfuncs_f = model.register_function(all_nlfuncs)
     N = len(nl_funcs)
     B = 1e10
     all_nlfuncs_con = model.add_nl_constraint(
-        all_nlfuncs_f, [x], poi.In, lb=[-B] * N, ub=[B] * N
+        all_nlfuncs_f, vars=nlfunc.Vars(x=x), lb=[-B] * N, ub=[B] * N
     )
 
     model.optimize()
@@ -126,9 +104,7 @@ def test_ipopt():
 
     correct_con_values = []
     for f in py_funcs:
-        if f == math.acosh:
-            v = f(x_value + 1)
-        elif f == math.pow:
+        if f == math.pow:
             v = f(x_value, 2)
         else:
             v = f(x_value)
@@ -149,22 +125,24 @@ def test_nlp_param():
         xs.append(x)
 
     def obj(vars):
-        return poi.exp(vars[0])
+        return nlfunc.exp(vars.x)
 
-    obj_f = model.register_function(obj, var=1, name="obj")
+    obj_f = model.register_function(obj)
 
     for i in range(N):
-        model.add_nl_objective(obj_f, [xs[i]])
+        model.add_nl_objective(obj_f, vars=nlfunc.Vars(x=xs[i]))
 
     def con(vars, params):
-        x = vars[0]
-        p = params[0]
+        x = vars.x
+        p = params.p
         return x * (p + 1) * (p + 1)
 
-    con_f = model.register_function(con, var=1, param=1, name="con")
+    con_f = model.register_function(con)
 
     for i in range(N):
-        model.add_nl_constraint(con_f, [xs[i]], [i], poi.Geq, [1.0])
+        model.add_nl_constraint(
+            con_f, vars=nlfunc.Vars(x=xs[i]), params=nlfunc.Params(p=i), lb=[1.0]
+        )
 
     model.optimize()
 

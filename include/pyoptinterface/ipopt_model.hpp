@@ -1,7 +1,7 @@
 #pragma once
 
 #include "solvers/ipopt/IpStdCInterface.h"
-#include "pyoptinterface/nlcore.hpp"
+#include "pyoptinterface/nleval.hpp"
 
 #define APILIST                 \
 	B(CreateIpoptProblem);      \
@@ -120,56 +120,22 @@ struct IpoptModel
 		}
 	}
 
-	FunctionIndex register_function(ADFunD &f, const std::string &name,
-	                                const std::vector<double> &x_values,
-	                                const std::vector<double> &p_values);
+	FunctionIndex _register_function(const AutodiffSymbolicStructure &structure);
+	void _set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
 
-	NLConstraintIndex add_empty_nl_constraint(int dim, ConstraintSense sense,
-	                                          const std::vector<double> &rhss);
-	NLConstraintIndex add_empty_nl_constraint(int dim, ConstraintSense sense,
-	                                          const std::vector<double> &lbs,
-	                                          const std::vector<double> &ubs);
+	NLConstraintIndex _add_nl_constraint_bounds(const FunctionIndex &k,
+	                                            const std::vector<VariableIndex> &xs,
+	                                            const std::vector<ParameterIndex> &ps,
+	                                            const std::vector<double> &lbs,
+	                                            const std::vector<double> &ubs);
 
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs,
-	                                    const std::vector<ParameterIndex> &ps,
-	                                    ConstraintSense sense, const std::vector<double> &rhss);
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs,
-	                                    const std::vector<double> &ps, ConstraintSense sense,
-	                                    const std::vector<double> &rhss);
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs, ConstraintSense sense,
-	                                    const std::vector<double> &rhss);
+	NLConstraintIndex _add_nl_constraint_eq(const FunctionIndex &k,
+	                                        const std::vector<VariableIndex> &xs,
+	                                        const std::vector<ParameterIndex> &ps,
+	                                        const std::vector<double> &eqs);
 
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs,
-	                                    const std::vector<ParameterIndex> &ps,
-	                                    ConstraintSense sense, const std::vector<double> &lbs,
-	                                    const std::vector<double> &ubs);
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs,
-	                                    const std::vector<double> &ps, ConstraintSense sense,
-	                                    const std::vector<double> &lbs,
-	                                    const std::vector<double> &ubs);
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs, ConstraintSense sense,
-	                                    const std::vector<double> &lbs,
-	                                    const std::vector<double> &ubs);
-
-	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-	                       const std::vector<VariableIndex> &xs,
+	void _add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
 	                       const std::vector<ParameterIndex> &ps);
-	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-	                       const std::vector<VariableIndex> &xs, const std::vector<double> &ps);
-	void add_nl_expression(const NLConstraintIndex &constraint, const FunctionIndex &k,
-	                       const std::vector<VariableIndex> &xs);
-
-	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs);
-	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-	                      const std::vector<ParameterIndex> &ps);
-	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-	                      const std::vector<double> &ps);
 
 	void clear_nl_objective();
 
@@ -197,8 +163,8 @@ struct IpoptModel
 	std::vector<size_t> m_hessian_rows, m_hessian_cols;
 	Hashmap<VariablePair, size_t> m_hessian_index_map;
 
-	NonlinearFunctionModel m_function_model;
-	LinearQuadraticModel m_lq_model;
+	NonlinearFunctionEvaluator m_function_model;
+	LinearQuadraticEvaluator m_lq_model;
 
 	// The options of the Ipopt solver, we cache them before constructing the m_problem
 	Hashmap<std::string, int> m_options_int;

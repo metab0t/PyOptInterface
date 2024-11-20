@@ -1,4 +1,4 @@
-from .nlcore_ext import (
+from .cppad_interface_ext import (
     graph_op,
 )
 from .cpp_graph_iter import cpp_graph_iterator
@@ -208,30 +208,28 @@ def create_indirect_load_store(module: ir.Module):
 op2name = {
     graph_op.abs: "fabs",
     graph_op.acos: "acos",
-    graph_op.acosh: "acosh",
     graph_op.asin: "asin",
-    graph_op.asinh: "asinh",
     graph_op.atan: "atan",
-    graph_op.atanh: "atanh",
     graph_op.cos: "cos",
-    graph_op.cosh: "cosh",
-    graph_op.erf: "erf",
-    graph_op.erfc: "erfc",
     graph_op.exp: "exp",
-    graph_op.expm1: "expm1",
-    graph_op.log1p: "log1p",
     graph_op.log: "log",
     graph_op.pow: "pow",
     graph_op.sin: "sin",
-    graph_op.sinh: "sinh",
     graph_op.sqrt: "sqrt",
     graph_op.tan: "tan",
-    graph_op.tanh: "tanh",
 }
 
 math_ops = set(op2name.keys())
 
 binary_ops = set([graph_op.pow])
+
+compare_ops = set([graph_op.cexp_eq, graph_op.cexp_le, graph_op.cexp_lt])
+
+compare_ops_string = {
+    graph_op.cexp_eq: "==",
+    graph_op.cexp_le: "<=",
+    graph_op.cexp_lt: "<",
+}
 
 
 def create_llvmir_basic_functions(module: ir.Module):
@@ -442,10 +440,9 @@ def generate_llvmir_from_graph(
         args = iter.args
 
         assert n_result == 1
-        assert len(args) <= 2
 
         arg1 = get_node_value(args[0])
-        if len(args) == 2:
+        if len(args) >= 2:
             arg2 = get_node_value(args[1])
 
         if op == graph_op.add:
@@ -470,8 +467,19 @@ def generate_llvmir_from_graph(
                 ret_val = builder.call(op_function, [arg1, arg2])
             else:
                 ret_val = builder.call(op_function, [arg1])
+        elif op in compare_ops:
+            assert len(args) == 4
+            predicate = arg1
+            target = arg2
+            then_value = get_node_value(args[2])
+            else_value = get_node_value(args[3])
+
+            cmp_string = compare_ops_string[op]
+            cond = builder.fcmp_ordered(cmp_string, predicate, target)
+
+            ret_val = builder.select(cond, then_value, else_value)
         else:
-            raise ValueError(f"Unknown op_enum: {op}")
+            raise ValueError(f"Unknown CppAD graph op_enum: {op}")
 
         ret_val.name = f"v[{result_node}]"
         v_dict[result_node] = ret_val

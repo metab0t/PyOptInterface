@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_REV_HES_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/atom_op_info.hpp>
@@ -176,7 +176,7 @@ void rev_hes(
    // skip the EndOp at the end of the recording
    play::const_sequential_iterator itr = play->end();
    // op_info
-   OpCode op;
+   op_code_var op;
    size_t i_var;
    const Addr*   arg;
    itr.op_info(op, arg, i_var);
@@ -287,14 +287,14 @@ void rev_hes(
 
          case CSumOp:
          itr.correct_after_decrement(arg);
-         reverse_sparse_hessian_csum_op(
+         var_op::csum_reverse_hes(
             i_var, arg, RevJac, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
 
          case CExpOp:
-         reverse_sparse_hessian_cond_op(
+         var_op::reverse_sparse_hessian_cond_op(
             i_var, arg, num_par, RevJac, rev_hes_sparse
          );
          break;
@@ -382,31 +382,17 @@ void rev_hes(
          // -------------------------------------------------
 
          case LdpOp:
-         reverse_sparse_hessian_load_op(
-            op,
-            i_var,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            rev_hes_sparse,
-            vecad_sparse,
-            RevJac,
-            vecad_jac.data()
-         );
-         break;
-         // -------------------------------------------------
-
          case LdvOp:
-         reverse_sparse_hessian_load_op(
+         var_op::load_reverse_hes(
             op,
-            i_var,
             arg,
             num_vecad_ind,
-            vecad_ind.data(),
+            i_var,
+            vecad_ind,
             rev_hes_sparse,
             vecad_sparse,
             RevJac,
-            vecad_jac.data()
+            vecad_jac
          );
          break;
          // -------------------------------------------------
@@ -530,41 +516,18 @@ void rev_hes(
          // -------------------------------------------------
 
          case StppOp:
-         // sparsity cannot propagate through a parameter
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0)
-         break;
-         // -------------------------------------------------
-
          case StpvOp:
-         reverse_sparse_hessian_store_op(
-            op,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            rev_hes_sparse,
-            vecad_sparse,
-            RevJac,
-            vecad_jac.data()
-         );
-         break;
-         // -------------------------------------------------
-
          case StvpOp:
-         // sparsity cannot propagate through a parameter
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0)
-         break;
-         // -------------------------------------------------
-
          case StvvOp:
-         reverse_sparse_hessian_store_op(
+         var_op::store_reverse_hes(
             op,
             arg,
             num_vecad_ind,
-            vecad_ind.data(),
+            vecad_ind,
             rev_hes_sparse,
             vecad_sparse,
             RevJac,
-            vecad_jac.data()
+            vecad_jac
          );
          break;
          // -------------------------------------------------

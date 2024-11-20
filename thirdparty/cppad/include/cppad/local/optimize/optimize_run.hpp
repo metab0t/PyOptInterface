@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_OPTIMIZE_RUN_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <stack>
@@ -38,7 +38,6 @@ Convert a player object to an optimized recorder object
 
 Syntax
 ******
-
 | *exceed_collision_limit* = ``local::optimize::optimize_run`` (
 | |tab| ``options`` , ``n`` , ``dep_taddr`` , ``play`` , ``rec``
 | )
@@ -329,7 +328,7 @@ bool optimize_run(
    rec->set_record_compare( compare_op );
 
    // copy parameters with index 0
-   CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[0] && isnan( play->GetPar(0) ) );
+   CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[0] && CppAD::isnan( play->GetPar(0) ) );
    rec->put_con_par( play->GetPar(0) );
    new_par[0] = 0;
 
@@ -443,7 +442,7 @@ bool optimize_run(
             rec->put_dyn_arg_vec( arg_vec );
          }
       }
-      else if( par_usage[i_par] & (op != result_dyn) )
+      else if( par_usage[i_par] && (op != result_dyn) )
       {  size_t j_dyn = size_t( dyn_previous[i_dyn] );
          if( j_dyn != num_dynamic_par )
          {  size_t j_par = size_t( dyn_ind2par_ind[j_dyn] );
@@ -560,7 +559,7 @@ bool optimize_run(
    // -------------------------------------------------------------
    // information for current operator
    size_t          i_op;   // index
-   OpCode          op;     // operator
+   op_code_var     op;     // operator
    const addr_t*   arg;    // arguments
    size_t          i_var;  // variable index of primary (last) result
    //

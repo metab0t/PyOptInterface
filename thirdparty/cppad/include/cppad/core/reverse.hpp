@@ -2,7 +2,7 @@
 # define CPPAD_CORE_REVERSE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <algorithm>
@@ -117,7 +117,7 @@ BaseVector ADFun<Base,RecBase>::Reverse(size_t q, const BaseVector &w)
    );
    // special case where multiple forward directions have been computed,
    // but we are only using the one direction zero order results
-   if( (q == 1) & (num_direction_taylor_ > 1) )
+   if( (q == 1) && (num_direction_taylor_ > 1) )
    {  num_order_taylor_ = 1;        // number of orders to copy
       size_t c = cap_order_taylor_; // keep the same capacity setting
       size_t r = 1;                 // only keep one direction
@@ -137,22 +137,25 @@ BaseVector ADFun<Base,RecBase>::Reverse(size_t q, const BaseVector &w)
 
    // set the dependent variable direction
    // (use += because two dependent variables can point to same location)
-   for(i = 0; i < m; i++)
-   {  CPPAD_ASSERT_UNKNOWN( dep_taddr_[i] < num_var_tape_  );
-      if( size_t(w.size()) == m )
+   if( size_t(w.size()) == m )
+   {  for(i = 0; i < m; ++i)
+      {  CPPAD_ASSERT_UNKNOWN( dep_taddr_[i] < num_var_tape_  );
          Partial[dep_taddr_[i] * q + q - 1] += w[i];
-      else
-      {  for(k = 0; k < q; k++)
+      }
+   }
+   else
+   {  CPPAD_ASSERT_UNKNOWN( size_t(w.size()) == m * q );
+      for(i = 0; i < m; i++)
+      {  CPPAD_ASSERT_UNKNOWN( dep_taddr_[i] < num_var_tape_  );
+         for(k = 0; k < q; k++)
             Partial[ dep_taddr_[i] * q + k ] += w[i * q + k ];
       }
    }
-
    // evaluate the derivatives
    CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
    CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );
    local::play::const_sequential_iterator play_itr = play_.end();
    local::sweep::reverse(
-      q - 1,
       n,
       num_var_tape_,
       &play_,

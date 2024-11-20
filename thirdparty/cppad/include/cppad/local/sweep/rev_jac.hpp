@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_REV_JAC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/atom_op_info.hpp>
@@ -23,7 +23,6 @@ Reverse Mode Jacobian Sparsity Patterns
 
 Syntax
 ******
-
 | ``local::sweep::rev_jac`` (
 | |tab| *play*               ,
 | |tab| *dependency*         ,
@@ -192,7 +191,7 @@ void rev_jac(
    // skip the EndOp at the end of the recording
    play::const_sequential_iterator itr = play->end();
    // op_info
-   OpCode op;
+   op_code_var op;
    size_t i_var;
    const Addr*   arg;
    itr.op_info(op, arg, i_var);
@@ -302,14 +301,14 @@ void rev_jac(
 
          case CSumOp:
          itr.correct_after_decrement(arg);
-         reverse_sparse_jacobian_csum_op(
+         var_op::csum_reverse_jac(
             i_var, arg, var_sparsity
          );
          break;
          // -------------------------------------------------
 
          case CExpOp:
-         reverse_sparse_jacobian_cond_op(
+         var_op::reverse_sparse_jacobian_cond_op(
             dependency, i_var, arg, num_par, var_sparsity
          );
          break;
@@ -399,27 +398,14 @@ void rev_jac(
          // -------------------------------------------------
 
          case LdpOp:
-         reverse_sparse_jacobian_load_op(
-            dependency,
-            op,
-            i_var,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case LdvOp:
-         reverse_sparse_jacobian_load_op(
-            dependency,
+         var_op::load_reverse_jac(
             op,
+            num_vecad_ind,
             i_var,
             arg,
-            num_vecad_ind,
-            vecad_ind.data(),
+            dependency,
+            vecad_ind,
             var_sparsity,
             vecad_sparsity
          );
@@ -547,46 +533,15 @@ void rev_jac(
          // -------------------------------------------------
 
          case StppOp:
-         // does not affect sparsity or dependency when both are parameters
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0);
-         break;
-         // -------------------------------------------------
-
          case StpvOp:
-         reverse_sparse_jacobian_store_op(
-            dependency,
-            op,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case StvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0);
-         // storing a parameter only affects dependency
-         reverse_sparse_jacobian_store_op(
-            dependency,
-            op,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case StvvOp:
-         reverse_sparse_jacobian_store_op(
-            dependency,
+         var_op::store_reverse_jac(
             op,
-            arg,
             num_vecad_ind,
-            vecad_ind.data(),
+            arg,
+            dependency,
+            vecad_ind,
             var_sparsity,
             vecad_sparsity
          );

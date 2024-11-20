@@ -2,7 +2,7 @@
 # define CPPAD_CORE_SUBGRAPH_REVERSE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin subgraph_reverse}
@@ -16,7 +16,6 @@ Reverse Mode Using Subgraphs
 
 Syntax
 ******
-
 | *f* . ``subgraph_reverse`` ( *select_domain* )
 | *f* . ``subgraph_reverse`` ( *q* , *ell* , *col* , *dw* )
 | *f* . ``clear_subgraph`` ()
@@ -370,7 +369,7 @@ void ADFun<Base,RecBase>::subgraph_reverse_helper(
    for(size_t k = 0; k < subgraph.size(); ++k)
    {
       size_t               i_op = size_t( subgraph[k] );
-      local::OpCode        op;
+      local::op_code_var   op;
       const addr_t*        arg;
       size_t               i_var;
       random_itr.op_info(i_op, op, arg, i_var);
@@ -405,7 +404,6 @@ void ADFun<Base,RecBase>::subgraph_reverse_helper(
       play_.end_subgraph(random_itr, &subgraph);
    //
    local::sweep::reverse(
-      q - 1,
       n,
       num_var_tape_,
       &play_,

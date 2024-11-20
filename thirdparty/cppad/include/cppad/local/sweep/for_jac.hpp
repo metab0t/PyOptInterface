@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_FOR_JAC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <set>
@@ -156,7 +156,7 @@ void for_jac(
    // skip the BeginOp at the beginning of the recording
    play::const_sequential_iterator itr = play->begin();
    // op_info
-   OpCode op;
+   op_code_var op;
    size_t i_var;
    const Addr*   arg;
    itr.op_info(op, arg, i_var);
@@ -256,7 +256,7 @@ void for_jac(
          // -------------------------------------------------
 
          case CSumOp:
-         forward_sparse_jacobian_csum_op(
+         var_op::csum_forward_jac(
             i_var, arg, var_sparsity
          );
          itr.correct_before_increment();
@@ -264,7 +264,7 @@ void for_jac(
          // -------------------------------------------------
 
          case CExpOp:
-         forward_sparse_jacobian_cond_op(
+         var_op::forward_sparse_jacobian_cond_op(
             dependency, i_var, arg, num_par, var_sparsity
          );
          break;
@@ -363,27 +363,14 @@ void for_jac(
          // -------------------------------------------------
 
          case LdpOp:
-         forward_sparse_load_op(
-            dependency,
-            op,
-            i_var,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case LdvOp:
-         forward_sparse_load_op(
-            dependency,
+         var_op::load_forward_jac(
             op,
+            num_vecad_ind,
             i_var,
             arg,
-            num_vecad_ind,
-            vecad_ind.data(),
+            dependency,
+            vecad_ind,
             var_sparsity,
             vecad_sparsity
          );
@@ -514,46 +501,15 @@ void for_jac(
          // -------------------------------------------------
 
          case StppOp:
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0);
-         // if both arguments are parameters does not affect sparsity
-         // or dependency
-         break;
-         // -------------------------------------------------
-
          case StpvOp:
-         forward_sparse_store_op(
-            dependency,
-            op,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case StvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 3, 0);
-         forward_sparse_store_op(
-            dependency,
-            op,
-            arg,
-            num_vecad_ind,
-            vecad_ind.data(),
-            var_sparsity,
-            vecad_sparsity
-         );
-         break;
-         // -------------------------------------------------
-
          case StvvOp:
-         forward_sparse_store_op(
-            dependency,
+         var_op::store_forward_jac(
             op,
-            arg,
             num_vecad_ind,
-            vecad_ind.data(),
+            arg,
+            dependency,
+            vecad_ind,
             var_sparsity,
             vecad_sparsity
          );
@@ -759,7 +715,7 @@ void for_jac(
             {  z_value[j] = true;
                j = *(++itr);
             }
-            OpCode op_tmp = FunrvOp;
+            op_code_var op_tmp = FunrvOp;
             if( j_var == 0 )
             {  op_tmp     = FunrpOp;
                arg_tmp[0] = atom_funrp[i];

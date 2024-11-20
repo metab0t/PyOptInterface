@@ -57,8 +57,8 @@ typedef CPPAD_VEC_ENUM_TYPE opcode_t;
 /* {xrst_code}
 {xrst_spell_on}
 
-OpCode
-******
+op_code_var
+***********
 This enum type is used to distinguish different ``AD`` < *Base* >
 atomic operations.
 Each value in the enum type ends with the characters ``Op`` .
@@ -255,59 +255,7 @@ The is the total number operators that might be skipped; i.e., *n* + *m* .
 {xrst_comment ------------------------------------------------------------- }
 CSumOp
 ******
-Is a cumulative summation operator
-which has one result variable.
-
-arg[0]
-======
-is the index of the parameter that initializes the summation.
-
-arg[1]
-======
-argument index that flags the end of the addition variables,
-we use the notation *k* = *arg* [1] below.
-
-arg[2]
-======
-argument index that flags the end of the subtraction variables,
-we use the notation *ell* = *arg* [2] below.
-
-arg[3]
-======
-argument index that flags the end of the addition dynamic parameters,
-we use the notation *m* = *arg* [3] below.
-
-arg[4]
-======
-argument index that flags the end of the subtraction dynamic parameters,
-we use the notation *n* = *arg* [4] below.
-
-arg[5+i]
-========
-for *i* = 0, ..., *k* ``-6`` ,
-this is the index of the *i*-th variable to be added in the summation.
-
-arg[k+i]
-========
-for *i* = 0, ..., *ell* ``-`` *k* ``-1`` ,
-this is the index of the *i*-th variable to be subtracted in the summation.
-
-arg[ell+i]
-==========
-for *i* = 0, ..., *m* ``-`` *ell* ``-1`` , this is the index of the
-*i*-th dynamic parameter to be added in the summation.
-
-arg[m+i]
-========
-for *i* = 0, ..., *n* ``-`` *m* ``-1`` , this is the index of the
-*i*-th dynamic parameter to be subtracted in the summation.
-
-arg[n]
-======
-This is equal to *n* .
-Note that there are *n* +1 arguments to this operator
-and having this value at the end enable reverse model to know how far
-to back up to get to the start of this operation.
+see :ref:`var_csum_op@CSumOp`
 
 {xrst_comment ------------------------------------------------------------- }
 DisOp
@@ -325,93 +273,16 @@ arg[1]
 variable index corresponding to the argument for this function call.
 
 {xrst_comment ------------------------------------------------------------- }
-Load
-****
-The load operators create a new variable corresponding to
-*vec* [ *ind* ] where *vec* is a :ref:`VecAD-name` vector
-and *ind* is an ``AD`` < *Base* > .
-For these operators either *vec* or *ind* is a variable
-and there is one variable result.
 
-LdpOp
-=====
-This load is used for an index *ind* that is a parameter.
-
-LdvOp
-=====
-This load is used for an index *ind* that is a variable.
-
-arg[0]
-======
-is the offset of this VecAD vector
-relative to the beginning of the single array
-that contains all VecAD elements for all the VecAD vectors.
-This corresponds to the first element of this vector and not its size
-(which comes just before the first element).
-
-arg[1]
-======
-is the index in this VecAD vector for this load operation.
-For the ``LdpOp`` (``LdvOp`` ) operator this is the
-parameter index (variable index) corresponding to *ind* .
-
-arg[2]
-======
-is the index of this VecAD load operation in the set of all
-the load operations in this recording.
-This includes both dynamic parameter and variable loads.
-It is used to map load operations to corresponding
-dynamic parameters and variables.
+LdpOp, LdvOp
+============
+see :ref:`var_load_op@LdpOp, LdvOp`
 
 {xrst_comment ------------------------------------------------------------- }
-Store
-*****
-The store operators store information corresponding to
-*vec* [ *ind* ] = ``right`` where *vec* is a :ref:`VecAD-name` vector
-and *ind* is an ``AD`` < *Base* > .
-For these operators either *vec* , *ind* , or *right*
-is a variable and there is no result.
 
-StppOp
-======
-This store is used when *ind* and *right* are parameters.
-
-StpvOp
-======
-This store is used when *ind* is a parameter
-and *right* is a variable.
-
-StvpOp
-======
-This store is used when *ind* is a variable
-and *right* is a parameter.
-
-StvvOp
-======
-This store is used when *index* and *right* are variables.
-
-arg[0]
-======
-is the offset of this VecAD vector
-relative to the beginning of the single array
-that contains all VecAD elements for all the VecAD vectors.
-This corresponds to the first element of this vector and not its size
-(which comes just before the first element).
-
-arg[1]
-======
-is the index in this VecAD vector for this store operation.
-For the ``StppOp`` and ``StpvOp`` cases
-this is the parameter index corresponding to *ind* .
-For the ``StvpOp`` and ``StvvOp`` cases,
-this is the variable index corresponding to *ind* .
-
-arg[2]
-======
-For the ``StppOp`` and ``StvpOp`` cases,
-this is the parameter index corresponding to *right* .
-For the ``StpvOp`` and ``StvvOp`` cases,
-this is the variable index corresponding to *right* .
+StppOp, StpvOp, StvpOp, StvvOp
+==============================
+see :ref:`var_store_op@StppOp, StpvOp, StvpOp, StvvOp`
 
 {xrst_comment ------------------------------------------------------------- }
 ParOp
@@ -454,12 +325,18 @@ is the text index corresponding to *after* .
 
 {xrst_comment ------------------------------------------------------------- }
 
+{xrst_toc_table
+   include/cppad/local/var_op/load_op.hpp
+   include/cppad/local/var_op/store_op.hpp
+   include/cppad/local/var_op/csum_op.hpp
+}
+
 Source
 ******
 {xrst_spell_off}
 {xrst_code hpp} */
 // BEGIN_SORT_THIS_LINE_PLUS_2
-enum OpCode {
+enum op_code_var {
    AFunOp,   // see its heading above
    AbsOp,    // unary fabs
    AcosOp,   // unary acos
@@ -554,20 +431,20 @@ Operator for which we are fetching the number of arugments.
 
 \par NumArgTable
 this table specifes the number of arguments stored for each
-occurance of the operator that is the i-th value in the OpCode enum type.
-For example, for the first three OpCode enum values we have
+occurance of the operator that is the i-th value in the op_code_var enum type.
+For example, for the first three op_code_var enum values we have
 \verbatim
-OpCode   j   NumArgTable[j]  Meaning
+op_code_var j   NumArgTable[j]  Meaning
 AbsOp    0                1  index of variable we are taking absolute value of
 AcosOp   1                1  index of variable we are taking acos of
 AcoshOp  2                1  index of variable we are taking acosh of
 \endverbatim
 Note that the meaning of the arguments depends on the operator.
 */
-inline size_t NumArg( OpCode op)
+inline size_t NumArg( op_code_var op)
 {  CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;
 
-   // agreement with OpCode is checked by bin/check_op_code.sh
+   // agreement with op_code_var is checked by bin/check_op_code.sh
    // BEGIN_SORT_THIS_LINE_PLUS_2
    static const size_t NumArgTable[] = {
       /* AFunOp   */ 4,
@@ -676,19 +553,19 @@ Operator for which we are fecching the number of results.
 
 \par NumResTable
 table specifes the number of varibles that result for each
-occurance of the operator that is the i-th value in the OpCode enum type.
-For example, for the first three OpCode enum values we have
+occurance of the operator that is the i-th value in the op_code_var enum type.
+For example, for the first three op_code_var enum values we have
 \verbatim
-OpCode   j   NumResTable[j]  Meaning
+op_code_var j   NumResTable[j]  Meaning
 AbsOp    0                1  variable that is the result of the absolute value
 AcosOp   1                2  acos(x) and sqrt(1-x*x) are required for this op
 AcoshOp  2                2  acosh(x) and sqrt(x*x-1) are required for this op
 \endverbatim
 */
-inline size_t NumRes(OpCode op)
+inline size_t NumRes(op_code_var op)
 {  CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;
 
-   // agreement with OpCode is checked by bin/check_op_code.sh
+   // agreement with op_code_var is checked by bin/check_op_code.sh
    // BEGIN_SORT_THIS_LINE_PLUS_2
    static const size_t NumResTable[] = {
       /* AFunOp   */ 0,
@@ -786,8 +663,8 @@ name of the specified operation.
 \param op
 Operator for which we are fetching the name
 */
-inline std::string OpName(OpCode op)
-{  // agreement with OpCode is checked by bin/check_op_code.sh
+inline std::string OpName(op_code_var op)
+{  // agreement with op_code_var is checked by bin/check_op_code.sh
    // BEGIN_SORT_THIS_LINE_PLUS_2
    static const char *OpNameTable[] = {
       "AFunOp"  ,
@@ -965,7 +842,7 @@ is the index for the variable corresponding to the result of this operation
 (if NumRes(op) > 0).
 
 \param op
-The operator code (OpCode) for this operation.
+The operator code (op_code_var) for this operation.
 
 \param arg
 is the vector of argument indices for this operation
@@ -977,7 +854,7 @@ void printOp(
    const local::player<Base>* play,
    size_t                 i_op   ,
    size_t                 i_var  ,
-   OpCode                 op     ,
+   op_code_var            op     ,
    const addr_t*          arg    )
 {
    CPPAD_ASSERT_KNOWN(
@@ -1370,7 +1247,7 @@ and all the other is_variable values are false.
 */
 template <class Addr>
 void arg_is_variable(
-   OpCode            op          ,
+   op_code_var       op          ,
    const Addr*       arg         ,
    pod_vector<bool>& is_variable )
 {  size_t num_arg = NumArg(op);
@@ -1566,7 +1443,7 @@ void arg_is_variable(
       //
       is_variable.resize( num_arg );
       for(size_t i = 0; i < num_arg; ++i)
-         is_variable[i] = (5 <= i) & (i < size_t(arg[2]));
+         is_variable[i] = (5 <= i) && (i < size_t(arg[2]));
       break;
 
       case EqppOp:
