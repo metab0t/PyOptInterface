@@ -2,6 +2,7 @@
 
 #include "solvers/ipopt/IpStdCInterface.h"
 #include "pyoptinterface/nleval.hpp"
+#include <cmath>
 
 #define APILIST            \
 	B(CreateIpoptProblem); \

@@ -128,7 +128,7 @@ runs:
       shell: pwsh
       run: |
         7z x -so D:\installers\idaes-solvers.tar.gz | 7z x -si -ttar -oD:\ipopt
-        echo "PATH=$env:PATH;D:\ipopt" >> $env:GITHUB_ENV
+        echo "PATH=D:\ipopt;$env:PATH" >> $env:GITHUB_ENV
         ls D:\ipopt
     - name: Test IPOPT
       shell: pwsh
