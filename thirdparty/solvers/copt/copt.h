@@ -8,7 +8,11 @@
 #endif
 
 #ifdef _WIN32
+#if defined(__MINGW64__)
+#define COPT_INT64 long long
+#else
 #define COPT_INT64 __int64
+#endif
 #elif defined(__LP64__) || defined(_LP64) || defined(__ILP64__) || defined(_ILP64)
 #define COPT_INT64 long
 #else
@@ -20,8 +24,8 @@ extern "C" {
 #endif
 
 #define COPT_VERSION_MAJOR                      7
-#define COPT_VERSION_MINOR                      1
-#define COPT_VERSION_TECHNICAL                  4
+#define COPT_VERSION_MINOR                      2
+#define COPT_VERSION_TECHNICAL                  2
 
 
 /*
@@ -54,6 +58,11 @@ extern "C" {
 /* SOS types */
 #define COPT_SOS_TYPE1                          1
 #define COPT_SOS_TYPE2                          2
+
+/* Indicator types */
+#define COPT_INDICATOR_IF                       1
+#define COPT_INDICATOR_ONLYIF                   2
+#define COPT_INDICATOR_IFANDONLYIF              3
 
 /* Cone types */
 #define COPT_CONE_QUAD                          1
@@ -250,6 +259,9 @@ extern "C" {
 #define COPT_DBLINFO_RELAXVALUE                 "RelaxValue"
 
 /* COPT client config keywords */
+#define COPT_CLIENT_CAFILE                      "CaFile"
+#define COPT_CLIENT_CERTFILE                    "CertFile"
+#define COPT_CLIENT_CERTKEYFILE                 "CertKeyFile"
 #define COPT_CLIENT_CLUSTER                     "Cluster"
 #define COPT_CLIENT_FLOATING                    "Floating"
 #define COPT_CLIENT_PASSWORD                    "PassWord"
@@ -285,6 +297,7 @@ int COPT_CALL COPT_GetLicenseMsg(copt_env *env, char *buff, int buffSize);
 
 int COPT_CALL COPT_CreateProb(copt_env *env, copt_prob **p_prob);
 int COPT_CALL COPT_CreateCopy(copt_prob *src_prob, copt_prob **p_dst_prob);
+int COPT_CALL COPT_ClearProb(copt_prob *prob);
 int COPT_CALL COPT_DeleteProb(copt_prob **p_prob);
 
 int COPT_CALL COPT_LoadProb(copt_prob *prob,
@@ -458,6 +471,19 @@ int COPT_CALL COPT_AddIndicator(copt_prob *prob,
     char              cRowSense,
     double            dRowBound);
 
+int COPT_CALL COPT_AddIndicators(copt_prob *prob,
+    int               nInd,
+    int               *indType,
+    int               *binColIdx,
+    int               *binColVal,
+    const int         *rowMatBeg,
+    const int         *rowMatCnt,
+    const int         *rowMatIdx,
+    const double      *rowMatElem,
+    char              *cRowSense,
+    double            *dRowBound,
+    char const *const *indNames);
+
 int COPT_CALL COPT_GetCols(copt_prob *prob,
     int               nCol,
     const int         *list,
@@ -562,6 +588,21 @@ int COPT_CALL COPT_GetIndicator(copt_prob *prob,
     int               nElemSize,
     int               *pReqSize);
 
+int COPT_CALL COPT_GetIndicators(copt_prob *prob,
+    int               nInd,
+    int               *list,
+    int               *indType,
+    int               *binColIdx,
+    int               *binColVal,
+    int               *rowMatBeg,
+    int               *rowMatCnt,
+    int               *rowMatIdx,
+    double            *rowMatElem,
+    char              *cRowSense,
+    double            *dRowBound,
+    int               nElemSize,
+    int               *pReqSize);
+
 int COPT_CALL COPT_GetElem(copt_prob *prob, int iCol, int iRow, double *p_elem);
 int COPT_CALL COPT_SetElem(copt_prob *prob, int iCol, int iRow, double newElem);
 int COPT_CALL COPT_SetElems(copt_prob *prob, int nelem, const int *cols, const int *rows, const double *elems);
@@ -619,6 +660,8 @@ int COPT_CALL COPT_SetPSDConstrNames(copt_prob *prob, int num, const int *list, 
 
 int COPT_CALL COPT_SetLMIConstrRhs(copt_prob *prob, int num, const int *list, const int *newIdx);
 int COPT_CALL COPT_SetLMIConstrNames(copt_prob *prob, int num, const int *list, char const *const *names);
+
+int COPT_CALL COPT_SetIndicatorNames(copt_prob *prob, int num, const int *list, char const *const *names);
 
 int COPT_CALL COPT_ReplaceColObj(copt_prob *prob, int num, const int *list, const double *obj);
 int COPT_CALL COPT_ReplacePSDObj(copt_prob *prob, int num, const int *list, const int *idx);
@@ -698,6 +741,7 @@ int COPT_CALL COPT_GetRowIdx(copt_prob *prob, const char *rowName, int *p_iRow);
 int COPT_CALL COPT_GetQConstrIdx(copt_prob *prob, const char *qConstrName, int *p_iQConstr);
 int COPT_CALL COPT_GetPSDConstrIdx(copt_prob *prob, const char *psdConstrName, int *p_iPSDConstr);
 int COPT_CALL COPT_GetLMIConstrIdx(copt_prob *prob, const char *lmiConstrName, int *p_iLMIConstr);
+int COPT_CALL COPT_GetIndicatorIdx(copt_prob *prob, const char *indicatorName, int *p_iIndicator);
 int COPT_CALL COPT_GetColInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
 int COPT_CALL COPT_GetPSDColInfo(copt_prob *prob, const char *infoName, int iCol, double *info);
 int COPT_CALL COPT_GetRowInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
@@ -725,6 +769,7 @@ int COPT_CALL COPT_GetRowName(copt_prob *prob, int iRow, char *buff, int buffSiz
 int COPT_CALL COPT_GetQConstrName(copt_prob *prob, int iQConstr, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetPSDConstrName(copt_prob *prob, int iPSDConstr, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetLMIConstrName(copt_prob *prob, int iLMIConstr, char *buff, int buffSize, int *pReqSize);
+int COPT_CALL COPT_GetIndicatorName(copt_prob *prob, int iIndicator, char *buff, int buffSize, int *pReqSize);
 
 int COPT_CALL COPT_SetLogFile(copt_prob *prob, const char *logfilename);
 int COPT_CALL COPT_SetLogCallback(copt_prob *prob, void (COPT_CALL *logcb)(char *msg, void *userdata), void *userdata);
