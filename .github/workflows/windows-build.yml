@@ -9,7 +9,7 @@ on:
 jobs:
 
   windows_build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     # Only allow one build at a time otherwise we can run out of licenses
     concurrency:
