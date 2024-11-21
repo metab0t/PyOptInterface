@@ -262,12 +262,12 @@ CppAD::AD<double> cppad_build_binary_expression(BinaryOperator op, const CppAD::
 	case BinaryOperator::Pow: {
 		return CppAD::pow(left, right);
 	}
-	case BinaryOperator::Lessthan:
-	case BinaryOperator::Lessequal:
+	case BinaryOperator::LessThan:
+	case BinaryOperator::LessEqual:
 	case BinaryOperator::Equal:
-	case BinaryOperator::Notequal:
-	case BinaryOperator::Greaterequal:
-	case BinaryOperator::Greaterthan: {
+	case BinaryOperator::NotEqual:
+	case BinaryOperator::GreaterEqual:
+	case BinaryOperator::GreaterThan: {
 		throw std::runtime_error("Currently comparision operator can only be used with ifelse "
 		                         "function and cannot be evaluated as value");
 	}
@@ -285,22 +285,22 @@ CppAD::AD<double> cppad_build_ternary_expression(BinaryOperator compare_op,
 {
 	switch (compare_op)
 	{
-	case BinaryOperator::Lessthan: {
+	case BinaryOperator::LessThan: {
 		return CppAD::CondExpLt(compare_left, compare_right, then_result, else_result);
 	}
-	case BinaryOperator::Lessequal: {
+	case BinaryOperator::LessEqual: {
 		return CppAD::CondExpLe(compare_left, compare_right, then_result, else_result);
 	}
 	case BinaryOperator::Equal: {
 		return CppAD::CondExpEq(compare_left, compare_right, then_result, else_result);
 	}
-	case BinaryOperator::Notequal: {
+	case BinaryOperator::NotEqual: {
 		return CppAD::CondExpEq(compare_left, compare_right, else_result, then_result);
 	}
-	case BinaryOperator::Greaterequal: {
+	case BinaryOperator::GreaterEqual: {
 		return CppAD::CondExpGe(compare_left, compare_right, then_result, else_result);
 	}
-	case BinaryOperator::Greaterthan: {
+	case BinaryOperator::GreaterThan: {
 		return CppAD::CondExpGt(compare_left, compare_right, then_result, else_result);
 	}
 	default: {

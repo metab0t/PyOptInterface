@@ -83,5 +83,5 @@ NaryOperator ExpressionGraph::get_nary_operator(const ExpressionHandle &expressi
 
 bool is_binary_compare_op(BinaryOperator op)
 {
-	return (op >= BinaryOperator::Lessthan) && (op <= BinaryOperator::Greaterthan);
+	return (op >= BinaryOperator::LessThan) && (op <= BinaryOperator::GreaterThan);
 }

@@ -68,12 +68,12 @@ enum class BinaryOperator
 	Pow,
 
 	// compare
-	Lessthan,
-	Lessequal,
+	LessThan,
+	LessEqual,
 	Equal,
-	Notequal,
-	Greaterequal,
-	Greaterthan,
+	NotEqual,
+	GreaterEqual,
+	GreaterThan,
 };
 
 bool is_binary_compare_op(BinaryOperator op);

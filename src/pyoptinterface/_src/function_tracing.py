@@ -29,13 +29,13 @@ def pow_int(graph, expr, N):
 
     M, r = divmod(N, 2)
 
-    pow_2 = graph.add_binary(BinaryOperator.Mul, [expr, expr])
+    pow_2 = graph.add_nary(NaryOperator.Mul, [expr, expr])
     pow_2M = pow_int(graph, pow_2, M)
 
     if r == 0:
         return pow_2M
     else:
-        return graph.add_binary(BinaryOperator.Mul, [pow_2M, expr])
+        return graph.add_nary(NaryOperator.Mul, [pow_2M, expr])
 
 
 @dataclass

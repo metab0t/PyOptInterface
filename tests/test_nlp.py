@@ -49,19 +49,6 @@ def test_ipopt():
         nlfunc.sqrt,
         nlfunc.tan,
     ]
-    py_funcs = [
-        abs,
-        math.acos,
-        math.asin,
-        math.atan,
-        math.cos,
-        math.exp,
-        math.log,
-        math.pow,
-        math.sin,
-        math.sqrt,
-        math.tan,
-    ]
 
     def all_nlfuncs(vars):
         x = vars.x
@@ -102,13 +89,9 @@ def test_ipopt():
         all_nlfuncs_con, poi.ConstraintAttribute.Primal
     )
 
-    correct_con_values = []
-    for f in py_funcs:
-        if f == math.pow:
-            v = f(x_value, 2)
-        else:
-            v = f(x_value)
-        correct_con_values.append(v)
+    vars = nlfunc.Vars(x=x_value)
+    correct_con_values = all_nlfuncs(vars)
+
     assert con_values == pytest.approx(correct_con_values)
 
 
@@ -155,6 +138,30 @@ def test_nlp_param():
     correct_x_values = [1.0 / (i + 1) / (i + 1) for i in range(N)]
 
     assert x_values == pytest.approx(correct_x_values)
+
+
+def test_nlfunc_ifelse():
+    if not ipopt.is_library_loaded():
+        pytest.skip("Ipopt library is not loaded")
+
+    for x_, fx in zip([0.2, 0.5, 1.0, 2.0, 3.0], [0.2, 0.5, 1.0, 4.0, 9.0]):
+        model = ipopt.Model()
+
+        x = model.add_variable(lb=0.0, ub=10.0, start=1.0)
+
+        def con(vars):
+            x = vars.x
+            return nlfunc.ifelse(x > 1.0, x**2, x)
+
+        con_f = model.register_function(con)
+        model.add_nl_constraint(con_f, vars=nlfunc.Vars(x=x), lb=[fx])
+
+        model.set_objective(x)
+
+        model.optimize()
+
+        x_value = model.get_value(x)
+        assert x_value == pytest.approx(x_)
 
 
 if __name__ == "__main__":

@@ -46,12 +46,12 @@ NB_MODULE(nlexpr_ext, m)
 	    .value("Div", BinaryOperator::Div)
 	    .value("Pow", BinaryOperator::Pow)
 	    // compare ops
-	    .value("Lessthan", BinaryOperator::Lessthan)
-	    .value("Lessequal", BinaryOperator::Lessequal)
+	    .value("LessThan", BinaryOperator::LessThan)
+	    .value("LessEqual", BinaryOperator::LessEqual)
 	    .value("Equal", BinaryOperator::Equal)
-	    .value("Notequal", BinaryOperator::Notequal)
-	    .value("Greaterequal", BinaryOperator::Greaterequal)
-	    .value("Greaterthan", BinaryOperator::Greaterthan);
+	    .value("NotEqual", BinaryOperator::NotEqual)
+	    .value("GreaterEqual", BinaryOperator::GreaterEqual)
+	    .value("GreaterThan", BinaryOperator::GreaterThan);
 
 	nb::enum_<TernaryOperator>(m, "TernaryOperator")
 	    .value("IfThenElse", TernaryOperator::IfThenElse);
