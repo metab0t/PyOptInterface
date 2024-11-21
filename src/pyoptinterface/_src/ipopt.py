@@ -2,7 +2,7 @@ from io import StringIO
 import types
 import logging
 import platform
-from typing import Optional
+from typing import Optional, Dict
 
 from llvmlite import ir
 
@@ -13,7 +13,7 @@ from .codegen_llvm import create_llvmir_basic_functions, generate_llvmir_from_gr
 from .jit_llvm import LLJITCompiler
 from .function_tracing import trace_function, FunctionTracingResult, Vars, Params
 
-from .core_ext import ConstraintIndex, ConstraintSense
+from .core_ext import ConstraintIndex
 from .nleval_ext import (
     NLConstraintIndex,
     FunctionIndex,
@@ -397,7 +397,7 @@ constraint_attribute_set_func_map = {}
 
 
 def match_variable_values(
-    tracing_result: FunctionTracingResult, vars_dict: dict[str, any]
+    tracing_result: FunctionTracingResult, vars_dict: Dict[str, any]
 ):
     nx = tracing_result.n_variables()
     variable_indices_map = tracing_result.variable_indices_map
@@ -415,7 +415,7 @@ def match_variable_values(
 
 
 def match_parameter_values(
-    tracing_result: FunctionTracingResult, params_dict: dict[str, any]
+    tracing_result: FunctionTracingResult, params_dict: Dict[str, any]
 ):
     np = tracing_result.n_parameters()
     parameter_indices_map = tracing_result.parameter_indices_map
@@ -445,15 +445,15 @@ class Model(RawModel):
         self.jit = jit
         self.add_variables = types.MethodType(make_nd_variable, self)
 
-        self.function_cppad_autodiff_graphs: dict[FunctionIndex, CppADAutodiffGraph] = (
+        self.function_cppad_autodiff_graphs: Dict[FunctionIndex, CppADAutodiffGraph] = (
             {}
         )
-        self.function_autodiff_structures: dict[
+        self.function_autodiff_structures: Dict[
             FunctionIndex, AutodiffSymbolicStructure
         ] = {}
-        self.function_evaluators: dict[FunctionIndex, AutodiffEvaluator] = {}
-        self.function_names: dict[FunctionIndex, str] = {}
-        self.function_tracing_results: dict[FunctionIndex, FunctionTracingResult] = {}
+        self.function_evaluators: Dict[FunctionIndex, AutodiffEvaluator] = {}
+        self.function_names: Dict[FunctionIndex, str] = {}
+        self.function_tracing_results: Dict[FunctionIndex, FunctionTracingResult] = {}
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):

@@ -3,6 +3,7 @@ import os
 import platform
 import types
 from pathlib import Path
+from typing import Dict
 
 from .highs_model_ext import (
     RawModel,
@@ -285,7 +286,7 @@ class Model(RawModel):
     def __init__(self):
         super().__init__()
 
-        self.mip_start_values: dict[VariableIndex, float] = dict()
+        self.mip_start_values: Dict[VariableIndex, float] = dict()
 
         self.add_variables = types.MethodType(make_nd_variable, self)
 

@@ -133,4 +133,4 @@ runs:
     - name: Test IPOPT
       shell: pwsh
       run: |
-        D:\ipopt\ipopt.exe -v
+        ipopt -v

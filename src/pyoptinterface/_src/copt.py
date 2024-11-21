@@ -3,6 +3,7 @@ import platform
 import types
 from pathlib import Path
 import logging
+from typing import Dict
 
 from .copt_model_ext import RawModel, Env, COPT, load_library
 from .attributes import (
@@ -352,7 +353,7 @@ class Model(RawModel):
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
-        self.mip_start_values: dict[VariableIndex, float] = dict()
+        self.mip_start_values: Dict[VariableIndex, float] = dict()
 
         self.add_variables = types.MethodType(make_nd_variable, self)
 
