@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Model" href="model.html" /><link rel="prev" title="PyOptInterface (Python Optimization Interface)" href="index.html" />
 
-    <!-- Generated with Sphinx 8.0.2 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Getting Started - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
@@ -295,6 +295,11 @@
 </pre></div>
 </div>
 <p>It will install a full-featured binary version of HiGHS optimizer via <a class="reference external" href="http://github.com/metab0t/highsbox">highsbox</a>, which can be used with PyOptInterface.</p>
+<p>In order to use nonlinear programming solvers (currently we only support IPOPT), you should install extra dependencies like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyoptinterface</span><span class="p">[</span><span class="n">nlp</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It will install the <a class="reference external" href="https://github.com/numba/llvmlite"><code class="docutils literal notranslate"><span class="pre">llvmlite</span></code></a> and <a class="reference external" href="https://github.com/metab0t/tccbox"><code class="docutils literal notranslate"><span class="pre">tccbox</span></code></a> package as the JIT compilers required by nonlinear programming.</p>
 <p>We will introduce how to set up the optimizers to use with PyOptInterface in this page.</p>
 </section>
 <section id="setup-of-optimizers">
@@ -394,7 +399,7 @@
 </section>
 <section id="highs">
 <h3>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">¶</a></h3>
-<p>The currently supported version is <strong>1.7.x</strong>. Other versions may work but are not tested.</p>
+<p>The currently supported version is <strong>1.8.x</strong>. Other versions may work but are not tested.</p>
 <p>For HiGHS, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
 <li><p>The environment variable <code class="docutils literal notranslate"><span class="pre">HiGHS_HOME</span></code> set by the user</p></li>
@@ -402,6 +407,15 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">highs.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libhighs.so</span></code>/<code class="docutils literal notranslate"><span class="pre">libhighs.dylib</span></code> in the system</p></li>
 </ol>
 <p>For HiGHS, we recommend installing the <code class="docutils literal notranslate"><span class="pre">highsbox</span></code> PyPI package, which provides a full-featured binary version of HiGHS optimizer for you.</p>
+</section>
+<section id="ipopt">
+<h3>Ipopt<a class="headerlink" href="#ipopt" title="Link to this heading">¶</a></h3>
+<p>The currently supported version is <strong>3.14.x</strong>. Other versions may work but are not tested.</p>
+<p>For Ipopt, the automatic detection looks for the following things in order:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ipopt.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.so</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.dylib</span></code> in the system, we also look for <code class="docutils literal notranslate"><span class="pre">ipopt-3.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt-3.dll</span></code> on Windows.</p></li>
+</ol>
+<p>We recommend using the official binary from <a class="reference external" href="https://github.com/coin-or/Ipopt/releases">GitHub</a> if you work on Windows, since compiling Ipopt on Windows from source is not an easy task.</p>
 </section>
 </section>
 <section id="manually-specifying-the-path-of-the-dynamic-library-of-optimizer">
@@ -498,7 +512,7 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.7.2 (git hash: 5ce7a27): Copyright (c) 2024 HiGHS under MIT licence terms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.8.0 (git hash: fcfb534): Copyright (c) 2024 HiGHS under MIT licence terms
 </pre></div>
 </div>
 </div>
@@ -650,6 +664,7 @@ obj =  0.6666666666666667
 <li><a class="reference internal" href="#copt">COPT</a></li>
 <li><a class="reference internal" href="#mosek">Mosek</a></li>
 <li><a class="reference internal" href="#highs">HiGHS</a></li>
+<li><a class="reference internal" href="#ipopt">Ipopt</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#manually-specifying-the-path-of-the-dynamic-library-of-optimizer">Manually specifying the path of the dynamic library of optimizer</a></li>
@@ -666,7 +681,7 @@ obj =  0.6666666666666667
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
