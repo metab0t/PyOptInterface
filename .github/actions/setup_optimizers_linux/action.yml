@@ -120,6 +120,7 @@ runs:
         mkdir -p ~/ipopt
         tar xfz ~/installers/idaes-solvers.tar.gz -C ~/ipopt
         echo "PATH=${PATH}:${HOME}/ipopt" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/ipopt" >> $GITHUB_ENV
         ls ~/ipopt
     - name: Test IPOPT
       shell: bash
