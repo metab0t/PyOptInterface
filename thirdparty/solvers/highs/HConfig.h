@@ -1,7 +1,7 @@
 #ifndef HCONFIG_H_
 #define HCONFIG_H_
 
-/* #undef FAST_BUILD */
+#define FAST_BUILD
 /* #undef ZLIB_FOUND */
 /* #undef CUPDLP_CPU */
 #define CMAKE_BUILD_TYPE "Release"
@@ -12,10 +12,10 @@
 /* #undef HIGHS_HAVE_BUILTIN_CLZ */
 #define HIGHS_HAVE_BITSCAN_REVERSE
 
-#define HIGHS_GITHASH "fcfb53414"
+#define HIGHS_GITHASH "4a7f24ac6"
 #define HIGHS_VERSION_MAJOR 1
 #define HIGHS_VERSION_MINOR 8
-#define HIGHS_VERSION_PATCH 0
+#define HIGHS_VERSION_PATCH 1
 #define HIGHS_DIR "E:/HiGHS"
 
 #endif /* HCONFIG_H_ */
