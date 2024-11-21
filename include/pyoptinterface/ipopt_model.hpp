@@ -3,18 +3,13 @@
 #include "solvers/ipopt/IpStdCInterface.h"
 #include "pyoptinterface/nleval.hpp"
 
-#define APILIST                 \
-	B(CreateIpoptProblem);      \
-	B(FreeIpoptProblem);        \
-	B(AddIpoptStrOption);       \
-	B(AddIpoptNumOption);       \
-	B(AddIpoptIntOption);       \
-	B(OpenIpoptOutputFile);     \
-	B(SetIpoptProblemScaling);  \
-	B(SetIntermediateCallback); \
-	B(IpoptSolve);              \
-	B(GetIpoptCurrentIterate);  \
-	B(GetIpoptCurrentViolations);
+#define APILIST            \
+	B(CreateIpoptProblem); \
+	B(FreeIpoptProblem);   \
+	B(AddIpoptStrOption);  \
+	B(AddIpoptNumOption);  \
+	B(AddIpoptIntOption);  \
+	B(IpoptSolve);
 
 namespace ipopt
 {
