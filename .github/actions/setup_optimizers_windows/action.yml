@@ -52,8 +52,9 @@ runs:
       name: Download Installers
       run: |
         curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.1.4/win64/CardinalOptimizer-7.1.4-win64.zip
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.2/win64/CardinalOptimizer-7.2.2-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
+        curl -L -o D:\installers\idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-windows-x86_64.tar.gz
 
     - name: Setup Gurobi Installation
       shell: pwsh
@@ -85,10 +86,10 @@ runs:
       run: |
         # unzip with 7zip
         7z x D:\installers\copt.zip -oD:\
-        ls D:\copt71
+        ls D:\copt72
         # set environment variables
-        echo "COPT_HOME=D:\copt71" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\copt71\bin" >> $env:GITHUB_ENV
+        echo "COPT_HOME=D:\copt72" >> $env:GITHUB_ENV
+        echo "PATH=$env:PATH;D:\copt72\bin" >> $env:GITHUB_ENV
         echo $env:COPT_HOME
 
         # Just use the size-limited license
@@ -122,3 +123,14 @@ runs:
       shell: pwsh
       run: |
         msktestlic
+
+    - name: Setup IPOPT solver
+      shell: pwsh
+      run: |
+        7z x -so D:\installers\idaes-solvers.tar.gz | 7z x -si -ttar -oD:\ipopt
+        echo "PATH=$env:PATH;D:\ipopt" >> $env:GITHUB_ENV
+        ls D:\ipopt
+    - name: Test IPOPT
+      shell: pwsh
+      run: |
+        D:\ipopt\ipopt.exe -v
