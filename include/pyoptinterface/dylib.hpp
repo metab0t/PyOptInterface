@@ -83,7 +83,7 @@ class DynamicLibrary
 			fmt::print("function {} is not loaded correctly\n", #f);  \
 			_load_success = false;                                    \
 		}                                                             \
-		_function_pointers[#f] = ptr;                                 \
+		_function_pointers[#f] = reinterpret_cast<void *>(ptr);       \
 	}
 
 #define IS_DYLIB_LOAD_SUCCESS _load_success

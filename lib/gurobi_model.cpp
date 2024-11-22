@@ -55,8 +55,8 @@ bool load_library(const std::string &path)
 			{
 				DYLIB_LOAD_FUNCTION(GRBloadenvinternal);
 				DYLIB_LOAD_FUNCTION(GRBemptyenvinternal);
-				_function_pointers["GRBloadenv"] = &GRBloadenv_1200;
-				_function_pointers["GRBemptyenv"] = &GRBemptyenv_1200;
+				_function_pointers["GRBloadenv"] = reinterpret_cast<void *>(&GRBloadenv_1200);
+				_function_pointers["GRBemptyenv"] = reinterpret_cast<void *>(&GRBemptyenv_1200);
 
 				// Now check there is no nullptr in _function_pointers
 				_load_success = true;
