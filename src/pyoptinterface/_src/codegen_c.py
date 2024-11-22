@@ -38,11 +38,29 @@ compare_ops_string = {
 def generate_csrc_prelude(io: IO[str]):
     io.write(
         """// includes
-#include "stddef.h"
-#include "math.h"
+#include <stddef.h>
 
 // typedefs
 typedef double float_point_t;
+
+// declare mathematical functions
+#define UNARY(f) float_point_t f(float_point_t x)
+#define BINARY(f) float_point_t f(float_point_t x, float_point_t y)
+
+// unary functions
+UNARY(fabs);
+UNARY(acos);
+UNARY(asin);
+UNARY(atan);
+UNARY(cos);
+UNARY(exp);
+UNARY(log);
+UNARY(sin);
+UNARY(sqrt);
+UNARY(tan);
+
+// binary functions
+BINARY(pow);
 
 // externals
 // azmul

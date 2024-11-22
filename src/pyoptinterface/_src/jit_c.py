@@ -20,11 +20,11 @@ libtcc_path = os.path.join(libtcc_dir, f"libtcc.{sharedlib_suffix}")
 # On Linux/Mac, tcc has lib/tcc/include/ and lib/tcc/libtcc1.a which must be included in compilation
 libtcc_extra_include_path = None
 libtcc_extra_lib_path = None
-libtcc_extra_lib_name = None
+libtcc_extra_lib_names = None
 if system in ["Linux", "Darwin"]:
     libtcc_extra_include_path = os.path.join(libtcc_dir, "tcc", "include")
     libtcc_extra_lib_path = os.path.join(libtcc_dir, "tcc")
-    libtcc_extra_lib_name = "libtcc1.a"
+    libtcc_extra_lib_names = []
 
 # Define types
 TCCState = ctypes.c_void_p
@@ -82,9 +82,10 @@ class TCCJITCompiler:
                 == -1
             ):
                 raise Exception("Failed to add extra library path")
-        if libtcc_extra_lib_name:
-            if self.libtcc.tcc_add_library(state, libtcc_extra_lib_name.encode()) == -1:
-                raise Exception("Failed to add extra library")
+        if libtcc_extra_lib_names:
+            for name in libtcc_extra_lib_names:
+                if self.libtcc.tcc_add_library(state, name.encode()) == -1:
+                    raise Exception("Failed to add extra library")
 
         self.states.append(state)
 
