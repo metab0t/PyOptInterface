@@ -44,6 +44,7 @@ def test_ipopt():
         nlfunc.cos,
         nlfunc.exp,
         nlfunc.log,
+        nlfunc.log10,
         nlfunc.pow,
         nlfunc.sin,
         nlfunc.sqrt,

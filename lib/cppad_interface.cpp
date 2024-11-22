@@ -242,6 +242,9 @@ CppAD::AD<double> cppad_build_unary_expression(UnaryOperator op, const CppAD::AD
 	case UnaryOperator::Log: {
 		return CppAD::log(operand);
 	}
+	case UnaryOperator::Log10: {
+		return CppAD::log10(operand);
+	}
 	default: {
 		throw std::runtime_error("Invalid unary operator");
 	}

@@ -11,6 +11,7 @@ from pyoptinterface._src.function_tracing import (
     sqrt,
     exp,
     log,
+    log10,
     pow,
     ifelse,
 )

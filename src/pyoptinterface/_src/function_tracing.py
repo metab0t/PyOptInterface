@@ -166,6 +166,7 @@ abs = unary_mathematical_function(math.fabs, UnaryOperator.Abs)
 sqrt = unary_mathematical_function(math.sqrt, UnaryOperator.Sqrt)
 exp = unary_mathematical_function(math.exp, UnaryOperator.Exp)
 log = unary_mathematical_function(math.log, UnaryOperator.Log)
+log10 = unary_mathematical_function(math.log10, UnaryOperator.Log10)
 
 
 # Implement binary mathematical functions

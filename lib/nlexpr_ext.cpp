@@ -39,7 +39,8 @@ NB_MODULE(nlexpr_ext, m)
 	    .value("Abs", UnaryOperator::Abs)
 	    .value("Sqrt", UnaryOperator::Sqrt)
 	    .value("Exp", UnaryOperator::Exp)
-	    .value("Log", UnaryOperator::Log);
+	    .value("Log", UnaryOperator::Log)
+	    .value("Log10", UnaryOperator::Log10);
 
 	nb::enum_<BinaryOperator>(m, "BinaryOperator")
 	    .value("Sub", BinaryOperator::Sub)

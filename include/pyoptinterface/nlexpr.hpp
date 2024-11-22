@@ -59,6 +59,7 @@ enum class UnaryOperator
 	Sqrt,
 	Exp,
 	Log,
+	Log10
 };
 
 enum class BinaryOperator
