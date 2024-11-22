@@ -1,15 +1,24 @@
-#include "pyoptinterface/dylib.hpp"
-#include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/gurobi_model.hpp"
-#include <fmt/core.h>
+#include "fmt/core.h"
+
+extern "C"
+{
+	int __stdcall GRBloadenvinternal(GRBenv **envP, const char *logfilename, int major, int minor,
+	                                 int tech);
+	int __stdcall GRBemptyenvinternal(GRBenv **envP, int major, int minor, int tech);
+	int __stdcall GRBloadenv_1200(GRBenv **envP, const char *logfile);
+	int __stdcall GRBemptyenv_1200(GRBenv **envP);
+}
 
 namespace gurobi
 {
-#define B(f) decltype(&::f) f = nullptr
-
+#define B DYLIB_DECLARE
 APILIST
-
 #undef B
+
+// Gurobi 12.0.0 workarounds
+DYLIB_DECLARE(GRBloadenvinternal);
+DYLIB_DECLARE(GRBemptyenvinternal);
 
 static DynamicLibrary lib;
 static bool is_loaded = false;
@@ -27,24 +36,72 @@ bool load_library(const std::string &path)
 		return false;
 	}
 
-#define B(f)                                                          \
-	{                                                                 \
-		auto ptr = reinterpret_cast<decltype(f)>(lib.get_symbol(#f)); \
-		if (ptr == nullptr)                                           \
-		{                                                             \
-			fmt::print("function {} is not loaded correctly", #f);    \
-			return false;                                             \
-		}                                                             \
-		f = ptr;                                                      \
-	}
+	DYLIB_LOAD_INIT;
+
+#define B DYLIB_LOAD_FUNCTION
 	APILIST
 #undef B
 
-	is_loaded = true;
+	// We have to deal with Gurobi 12.0.0 where some functions are absent from the dynamic library
+	{
+		int major, minor, techinical;
+		auto GRBversion_p =
+		    reinterpret_cast<decltype(GRBversion)>(_function_pointers["GRBversion"]);
+		if (GRBversion_p != nullptr)
+		{
+			GRBversion_p(&major, &minor, &techinical);
 
-	return true;
+			if (major == 12 && minor == 0 && techinical == 0)
+			{
+				DYLIB_LOAD_FUNCTION(GRBloadenvinternal);
+				DYLIB_LOAD_FUNCTION(GRBemptyenvinternal);
+				_function_pointers["GRBloadenv"] = &GRBloadenv_1200;
+				_function_pointers["GRBemptyenv"] = &GRBemptyenv_1200;
+
+				// Now check there is no nullptr in _function_pointers
+				_load_success = true;
+				for (auto &pair : _function_pointers)
+				{
+					if (pair.second == nullptr)
+					{
+						fmt::print("function {} is not loaded correctly\n", pair.first);
+						_load_success = false;
+					}
+				}
+
+				if (_load_success)
+				{
+					DYLIB_SAVE_FUNCTION(GRBloadenvinternal);
+					DYLIB_SAVE_FUNCTION(GRBemptyenvinternal);
+				}
+			}
+		}
+	}
+
+	if (IS_DYLIB_LOAD_SUCCESS)
+	{
+#define B DYLIB_SAVE_FUNCTION
+		APILIST
+#undef B
+		is_loaded = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 } // namespace gurobi
+
+int GRBloadenv_1200(GRBenv **envP, const char *logfile)
+{
+	return gurobi::GRBloadenvinternal(envP, logfile, 12, 0, 0);
+}
+
+int GRBemptyenv_1200(GRBenv **envP)
+{
+	return gurobi::GRBemptyenvinternal(envP, 12, 0, 0);
+}
 
 static char gurobi_con_sense(ConstraintSense sense)
 {

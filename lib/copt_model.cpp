@@ -1,14 +1,10 @@
-#include "pyoptinterface/dylib.hpp"
-#include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/copt_model.hpp"
 #include "fmt/core.h"
 
 namespace copt
 {
-#define B(f) decltype(&::f) f = nullptr
-
+#define B DYLIB_DECLARE
 APILIST
-
 #undef B
 
 static DynamicLibrary lib;
@@ -27,22 +23,24 @@ bool load_library(const std::string &path)
 		return false;
 	}
 
-#define B(f)                                                          \
-	{                                                                 \
-		auto ptr = reinterpret_cast<decltype(f)>(lib.get_symbol(#f)); \
-		if (ptr == nullptr)                                           \
-		{                                                             \
-			fmt::print("function {} is not loaded correctly", #f);    \
-			return false;                                             \
-		}                                                             \
-		f = ptr;                                                      \
-	}
+	DYLIB_LOAD_INIT;
+
+#define B DYLIB_LOAD_FUNCTION
 	APILIST
 #undef B
 
-	is_loaded = true;
-
-	return true;
+	if (IS_DYLIB_LOAD_SUCCESS)
+	{
+#define B DYLIB_SAVE_FUNCTION
+		APILIST
+#undef B
+		is_loaded = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 } // namespace copt
 

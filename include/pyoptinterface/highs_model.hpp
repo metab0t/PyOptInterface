@@ -8,6 +8,7 @@
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
+#include "pyoptinterface/dylib.hpp"
 
 #define APILIST                     \
 	B(Highs_create);                \
@@ -62,10 +63,8 @@
 
 namespace highs
 {
-#define B(f) extern decltype(&::f) f
-
+#define B DYLIB_EXTERN_DECLARE
 APILIST
-
 #undef B
 
 bool is_library_loaded();

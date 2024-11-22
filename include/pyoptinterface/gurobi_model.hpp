@@ -7,6 +7,7 @@
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
+#include "pyoptinterface/dylib.hpp"
 
 // define Gurobi C APIs
 #define APILIST               \
@@ -69,10 +70,8 @@
 
 namespace gurobi
 {
-#define B(f) extern decltype(&::f) f
-
+#define B DYLIB_EXTERN_DECLARE
 APILIST
-
 #undef B
 
 bool is_library_loaded();

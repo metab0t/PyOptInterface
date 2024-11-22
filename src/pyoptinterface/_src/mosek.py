@@ -75,11 +75,11 @@ def detected_libraries():
 
     # default names
     default_libname = {
-        "Linux": "libmosek64.so",
-        "Darwin": "libmosek64.dylib",
-        "Windows": "mosek64_10_2.dll",
+        "Linux": ["libmosek64.so"],
+        "Darwin": ["libmosek64.dylib"],
+        "Windows": ["mosek64_10_2.dll", "mosek64_10_1.dll"],
     }[platform.system()]
-    libs.append(default_libname)
+    libs.extend(default_libname)
 
     return libs
 

@@ -2,6 +2,7 @@
 
 #include "solvers/ipopt/IpStdCInterface.h"
 #include "pyoptinterface/nleval.hpp"
+#include "pyoptinterface/dylib.hpp"
 #include <cmath>
 
 #define APILIST            \
@@ -14,10 +15,8 @@
 
 namespace ipopt
 {
-#define B(f) extern decltype(&::f) f
-
+#define B DYLIB_EXTERN_DECLARE
 APILIST
-
 #undef B
 
 bool is_library_loaded();

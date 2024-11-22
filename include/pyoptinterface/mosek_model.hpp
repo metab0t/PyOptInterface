@@ -11,6 +11,7 @@
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
+#include "pyoptinterface/dylib.hpp"
 
 #define APILIST                        \
 	B(MSK_getcodedesc);                \

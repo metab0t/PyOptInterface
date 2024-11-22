@@ -64,3 +64,28 @@ class DynamicLibrary
   private:
 	void *handle = nullptr;
 };
+
+// Next we will introduce some magic macros to declare function pointers and load them from dynamic
+// library robustly
+
+#define DYLIB_EXTERN_DECLARE(f) extern decltype(&::f) f
+#define DYLIB_DECLARE(f) decltype(&::f) f = nullptr
+
+#define DYLIB_LOAD_INIT                              \
+	Hashmap<std::string, void *> _function_pointers; \
+	bool _load_success = true
+
+#define DYLIB_LOAD_FUNCTION(f)                                        \
+	{                                                                 \
+		auto ptr = reinterpret_cast<decltype(f)>(lib.get_symbol(#f)); \
+		if (ptr == nullptr)                                           \
+		{                                                             \
+			fmt::print("function {} is not loaded correctly\n", #f);  \
+			_load_success = false;                                    \
+		}                                                             \
+		_function_pointers[#f] = ptr;                                 \
+	}
+
+#define IS_DYLIB_LOAD_SUCCESS _load_success
+
+#define DYLIB_SAVE_FUNCTION(f) f = reinterpret_cast<decltype(f)>(_function_pointers[#f])
