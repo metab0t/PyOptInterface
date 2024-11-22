@@ -85,11 +85,9 @@ def rocket_model(model: ipopt.Model, nh: int):
     model.h = h
 
 
-def test_rocket():
-    if not ipopt.is_library_loaded():
-        pytest.skip("Ipopt library is not loaded")
+def test_rocket(ipopt_model_ctor):
     nh = 400
-    model = ipopt.Model(jit="LLVM")
+    model = ipopt_model_ctor()
     rocket_model(model, nh)
     model.optimize()
 

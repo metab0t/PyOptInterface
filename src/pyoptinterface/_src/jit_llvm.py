@@ -14,13 +14,18 @@ class LLJITCompiler:
         target_machine = target.create_target_machine(jit=True, opt=3)
         self.lljit = binding.create_lljit_compiler(target_machine)
 
+        self.rts = []
+        self.source_codes = []
+
     def compile_module(self, module: ir.Module, export_functions: List[str] = []):
         ir_str = str(module)
-        self.source_code = ir_str
+        self.source_codes.append(ir_str)
         builder = binding.JITLibraryBuilder().add_ir(ir_str).add_current_process()
         for f in export_functions:
             builder.export_symbol(f)
-        self.rt = builder.link(self.lljit, "lib")
+        n = len(self.rts)
+        libname = f"lib{n}"
+        rt = builder.link(self.lljit, libname)
+        self.rts.append(rt)
 
-    def get_symbol(self, symbol_name: str):
-        return self.rt[symbol_name]
+        return rt

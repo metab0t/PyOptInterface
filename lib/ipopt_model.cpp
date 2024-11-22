@@ -337,6 +337,11 @@ void IpoptModel::_set_function_evaluator(const FunctionIndex &k, const AutodiffE
 	m_function_model.set_function_evaluator(k, evaluator);
 }
 
+bool IpoptModel::_has_function_evaluator(const FunctionIndex &k)
+{
+	return m_function_model.has_function_evaluator(k);
+}
+
 NLConstraintIndex IpoptModel::_add_nl_constraint_bounds(const FunctionIndex &k,
                                                         const std::vector<VariableIndex> &xs,
                                                         const std::vector<ParameterIndex> &ps,
@@ -444,8 +449,17 @@ static bool eval_h(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipin
 	return true;
 }
 
-void IpoptModel::optimize()
+void IpoptModel::analyze_structure()
 {
+	// init variables
+	m_jacobian_nnz = 0;
+	m_jacobian_rows.clear();
+	m_jacobian_cols.clear();
+	m_hessian_nnz = 0;
+	m_hessian_rows.clear();
+	m_hessian_cols.clear();
+	m_hessian_index_map.clear();
+
 	// analyze structure
 	m_function_model.analyze_active_functions();
 	m_function_model.analyze_dense_gradient_structure();
@@ -465,6 +479,11 @@ void IpoptModel::optimize()
 	fmt::print("Hessian has {} nonzeros\n", m_hessian_nnz);
 	fmt::print("Hessian rows : {}\n", m_hessian_rows);
 	fmt::print("Hessian cols : {}\n", m_hessian_cols);*/
+}
+
+void IpoptModel::optimize()
+{
+	analyze_structure();
 
 	auto problem_ptr =
 	    ipopt::CreateIpoptProblem(n_variables, m_var_lb.data(), m_var_ub.data(), n_constraints,

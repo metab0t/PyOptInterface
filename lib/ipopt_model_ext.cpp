@@ -147,6 +147,7 @@ NB_MODULE(ipopt_model_ext, m)
 
 	    .def("_register_function", &IpoptModel::_register_function)
 	    .def("_set_function_evaluator", &IpoptModel::_set_function_evaluator)
+	    .def("_has_function_evaluator", &IpoptModel::_has_function_evaluator)
 
 	    .def("_add_nl_constraint_bounds", &IpoptModel::_add_nl_constraint_bounds)
 	    .def("_add_nl_constraint_eq", &IpoptModel::_add_nl_constraint_eq)

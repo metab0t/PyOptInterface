@@ -209,7 +209,7 @@ struct LinearQuadraticEvaluator
 struct NonlinearFunctionEvaluator
 {
 	std::vector<AutodiffSymbolicStructure> nl_function_structures;
-	std::vector<AutodiffEvaluator> nl_function_evaluators;
+	std::vector<std::optional<AutodiffEvaluator>> nl_function_evaluators;
 	std::vector<FunctionInstances> constraint_function_instances;
 	std::vector<size_t> active_constraint_function_indices;
 	std::vector<FunctionInstances> objective_function_instances;
@@ -222,6 +222,7 @@ struct NonlinearFunctionEvaluator
 
 	FunctionIndex register_function(const AutodiffSymbolicStructure &structure);
 	void set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
+	bool has_function_evaluator(const FunctionIndex &k);
 
 	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
 	                                    const std::vector<VariableIndex> &xs,

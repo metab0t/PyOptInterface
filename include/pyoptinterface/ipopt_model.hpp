@@ -117,6 +117,7 @@ struct IpoptModel
 
 	FunctionIndex _register_function(const AutodiffSymbolicStructure &structure);
 	void _set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
+	bool _has_function_evaluator(const FunctionIndex &k);
 
 	NLConstraintIndex _add_nl_constraint_bounds(const FunctionIndex &k,
 	                                            const std::vector<VariableIndex> &xs,
@@ -134,6 +135,7 @@ struct IpoptModel
 
 	void clear_nl_objective();
 
+	void analyze_structure();
 	void optimize();
 
 	// set options

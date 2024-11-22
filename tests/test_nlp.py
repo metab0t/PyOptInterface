@@ -5,11 +5,8 @@ import pyoptinterface as poi
 from pyoptinterface import ipopt, nlfunc
 
 
-def test_ipopt():
-    if not ipopt.is_library_loaded():
-        pytest.skip("Ipopt library is not loaded")
-
-    model = ipopt.Model()
+def test_ipopt(ipopt_model_ctor):
+    model = ipopt_model_ctor()
 
     x = model.add_variable(lb=0.1, ub=10.0, start=0.65)
     y = model.add_variable(lb=0.1, ub=10.0, start=0.35)
@@ -96,11 +93,8 @@ def test_ipopt():
     assert con_values == pytest.approx(correct_con_values)
 
 
-def test_nlp_param():
-    if not ipopt.is_library_loaded():
-        pytest.skip("Ipopt library is not loaded")
-
-    model = ipopt.Model()
+def test_nlp_param(ipopt_model_ctor):
+    model = ipopt_model_ctor()
 
     N = 10
     xs = []
@@ -141,12 +135,9 @@ def test_nlp_param():
     assert x_values == pytest.approx(correct_x_values)
 
 
-def test_nlfunc_ifelse():
-    if not ipopt.is_library_loaded():
-        pytest.skip("Ipopt library is not loaded")
-
+def test_nlfunc_ifelse(ipopt_model_ctor):
     for x_, fx in zip([0.2, 0.5, 1.0, 2.0, 3.0], [0.2, 0.5, 1.0, 4.0, 9.0]):
-        model = ipopt.Model()
+        model = ipopt_model_ctor()
 
         x = model.add_variable(lb=0.0, ub=10.0, start=1.0)
 

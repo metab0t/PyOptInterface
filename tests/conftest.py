@@ -28,3 +28,26 @@ def model_interface(request):
     name = request.param
     model_interface_class = model_interface_dict[name]
     return model_interface_class()
+
+
+ipopt_model_dict = {}
+
+import pyoptinterface.ipopt as ipopt
+
+if ipopt.is_library_loaded():
+
+    def f():
+        return ipopt.Model(jit="C")
+
+    def g():
+        return ipopt.Model(jit="LLVM")
+
+    ipopt_model_dict["ipopt_c"] = f
+    ipopt_model_dict["ipopt_llvm"] = g
+
+
+@pytest.fixture(params=ipopt_model_dict.keys())
+def ipopt_model_ctor(request):
+    name = request.param
+    ctor = ipopt_model_dict[name]
+    return ctor

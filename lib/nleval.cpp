@@ -377,7 +377,7 @@ FunctionIndex NonlinearFunctionEvaluator::register_function(
 	idx.index = nl_function_structures.size();
 
 	nl_function_structures.push_back(structure);
-	nl_function_evaluators.emplace_back();
+	nl_function_evaluators.emplace_back(std::nullopt);
 	constraint_function_instances.emplace_back();
 	objective_function_instances.emplace_back();
 
@@ -388,6 +388,11 @@ void NonlinearFunctionEvaluator::set_function_evaluator(const FunctionIndex &k,
                                                         const AutodiffEvaluator &evaluator)
 {
 	nl_function_evaluators[k.index] = evaluator;
+}
+
+bool NonlinearFunctionEvaluator::has_function_evaluator(const FunctionIndex &k)
+{
+	return nl_function_evaluators[k.index].has_value();
 }
 
 NLConstraintIndex NonlinearFunctionEvaluator::add_nl_constraint(
@@ -693,7 +698,7 @@ void NonlinearFunctionEvaluator::eval_objective(const double *x, double *y)
 	for (auto k : active_objective_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = objective_function_instances[k];
 
@@ -728,7 +733,7 @@ void NonlinearFunctionEvaluator::eval_objective_gradient(const double *x, double
 	for (auto k : active_objective_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		if (!kernel.has_jacobian)
 			continue;
 
@@ -766,7 +771,7 @@ void NonlinearFunctionEvaluator::eval_constraint(const double *x, double *con)
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		bool has_parameter = kernel.has_parameter;
 		auto &inst_vec = constraint_function_instances[k];
 		if (has_parameter)
@@ -799,7 +804,7 @@ void NonlinearFunctionEvaluator::eval_constraint_jacobian(const double *x, doubl
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		if (!kernel.has_jacobian)
 			continue;
 
@@ -837,7 +842,7 @@ void NonlinearFunctionEvaluator::eval_lagrangian_hessian(const double *x, const 
 	for (auto k : active_constraint_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		if (!kernel.has_hessian)
 			continue;
 
@@ -874,7 +879,7 @@ void NonlinearFunctionEvaluator::eval_lagrangian_hessian(const double *x, const 
 	for (auto k : active_objective_function_indices)
 	{
 		auto &kernel = nl_function_structures[k];
-		auto &evaluator = nl_function_evaluators[k];
+		auto &evaluator = nl_function_evaluators[k].value();
 		if (!kernel.has_hessian)
 			continue;
 

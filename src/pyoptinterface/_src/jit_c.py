@@ -32,20 +32,26 @@ class TCCJITCompiler:
         # Initialize libtcc function prototypes
         self._initialize_function_prototypes()
 
+        # store all TCC states
+        self.states = []
+
+        self.source_codes = []
+
+    def create_state(self):
         # Create a new TCC state
-        self.state = self.libtcc.tcc_new()
+        state = self.libtcc.tcc_new()
 
         # Ensure the state was successfully created
-        if not self.state:
+        if not state:
             raise Exception("Failed to create TCC state")
 
         # Set the output type to memory
-        if self.libtcc.tcc_set_output_type(self.state, TCC_OUTPUT_MEMORY) == -1:
-            self.cleanup()
+        if self.libtcc.tcc_set_output_type(state, TCC_OUTPUT_MEMORY) == -1:
             raise Exception("Failed to set output type")
 
-        # relocate has been called
-        self.relocated = False
+        self.states.append(state)
+
+        return state
 
     def _initialize_function_prototypes(self):
         libtcc = self.libtcc
@@ -60,37 +66,30 @@ class TCCJITCompiler:
         libtcc.tcc_get_symbol.argtypes = [TCCState, ctypes.c_char_p]
         libtcc.tcc_get_symbol.restype = ctypes.c_void_p
 
-    def compile_string(self, c_code):
-        # Compile C code string
-        if self.libtcc.tcc_compile_string(self.state, c_code) == -1:
+    def compile_string(self, state, c_code: str):
+        if self.libtcc.tcc_compile_string(state, c_code.encode()) == -1:
             raise Exception("Failed to compile code")
 
-        self.relocated = False
+        if self.libtcc.tcc_relocate(state) == -1:
+            raise Exception("Failed to relocate")
 
-    def add_symbol(self, symbol_name, symbol_address):
+        self.source_codes.append(c_code)
+
+    def add_symbol(self, state, symbol_name: str, symbol_address):
         # Add a symbol to the TCC state
-        if self.libtcc.tcc_add_symbol(self.state, symbol_name, symbol_address) == -1:
+        if (
+            self.libtcc.tcc_add_symbol(state, symbol_name.encode(), symbol_address)
+            == -1
+        ):
             raise Exception(f"Failed to add symbol {symbol_name} to TCC state")
 
-        self.relocated = False
-
-    def get_symbol(self, symbol_name):
-        if not self.relocated:
-            if self.libtcc.tcc_relocate(self.state) == -1:
-                raise Exception("Failed to relocate")
-            self.relocated = True
+    def get_symbol(self, state, symbol_name: str):
         # Get the symbol for the compiled function
-        symbol = self.libtcc.tcc_get_symbol(self.state, symbol_name)
+        symbol = self.libtcc.tcc_get_symbol(state, symbol_name.encode())
         if not symbol:
-            raise Exception(f"Symbol {symbol_name.decode()} not found")
+            raise Exception(f"Symbol {symbol_name} not found")
         return symbol
 
-    def cleanup(self):
-        # Clean up the TCC state
-        if self.state:
-            self.libtcc.tcc_delete(self.state)
-            self.state = None
-
     def __del__(self):
-        # Ensure clean up is called when the instance is destroyed
-        self.cleanup()
+        for state in self.states:
+            self.libtcc.tcc_delete(state)

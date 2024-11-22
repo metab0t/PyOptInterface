@@ -2,7 +2,7 @@ from io import StringIO
 import types
 import logging
 import platform
-from typing import Optional, Dict
+from typing import Optional, Dict, Set
 
 from llvmlite import ir
 
@@ -70,16 +70,22 @@ autoload_library()
 
 
 def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
+    needs_compile_function_indices = []
+    for function_index in model.function_indices:
+        if not model._has_function_evaluator(function_index):
+            needs_compile_function_indices.append(function_index)
+
+    if len(needs_compile_function_indices) == 0:
+        return
+
     io = StringIO()
 
     generate_csrc_prelude(io)
 
-    for (
-        function_index,
-        cppad_autodiff_graph,
-    ) in model.function_cppad_autodiff_graphs.items():
+    for function_index in needs_compile_function_indices:
         name = model.function_names[function_index]
         autodiff_structure = model.function_autodiff_structures[function_index]
+        cppad_autodiff_graph = model.function_cppad_autodiff_graphs[function_index]
 
         np = autodiff_structure.np
         ny = autodiff_structure.ny
@@ -131,14 +137,10 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
 
     csrc = io.getvalue()
 
-    jit_compiler.source_code = csrc
+    state = jit_compiler.create_state()
+    jit_compiler.compile_string(state, csrc)
 
-    jit_compiler.compile_string(csrc.encode())
-
-    for (
-        function_index,
-        cppad_autodiff_graph,
-    ) in model.function_cppad_autodiff_graphs.items():
+    for function_index in needs_compile_function_indices:
         name = model.function_names[function_index]
         autodiff_structure = model.function_autodiff_structures[function_index]
 
@@ -147,13 +149,13 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
         gradient_name = name + "_gradient"
         hessian_name = name + "_hessian"
 
-        f_ptr = jit_compiler.get_symbol(f_name.encode())
+        f_ptr = jit_compiler.get_symbol(state, f_name)
         jacobian_ptr = gradient_ptr = hessian_ptr = 0
         if autodiff_structure.has_jacobian:
-            jacobian_ptr = jit_compiler.get_symbol(jacobian_name.encode())
-            gradient_ptr = jit_compiler.get_symbol(gradient_name.encode())
+            jacobian_ptr = jit_compiler.get_symbol(state, jacobian_name)
+            gradient_ptr = jit_compiler.get_symbol(state, gradient_name)
         if autodiff_structure.has_hessian:
-            hessian_ptr = jit_compiler.get_symbol(hessian_name.encode())
+            hessian_ptr = jit_compiler.get_symbol(state, hessian_name)
 
         evaluator = AutodiffEvaluator(
             autodiff_structure, f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr
@@ -162,17 +164,23 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
 
 
 def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
+    needs_compile_function_indices = []
+    for function_index in model.function_indices:
+        if not model._has_function_evaluator(function_index):
+            needs_compile_function_indices.append(function_index)
+
+    if len(needs_compile_function_indices) == 0:
+        return
+
     module = ir.Module(name="my_module")
     create_llvmir_basic_functions(module)
 
     export_functions = []
 
-    for (
-        function_index,
-        cppad_autodiff_graph,
-    ) in model.function_cppad_autodiff_graphs.items():
+    for function_index in needs_compile_function_indices:
         name = model.function_names[function_index]
         autodiff_structure = model.function_autodiff_structures[function_index]
+        cppad_autodiff_graph = model.function_cppad_autodiff_graphs[function_index]
 
         np = autodiff_structure.np
         ny = autodiff_structure.ny
@@ -224,12 +232,9 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
 
         export_functions.extend([f_name, jacobian_name, gradient_name, hessian_name])
 
-    jit_compiler.compile_module(module, export_functions)
+    rt = jit_compiler.compile_module(module, export_functions)
 
-    for (
-        function_index,
-        cppad_autodiff_graph,
-    ) in model.function_cppad_autodiff_graphs.items():
+    for function_index in needs_compile_function_indices:
         name = model.function_names[function_index]
         autodiff_structure = model.function_autodiff_structures[function_index]
 
@@ -238,13 +243,13 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
         gradient_name = name + "_gradient"
         hessian_name = name + "_hessian"
 
-        f_ptr = jit_compiler.get_symbol(f_name)
+        f_ptr = rt[f_name]
         jacobian_ptr = gradient_ptr = hessian_ptr = 0
         if autodiff_structure.has_jacobian:
-            jacobian_ptr = jit_compiler.get_symbol(jacobian_name)
-            gradient_ptr = jit_compiler.get_symbol(gradient_name)
+            jacobian_ptr = rt[jacobian_name]
+            gradient_ptr = rt[gradient_name]
         if autodiff_structure.has_hessian:
-            hessian_ptr = jit_compiler.get_symbol(hessian_name)
+            hessian_ptr = rt[hessian_name]
 
         evaluator = AutodiffEvaluator(
             autodiff_structure, f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr
@@ -445,6 +450,7 @@ class Model(RawModel):
         self.jit = jit
         self.add_variables = types.MethodType(make_nd_variable, self)
 
+        self.function_indices: Set[FunctionIndex] = set()
         self.function_cppad_autodiff_graphs: Dict[FunctionIndex, CppADAutodiffGraph] = (
             {}
         )
@@ -514,6 +520,7 @@ class Model(RawModel):
         )
 
         function_index = super()._register_function(autodiff_structure)
+        self.function_indices.add(function_index)
         self.function_cppad_autodiff_graphs[function_index] = cppad_graph
         self.function_autodiff_structures[function_index] = autodiff_structure
         self.function_tracing_results[function_index] = tracing_result
