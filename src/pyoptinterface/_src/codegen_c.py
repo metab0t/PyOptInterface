@@ -38,8 +38,8 @@ compare_ops_string = {
 def generate_csrc_prelude(io: IO[str]):
     io.write(
         """// includes
-#include <stddef.h>
-#include <math.h>
+#include "stddef.h"
+#include "math.h"
 
 // typedefs
 typedef double float_point_t;
