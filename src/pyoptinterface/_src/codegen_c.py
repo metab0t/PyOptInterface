@@ -38,8 +38,8 @@ compare_ops_string = {
 def generate_csrc_prelude(io: IO[str]):
     io.write(
         """// includes
-# include <stddef.h>
-# include <math.h>
+#include <stddef.h>
+#include <math.h>
 
 // typedefs
 typedef double float_point_t;
@@ -59,24 +59,6 @@ float_point_t sign(float_point_t x)
     if( x == 0.0 ) return 0.0;
     return -1.0;
 }
-"""
-    )
-
-
-def generate_csrc_prelude_declaration(io: IO[str]):
-    io.write(
-        """// includes
-# include <stddef.h>
-# include <math.h>
-
-// typedefs
-typedef double float_point_t;
-
-// externals
-// azmul
-extern float_point_t azmul(float_point_t x, float_point_t y);
-// sign
-extern float_point_t sign(float_point_t x);
 """
     )
 
@@ -299,7 +281,3 @@ void {name}(
 }
 """
     )
-
-    extern_function_declaration = "extern " + function_prototype
-
-    return extern_function_declaration

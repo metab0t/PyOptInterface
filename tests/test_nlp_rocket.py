@@ -97,4 +97,4 @@ def test_rocket(ipopt_model_ctor):
 
 
 if __name__ == "__main__":
-    test_rocket()
+    test_rocket(ipopt.Model)

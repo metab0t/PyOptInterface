@@ -220,10 +220,6 @@ nanobind_add_module(
 target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
-# Set RPATH
-# set_rpath(nlcore_ext)
-set_rpath(ipopt_model_ext)
-
 # stub
 nanobind_add_stub(
   core_ext_stub

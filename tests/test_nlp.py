@@ -157,5 +157,6 @@ def test_nlfunc_ifelse(ipopt_model_ctor):
 
 
 if __name__ == "__main__":
-    test_ipopt()
-    test_nlp_param()
+    test_ipopt(ipopt.Model)
+    test_nlp_param(ipopt.Model)
+    test_nlfunc_ifelse(ipopt.Model)

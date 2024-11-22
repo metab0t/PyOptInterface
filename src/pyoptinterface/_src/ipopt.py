@@ -194,6 +194,7 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
             indirect_x=True,
             indirect_p=True,
         )
+        export_functions.append(f_name)
         if autodiff_structure.has_jacobian:
             jacobian_name = name + "_jacobian"
             generate_llvmir_from_graph(
@@ -215,6 +216,7 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
                 indirect_y=True,
                 add_y=True,
             )
+            export_functions.extend([jacobian_name, gradient_name])
         if autodiff_structure.has_hessian:
             hessian_name = name + "_hessian"
             generate_llvmir_from_graph(
@@ -229,8 +231,7 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
                 indirect_y=True,
                 add_y=True,
             )
-
-        export_functions.extend([f_name, jacobian_name, gradient_name, hessian_name])
+            export_functions.append(hessian_name)
 
     rt = jit_compiler.compile_module(module, export_functions)
 
