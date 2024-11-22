@@ -29,6 +29,8 @@ nlp = ["llvmlite", "tccbox"]
 editable.rebuild = true
 build-dir = "build/{wheel_tag}"
 cmake.build-type = "Release"
+# Build stable ABI wheels for CPython 3.12+
+wheel.py-api = "cp312"
 
 [tool.scikit-build.cmake.define]
 PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.8" }
