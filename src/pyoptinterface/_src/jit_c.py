@@ -30,7 +30,7 @@ libtcc_extra_lib_names = None
 if system in ["Linux", "Darwin"]:
     libtcc_extra_include_path = os.path.join(libtcc_dir, "tcc", "include")
     libtcc_extra_lib_path = os.path.join(libtcc_dir, "tcc")
-    libtcc_extra_lib_names = []
+    libtcc_extra_lib_names = ["tcc1", "m"]
 
 
 class TCCJITCompiler:
@@ -41,7 +41,6 @@ class TCCJITCompiler:
     def create_instance(self):
         inst = TCCInstance()
         inst.init()
-        inst.import_math_symbols()
 
         # Add extra include path and library path
         if libtcc_extra_include_path:
