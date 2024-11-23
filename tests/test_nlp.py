@@ -157,8 +157,17 @@ def test_nlfunc_ifelse(ipopt_model_ctor):
 
 
 if __name__ == "__main__":
+
     def c():
         return ipopt.Model(jit="C")
+
     test_ipopt(c)
     test_nlp_param(c)
     test_nlfunc_ifelse(c)
+
+    def llvm():
+        return ipopt.Model(jit="LLVM")
+
+    test_ipopt(llvm)
+    test_nlp_param(llvm)
+    test_nlfunc_ifelse(llvm)

@@ -50,6 +50,13 @@ jobs:
           python -c "import pyoptinterface as poi; print(dir(poi))"
           python -m pip wheel -w dist --no-build-isolation .
 
+      - name: Test
+        run: |
+          python -m pytest tests -k "highs or ipopt" -v
+          python tests/test_nlp.py
+          python tests/test_nlp_rocket.py
+          python tests/test_nlp_multiple_run.py
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

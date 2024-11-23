@@ -97,4 +97,13 @@ def test_rocket(ipopt_model_ctor):
 
 
 if __name__ == "__main__":
-    test_rocket(ipopt.Model)
+
+    def c():
+        return ipopt.Model(jit="C")
+
+    test_rocket(c)
+
+    def llvm():
+        return ipopt.Model(jit="LLVM")
+
+    test_rocket(llvm)

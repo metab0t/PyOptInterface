@@ -1,4 +1,5 @@
 import pytest
+import platform
 
 model_interface_dict = {}
 
@@ -36,14 +37,19 @@ import pyoptinterface.ipopt as ipopt
 
 if ipopt.is_library_loaded():
 
-    def f():
-        return ipopt.Model(jit="C")
-
-    def g():
+    def llvm():
         return ipopt.Model(jit="LLVM")
 
-    ipopt_model_dict["ipopt_c"] = f
-    ipopt_model_dict["ipopt_llvm"] = g
+    def c():
+        return ipopt.Model(jit="C")
+
+    ipopt_model_dict["ipopt_llvm"] = llvm
+
+    system = platform.system()
+
+    # pytest with tcc jit does not work on Linux and mac
+    if system == "Windows":
+        ipopt_model_dict["ipopt_c"] = c
 
 
 @pytest.fixture(params=ipopt_model_dict.keys())

@@ -45,3 +45,16 @@ def test_nlp_reopt(ipopt_model_ctor):
     model.optimize()
 
     assert model.get_value(z) == pytest.approx(4.0)
+
+
+if __name__ == "__main__":
+
+    def c():
+        return ipopt.Model(jit="C")
+
+    test_nlp_reopt(c)
+
+    def llvm():
+        return ipopt.Model(jit="LLVM")
+
+    test_nlp_reopt(llvm)
