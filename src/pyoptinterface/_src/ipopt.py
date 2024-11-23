@@ -137,8 +137,8 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
 
     csrc = io.getvalue()
 
-    state = jit_compiler.create_state()
-    jit_compiler.compile_string(state, csrc)
+    inst = jit_compiler.create_instance()
+    jit_compiler.compile_string(inst, csrc)
 
     for function_index in needs_compile_function_indices:
         name = model.function_names[function_index]
@@ -149,13 +149,13 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
         gradient_name = name + "_gradient"
         hessian_name = name + "_hessian"
 
-        f_ptr = jit_compiler.get_symbol(state, f_name)
+        f_ptr = inst.get_symbol(f_name)
         jacobian_ptr = gradient_ptr = hessian_ptr = 0
         if autodiff_structure.has_jacobian:
-            jacobian_ptr = jit_compiler.get_symbol(state, jacobian_name)
-            gradient_ptr = jit_compiler.get_symbol(state, gradient_name)
+            jacobian_ptr = inst.get_symbol(jacobian_name)
+            gradient_ptr = inst.get_symbol(gradient_name)
         if autodiff_structure.has_hessian:
-            hessian_ptr = jit_compiler.get_symbol(state, hessian_name)
+            hessian_ptr = inst.get_symbol(hessian_name)
 
         evaluator = AutodiffEvaluator(
             autodiff_structure, f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr

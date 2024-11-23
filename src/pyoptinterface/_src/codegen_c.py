@@ -44,8 +44,8 @@ def generate_csrc_prelude(io: IO[str]):
 typedef double float_point_t;
 
 // declare mathematical functions
-#define UNARY(f) float_point_t f(float_point_t x)
-#define BINARY(f) float_point_t f(float_point_t x, float_point_t y)
+#define UNARY(f) extern float_point_t f(float_point_t x)
+#define BINARY(f) extern float_point_t f(float_point_t x, float_point_t y)
 
 // unary functions
 UNARY(fabs);

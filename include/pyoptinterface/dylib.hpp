@@ -71,8 +71,8 @@ class DynamicLibrary
 #define DYLIB_EXTERN_DECLARE(f) extern decltype(&::f) f
 #define DYLIB_DECLARE(f) decltype(&::f) f = nullptr
 
-#define DYLIB_LOAD_INIT                              \
-	Hashmap<std::string, void *> _function_pointers; \
+#define DYLIB_LOAD_INIT                                                   \
+	ankerl::unordered_dense::map<std::string, void *> _function_pointers; \
 	bool _load_success = true
 
 #define DYLIB_LOAD_FUNCTION(f)                                        \

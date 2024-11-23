@@ -74,6 +74,14 @@ target_sources(cppad_interface PRIVATE
 target_include_directories(cppad_interface PUBLIC include thirdparty)
 target_link_libraries(cppad_interface PUBLIC nlexpr cppad)
 
+add_library(tcc_interface STATIC)
+target_sources(tcc_interface PRIVATE
+  include/pyoptinterface/tcc_interface.hpp
+  lib/tcc_interface.cpp
+)
+target_include_directories(tcc_interface PUBLIC include thirdparty)
+target_link_libraries(tcc_interface PUBLIC fmt)
+
 # Build Python extensions
 find_package(Python ${PYTHON_VERSION}
   REQUIRED COMPONENTS Interpreter Development.Module
@@ -121,6 +129,16 @@ nanobind_add_module(
 )
 target_link_libraries(cppad_interface_ext PUBLIC cppad_interface)
 install(TARGETS cppad_interface_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+nanobind_add_module(
+  tcc_interface_ext
+
+  STABLE_ABI NB_STATIC
+
+  lib/tcc_interface_ext.cpp
+)
+target_link_libraries(tcc_interface_ext PUBLIC tcc_interface)
+install(TARGETS tcc_interface_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # Solvers
 
@@ -247,6 +265,13 @@ nanobind_add_stub(
   INSTALL_TIME
   MODULE pyoptinterface._src.cppad_interface_ext
   OUTPUT ${POI_INSTALL_DIR}/cppad_interface_ext.pyi
+)
+
+nanobind_add_stub(
+  tcc_interface_ext_stub
+  INSTALL_TIME
+  MODULE pyoptinterface._src.tcc_interface_ext
+  OUTPUT ${POI_INSTALL_DIR}/tcc_interface_ext.pyi
 )
 
 nanobind_add_stub(
