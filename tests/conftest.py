@@ -1,4 +1,5 @@
 import pytest
+import platform
 
 ipopt_model_dict = {}
 
@@ -13,9 +14,11 @@ if ipopt.is_library_loaded():
         return ipopt.Model(jit="C")
 
     ipopt_model_dict["ipopt_llvm"] = llvm
-    # On macOS, loading dynamic library of Gurobi/COPT/Mosek before loading libtcc will cause memory error
-    # The reason is still unclear
-    ipopt_model_dict["ipopt_c"] = c
+    system = platform.system()
+    if system != "Darwin":
+        # On macOS, loading dynamic library of Gurobi/COPT/Mosek before loading libtcc will cause memory error
+        # The reason is still unclear
+        ipopt_model_dict["ipopt_c"] = c
 
 
 @pytest.fixture(params=ipopt_model_dict.keys())
