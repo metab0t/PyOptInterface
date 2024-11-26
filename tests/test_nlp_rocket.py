@@ -73,7 +73,7 @@ def rocket_model(model: ipopt.Model, nh: int):
                 T2=T[i + 1],
                 step=step,
             ),
-            eq=[0.0, 0.0, 0.0],
+            eq=0.0,
         )
 
     # Boundary conditions

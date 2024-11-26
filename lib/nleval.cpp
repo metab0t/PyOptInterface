@@ -690,7 +690,6 @@ void NonlinearFunctionEvaluator::analyze_hessian_structure(
 void NonlinearFunctionEvaluator::eval_objective(const double *x, double *y)
 {
 	double obj = 0.0;
-	double temp = 0.0;
 
 	double *p = this->p.data();
 
@@ -708,7 +707,7 @@ void NonlinearFunctionEvaluator::eval_objective(const double *x, double *y)
 			{
 				auto &x_indices = inst.xs;
 				auto &p_indices = inst.ps;
-				evaluator.f_eval.p(x, p, &temp, x_indices.data(), p_indices.data());
+				evaluator.f_eval.p(x, p, &obj, x_indices.data(), p_indices.data());
 			}
 		}
 		else
@@ -716,10 +715,9 @@ void NonlinearFunctionEvaluator::eval_objective(const double *x, double *y)
 			for (const auto &inst : inst_vec)
 			{
 				auto &x_indices = inst.xs;
-				evaluator.f_eval.nop(x, &temp, x_indices.data());
+				evaluator.f_eval.nop(x, &obj, x_indices.data());
 			}
 		}
-		obj += temp;
 	}
 
 	y[0] += obj;

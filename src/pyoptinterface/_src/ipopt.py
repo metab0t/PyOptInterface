@@ -98,6 +98,7 @@ def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
             np=np,
             indirect_x=True,
             indirect_p=True,
+            add_y=True,
         )
         if autodiff_structure.has_jacobian:
             jacobian_name = name + "_jacobian"
@@ -193,6 +194,7 @@ def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
             np=np,
             indirect_x=True,
             indirect_p=True,
+            add_y=True,
         )
         export_functions.append(f_name)
         if autodiff_structure.has_jacobian:
