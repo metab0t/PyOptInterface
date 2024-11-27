@@ -117,18 +117,15 @@ for i in range(T):
     h_value.append(model.get_value(h[i]))
 
 print("Optimal altitude: ", h_value[-1])
-
-import pygal
-chart = pygal.Line()
-chart.title = 'Rocket Altitude'
-chart.add('Altitude', h_value)
-chart.render_to_file('rocket_altitude.svg')
 ```
 
 The plot of the altitude of the rocket is shown below.
 
-```{image} rocket_altitude.svg
-:alt: rocket_altitude
-:width: 600px
-:align: center
+```{code-cell}
+import matplotlib.pyplot as plt
+
+plt.plot(h_value)
+plt.xlabel("Time")
+plt.ylabel("Altitude")
+plt.show()
 ```

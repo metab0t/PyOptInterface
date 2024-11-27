@@ -16,4 +16,4 @@ debug/
 docs/jupyter_execute
 docs/build
 
-*.svg
+*.lp
