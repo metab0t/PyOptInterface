@@ -366,7 +366,7 @@ model_attribute_set_func_map = {
     ModelAttribute.TimeLimitSec: lambda model, v: model.set_raw_parameter(
         "max_wall_time", v
     ),
-    ModelAttribute.Silent: lambda model, v: model.set_raw_option_bool(
+    ModelAttribute.Silent: lambda model, v: model.set_raw_parameter(
         "print_level", 0 if v else 5
     ),
 }
