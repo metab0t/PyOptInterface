@@ -177,7 +177,9 @@ model.add_nl_constraint(con_f, nlfunc.Vars(x=x,y=y), ub = [4.0, -1.0])
 model.add_nl_objective(obj_f, nlfunc.Vars(x=x,y=y))
 
 model.optimize()
+```
 
+```{code-cell}
 x_value = model.get_value(x)
 y_value = model.get_value(y)
 
@@ -241,7 +243,9 @@ rosenbrock_f = model.register_function(rosenbrock)
 model.add_nl_objective(rosenbrock_f, nlfunc.Vars(x=x, y=y))
 
 model.optimize()
+```
 
+```{code-cell}
 x_value = model.get_value(x)
 y_value = model.get_value(y)
 
@@ -286,7 +290,9 @@ for i in range(N):
     model.add_linear_constraint(t[i+1] - t[i] - 0.5 * h * u[i+1] - 0.5 * h * u[i] , poi.Eq, 0.0)
 
 model.optimize()
+```
 
+```{code-cell}
 objective_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
 
 print(f"Objective value: {objective_value}")

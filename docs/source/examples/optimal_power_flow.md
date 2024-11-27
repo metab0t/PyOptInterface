@@ -236,7 +236,9 @@ After optimization, we can retrieve the optimal solution:
 
 ```{code-cell}
 model.optimize()
+```
 
+```{code-cell}
 print(model.get_model_attribute(poi.ModelAttribute.TerminationStatus))
 
 P_value = P.map(model.get_value)
