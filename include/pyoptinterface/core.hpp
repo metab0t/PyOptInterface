@@ -222,6 +222,12 @@ auto operator/(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
 auto operator/(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
 auto operator/(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 
+// unary minus operator
+auto operator-(const VariableIndex &a) -> ScalarAffineFunction;
+auto operator-(const ScalarAffineFunction &a) -> ScalarAffineFunction;
+auto operator-(const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
+auto operator-(const ExprBuilder &a) -> ExprBuilder;
+
 // Operator overloading for	ExprBuilder
 // Sadly, they are inefficient than the add/sub/mul/div functions but they are important for a
 // user-friendly interface
