@@ -11,6 +11,7 @@ def make_nd_variable(
     lb=None,
     ub=None,
     name=None,
+    start=None
 ):
     kw_args = dict()
     if domain is not None:
@@ -19,6 +20,8 @@ def make_nd_variable(
         kw_args["lb"] = lb
     if ub is not None:
         kw_args["ub"] = ub
+    if start is not None:
+        kw_args["start"] = start
 
     def f(*args):
         if name is not None:

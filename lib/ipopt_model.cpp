@@ -245,7 +245,7 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
                                                   double rhs, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs, name);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
@@ -257,7 +257,7 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, Constrai
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
                                                   double rhs, const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, rhs, name);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
