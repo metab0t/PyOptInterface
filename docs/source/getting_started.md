@@ -83,9 +83,9 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/gurobi1100/macos_universal2/lib`
 *   - COPT
     - `C:\Program Files\copt71\bin`
-    - `/opt/copt71/lib`
-    - `/opt/copt71/lib`
-    - `/opt/copt71/lib`
+    - `/opt/copt72/lib`
+    - `/opt/copt72/lib`
+    - `/opt/copt72/lib`
 *   - Mosek
     - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin`
     - `/opt/mosek/10.2/tools/platform/linux64x86/bin`
@@ -110,7 +110,7 @@ For Gurobi, the automatic detection looks for the following things in order:
 
 ### COPT
 
-The currently supported version is **7.1.4** and newer. Other versions may work but are not tested.
+The currently supported version is **7.2.x** and newer. Other versions may work but are not tested.
 
 For COPT, the automatic detection looks for the following things in order:
 1. The environment variable `COPT_HOME` set by the installer of COPT
@@ -194,9 +194,9 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/gurobi1100/macos_universal2/lib/libgurobi110.dylib`
 *   - COPT
     - `C:\Program Files\copt71\bin\copt.dll`
-    - `/opt/copt71/lib/libcopt.so`
-    - `/opt/copt71/lib/libcopt.dylib`
-    - `/opt/copt71/lib/libcopt.dylib`
+    - `/opt/copt72/lib/libcopt.so`
+    - `/opt/copt72/lib/libcopt.dylib`
+    - `/opt/copt72/lib/libcopt.dylib`
 *   - Mosek
     - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin\mosek64_10_1.dll`
     - `/opt/mosek/10.2/tools/platform/linux64x86/bin/libmosek64.so`

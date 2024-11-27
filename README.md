@@ -12,12 +12,13 @@ It is designed as a very thin wrapper of native C API of optimizers and attempts
 
 The key features of PyOptInterface include:
 - Very fast speed to construct optimization model (10x faster than Pyomo, comparable with JuMP.jl and some official Python bindings provided by vendors of optimizer)
+- Highly efficient structured automatic differentiation for nonlinear optimization with JIT compilation (faster than other NLP frameworks)
 - Low overhead to modify and re-solve the problem incrementally (including adding/removing variables/constraints, changing objective function, etc.)
 - Unified API to cover common usages, write once and the code works for all optimizers
 - You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendor-specific Python binding of optimizer
 
 ## Benchmark
-The benchmark comparing PyOptInterface with some other modeling interfaces can be found [here](https://metab0t.github.io/PyOptInterface/benchmark.html). PyOptInterface is among the fastest modeling interfaces in terms of model construction time.
+The benchmark comparing PyOptInterface with some other modeling interfaces can be found [here](https://metab0t.github.io/PyOptInterface/benchmark.html). PyOptInterface is among the fastest modeling interfaces in terms of model construction time and automatic differentiation of nonlinear optimization problems.
 
 ## Installation
 PyOptInterface is available on PyPI. You can install it via pip:
@@ -102,6 +103,18 @@ If you use PyOptInterface in your research, please consider citing [the followin
       eprint={2405.10130},
       archivePrefix={arXiv},
       primaryClass={cs.MS}
+}
+```
+
+If you use the nonlinear optimization feature of PyOptInterface, please consider citing [the following paper](https://ieeexplore.ieee.org/document/10721402) as well:
+
+```bibtex
+@article{yang2024accelerating,
+  title={Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation},
+  author={Yang, Yue and Lin, Chenhui and Xu, Luo and Yang, Xiaodong and Wu, Wenchuan and Wang, Bin},
+  journal={IEEE Transactions on Power Systems},
+  year={2024},
+  publisher={IEEE}
 }
 ```
 

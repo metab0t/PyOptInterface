@@ -5,9 +5,6 @@ kernelspec:
 ---
 # Constraint
 
-The `Constraint` class is used to define a constraint in the optimization model. It is a subclass
-of `Expression` and has the same methods and properties as `Expression`.
-
 PyOptInterface supports the following types of constraints:
 
 - Linear Constraint

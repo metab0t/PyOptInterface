@@ -20,7 +20,6 @@ classifiers = [
 Homepage = "https://github.com/metab0t/pyoptinterface"
 
 [project.optional-dependencies]
-doc = ["sphinx", "myst-parser", "myst-nb", "sphinx-copybutton", "furo", "numpy", "highsbox"]
 test = ["pytest", "numpy"]
 highs = ["highsbox"]
 nlp = ["llvmlite", "tccbox"]

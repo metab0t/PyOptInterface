@@ -3,7 +3,7 @@ file_format: mystnb
 kernelspec:
   name: python3
 ---
-# Economic dispatch
+# Economic Dispatch
 
 Economic dispatch is a classic optimization problem in power systems. It is used to determine the optimal power output of a set of generators to meet the demand at the lowest cost. The problem can be formulated as a linear programming problem or a quadratic programming problem depending on the formulation used to model the economic cost.
 
