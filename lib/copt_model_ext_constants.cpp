@@ -16,6 +16,9 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("CBCONTEXT_MIPNODE") = 4;
 	COPT.attr("CBCONTEXT_MIPRELAX") = 1;
 	COPT.attr("CBCONTEXT_MIPSOL") = 2;
+	COPT.attr("CLIENT_CAFILE") = "CaFile";
+	COPT.attr("CLIENT_CERTFILE") = "CertFile";
+	COPT.attr("CLIENT_CERTKEYFILE") = "CertKeyFile";
 	COPT.attr("CLIENT_CLUSTER") = "Cluster";
 	COPT.attr("CLIENT_FLOATING") = "Floating";
 	COPT.attr("CLIENT_PASSWORD") = "PassWord";
@@ -30,6 +33,8 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("CONE_RQUAD") = 2;
 	COPT.attr("CONTINUOUS") = "C";
 	COPT.attr("EQUAL") = "E";
+	COPT.attr("EXPCONE_DUAL") = 4;
+	COPT.attr("EXPCONE_PRIMAL") = 3;
 	COPT.attr("FREE") = "N";
 	COPT.attr("GENCONSTR_ABS") = 1;
 	COPT.attr("GENCONSTR_AND") = 2;
@@ -39,6 +44,9 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("GENCONSTR_PWL") = 6;
 	COPT.attr("GREATER_EQUAL") = "G";
 	COPT.attr("IMPRECISE") = 7;
+	COPT.attr("INDICATOR_IF") = 1;
+	COPT.attr("INDICATOR_IFANDONLYIF") = 3;
+	COPT.attr("INDICATOR_ONLYIF") = 2;
 	COPT.attr("INFEASIBLE") = 2;
 	COPT.attr("INFINITY") = 1e+30;
 	COPT.attr("INF_OR_UNB") = 4;
@@ -59,7 +67,7 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("UNFINISHED") = 9;
 	COPT.attr("UNSTARTED") = 0;
 	COPT.attr("VERSION_MAJOR") = 7;
-	COPT.attr("VERSION_MINOR") = 1;
+	COPT.attr("VERSION_MINOR") = 2;
 	COPT.attr("VERSION_TECHNICAL") = 3;
 
 	nb::module_ Attr = COPT.def_submodule("Attr");
@@ -71,6 +79,7 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("Cols") = "Cols";
 	Attr.attr("Cones") = "Cones";
 	Attr.attr("Elems") = "Elems";
+	Attr.attr("ExpCones") = "ExpCones";
 	Attr.attr("FeasRelaxObj") = "FeasRelaxObj";
 	Attr.attr("HasBasis") = "HasBasis";
 	Attr.attr("HasDualFarkas") = "HasDualFarkas";
