@@ -520,15 +520,6 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
-
-<span class="n">P_value</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal active power output of the generators:&quot;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generator </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">P_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -592,13 +583,6 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
   20  1.4997039e+04 9.74e-09 2.33e-05  -8.6 1.52e-03    -  1.00e+00 9.99e-01h  1
   21  1.4997039e+04 5.94e-12 2.83e-12  -8.6 1.03e-03    -  1.00e+00 1.00e+00f  1
-TerminationStatusCode.LOCALLY_SOLVED
-Optimal active power output of the generators:
-Generator 0: 0.4
-Generator 1: 1.7
-Generator 2: 1.9623464660959797
-Generator 3: 0.0
-Generator 4: 6.0
 
 Number of Iterations....: 21
 
@@ -617,10 +601,35 @@ Number of inequality constraint evaluations          = 22
 Number of equality constraint Jacobian evaluations   = 22
 Number of inequality constraint Jacobian evaluations = 22
 Number of Lagrangian Hessian evaluations             = 21
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.006
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.007
 Total CPU secs in NLP function evaluations           =      0.000
 
 EXIT: Optimal Solution Found.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
+
+<span class="n">P_value</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal active power output of the generators:&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generator </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">P_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.LOCALLY_SOLVED
+Optimal active power output of the generators:
+Generator 0: 0.4
+Generator 1: 1.7
+Generator 2: 1.9623464660959797
+Generator 3: 0.0
+Generator 4: 6.0
 </pre></div>
 </div>
 </div>

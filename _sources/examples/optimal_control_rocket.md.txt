@@ -111,7 +111,9 @@ After solving the problem, we can plot the results.
 
 ```{code-cell}
 model.optimize()
+```
 
+```{code-cell}
 h_value = []
 for i in range(T):
     h_value.append(model.get_value(h[i]))

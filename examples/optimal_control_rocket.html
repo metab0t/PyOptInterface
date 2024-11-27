@@ -394,12 +394,6 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
-
-<span class="n">h_value</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
-    <span class="n">h_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal altitude: &quot;</span><span class="p">,</span> <span class="n">h_value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -483,11 +477,26 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 24
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 23
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.111
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.108
 Total CPU secs in NLP function evaluations           =      0.004
 
 EXIT: Optimal Solution Found.
-Optimal altitude:  1.012779392216388
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h_value</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">h_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal altitude: &quot;</span><span class="p">,</span> <span class="n">h_value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Optimal altitude:  1.012779392216388
 </pre></div>
 </div>
 </div>
