@@ -1,0 +1,82 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from math import sqrt
+import pyoptinterface as poi
+from pyoptinterface import nlfunc, ipopt
+
+model = ipopt.Model()
+
+h_0 = 1                      # Initial height
+v_0 = 0                      # Initial velocity
+m_0 = 1.0                    # Initial mass
+m_T = 0.6                    # Final mass
+g_0 = 1                      # Gravity at the surface
+h_c = 500                    # Used for drag
+c = 0.5 * sqrt(g_0 * h_0)    # Thrust-to-fuel mass
+D_c = 0.5 * 620 * m_0 / g_0  # Drag scaling
+u_t_max = 3.5 * g_0 * m_0    # Maximum thrust
+T_max = 0.2                  # Number of seconds
+T = 1_000                    # Number of time steps
+delta_t = 0.2 / T;           # Time per discretized step
+
+def rocket_dynamics(vars, params):
+    m2, m1 = vars.m2, vars.m1
+    h2, h1 = vars.h2, vars.h1
+    v2, v1 = vars.v2, vars.v1
+    u = vars.u
+
+    h_eq = (h2 - h1) - delta_t * v1
+    v_eq = (v2 - v1) - delta_t * (-g_0 * (h_0 / h1)**2 + (u - D_c * v1**2 * nlfunc.exp(-h_c * (h1 - h_0) / h_0)) / m1)
+    m_eq = (m2 - m1) - delta_t * (-u / c)
+
+    return [h_eq, v_eq, m_eq]
+
+rd = model.register_function(rocket_dynamics)
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [0;32mIn[1], line 3[0m
+[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmath[39;00m [38;5;28;01mimport[39;00m sqrt
+[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mpyoptinterface[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpoi[39;00m
+[0;32m----> 3[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpyoptinterface[39;00m [38;5;28;01mimport[39;00m nlfunc, ipopt
+[1;32m      5[0m model [38;5;241m=[39m ipopt[38;5;241m.[39mModel()
+[1;32m      7[0m h_0 [38;5;241m=[39m [38;5;241m1[39m                      [38;5;66;03m# Initial height[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/pyoptinterface/ipopt.py:1[0m
+[0;32m----> 1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpyoptinterface[39;00m[38;5;21;01m.[39;00m[38;5;21;01m_src[39;00m[38;5;21;01m.[39;00m[38;5;21;01mipopt[39;00m [38;5;28;01mimport[39;00m Model
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpyoptinterface[39;00m[38;5;21;01m.[39;00m[38;5;21;01m_src[39;00m[38;5;21;01m.[39;00m[38;5;21;01mipopt_model_ext[39;00m [38;5;28;01mimport[39;00m (
+[1;32m      3[0m     ApplicationReturnStatus,
+[1;32m      4[0m     load_library,
+[1;32m      5[0m     is_library_loaded,
+[1;32m      6[0m )
+[1;32m      8[0m __all__ [38;5;241m=[39m [[38;5;124m"[39m[38;5;124mModel[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mApplicationReturnStatus[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mload_library[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mis_library_loaded[39m[38;5;124m"[39m]
+
+File [0;32m/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/pyoptinterface/_src/ipopt.py:7[0m
+[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mplatform[39;00m
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mtyping[39;00m [38;5;28;01mimport[39;00m Optional, Dict, Set
+[0;32m----> 7[0m [38;5;28;01mfrom[39;00m [38;5;21;01mllvmlite[39;00m [38;5;28;01mimport[39;00m ir
+[1;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mipopt_model_ext[39;00m [38;5;28;01mimport[39;00m RawModel, ApplicationReturnStatus, load_library
+[1;32m     10[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mcodegen_c[39;00m [38;5;28;01mimport[39;00m generate_csrc_prelude, generate_csrc_from_graph
+
+[0;31mModuleNotFoundError[0m: No module named 'llvmlite'
+

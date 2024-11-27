@@ -200,7 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
@@ -208,6 +208,7 @@
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -222,7 +223,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_power_flow.html">Optimal Power Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_control_rocket.html">Optimal Control of a Rocket</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
 <ul>
@@ -279,8 +282,6 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="constraint">
 <h1>Constraint<a class="headerlink" href="#constraint" title="Link to this heading">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">Constraint</span></code> class is used to define a constraint in the optimization model. It is a subclass
-of <code class="docutils literal notranslate"><span class="pre">Expression</span></code> and has the same methods and properties as <code class="docutils literal notranslate"><span class="pre">Expression</span></code>.</p>
 <p>PyOptInterface supports the following types of constraints:</p>
 <ul class="simple">
 <li><p>Linear Constraint</p></li>
@@ -303,12 +304,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-11-27 15:30:03 [INFO] checks license for COPT v7.2.2 20241023
-2024-11-27 15:30:03 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
-2024-11-27 15:30:03 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.11.10/x64/bin
-2024-11-27 15:30:03 [WARN] no license files in HOME folder: /home/runner/copt
-2024-11-27 15:30:03 [INFO] empty environment variable: COPT_LICENSE_DIR
-2024-11-27 15:30:03 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-11-27 16:53:04 [INFO] checks license for COPT v7.2.2 20241023
+2024-11-27 16:53:04 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2024-11-27 16:53:04 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.7/x64/bin
+2024-11-27 16:53:04 [WARN] no license files in HOME folder: /home/runner/copt
+2024-11-27 16:53:04 [INFO] empty environment variable: COPT_LICENSE_DIR
+2024-11-27 16:53:04 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
 No license found. Starting COPT with size limitations for non-commercial use
 Please apply for a license from www.shanshu.ai/copt

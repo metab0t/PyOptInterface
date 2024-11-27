@@ -5,7 +5,7 @@
 ```{toctree}
 :maxdepth: 2
 :titlesonly:
-:caption: Usage Guide
+:caption: User Guide
 
 getting_started.md
 model.md
@@ -13,6 +13,7 @@ variable.md
 expression.md
 constraint.md
 objective.md
+nonlinear.md
 container.md
 numpy.md
 structure.md
@@ -32,6 +33,8 @@ changelog.md
 :caption: Examples
 
 examples/economic_dispatch.md
+examples/optimal_power_flow.md
+examples/optimal_control_rocket.md
 ```
 
 ```{toctree}

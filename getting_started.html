@@ -200,7 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
@@ -208,6 +208,7 @@
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -222,7 +223,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_power_flow.html">Optimal Power Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_control_rocket.html">Optimal Control of a Rocket</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
 <ul>
@@ -349,9 +352,9 @@
 </tr>
 <tr class="row-odd"><td><p>COPT</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\copt71\bin</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Mosek</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Mosek\10.2\tools\platform\win64x86\bin</span></code></p></td>
@@ -380,7 +383,7 @@
 </section>
 <section id="copt">
 <h3>COPT<a class="headerlink" href="#copt" title="Link to this heading">¶</a></h3>
-<p>The currently supported version is <strong>7.1.4</strong> and newer. Other versions may work but are not tested.</p>
+<p>The currently supported version is <strong>7.2.x</strong> and newer. Other versions may work but are not tested.</p>
 <p>For COPT, the automatic detection looks for the following things in order:</p>
 <ol class="arabic simple">
 <li><p>The environment variable <code class="docutils literal notranslate"><span class="pre">COPT_HOME</span></code> set by the installer of COPT</p></li>
@@ -461,9 +464,9 @@
 </tr>
 <tr class="row-odd"><td><p>COPT</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\copt71\bin\copt.dll</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib/libcopt.so</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib/libcopt.dylib</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt71/lib/libcopt.dylib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib/libcopt.so</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib/libcopt.dylib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/copt72/lib/libcopt.dylib</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Mosek</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Mosek\10.2\tools\platform\win64x86\bin\mosek64_10_1.dll</span></code></p></td>

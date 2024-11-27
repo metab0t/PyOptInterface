@@ -6,6 +6,7 @@ kernelspec:
 # Expression
 
 ## Basic expression
+
 PyOptInterface currently supports polynomial expressions with degree up to 2, including
 - quadratic expression
 - linear expression

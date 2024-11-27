@@ -200,7 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
@@ -208,6 +208,7 @@
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -222,7 +223,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_power_flow.html">Optimal Power Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_control_rocket.html">Optimal Control of a Rocket</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
 <ul>
@@ -288,6 +291,7 @@
 <p>The key features of PyOptInterface include:</p>
 <ul class="simple">
 <li><p>Very fast speed to construct optimization model (10x faster than Pyomo, comparable with JuMP.jl and some official Python bindings provided by vendors of optimizer)</p></li>
+<li><p>Highly efficient structured automatic differentiation for nonlinear optimization with JIT compilation (faster than other NLP frameworks)</p></li>
 <li><p>Low overhead to modify and re-solve the problem incrementally (including adding/removing variables/constraints, changing objective function, etc.)</p></li>
 <li><p>Unified API to cover common usages, write once and the code works for all optimizers</p></li>
 <li><p>You still have escape hatch to query or modify solver-specific parameter/attribute/information for different optimizers directly like the vendor-specific Python binding of optimizer</p></li>
@@ -295,7 +299,7 @@
 </section>
 <section id="benchmark">
 <h2>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">¶</a></h2>
-<p>The benchmark comparing PyOptInterface with some other modeling interfaces can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/benchmark.html">here</a>. PyOptInterface is among the fastest modeling interfaces in terms of model construction time.</p>
+<p>The benchmark comparing PyOptInterface with some other modeling interfaces can be found <a class="reference external" href="https://metab0t.github.io/PyOptInterface/benchmark.html">here</a>. PyOptInterface is among the fastest modeling interfaces in terms of model construction time and automatic differentiation of nonlinear optimization problems.</p>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
@@ -384,6 +388,16 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>If you use the nonlinear optimization feature of PyOptInterface, please consider citing <a class="reference external" href="https://ieeexplore.ieee.org/document/10721402">the following paper</a> as well:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@article</span><span class="p">{</span><span class="nl">yang2024accelerating</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Yang, Yue and Lin, Chenhui and Xu, Luo and Yang, Xiaodong and Wu, Wenchuan and Wang, Bin}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="p">=</span><span class="s">{IEEE Transactions on Power Systems}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{IEEE}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
@@ -397,7 +411,7 @@ ecosystem, which is licensed under MIT License.</p>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
@@ -405,6 +419,7 @@ ecosystem, which is licensed under MIT License.</p>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -421,7 +436,9 @@ ecosystem, which is licensed under MIT License.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_power_flow.html">Optimal Power Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_control_rocket.html">Optimal Control of a Rocket</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">

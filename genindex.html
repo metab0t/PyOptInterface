@@ -198,7 +198,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Usage Guide</span></p>
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
@@ -206,6 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraint.html">Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
@@ -220,7 +221,9 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/economic_dispatch.html">Economic Dispatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_power_flow.html">Optimal Power Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/optimal_control_rocket.html">Optimal Control of a Rocket</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Advanced</span></p>
 <ul>
@@ -387,6 +390,10 @@
           <li><a href="constraint.html#model.add_exp_cone_constraint">model.add_exp_cone_constraint()</a>
 </li>
           <li><a href="constraint.html#model.add_linear_constraint">model.add_linear_constraint()</a>
+</li>
+          <li><a href="nonlinear.html#model.add_nl_constraint">model.add_nl_constraint()</a>
+</li>
+          <li><a href="nonlinear.html#model.add_nl_objective">model.add_nl_objective()</a>
 </li>
           <li><a href="constraint.html#model.add_quadratic_constraint">model.add_quadratic_constraint()</a>
 </li>
@@ -1044,6 +1051,20 @@
 </li>
         </ul></li>
         <li>
+    model.add_nl_constraint()
+
+        <ul>
+          <li><a href="nonlinear.html#model.add_nl_constraint">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_nl_objective()
+
+        <ul>
+          <li><a href="nonlinear.html#model.add_nl_objective">built-in function</a>
+</li>
+        </ul></li>
+        <li>
     model.add_quadratic_constraint()
 
         <ul>
@@ -1106,6 +1127,8 @@
           <li><a href="common_model_interface.html#model.get_model_attribute">built-in function</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     model.get_normalized_coefficient()
 
@@ -1113,8 +1136,6 @@
           <li><a href="common_model_interface.html#model.get_normalized_coefficient">built-in function</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     model.get_normalized_rhs()
 
