@@ -5,13 +5,7 @@ from collections.abc import Collection
 
 
 def make_nd_variable(
-    model,
-    *coords: Collection,
-    domain=None,
-    lb=None,
-    ub=None,
-    name=None,
-    start=None
+    model, *coords: Collection, domain=None, lb=None, ub=None, name=None, start=None
 ):
     kw_args = dict()
     if domain is not None:
