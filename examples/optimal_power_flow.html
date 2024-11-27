@@ -345,36 +345,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">math</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="k">def</span> <span class="nf">branch_flow</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.12.7</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.12</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">ipopt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.ipopt</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.ipopt_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">ApplicationReturnStatus</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">load_library</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">is_library_loaded</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;ApplicationReturnStatus&quot;</span><span class="p">,</span> <span class="s2">&quot;load_library&quot;</span><span class="p">,</span> <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">]</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.12.7</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.12</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">ipopt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">platform</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">llvmlite</span> <span class="kn">import</span> <span class="n">ir</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">from</span> <span class="nn">.ipopt_model_ext</span> <span class="kn">import</span> <span class="n">RawModel</span><span class="p">,</span> <span class="n">ApplicationReturnStatus</span><span class="p">,</span> <span class="n">load_library</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="kn">from</span> <span class="nn">.codegen_c</span> <span class="kn">import</span> <span class="n">generate_csrc_prelude</span><span class="p">,</span> <span class="n">generate_csrc_from_graph</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;llvmlite&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>Here the nonlinear function takes two arguments: <code class="docutils literal notranslate"><span class="pre">vars</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code>. Although the power flow constraints take the same form for each branch, the parameters <code class="docutils literal notranslate"><span class="pre">G</span></code> <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">Bc</span></code>, namely the <span class="math notranslate nohighlight">\(\pi\)</span> circuit parameters of the branch, are different for each branch.</p>
 <p>Next, we will use PJM 5-bus system as an example to demonstrate the implementation of the optimal power flow problem. The PJM 5-bus system is a small power system with 5 buses and 6 branches. The system data is shown below.</p>
@@ -559,6 +529,98 @@
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generator </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">P_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit http://projects.coin-or.org/Ipopt
+
+This version of Ipopt was compiled from source code available at
+    https://github.com/IDAES/Ipopt as part of the Institute for the Design of
+    Advanced Energy Systems Process Systems Engineering Framework (IDAES PSE
+    Framework) Copyright (c) 2018-2019. See https://github.com/IDAES/idaes-pse.
+
+This version of Ipopt was compiled using HSL, a collection of Fortran codes
+    for large-scale scientific computation.  All technical papers, sales and
+    publicity material resulting from use of the HSL codes within IPOPT must
+    contain the following acknowledgement:
+        HSL, a collection of Fortran codes for large-scale scientific
+        computation. See http://www.hsl.rl.ac.uk.
+******************************************************************************
+
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:      152
+Number of nonzeros in inequality constraint Jacobian.:        9
+Number of nonzeros in Lagrangian Hessian.............:       36
+
+Total number of variables............................:       43
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:       15
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:       34
+Total number of inequality constraints...............:        6
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        6
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.0059989e+02 3.99e+00 2.88e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  8.1077057e+03 2.49e+00 1.02e+02  -1.0 2.83e+00    -  3.99e-03 3.77e-01h  1
+   2  5.3724573e+03 2.43e+00 1.00e+02  -1.0 5.64e+01    -  2.05e-02 2.07e-02f  1
+   3  4.8438530e+03 2.40e+00 9.82e+01  -1.0 2.87e+01    -  9.27e-02 1.38e-02f  1
+   4  4.9054651e+03 2.28e+00 9.28e+01  -1.0 1.11e+01    -  1.72e-01 5.00e-02h  1
+   5  5.3803188e+03 1.93e+00 7.98e+01  -1.0 1.12e+01    -  8.33e-01 1.55e-01h  1
+   6  5.8571269e+03 1.75e+00 7.35e+01  -1.0 4.17e+00    -  3.19e-02 9.15e-02h  1
+   7  8.6818404e+03 9.55e-01 4.37e+01  -1.0 3.61e+00    -  1.00e+00 4.54e-01h  1
+   8  8.7269620e+03 9.41e-01 3.15e+01  -1.0 1.12e+00    -  6.08e-01 1.46e-02h  1
+   9  8.9937384e+03 8.40e-01 1.55e+01  -1.0 2.24e+00    -  2.17e-01 1.08e-01h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  1.0973670e+04 5.40e-01 4.04e+01  -1.0 1.72e+00    -  2.92e-03 3.57e-01h  1
+  11  1.5024686e+04 2.35e-03 7.65e+00  -1.0 1.35e+00    -  1.00e+00 1.00e+00h  1
+  12  1.5026639e+04 3.13e-05 2.32e-02  -1.0 4.12e-02    -  1.00e+00 1.00e+00h  1
+  13  1.5001010e+04 4.87e-03 1.25e-01  -2.5 3.05e-01    -  8.75e-01 1.00e+00f  1
+  14  1.4997944e+04 1.91e-03 1.94e-01  -2.5 2.96e-01    -  1.00e+00 8.31e-01h  1
+  15  1.4997833e+04 1.23e-04 3.19e-03  -2.5 2.65e-01    -  1.00e+00 1.00e+00h  1
+  16  1.4997141e+04 8.35e-05 1.14e-01  -3.8 1.26e-01    -  1.00e+00 8.83e-01h  1
+  17  1.4997080e+04 1.23e-05 3.63e-04  -3.8 7.00e-02    -  1.00e+00 1.00e+00f  1
+  18  1.4997042e+04 3.49e-06 1.18e-02  -5.7 3.13e-02    -  1.00e+00 9.66e-01h  1
+  19  1.4997040e+04 3.28e-07 1.03e-06  -5.7 9.47e-03    -  1.00e+00 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  20  1.4997039e+04 9.74e-09 2.33e-05  -8.6 1.52e-03    -  1.00e+00 9.99e-01h  1
+  21  1.4997039e+04 5.94e-12 2.83e-12  -8.6 1.03e-03    -  1.00e+00 1.00e+00f  1
+TerminationStatusCode.LOCALLY_SOLVED
+Optimal active power output of the generators:
+Generator 0: 0.4
+Generator 1: 1.7
+Generator 2: 1.9623464660959797
+Generator 3: 0.0
+Generator 4: 6.0
+
+Number of Iterations....: 21
+
+                                   (scaled)                 (unscaled)
+Objective...............:   3.7492598644845873e+02    1.4997039457938348e+04
+Dual infeasibility......:   2.8270795726488197e-12    1.1308318290595279e-10
+Constraint violation....:   5.9404703378618251e-12    5.9404703378618251e-12
+Complementarity.........:   2.5990945428864438e-09    1.0396378171545775e-07
+Overall NLP error.......:   2.5990945428864438e-09    1.0396378171545775e-07
+
+
+Number of objective function evaluations             = 22
+Number of objective gradient evaluations             = 22
+Number of equality constraint evaluations            = 22
+Number of inequality constraint evaluations          = 22
+Number of equality constraint Jacobian evaluations   = 22
+Number of inequality constraint Jacobian evaluations = 22
+Number of Lagrangian Hessian evaluations             = 21
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.008
+Total CPU secs in NLP function evaluations           =      0.000
+
+EXIT: Optimal Solution Found.
 </pre></div>
 </div>
 </div>

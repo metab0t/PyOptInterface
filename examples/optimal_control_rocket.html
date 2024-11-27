@@ -352,36 +352,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">h_0</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># Initial height</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.12.7</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.12</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">ipopt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.ipopt</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pyoptinterface._src.ipopt_model_ext</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">ApplicationReturnStatus</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">load_library</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">is_library_loaded</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="s2">&quot;ApplicationReturnStatus&quot;</span><span class="p">,</span> <span class="s2">&quot;load_library&quot;</span><span class="p">,</span> <span class="s2">&quot;is_library_loaded&quot;</span><span class="p">]</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.12.7</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.12</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyoptinterface</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">ipopt</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">platform</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">llvmlite</span> <span class="kn">import</span> <span class="n">ir</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">from</span> <span class="nn">.ipopt_model_ext</span> <span class="kn">import</span> <span class="n">RawModel</span><span class="p">,</span> <span class="n">ApplicationReturnStatus</span><span class="p">,</span> <span class="n">load_library</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="kn">from</span> <span class="nn">.codegen_c</span> <span class="kn">import</span> <span class="n">generate_csrc_prelude</span><span class="p">,</span> <span class="n">generate_csrc_from_graph</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;llvmlite&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>Then, we declare variables and set boundary conditions.</p>
 <div class="cell docutils container">
@@ -430,19 +400,117 @@
     <span class="n">h_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal altitude: &quot;</span><span class="p">,</span> <span class="n">h_value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit http://projects.coin-or.org/Ipopt
 
-<span class="kn">import</span> <span class="nn">pygal</span>
-<span class="n">chart</span> <span class="o">=</span> <span class="n">pygal</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Rocket Altitude&#39;</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;Altitude&#39;</span><span class="p">,</span> <span class="n">h_value</span><span class="p">)</span>
-<span class="n">chart</span><span class="o">.</span><span class="n">render_to_file</span><span class="p">(</span><span class="s1">&#39;rocket_altitude.svg&#39;</span><span class="p">)</span>
+This version of Ipopt was compiled from source code available at
+    https://github.com/IDAES/Ipopt as part of the Institute for the Design of
+    Advanced Energy Systems Process Systems Engineering Framework (IDAES PSE
+    Framework) Copyright (c) 2018-2019. See https://github.com/IDAES/idaes-pse.
+
+This version of Ipopt was compiled using HSL, a collection of Fortran codes
+    for large-scale scientific computation.  All technical papers, sales and
+    publicity material resulting from use of the HSL codes within IPOPT must
+    contain the following acknowledgement:
+        HSL, a collection of Fortran codes for large-scale scientific
+        computation. See http://www.hsl.rl.ac.uk.
+******************************************************************************
+
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:    10983
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:     7985
+
+Total number of variables............................:     3996
+                     variables with only lower bounds:     1998
+                variables with lower and upper bounds:     1998
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:     2997
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0 -1.0000000e+00 1.02e-02 2.00e+00  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1 -9.9900008e-01 9.32e-03 1.82e+00  -1.0 1.89e-01    -  1.00e-01 8.60e-02f  1
+   2 -9.9899675e-01 9.30e-03 9.71e+01  -1.0 4.00e+00    -  3.81e-02 1.83e-03f  1
+   3 -1.0023330e+00 1.74e-04 2.26e+04  -1.0 1.49e+00    -  7.43e-02 9.81e-01f  1
+   4 -1.0038323e+00 4.66e-05 6.03e+03  -1.0 2.14e+00    -  7.36e-01 7.33e-01f  1
+   5 -1.0053212e+00 2.04e-06 3.51e+02  -1.0 3.82e-01    -  1.80e-01 1.00e+00f  1
+   6 -1.0062108e+00 1.43e-06 3.11e+01  -1.0 2.77e-01    -  5.64e-01 1.00e+00f  1
+   7 -1.0067054e+00 2.36e-06 1.38e+00  -1.0 2.99e-01    -  1.00e+00 1.00e+00f  1
+   8 -1.0067009e+00 4.96e-10 5.89e-02  -2.5 3.58e-02    -  1.00e+00 1.00e+00h  1
+   9 -1.0065674e+00 3.08e-07 1.40e-03  -2.5 8.48e-01    -  1.00e+00 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10 -1.0065717e+00 1.85e-11 1.10e-03  -3.8 8.93e-04    -  1.00e+00 1.00e+00h  1
+  11 -1.0066639e+00 7.76e-09 2.45e-03  -5.7 2.00e-02    -  9.93e-01 1.00e+00h  1
+  12 -1.0105346e+00 2.22e-05 1.20e-03  -5.7 8.59e-01    -  1.00e+00 9.79e-01f  1
+  13 -1.0106556e+00 3.08e-07 2.30e-05  -5.7 3.62e-01    -  1.00e+00 1.00e+00f  1
+  14 -1.0106567e+00 1.16e-08 1.08e-07  -5.7 1.18e-01    -  1.00e+00 1.00e+00h  1
+  15 -1.0122821e+00 1.07e-05 9.12e-04  -8.6 4.88e-01    -  7.71e-01 1.00e+00h  1
+  16 -1.0126834e+00 7.79e-06 2.40e-04  -8.6 9.41e-01    -  7.31e-01 7.77e-01h  1
+  17 -1.0127609e+00 3.53e-06 7.30e-05  -8.6 1.16e+00    -  6.90e-01 7.35e-01h  1
+  18 -1.0127670e+00 2.61e-06 1.32e-04  -8.6 9.91e-01    -  7.65e-01 2.74e-01h  1
+  19 -1.0127794e+00 3.72e-07 5.70e-04  -8.6 3.55e-01    -  8.94e-01 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  20 -1.0127794e+00 7.49e-08 4.51e-05  -8.6 2.25e-01    -  1.00e+00 8.85e-01h  1
+  21 -1.0127794e+00 3.92e-08 6.47e-05  -8.6 1.12e-01    -  1.00e+00 5.00e-01f  2
+  22 -1.0127794e+00 2.33e-09 4.28e-08  -8.6 5.82e-02    -  1.00e+00 1.00e+00h  1
+  23 -1.0127794e+00 2.55e-13 4.12e-12  -8.6 1.01e-03    -  1.00e+00 1.00e+00h  1
+Optimal altitude:  1.012779392216388
+
+Number of Iterations....: 23
+
+                                   (scaled)                 (unscaled)
+Objective...............:  -1.0127793922163879e+00   -1.0127793922163879e+00
+Dual infeasibility......:   4.1223226930173622e-12    4.1223226930173622e-12
+Constraint violation....:   2.5533313527739687e-13    2.5533313527739687e-13
+Complementarity.........:   2.5059421407651927e-09    2.5059421407651927e-09
+Overall NLP error.......:   2.5059421407651927e-09    2.5059421407651927e-09
+
+
+Number of objective function evaluations             = 25
+Number of objective gradient evaluations             = 24
+Number of equality constraint evaluations            = 25
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 24
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 23
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.107
+Total CPU secs in NLP function evaluation
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>s           =      0.004
+
+EXIT: Optimal Solution Found.
 </pre></div>
 </div>
 </div>
 </div>
 <p>The plot of the altitude of the rocket is shown below.</p>
-<a class="reference internal image-reference" href="examples/rocket_altitude.svg"><img alt="rocket_altitude" class="align-center" src="examples/rocket_altitude.svg" style="width: 600px;" />
-</a>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">h_value</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Altitude&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7b030d81107e5a2b94418f9a2abe236e3c221baf177c6b8a29c74a91e96ec72e.png" src="../_images/7b030d81107e5a2b94418f9a2abe236e3c221baf177c6b8a29c74a91e96ec72e.png" />
+</div>
+</div>
 </section>
 </section>
 
