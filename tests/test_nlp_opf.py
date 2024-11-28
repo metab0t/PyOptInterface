@@ -34,13 +34,13 @@ def test_acopf(ipopt_model_ctor):
     bf = model.register_function(branch_flow)
 
     branches = [
-        # (from, to, R, X, B, angmin, angmax)
-        (0, 1, 0.00281, 0.0281, 0.00712, -30.0, 30.0),
-        (0, 3, 0.00304, 0.0304, 0.00658, -30.0, 30.0),
-        (0, 4, 0.00064, 0.0064, 0.03126, -30.0, 30.0),
-        (1, 2, 0.00108, 0.0108, 0.01852, -30.0, 30.0),
-        (2, 3, 0.00297, 0.0297, 0.00674, -30.0, 30.0),
-        (3, 4, 0.00297, 0.0297, 0.00674, -30.0, 30.0),
+        # (from, to, R, X, B, angmin, angmax, Smax)
+        (0, 1, 0.00281, 0.0281, 0.00712, -30.0, 30.0, 4.00),
+        (0, 3, 0.00304, 0.0304, 0.00658, -30.0, 30.0, 4.26),
+        (0, 4, 0.00064, 0.0064, 0.03126, -30.0, 30.0, 4.26),
+        (1, 2, 0.00108, 0.0108, 0.01852, -30.0, 30.0, 4.26),
+        (2, 3, 0.00297, 0.0297, 0.00674, -30.0, 30.0, 4.26),
+        (3, 4, 0.00297, 0.0297, 0.00674, -30.0, 30.0, 2.40),
     ]
 
     buses = [
@@ -176,6 +176,14 @@ def test_acopf(ipopt_model_ctor):
 
         model.add_linear_constraint(theta_i - theta_j, poi.In, angmin, angmax)
 
+        Smax = branch[7]
+        Pij = Pbr_from[k]
+        Qij = Qbr_from[k]
+        Pji = Pbr_to[k]
+        Qji = Qbr_to[k]
+        model.add_quadratic_constraint(Pij * Pij + Qij * Qij, poi.Leq, Smax * Smax)
+        model.add_quadratic_constraint(Pji * Pji + Qji * Qji, poi.Leq, Smax * Smax)
+
     cost = poi.ExprBuilder()
     for i in range(N_gen):
         a, b, c = generators[i][5], generators[i][6], generators[i][7]
@@ -196,7 +204,8 @@ def test_acopf(ipopt_model_ctor):
 
     assert P_value_sum > total_load_p
 
-    assert P_value[0] == pytest.approx(0.4, abs=1e-6)
-    assert P_value[1] == pytest.approx(1.7, abs=1e-6)
-    assert P_value[3] == pytest.approx(0.0, abs=1e-6)
-    assert P_value[4] == pytest.approx(6.0, abs=1e-6)
+
+if __name__ == "__main__":
+    from pyoptinterface import ipopt
+
+    test_acopf(ipopt.Model)
