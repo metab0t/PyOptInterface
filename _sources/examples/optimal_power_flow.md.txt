@@ -75,13 +75,13 @@ Next, we will use PJM 5-bus system as an example to demonstrate the implementati
 ```{code-cell}
 
 branches = [
-    # (from, to, R, X, B, angmin, angmax)
-    (0, 1, 0.00281, 0.0281, 0.00712, -30.0, 30.0),
-    (0, 3, 0.00304, 0.0304, 0.00658, -30.0, 30.0),
-    (0, 4, 0.00064, 0.0064, 0.03126, -30.0, 30.0),
-    (1, 2, 0.00108, 0.0108, 0.01852, -30.0, 30.0),
-    (2, 3, 0.00297, 0.0297, 0.00674, -30.0, 30.0),
-    (3, 4, 0.00297, 0.0297, 0.00674, -30.0, 30.0),
+    # (from, to, R, X, B, angmin, angmax, Smax)
+    (0, 1, 0.00281, 0.0281, 0.00712, -30.0, 30.0, 4.00),
+    (0, 3, 0.00304, 0.0304, 0.00658, -30.0, 30.0, 4.26),
+    (0, 4, 0.00064, 0.0064, 0.03126, -30.0, 30.0, 4.26),
+    (1, 2, 0.00108, 0.0108, 0.01852, -30.0, 30.0, 4.26),
+    (2, 3, 0.00297, 0.0297, 0.00674, -30.0, 30.0, 4.26),
+    (3, 4, 0.00297, 0.0297, 0.00674, -30.0, 30.0, 2.40),
 ]
 
 buses = [
@@ -220,6 +220,14 @@ for k in range(N_branch):
     angmax = branch[6] / 180 * math.pi
 
     model.add_linear_constraint(theta_i - theta_j, poi.In, angmin, angmax)
+
+    Smax = branch[7]
+    Pij = Pbr_from[k]
+    Qij = Qbr_from[k]
+    Pji = Pbr_to[k]
+    Qji = Qbr_to[k]
+    model.add_quadratic_constraint(Pij * Pij + Qij * Qij, poi.Leq, Smax * Smax)
+    model.add_quadratic_constraint(Pji * Pji + Qji * Qji, poi.Leq, Smax * Smax)
 ```
 
 Finally, we set the objective function:
@@ -248,5 +256,3 @@ print("Optimal active power output of the generators:")
 for i in range(N_gen):
     print(f"Generator {i}: {P_value[i]}")
 ```
-
-As shown by the result, the generator with less cost efficient has the highest active power output. The total generation power is also greater than the total demand due to the network loss.

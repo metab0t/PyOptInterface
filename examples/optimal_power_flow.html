@@ -351,13 +351,13 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">branches</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="c1"># (from, to, R, X, B, angmin, angmax)</span>
-    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.00281</span><span class="p">,</span> <span class="mf">0.0281</span><span class="p">,</span> <span class="mf">0.00712</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.00304</span><span class="p">,</span> <span class="mf">0.0304</span><span class="p">,</span> <span class="mf">0.00658</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.00064</span><span class="p">,</span> <span class="mf">0.0064</span><span class="p">,</span> <span class="mf">0.03126</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.00108</span><span class="p">,</span> <span class="mf">0.0108</span><span class="p">,</span> <span class="mf">0.01852</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.00297</span><span class="p">,</span> <span class="mf">0.0297</span><span class="p">,</span> <span class="mf">0.00674</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
-    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.00297</span><span class="p">,</span> <span class="mf">0.0297</span><span class="p">,</span> <span class="mf">0.00674</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">),</span>
+    <span class="c1"># (from, to, R, X, B, angmin, angmax, Smax)</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.00281</span><span class="p">,</span> <span class="mf">0.0281</span><span class="p">,</span> <span class="mf">0.00712</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">4.00</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.00304</span><span class="p">,</span> <span class="mf">0.0304</span><span class="p">,</span> <span class="mf">0.00658</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">4.26</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.00064</span><span class="p">,</span> <span class="mf">0.0064</span><span class="p">,</span> <span class="mf">0.03126</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">4.26</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.00108</span><span class="p">,</span> <span class="mf">0.0108</span><span class="p">,</span> <span class="mf">0.01852</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">4.26</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.00297</span><span class="p">,</span> <span class="mf">0.0297</span><span class="p">,</span> <span class="mf">0.00674</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">4.26</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.00297</span><span class="p">,</span> <span class="mf">0.0297</span><span class="p">,</span> <span class="mf">0.00674</span><span class="p">,</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">2.40</span><span class="p">),</span>
 <span class="p">]</span>
 
 <span class="n">buses</span> <span class="o">=</span> <span class="p">[</span>
@@ -500,6 +500,14 @@
     <span class="n">angmax</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
 
     <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">In</span><span class="p">,</span> <span class="n">angmin</span><span class="p">,</span> <span class="n">angmax</span><span class="p">)</span>
+
+    <span class="n">Smax</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+    <span class="n">Pij</span> <span class="o">=</span> <span class="n">Pbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">Qij</span> <span class="o">=</span> <span class="n">Qbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">Pji</span> <span class="o">=</span> <span class="n">Pbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">Qji</span> <span class="o">=</span> <span class="n">Qbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">Pij</span> <span class="o">*</span> <span class="n">Pij</span> <span class="o">+</span> <span class="n">Qij</span> <span class="o">*</span> <span class="n">Qij</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">Smax</span> <span class="o">*</span> <span class="n">Smax</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">Pji</span> <span class="o">*</span> <span class="n">Pji</span> <span class="o">+</span> <span class="n">Qji</span> <span class="o">*</span> <span class="n">Qji</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">Smax</span> <span class="o">*</span> <span class="n">Smax</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -545,64 +553,63 @@ This version of Ipopt was compiled using HSL, a collection of Fortran codes
 This is Ipopt version 3.13.2, running with linear solver ma27.
 
 Number of nonzeros in equality constraint Jacobian...:      152
-Number of nonzeros in inequality constraint Jacobian.:        9
-Number of nonzeros in Lagrangian Hessian.............:       36
+Number of nonzeros in inequality constraint Jacobian.:       33
+Number of nonzeros in Lagrangian Hessian.............:       60
 
 Total number of variables............................:       43
                      variables with only lower bounds:        0
                 variables with lower and upper bounds:       15
                      variables with only upper bounds:        0
 Total number of equality constraints.................:       34
-Total number of inequality constraints...............:        6
+Total number of inequality constraints...............:       18
         inequality constraints with only lower bounds:        0
    inequality constraints with lower and upper bounds:        6
-        inequality constraints with only upper bounds:        0
+        inequality constraints with only upper bounds:       12
 
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
    0  1.0059989e+02 3.99e+00 2.88e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
-   1  8.1077057e+03 2.49e+00 1.02e+02  -1.0 2.83e+00    -  3.99e-03 3.77e-01h  1
-   2  5.3724573e+03 2.43e+00 1.00e+02  -1.0 5.64e+01    -  2.05e-02 2.07e-02f  1
-   3  4.8438530e+03 2.40e+00 9.82e+01  -1.0 2.87e+01    -  9.27e-02 1.38e-02f  1
-   4  4.9054651e+03 2.28e+00 9.28e+01  -1.0 1.11e+01    -  1.72e-01 5.00e-02h  1
-   5  5.3803188e+03 1.93e+00 7.98e+01  -1.0 1.12e+01    -  8.33e-01 1.55e-01h  1
-   6  5.8571269e+03 1.75e+00 7.35e+01  -1.0 4.17e+00    -  3.19e-02 9.15e-02h  1
-   7  8.6818404e+03 9.55e-01 4.37e+01  -1.0 3.61e+00    -  1.00e+00 4.54e-01h  1
-   8  8.7269620e+03 9.41e-01 3.15e+01  -1.0 1.12e+00    -  6.08e-01 1.46e-02h  1
-   9  8.9937384e+03 8.40e-01 1.55e+01  -1.0 2.24e+00    -  2.17e-01 1.08e-01h  1
+   1  8.2642475e+03 2.47e+00 1.01e+02  -1.0 2.79e+00    -  4.08e-03 3.81e-01h  1
+   2  7.3953828e+03 2.42e+00 9.90e+01  -1.0 1.89e+01    -  6.33e-02 1.87e-02f  2
+   3  6.5016499e+03 2.36e+00 9.57e+01  -1.0 1.58e+01    -  2.57e-01 2.73e-02f  1
+   4  6.3495650e+03 2.27e+00 9.10e+01  -1.0 1.48e+01    -  4.57e-01 3.80e-02f  3
+   5  6.2696718e+03 2.07e+00 8.07e+01  -1.0 1.38e+01    -  7.59e-01 8.54e-02f  2
+   6  7.1293922e+03 1.63e+00 6.07e+01  -1.0 1.07e+01    -  8.60e-01 2.13e-01h  2
+   7  9.2308978e+03 9.26e-01 3.44e+01  -1.0 8.92e+00    -  4.35e-01 4.33e-01h  1
+   8  1.1477927e+04 6.73e-01 2.82e+01  -1.0 2.96e+00    -  1.27e-01 2.73e-01h  1
+   9  1.5885484e+04 1.86e-01 1.12e+01  -1.0 2.20e+00    -  5.73e-01 7.24e-01h  1
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  10  1.0973670e+04 5.40e-01 4.04e+01  -1.0 1.72e+00    -  2.92e-03 3.57e-01h  1
-  11  1.5024686e+04 2.35e-03 7.65e+00  -1.0 1.35e+00    -  1.00e+00 1.00e+00h  1
-  12  1.5026639e+04 3.13e-05 2.32e-02  -1.0 4.12e-02    -  1.00e+00 1.00e+00h  1
-  13  1.5001010e+04 4.87e-03 1.25e-01  -2.5 3.05e-01    -  8.75e-01 1.00e+00f  1
-  14  1.4997944e+04 1.91e-03 1.94e-01  -2.5 2.96e-01    -  1.00e+00 8.31e-01h  1
-  15  1.4997833e+04 1.23e-04 3.19e-03  -2.5 2.65e-01    -  1.00e+00 1.00e+00h  1
-  16  1.4997141e+04 8.35e-05 1.14e-01  -3.8 1.26e-01    -  1.00e+00 8.83e-01h  1
-  17  1.4997080e+04 1.23e-05 3.63e-04  -3.8 7.00e-02    -  1.00e+00 1.00e+00f  1
-  18  1.4997042e+04 3.49e-06 1.18e-02  -5.7 3.13e-02    -  1.00e+00 9.66e-01h  1
-  19  1.4997040e+04 3.28e-07 1.03e-06  -5.7 9.47e-03    -  1.00e+00 1.00e+00f  1
-iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  20  1.4997039e+04 9.74e-09 2.33e-05  -8.6 1.52e-03    -  1.00e+00 9.99e-01h  1
-  21  1.4997039e+04 5.94e-12 2.83e-12  -8.6 1.03e-03    -  1.00e+00 1.00e+00f  1
+  10  1.7582902e+04 7.44e-03 1.39e+00  -1.0 1.54e+00    -  8.05e-01 1.00e+00h  1
+  11  1.7581523e+04 5.37e-04 6.38e-02  -1.0 8.19e-01    -  1.00e+00 1.00e+00h  1
+  12  1.7556846e+04 4.26e-03 1.53e-01  -2.5 3.55e-01    -  8.73e-01 9.76e-01f  1
+  13  1.7552853e+04 3.50e-03 1.39e-01  -2.5 8.11e-02    -  1.00e+00 7.89e-01h  1
+  14  1.7552881e+04 1.84e-05 1.96e-03  -2.5 1.30e-02    -  1.00e+00 1.00e+00h  1
+  15  1.7551955e+04 1.39e-05 6.19e-03  -3.8 1.78e-02    -  1.00e+00 9.72e-01f  1
+  16  1.7551939e+04 1.54e-08 1.13e-06  -3.8 6.68e-04    -  1.00e+00 1.00e+00f  1
+  17  1.7551891e+04 1.33e-08 1.02e-06  -5.7 9.92e-04    -  1.00e+00 1.00e+00f  1
+  18  1.7551891e+04 1.15e-12 1.20e-10  -8.6 1.29e-05    -  1.00e+00 1.00e+00h  1
 
-Number of Iterations....: 21
+Number of Iterations....: 18
 
                                    (scaled)                 (unscaled)
-Objective...............:   3.7492598644845873e+02    1.4997039457938348e+04
-Dual infeasibility......:   2.8270795726488197e-12    1.1308318290595279e-10
-Constraint violation....:   5.9404703378618251e-12    5.9404703378618251e-12
-Complementarity.........:   2.5990945428864438e-09    1.0396378171545775e-07
-Overall NLP error.......:   2.5990945428864438e-09    1.0396378171545775e-07
+Objective...............:   4.3879727096482048e+02    1.7551890838592819e+04
+Dual infeasibility......:   1.1970113789061543e-10    4.7880455156246171e-09
+Constraint violation....:   1.1473044736476368e-12    1.1473044736476368e-12
+Complementarity.........:   2.5405436222116973e-09    1.0162174488846789e-07
+Overall NLP error.......:   2.5405436222116973e-09    1.0162174488846789e-07
 
 
-Number of objective function evaluations             = 22
-Number of objective gradient evaluations             = 22
-Number of equality constraint evaluations            = 22
-Number of inequality constraint evaluations          = 22
-Number of equality constraint Jacobian evaluations   = 22
-Number of inequality constraint Jacobian evaluations = 22
-Number of Lagrangian Hessian evaluations             = 21
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.003
-Total CPU secs in NLP function evaluations           =      0.000
+Number of objective function evaluations             = 33
+Number of objective gradient evaluations             = 19
+Number of equality constraint evaluations            = 33
+Number of inequality constraint evaluations          = 33
+Number of equality constraint Jacobian evaluations   = 19
+Number of inequality constraint Jacobian evaluations = 19
+Number of Lagrangian Hessian evaluations             = 18
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.007
+Total CPU secs in NLP function evaluati
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ons           =      0.000
 
 EXIT: Optimal Solution Found.
 </pre></div>
@@ -627,14 +634,13 @@ EXIT: Optimal Solution Found.
 Optimal active power output of the generators:
 Generator 0: 0.4
 Generator 1: 1.7
-Generator 2: 1.9623464660959797
+Generator 2: 3.2449849431098143
 Generator 3: 0.0
-Generator 4: 6.0
+Generator 4: 4.7069359970171085
 </pre></div>
 </div>
 </div>
 </div>
-<p>As shown by the result, the generator with less cost efficient has the highest active power output. The total generation power is also greater than the total demand due to the network loss.</p>
 </section>
 </section>
 
