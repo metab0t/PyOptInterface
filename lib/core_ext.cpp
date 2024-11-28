@@ -60,6 +60,7 @@ NB_MODULE(core_ext, m)
 	    .def(nb::self / CoeffT());
 
 	nb::class_<ConstraintIndex>(m, "ConstraintIndex")
+	    .def(nb::init<ConstraintType, IndexT>())
 	    .def_ro("type", &ConstraintIndex::type)
 	    .def_ro("index", &ConstraintIndex::index);
 
