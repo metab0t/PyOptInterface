@@ -204,6 +204,9 @@ def test_acopf(ipopt_model_ctor):
 
     assert P_value_sum > total_load_p
 
+    objective_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+    assert objective_value == pytest.approx(1.7552e4, rel=1e-3)
+
 
 if __name__ == "__main__":
     from pyoptinterface import ipopt
