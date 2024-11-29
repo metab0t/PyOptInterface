@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -220,6 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ipopt.html">Ipopt</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#nonlinear-programming">Nonlinear programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
@@ -275,7 +276,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -283,6 +284,8 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="benchmark">
 <h1>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">¶</a></h1>
+<section id="model-construction-time">
+<h2>Model construction time<a class="headerlink" href="#model-construction-time" title="Link to this heading">¶</a></h2>
 <p>The benchmark is adapted from <a class="reference external" href="https://github.com/jump-dev/JuMPPaperBenchmarks">the JuMP paper</a>. Eight optimization models with different sizes are selected as test cases, including four facility location models and four linear quadratic control problems. We conduct two rounds of benchmark using Gurobi and COPT as optimizer respectively. For each model, we measure the total time of modeling interface to generate model and pass it to the optimizer, and the time limit of optimizer is set to 0.0 seconds to avoid the influence of solution process.</p>
 <p>All code to run the benchmarks is available at <a class="reference external" href="https://github.com/metab0t/PyOptInterface_benchmark">https://github.com/metab0t/PyOptInterface_benchmark</a>.</p>
 <div class="table-wrapper colwidths-auto docutils container" id="id1">
@@ -495,6 +498,11 @@
 </table>
 </div>
 </section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="nonlinear-programming">
+<h1>Nonlinear programming<a class="headerlink" href="#nonlinear-programming" title="Link to this heading">¶</a></h1>
+<p>We use the AC Optimal Power Flow problem to benchmark performance of PyOptInterface against different modeling languages. The code is at https://github.com/metab0t/opf_benchmark and the result is published by our paper <a class="reference external" href="https://ieeexplore.ieee.org/document/10721402">Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation</a>.</p>
+</section>
 
         </article>
       </div>
@@ -539,8 +547,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Benchmark</a><ul>
+<li><a class="reference internal" href="#model-construction-time">Model construction time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nonlinear-programming">Nonlinear programming</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

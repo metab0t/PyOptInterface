@@ -1,5 +1,7 @@
 # Benchmark
 
+## Model construction time
+
 The benchmark is adapted from [the JuMP paper](https://github.com/jump-dev/JuMPPaperBenchmarks). Eight optimization models with different sizes are selected as test cases, including four facility location models and four linear quadratic control problems. We conduct two rounds of benchmark using Gurobi and COPT as optimizer respectively. For each model, we measure the total time of modeling interface to generate model and pass it to the optimizer, and the time limit of optimizer is set to 0.0 seconds to avoid the influence of solution process.
 
 All code to run the benchmarks is available at [https://github.com/metab0t/PyOptInterface_benchmark](https://github.com/metab0t/PyOptInterface_benchmark).
@@ -55,3 +57,7 @@ This is the result of benchmark, where the performance of PyOptInterface exceeds
 | 500 | 500000    | 2.189127       | 8.243707 | 18.941519 |
 
 :::
+
+# Nonlinear programming
+
+We use the AC Optimal Power Flow problem to benchmark performance of PyOptInterface against different modeling languages. The code is at https://github.com/metab0t/opf_benchmark and the result is published by our paper [Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation](https://ieeexplore.ieee.org/document/10721402).
