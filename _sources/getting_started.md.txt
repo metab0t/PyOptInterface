@@ -101,7 +101,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
 
 ### Gurobi
 
-The currently supported version is **11.0.x**. Other versions may work but are not tested.
+The currently supported version is **11.0.x** and **12.0.0**. Other versions may work but are not tested.
 
 For Gurobi, the automatic detection looks for the following things in order:
 1. The environment variable `GUROBI_HOME` set by the installer of Gurobi
@@ -110,7 +110,7 @@ For Gurobi, the automatic detection looks for the following things in order:
 
 ### COPT
 
-The currently supported version is **7.2.x** and newer. Other versions may work but are not tested.
+The currently supported version is **7.2.x**. Other versions may work but are not tested.
 
 For COPT, the automatic detection looks for the following things in order:
 1. The environment variable `COPT_HOME` set by the installer of COPT
