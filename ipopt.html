@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Common Model Interface" href="common_model_interface.html" /><link rel="prev" title="Numpy Container and N-queens Problem" href="numpy.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Benchmark" href="benchmark.html" /><link rel="prev" title="HiGHS" href="highs.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Building Bigger Optimization Model - PyOptInterface documentation</title>
+        <title>Ipopt - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -211,14 +211,14 @@
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Building Bigger Optimization Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ipopt.html">Ipopt</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Ipopt</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -261,7 +261,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/structure.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/ipopt.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -275,165 +275,242 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="building-bigger-optimization-model">
-<h1>Building Bigger Optimization Model<a class="headerlink" href="#building-bigger-optimization-model" title="Link to this heading">¶</a></h1>
-<p>In this document, we will introduce how to decompose the process of building a large optimization model into smaller parts and how to compose them together. This is a common practice in optimization modeling to make the code more readable and maintainable.</p>
-<p>Generally speaking, we need two important parts to build an optimization model:</p>
-<ol class="arabic simple">
-<li><p>A <a class="reference internal" href="model.html"><span class="std std-doc">model</span></a> object that represents the optimization problem and communicates with the underlying optimizer. Due to the lightweight design philosophy of PyOptInterface, the model object is just a thin wrapper around the optimizer API, and it does not store the optimization problem itself. The model object is responsible for creating and managing variables, constraints, and the objective function, as well as solving the optimization problem.</p></li>
-<li><p>A dict-like container to store the variables and constraints. We recommend the <a class="reference external" href="https://docs.python.org/3/library/types.html#types.SimpleNamespace"><code class="docutils literal notranslate"><span class="pre">types.SimpleNamespace</span></code></a> object as the container to store the variables and constraints. It is a simple way to store and manipulate the optimization problem in Python. You can use attribute access to get and set the variables and constraints.</p></li>
-</ol>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">types</span>
+          <section class="tex2jax_ignore mathjax_ignore" id="ipopt">
+<h1>Ipopt<a class="headerlink" href="#ipopt" title="Link to this heading">¶</a></h1>
+<section id="initial-setup">
+<h2>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">ipopt</span>
 
-<span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
-<span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">container</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#ipopt"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Due to the internal API design of Ipopt, the <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code> lacks some features compared to other solvers. Some of these restrictions may be lifted in the future.</p>
+<ul class="simple">
+<li><p>It does not support <code class="docutils literal notranslate"><span class="pre">delete_variable</span></code> and <code class="docutils literal notranslate"><span class="pre">delete_constraint</span></code> methods.</p></li>
+<li><p>It does not support incremental modification of linear constraint like <code class="docutils literal notranslate"><span class="pre">set_normalized_rhs</span></code> and <code class="docutils literal notranslate"><span class="pre">set_normalized_coefficient</span></code>.</p></li>
+<li><p>It only supports to minimize the objective function. If you want to maximize the objective function, you need to multiply the objective function by -1 manually.</p></li>
+</ul>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1 2
+</section>
+<section id="the-capability-of-ipopt-model">
+<h2>The capability of <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code><a class="headerlink" href="#the-capability-of-ipopt-model" title="Link to this heading">¶</a></h2>
+<section id="supported-constraints">
+<h3>Supported constraints<a class="headerlink" href="#supported-constraints" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Constraint</p></th>
+<th class="head"><p>Supported</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_linear_constraint" title="model.add_linear_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_quadratic_constraint" title="model.add_quadratic_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_quadratic_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_second_order_cone_constraint" title="model.add_second_order_cone_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_second_order_cone_constraint</span></code></a></p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_sos_constraint" title="model.add_sos_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_sos_constraint</span></code></a></p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="nonlinear.html#model.add_nl_constraint" title="model.add_nl_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_nl_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-model-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface.ModelAttribute"><span class="xref myst py py-class">model attribute</span></a><a class="headerlink" href="#supported-model-attribute" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjectiveSense</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>DualStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>PrimalStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>RawStatusString</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>TerminationStatus</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>BarrierIterations</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>DualObjectiveValue</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>NodeCount</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>NumberOfThreads</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>ObjectiveBound</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjectiveValue</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>RelativeGap</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>Silent</p></td>
+<td><p>❌</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>SimplexIterations</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>SolverName</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>SolverVersion</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>SolveTimeSec</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>TimeLimitSec</p></td>
+<td><p>❌</p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-variable-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface.VariableAttribute"><span class="xref myst py py-class">variable attribute</span></a><a class="headerlink" href="#supported-variable-attribute" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Value</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerBound</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>UpperBound</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Domain</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>PrimalStart</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="supported-constraint-attribute">
+<h3>Supported <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface.ConstraintAttribute"><span class="xref myst py py-class">constraint attribute</span></a><a class="headerlink" href="#supported-constraint-attribute" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Get</p></th>
+<th class="head"><p>Set</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Name</p></td>
+<td><p>❌</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-odd"><td><p>Primal</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+<tr class="row-even"><td><p>Dual</p></td>
+<td><p>✅</p></td>
+<td><p>❌</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="solver-specific-operations">
+<h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">¶</a></h2>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">¶</a></h3>
+<p>For <a class="reference external" href="https://coin-or.github.io/Ipopt/OPTIONS.html">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="c1"># set the value of the parameter</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;tol&quot;</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># For HSL library</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;hsllib&quot;</span><span class="p">,</span> <span class="s2">&quot;/path/to/libhsl.so&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;linear_solver&quot;</span><span class="p">,</span> <span class="s2">&quot;ma27&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<p>Thus, we can define a class to represent the optimization model and use the container to store the variables and constraints.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
-
-<span class="k">class</span> <span class="nc">OptModel</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then we can define small functions to declare the variables and constraints and add them to the model. We take the N-queens problem as an example.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
-
-<span class="k">def</span> <span class="nf">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="c1"># Row and column</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-        <span class="c1"># Diagonal</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="c1"># Anti-diagonal</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Finally, we can compose these functions to build the optimization model and solve it.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">OptModel</span><span class="p">()</span>
-
-<span class="n">N</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-<span class="n">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-<span class="n">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-
-<span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Termination status:&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.8.1 (git hash: 4a7f24a): Copyright (c) 2024 HiGHS under MIT licence terms
-Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [0e+00, 0e+00]
-  Bound  [1e+00, 1e+00]
-  RHS    [1e+00, 1e+00]
-Presolving model
-42 rows, 64 cols, 252 nonzeros  0s
-42 rows, 64 cols, 270 nonzeros  0s
-Objective function is integral with scale 1
-
-Solving MIP model with:
-   42 rows
-   64 cols (64 binary, 0 integer, 0 implied int., 0 continuous)
-   270 nonzeros
-MIP-Timing:      0.0014 - starting analytic centre calculation
-
-Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&gt; Heuristic; L =&gt; Sub-MIP;
-     P =&gt; Empty MIP; R =&gt; Randomized rounding; S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded;
-     z =&gt; Trivial zero; l =&gt; Trivial lower; u =&gt; Trivial upper; p =&gt; Trivial point
-
-        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
-Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
-
-         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
-         0       0         0   0.00%   0               inf                  inf        0      0      6        29     0.0s
- L       0       0         0 100.00%   0               0                  0.00%     1559     28     84       213     0.1s
-         1       0         1 100.00%   0               0                  0.00%     1559     28     84       267     0.1s
-
-Solving report
-  Status            Optimal
-  Primal bound      0
-  Dual bound        0
-  Gap               0% (tolerance: 0.01%)
-  P-D integral      0
-  Solution status   feasible
-                    0 (objective)
-                    0 (bound viol.)
-                    0 (int. viol.)
-                    0 (row viol.)
-  Timing            0.06 (total)
-                    0.00 (presolve)
-                    0.00 (solve)
-                    0.00 (postsolve)
-  Max sub-MIP depth 1
-  Nodes             1
-  Repair LPs        0 (0 feasible; 0 iterations)
-  LP iterations     267 (total)
-                    0 (strong br.)
-                    184 (separation)
-                    54 (heuristics)
-Termination status: TerminationStatusCode.OPTIMAL
-</pre></div>
-</div>
-</div>
-</div>
+</section>
+</section>
+<section id="jit-compiler-used-by-ipopt-interface">
+<h2>JIT compiler used by Ipopt interface<a class="headerlink" href="#jit-compiler-used-by-ipopt-interface" title="Link to this heading">¶</a></h2>
+</section>
 </section>
 
         </article>
@@ -441,23 +518,23 @@ Termination status: TerminationStatusCode.OPTIMAL
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="common_model_interface.html">
+          <a class="next-page" href="benchmark.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Common Model Interface</div>
+                <div class="title">Benchmark</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="numpy.html">
+          <a class="prev-page" href="highs.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Numpy Container and N-queens Problem</div>
+                <div class="title">HiGHS</div>
                 
               </div>
             </a>
@@ -479,8 +556,39 @@ Termination status: TerminationStatusCode.OPTIMAL
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Ipopt</a><ul>
+<li><a class="reference internal" href="#initial-setup">Initial setup</a></li>
+<li><a class="reference internal" href="#the-capability-of-ipopt-model">The capability of <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code></a><ul>
+<li><a class="reference internal" href="#supported-constraints">Supported constraints</a></li>
+<li><a class="reference internal" href="#supported-model-attribute">Supported <span class="xref myst">model attribute</span></a></li>
+<li><a class="reference internal" href="#supported-variable-attribute">Supported <span class="xref myst">variable attribute</span></a></li>
+<li><a class="reference internal" href="#supported-constraint-attribute">Supported <span class="xref myst">constraint attribute</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#solver-specific-operations">Solver-specific operations</a><ul>
+<li><a class="reference internal" href="#parameter">Parameter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jit-compiler-used-by-ipopt-interface">JIT compiler used by Ipopt interface</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
