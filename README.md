@@ -110,11 +110,11 @@ If you use the nonlinear optimization feature of PyOptInterface, please consider
 
 ```bibtex
 @article{yang2024accelerating,
-  title={Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation},
-  author={Yang, Yue and Lin, Chenhui and Xu, Luo and Yang, Xiaodong and Wu, Wenchuan and Wang, Bin},
-  journal={IEEE Transactions on Power Systems},
-  year={2024},
-  publisher={IEEE}
+      title={Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation},
+      author={Yang, Yue and Lin, Chenhui and Xu, Luo and Yang, Xiaodong and Wu, Wenchuan and Wang, Bin},
+      journal={IEEE Transactions on Power Systems},
+      year={2024},
+      publisher={IEEE}
 }
 ```
 
