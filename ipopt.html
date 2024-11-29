@@ -510,6 +510,15 @@
 </section>
 <section id="jit-compiler-used-by-ipopt-interface">
 <h2>JIT compiler used by Ipopt interface<a class="headerlink" href="#jit-compiler-used-by-ipopt-interface" title="Link to this heading">¶</a></h2>
+<p>The interface of Ipopt uses the JIT compiler to compile the nonlinear objective function, constraints and their derivatives. We have two implementations of JIT based on <code class="docutils literal notranslate"><span class="pre">llvmlite</span></code> and <code class="docutils literal notranslate"><span class="pre">tccbox</span></code>(Tiny C Compiler). The default JIT compiler is <code class="docutils literal notranslate"><span class="pre">llvmlite</span></code> and we advise you to use it for better performance brought by optimization capability of LLVM. If you want to use <code class="docutils literal notranslate"><span class="pre">tccbox</span></code>, you can specify <code class="docutils literal notranslate"><span class="pre">jit=&quot;C&quot;</span></code> when creating the <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="c1"># equivalent to</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">jit</span><span class="o">=</span><span class="s2">&quot;LLVM&quot;</span><span class="p">)</span>
+
+<span class="c1"># If you want to use tccbox</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">jit</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 

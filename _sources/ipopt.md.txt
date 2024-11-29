@@ -65,3 +65,13 @@ model.set_raw_parameter("linear_solver", "ma27")
 
 ## JIT compiler used by Ipopt interface
 
+The interface of Ipopt uses the JIT compiler to compile the nonlinear objective function, constraints and their derivatives. We have two implementations of JIT based on `llvmlite` and `tccbox`(Tiny C Compiler). The default JIT compiler is `llvmlite` and we advise you to use it for better performance brought by optimization capability of LLVM. If you want to use `tccbox`, you can specify `jit="C"` when creating the `ipopt.Model` object.
+
+```python
+model = ipopt.Model()
+# equivalent to
+model = ipopt.Model(jit="LLVM")
+
+# If you want to use tccbox
+model = ipopt.Model(jit="C")
+```
