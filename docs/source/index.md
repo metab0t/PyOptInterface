@@ -23,6 +23,7 @@ gurobi.md
 copt.md
 mosek.md
 highs.md
+ipopt.md
 benchmark.md
 changelog.md
 ```

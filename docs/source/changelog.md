@@ -1,7 +1,12 @@
 # Changelog
 
 ## Unreleased
+
+## 0.3.0
 - Add `model.set_variable_bounds(variable, lb, ub)` to make it easier to change variable bounds
+- Introduce nonlinear programming support of Ipopt
+- Support new versions of optimizers
+- Various minor bug fixes
 
 ## 0.2.8
 - Fix bugs in HiGHS and MOSEK when the quadratic objective function contains nondiagonal terms

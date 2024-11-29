@@ -3,9 +3,7 @@ from pathlib import Path
 
 
 import pyoptinterface as poi
-from pyoptinterface import gurobi, copt, mosek, highs
-
-model = gurobi.Model
+from pyoptinterface import gurobi, copt, mosek, highs, ipopt
 
 
 def attribute_support_table(f, attribute_enum):
@@ -44,6 +42,7 @@ io_pairs = [
     (copt.Model, "copt"),
     (mosek.Model, "mosek"),
     (highs.Model, "highs"),
+    (ipopt.Model, "ipopt"),
 ]
 
 rootdir = Path(__file__).parent.parent
