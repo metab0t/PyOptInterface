@@ -1085,7 +1085,8 @@ double MOSEKModel::get_constraint_primal(const ConstraintIndex &constraint)
 	{
 	case ConstraintType::Linear:
 	case ConstraintType::Quadratic:
-		error = mosek::MSK_getxcslice(m_model.get(), soltype, num, num + 1, &retval);
+		error = mosek::MSK_getxcslice(m_model.get(), soltype, constraint.index,
+		                              constraint.index + num, &retval);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1105,7 +1106,8 @@ double MOSEKModel::get_constraint_dual(const ConstraintIndex &constraint)
 	{
 	case ConstraintType::Linear:
 	case ConstraintType::Quadratic:
-		error = mosek::MSK_getyslice(m_model.get(), soltype, num, num + 1, &retval);
+		error = mosek::MSK_getyslice(m_model.get(), soltype, constraint.index,
+		                             constraint.index + num, &retval);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");

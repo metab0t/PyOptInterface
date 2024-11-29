@@ -108,3 +108,29 @@ def test_constant_objective(model_interface):
     assert status == poi.TerminationStatusCode.OPTIMAL
     obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
     assert obj_val == approx(1.0)
+
+
+def test_constraint_primal_dual(model_interface):
+    model = model_interface
+
+    x = model.add_variable(lb=0.0, ub=1.0)
+    y = model.add_variable(lb=0.0, ub=1.0)
+
+    model.set_variable_attribute(x, poi.VariableAttribute.Name, "x")
+    model.set_variable_attribute(y, poi.VariableAttribute.Name, "y")
+
+    obj = x + y
+    model.set_objective(obj, poi.ObjectiveSense.Minimize)
+
+    conexpr = x + 2 * y
+    con1 = model.add_linear_constraint(conexpr, poi.Geq, 1.0, name="con1")
+
+    model.optimize()
+    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert status == poi.TerminationStatusCode.OPTIMAL
+
+    primal_val = model.get_constraint_attribute(con1, poi.ConstraintAttribute.Primal)
+    assert primal_val == approx(1.0)
+
+    dual_val = model.get_constraint_attribute(con1, poi.ConstraintAttribute.Dual)
+    assert dual_val == approx(0.5)

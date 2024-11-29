@@ -394,7 +394,7 @@ def get_constraint_name(model, constraint):
     type = constraint.type
     attr_name_dict = {
         ConstraintType.Linear: "ConstrName",
-        ConstraintType.Quadratric: "QConstrName",
+        ConstraintType.Quadratic: "QConstrName",
     }
     attr_name = attr_name_dict.get(type, None)
     if not attr_name:
@@ -408,7 +408,7 @@ def get_constraint_primal(model, constraint):
     type = constraint.type
     attr_name_dict = {
         ConstraintType.Linear: ("RHS", "Slack"),
-        ConstraintType.Quadratric: ("QCRHS", "QCSlack"),
+        ConstraintType.Quadratic: ("QCRHS", "QCSlack"),
     }
     attr_name = attr_name_dict.get(type, None)
     if not attr_name:
@@ -422,12 +422,12 @@ def get_constraint_dual(model, constraint):
     type = constraint.type
     attr_name_dict = {
         ConstraintType.Linear: "Pi",
-        ConstraintType.Quadratric: "QCPi",
+        ConstraintType.Quadratic: "QCPi",
     }
     attr_name = attr_name_dict.get(type, None)
     if not attr_name:
         raise ValueError(f"Unknown constraint type: {type}")
-    return model.get_constraint_raw_attribute_string(constraint, attr_name)
+    return model.get_constraint_raw_attribute_double(constraint, attr_name)
 
 
 constraint_attribute_get_func_map = {
