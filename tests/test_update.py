@@ -29,3 +29,11 @@ def test_update(model_interface):
 
     assert model.get_value(x[0]) == approx(2.0)
     assert model.get_value(x[2]) == approx(2.0)
+
+    con = model.add_linear_constraint(expr, poi.Eq, 0.0)
+    model.set_normalized_coefficient(con, x[2], -2.0)
+
+    model.optimize()
+
+    assert model.get_value(x[0]) == approx(2.0)
+    assert model.get_value(x[2]) == approx(1.0)
