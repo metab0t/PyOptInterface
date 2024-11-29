@@ -60,4 +60,4 @@ This is the result of benchmark, where the performance of PyOptInterface exceeds
 
 # Nonlinear programming
 
-We use the AC Optimal Power Flow problem to benchmark performance of PyOptInterface against different modeling languages. The code is at https://github.com/metab0t/opf_benchmark and the result is published by our paper [Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation](https://ieeexplore.ieee.org/document/10721402).
+We use the AC Optimal Power Flow problem to benchmark performance of PyOptInterface against different modeling languages. The code is released at [GitHub](https://github.com/metab0t/opf_benchmark) and the result is published by our paper [Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation](https://ieeexplore.ieee.org/document/10721402).
