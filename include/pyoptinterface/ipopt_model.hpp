@@ -106,8 +106,16 @@ struct IpoptModel
 	}
 
 	template <typename T>
-	void set_objective(const T &expr, bool clear_nl = false)
+	void set_objective(const T &expr, ObjectiveSense sense = ObjectiveSense::Minimize,
+	                   bool clear_nl = false)
 	{
+		if (sense != ObjectiveSense::Minimize)
+		{
+			throw std::runtime_error(
+			    "Currently Ipopt only supports ObjectiveSense::Minimize, please negate the "
+			    "objective manually if you intend to maximize the objective");
+		}
+
 		m_lq_model.set_objective(expr);
 		if (clear_nl)
 		{

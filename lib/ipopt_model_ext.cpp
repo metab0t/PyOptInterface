@@ -131,15 +131,15 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("add_objective", &IpoptModel::add_objective<double>)
 
 	    .def("set_objective", &IpoptModel::set_objective<ExprBuilder>, nb::arg("expr"),
-	         nb::arg("clear_nl") = false)
+	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 	    .def("set_objective", &IpoptModel::set_objective<ScalarQuadraticFunction>, nb::arg("expr"),
-	         nb::arg("clear_nl") = false)
+	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 	    .def("set_objective", &IpoptModel::set_objective<ScalarAffineFunction>, nb::arg("expr"),
-	         nb::arg("clear_nl") = false)
+	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 	    .def("set_objective", &IpoptModel::set_objective<VariableIndex>, nb::arg("expr"),
-	         nb::arg("clear_nl") = false)
+	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 	    .def("set_objective", &IpoptModel::set_objective<double>, nb::arg("expr"),
-	         nb::arg("clear_nl") = false)
+	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 
 	    .def("_add_nl_objective", &IpoptModel::_add_nl_objective)
 
