@@ -203,6 +203,8 @@
   <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variable.html">Variable</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expression.html">Expression</a></li>
@@ -219,8 +221,6 @@
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ipopt.html">Ipopt</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmark.html#nonlinear-programming">Nonlinear programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
@@ -536,9 +536,8 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
    9  5.4365655e+00 0.00e+00 1.91e-08  -5.7 1.81e-04    -  1.00e+00 1.00e+00h  1
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
   10  5.4365636e+00 0.00e+00 3.26e-12  -8.6 2.72e-06    -  1.00e+00 1.00e+00h  1
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of Iterations....: 10
+
+Number of Iterations....: 10
 
                                    (scaled)                 (unscaled)
 Objective...............:   5.4365636322427102e+00    5.4365636322427102e+00
@@ -555,7 +554,7 @@ Number of inequality constraint evaluations          = 26
 Number of equality constraint Jacobian evaluations   = 0
 Number of inequality constraint Jacobian evaluations = 11
 Number of Lagrangian Hessian evaluations             = 10
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.003
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.002
 Total CPU secs in NLP function evaluations           =      0.000
 
 EXIT: Optimal Solution Found.
@@ -803,10 +802,7 @@ Number of equality constraint Jacobian evaluations   = 5
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 4
 Total CPU secs in IPOPT (w/o function evaluations)   =      0.026
-Total CPU secs in NLP function evaluations     
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      =      0.001
+Total CPU secs in NLP function evaluations           =      0.001
 
 EXIT: Optimal Solution Found.
 </pre></div>
