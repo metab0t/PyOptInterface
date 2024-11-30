@@ -8,6 +8,8 @@
 :caption: User Guide
 
 getting_started.md
+benchmark.md
+faq.md
 model.md
 variable.md
 expression.md
@@ -24,7 +26,6 @@ copt.md
 mosek.md
 highs.md
 ipopt.md
-benchmark.md
 changelog.md
 ```
 
