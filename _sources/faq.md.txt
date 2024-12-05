@@ -102,17 +102,17 @@ def add_matrix_constraints(model, A, x, sense, b):
 
     if is_ndarray:
         for i in range(M):
-            expr = poi.ExprBuilder()
+            expr = poi.ScalarAffineFunction()
             row = A[i]
             for coef, var in zip(row, x):
-                expr.add_affine_term(var, coef)
+                expr.add_term(var, coef)
             con = model.add_linear_constraint(expr, sense, b[i])
             constraints.append(con)
     elif is_sparse:
         for (row_indices, row_data), rhs in zip(iterate_sparse_matrix_rows(A), b):
-            expr = poi.ExprBuilder()
+            expr = poi.ScalarAffineFunction()
             for j, coef in zip(row_indices, row_data):
-                expr.add_affine_term(x[j], coef)
+                expr.add_term(x[j], coef)
             con = model.add_linear_constraint(expr, sense, rhs)
             constraints.append(con)
 
