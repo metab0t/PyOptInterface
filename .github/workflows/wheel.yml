@@ -30,7 +30,7 @@ jobs:
         env:
           # Select wheels
           CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
-          CIBW_SKIP: "cp36-* cp37-* pp* cp38-macosx_arm64"
+          CIBW_SKIP: "cp36-* cp37-* cp38-* pp* cp38-macosx_arm64"
           CIBW_ARCHS: "native"
           # use manylinux2014
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014

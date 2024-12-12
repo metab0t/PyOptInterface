@@ -7,7 +7,7 @@ name = "pyoptinterface"
 version = "0.3.0"
 description = "Python interface to multiple optimization solvers"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [{ name = "Yue Yang", email = "metab0t@outlook.com" }]
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -23,7 +23,7 @@ Homepage = "https://github.com/metab0t/pyoptinterface"
 matrix = ["numpy", "scipy"]
 highs = ["highsbox"]
 nlp = ["llvmlite", "tccbox"]
-test = ["pytest", "numpy", "scipy", "highsbox", "llvmlite", "tccbox"]
+test = ["pytest", "numpy", "scipy>=1.11.0", "highsbox", "llvmlite", "tccbox"]
 
 [tool.scikit-build]
 editable.rebuild = true
