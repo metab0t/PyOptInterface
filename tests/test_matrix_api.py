@@ -1,6 +1,6 @@
 import pyoptinterface as poi
 import numpy as np
-from scipy.sparse import eye_array
+from scipy.sparse import coo_array
 from pytest import approx
 
 
@@ -12,7 +12,7 @@ def test_matrix_api(model_interface):
     A = np.eye(N)
     ub = 3.0
     lb = 1.0
-    A_sparse = eye_array(N)
+    A_sparse = coo_array(np.eye(N))
     model.add_m_linear_constraints(A, x, poi.Leq, ub)
     model.add_m_linear_constraints(A_sparse, x, poi.Geq, lb)
 
