@@ -40,7 +40,7 @@ jobs:
 
       - name: Install python deps
         run: |
-          python -m pip install pytest numpy highsbox llvmlite tccbox
+          python -m pip install .[test]
 
       - name: Build
         run: |
