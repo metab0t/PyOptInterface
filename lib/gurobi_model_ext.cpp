@@ -203,6 +203,8 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(set_normalized_coefficient)
 		BIND_F(get_objective_coefficient)
 		BIND_F(set_objective_coefficient)
+
+		BIND_F(_converttofixed)
 	    // clang-format on
 	    ;
 }

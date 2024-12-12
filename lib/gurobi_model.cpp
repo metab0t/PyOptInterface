@@ -950,6 +950,12 @@ void GurobiModel::set_objective_coefficient(const VariableIndex &variable, doubl
 	set_variable_raw_attribute_double(variable, GRB_DBL_ATTR_OBJ, value);
 }
 
+void GurobiModel::_converttofixed()
+{
+	int error = gurobi::GRBconverttofixed(m_model.get());
+	check_error(error);
+}
+
 int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 {
 	_update_for_constraint_index(constraint.type);

@@ -66,7 +66,8 @@
 	B(GRBemptyenv);           \
 	B(GRBloadenv);            \
 	B(GRBfreeenv);            \
-	B(GRBstartenv);
+	B(GRBstartenv);           \
+	B(GRBconverttofixed);
 
 namespace gurobi
 {
@@ -250,6 +251,9 @@ class GurobiModel
 	// 3. set/get linear coefficient of variable in objective
 	double get_objective_coefficient(const VariableIndex &variable);
 	void set_objective_coefficient(const VariableIndex &variable, double value);
+
+	// Gurobi-specific convertofixed
+	void _converttofixed();
 
 	// Non-exported functions
 	void check_error(int error);
