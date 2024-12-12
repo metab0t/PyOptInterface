@@ -329,10 +329,39 @@
 <span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_linear_constraint" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_m_linear_constraints">
+<span class="sig-name descname"><span class="pre">add_m_linear_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_m_linear_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>add constraints Ax &lt;= / = / &gt;= b</p>
+<p>A is a 2-dimensional numpy array or scipy sparse matrix
+x is an iterable of variables
+sense is one of (poi.Leq, poi.Eq, poi.Geq)
+b is an iterable of values or a single scalar</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_m_variables">
+<span class="sig-name descname"><span class="pre">add_m_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_m_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_quadratic_constraint">
 <span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_quadratic_constraint" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_second_order_cone_constraint">
+<span class="sig-name descname"><span class="pre">add_second_order_cone_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cone_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_second_order_cone_constraint" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a second order cone constraint to a quadratic constraint.
+x[0] &gt;= sqrt(x[1]^2 + … + x[n]^2)
+to
+x[0]^2 - x[1]^2 - … - x[n]^2 &gt;= 0
+or
+convert a rotated second order cone constraint to a quadratic constraint.
+2 * x[0] * x[1] &gt;= x[2]^2 + … + x[n]^2
+to
+2 * x[0] * x[1] - x[2]^2 - … - x[n]^2 &gt;= 0</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_sos_constraint">
@@ -342,6 +371,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_variable">
 <span class="sig-name descname"><span class="pre">add_variable</span></span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_variable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.gurobi.Model.add_variables">
+<span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.gurobi.Model.add_variables" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -845,9 +879,13 @@
 </li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_linear_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_linear_constraint</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_m_linear_constraints"><code class="docutils literal notranslate"><span class="pre">Model.add_m_linear_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_m_variables"><code class="docutils literal notranslate"><span class="pre">Model.add_m_variables()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_quadratic_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_quadratic_constraint</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_second_order_cone_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_second_order_cone_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_sos_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_sos_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_variable"><code class="docutils literal notranslate"><span class="pre">Model.add_variable</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.gurobi.Model.add_variables"><code class="docutils literal notranslate"><span class="pre">Model.add_variables()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_add_lazy_constraint"><code class="docutils literal notranslate"><span class="pre">Model.cb_add_lazy_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_add_user_cut"><code class="docutils literal notranslate"><span class="pre">Model.cb_add_user_cut</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.gurobi.Model.cb_exit"><code class="docutils literal notranslate"><span class="pre">Model.cb_exit</span></code></a></li>
