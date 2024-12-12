@@ -38,10 +38,6 @@ jobs:
           CHECK_LICENSE: false
           ARCH: ${{ runner.arch }}
 
-      - name: Install python deps
-        run: |
-          python -m pip install .[test]
-
       - name: Build
         run: |
           python -m pip list
@@ -52,6 +48,7 @@ jobs:
 
       - name: Test
         run: |
+          python -m pip install pytest numpy scipy highsbox llvmlite tccbox
           python -m pytest tests -k "highs or ipopt" -v
 
       - name: Upload artifact
