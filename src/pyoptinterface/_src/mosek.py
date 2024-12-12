@@ -21,7 +21,8 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
-from .aml import make_nd_variable
+from .aml import make_variable_tupledict, make_variable_ndarray
+from .matrix import add_matrix_constraints
 
 
 def detected_libraries():
@@ -357,8 +358,6 @@ class Model(RawModel):
         self.last_solve_return_code: Optional[int] = None
         self.silent = True
 
-        self.add_variables = types.MethodType(make_nd_variable, self)
-
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):
         if settable:
@@ -498,3 +497,8 @@ class Model(RawModel):
     def optimize(self):
         ret = super().optimize()
         self.last_solve_return_code = ret
+
+
+Model.add_variables = make_variable_tupledict
+Model.add_m_variables = make_variable_ndarray
+Model.add_m_linear_constraints = add_matrix_constraints

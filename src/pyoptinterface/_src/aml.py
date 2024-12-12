@@ -2,9 +2,39 @@ from .core_ext import ExprBuilder
 from .tupledict import make_tupledict
 
 from collections.abc import Collection
+from typing import Tuple, Union
 
 
-def make_nd_variable(
+def make_variable_ndarray(
+    model, shape: Union[Tuple[int, ...], int], domain=None, lb=None, ub=None, name=None, start=None
+):
+    import numpy as np
+
+    if isinstance(shape, int):
+        shape = (shape,)
+
+    variables = np.empty(shape, dtype=object)
+
+    kw_args = dict()
+    if domain is not None:
+        kw_args["domain"] = domain
+    if lb is not None:
+        kw_args["lb"] = lb
+    if ub is not None:
+        kw_args["ub"] = ub
+    if start is not None:
+        kw_args["start"] = start
+
+    for index in np.ndindex(shape):
+        if name is not None:
+            suffix = str(index)
+            kw_args["name"] = f"{name}{suffix}"
+        variables[index] = model.add_variable(**kw_args)
+
+    return variables
+
+
+def make_variable_tupledict(
     model, *coords: Collection, domain=None, lb=None, ub=None, name=None, start=None
 ):
     kw_args = dict()

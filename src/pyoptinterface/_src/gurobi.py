@@ -2,7 +2,6 @@
 # only on windows
 import os
 import platform
-import types
 from pathlib import Path
 import re
 import logging
@@ -25,7 +24,8 @@ from .solver_common import (
     _direct_set_entity_attribute,
 )
 from .constraint_bridge import bridge_soc_quadratic_constraint
-from .aml import make_nd_variable
+from .aml import make_variable_tupledict, make_variable_ndarray
+from .matrix import add_matrix_constraints
 
 
 def detected_libraries():
@@ -510,12 +510,6 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
 
-        self.add_second_order_cone_constraint = types.MethodType(
-            bridge_soc_quadratic_constraint, self
-        )
-
-        self.add_variables = types.MethodType(make_nd_variable, self)
-
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):
         if settable:
@@ -722,3 +716,9 @@ class Model(RawModel):
             return self.cb_get_info_double(what)
         else:
             raise ValueError(f"Unknown callback info type: {what}")
+
+
+Model.add_variables = make_variable_tupledict
+Model.add_m_variables = make_variable_ndarray
+Model.add_m_linear_constraints = add_matrix_constraints
+Model.add_second_order_cone_constraint = bridge_soc_quadratic_constraint

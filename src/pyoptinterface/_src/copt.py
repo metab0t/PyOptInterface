@@ -20,7 +20,8 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
-from .aml import make_nd_variable
+from .aml import make_variable_tupledict, make_variable_ndarray
+from .matrix import add_matrix_constraints
 
 
 def detected_libraries():
@@ -355,7 +356,8 @@ class Model(RawModel):
         self._env = env
         self.mip_start_values: Dict[VariableIndex, float] = dict()
 
-        self.add_variables = types.MethodType(make_nd_variable, self)
+    def add_variables(self, *args, **kwargs):
+        return make_variable_tupledict(self, *args, **kwargs)
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):
@@ -522,3 +524,8 @@ class Model(RawModel):
             return self.cb_get_info_double(what)
         else:
             raise ValueError(f"Unknown callback info type: {what}")
+
+
+Model.add_variables = make_variable_tupledict
+Model.add_m_variables = make_variable_ndarray
+Model.add_m_linear_constraints = add_matrix_constraints

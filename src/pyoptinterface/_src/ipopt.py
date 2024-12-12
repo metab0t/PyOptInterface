@@ -39,7 +39,8 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
-from .aml import make_nd_variable
+from .aml import make_variable_tupledict, make_variable_ndarray
+from .matrix import add_matrix_constraints
 
 
 def detected_libraries():
@@ -451,7 +452,6 @@ class Model(RawModel):
         else:
             raise ValueError(f"JIT engine can only be 'C' or 'LLVM', got {jit}")
         self.jit = jit
-        self.add_variables = types.MethodType(make_nd_variable, self)
 
         self.function_indices: Set[FunctionIndex] = set()
         self.function_cppad_autodiff_graphs: Dict[FunctionIndex, CppADAutodiffGraph] = (
@@ -727,3 +727,8 @@ class Model(RawModel):
             self.set_raw_option_string(param_name, value)
         else:
             raise ValueError(f"Unsupported parameter type: {ty}")
+
+
+Model.add_variables = make_variable_tupledict
+Model.add_m_variables = make_variable_ndarray
+Model.add_m_linear_constraints = add_matrix_constraints

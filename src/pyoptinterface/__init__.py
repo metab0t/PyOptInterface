@@ -24,7 +24,7 @@ from pyoptinterface._src.tupledict import (
     make_tupledict,
 )
 
-from pyoptinterface._src.aml import make_nd_variable, quicksum, quicksum_
+from pyoptinterface._src.aml import quicksum, quicksum_
 
 # Alias of ConstraintSense
 Eq = ConstraintSense.Equal
@@ -58,7 +58,6 @@ __all__ = [
     "ConstraintAttribute",
     "tupledict",
     "make_tupledict",
-    "make_nd_variable",
     "quicksum",
     "quicksum_",
     "Eq",
