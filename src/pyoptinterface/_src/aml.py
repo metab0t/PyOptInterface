@@ -6,7 +6,13 @@ from typing import Tuple, Union
 
 
 def make_variable_ndarray(
-    model, shape: Union[Tuple[int, ...], int], domain=None, lb=None, ub=None, name=None, start=None
+    model,
+    shape: Union[Tuple[int, ...], int],
+    domain=None,
+    lb=None,
+    ub=None,
+    name=None,
+    start=None,
 ):
     import numpy as np
 
