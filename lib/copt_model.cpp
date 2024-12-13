@@ -1234,3 +1234,58 @@ void COPTModel::cb_add_user_cut(const ExprBuilder &function, ConstraintSense sen
 	ScalarAffineFunction f(function);
 	cb_add_user_cut(f, sense, rhs);
 }
+
+void COPTModel::computeIIS()
+{
+	int error = copt::COPT_ComputeIIS(m_model.get());
+	check_error(error);
+}
+
+int COPTModel::_get_variable_upperbound_IIS(const VariableIndex &variable)
+{
+	auto column = _checked_variable_index(variable);
+	int retval;
+	int error = copt::COPT_GetColUpperIIS(m_model.get(), 1, &column, &retval);
+	check_error(error);
+	return retval;
+}
+
+int COPTModel::_get_variable_lowerbound_IIS(const VariableIndex &variable)
+{
+	auto column = _checked_variable_index(variable);
+	int retval;
+	int error = copt::COPT_GetColLowerIIS(m_model.get(), 1, &column, &retval);
+	check_error(error);
+	return retval;
+}
+
+int COPTModel::_get_constraint_IIS(const ConstraintIndex &constraint)
+{
+	int row = _checked_constraint_index(constraint);
+	int num = 1;
+	int error;
+	switch (constraint.type)
+	{
+	case ConstraintType::Linear: {
+		int lb_iis, ub_iis;
+
+		error = copt::COPT_GetRowLowerIIS(m_model.get(), num, &row, &lb_iis);
+		check_error(error);
+
+		error = copt::COPT_GetRowUpperIIS(m_model.get(), num, &row, &ub_iis);
+		check_error(error);
+
+		return lb_iis + ub_iis;
+	}
+	break;
+	case ConstraintType::SOS: {
+		int iis;
+		error = copt::COPT_GetSOSIIS(m_model.get(), num, &row, &iis);
+		check_error(error);
+		return iis;
+	}
+	break;
+	default:
+		throw std::runtime_error("Unknown constraint type to get IIS state");
+	}
+}

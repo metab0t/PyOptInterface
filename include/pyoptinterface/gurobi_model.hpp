@@ -67,7 +67,8 @@
 	B(GRBloadenv);            \
 	B(GRBfreeenv);            \
 	B(GRBstartenv);           \
-	B(GRBconverttofixed);
+	B(GRBconverttofixed);     \
+	B(GRBcomputeIIS);
 
 namespace gurobi
 {
@@ -254,6 +255,9 @@ class GurobiModel
 
 	// Gurobi-specific convertofixed
 	void _converttofixed();
+
+	// IIS related
+	void computeIIS();
 
 	// Non-exported functions
 	void check_error(int error);

@@ -122,6 +122,14 @@ variable_attribute_get_func_map = {
     VariableAttribute.Name: lambda model, v: model.get_variable_raw_attribute_string(
         v, "VarName"
     ),
+    VariableAttribute.IISLowerBound: lambda model, v: model.get_variable_raw_attribute_int(
+        v, "IISLB"
+    )
+    > 0,
+    VariableAttribute.IISUpperBound: lambda model, v: model.get_variable_raw_attribute_int(
+        v, "IISUB"
+    )
+    > 0,
 }
 
 variable_attribute_get_translate_func_map = {
@@ -430,10 +438,24 @@ def get_constraint_dual(model, constraint):
     return model.get_constraint_raw_attribute_double(constraint, attr_name)
 
 
+def get_constraint_IIS(model, constraint):
+    type = constraint.type
+    attr_name_dict = {
+        ConstraintType.Linear: "IISConstr",
+        ConstraintType.SOS: "IISSOS",
+        ConstraintType.Quadratic: "IISQConstr",
+    }
+    attr_name = attr_name_dict.get(type, None)
+    if not attr_name:
+        raise ValueError(f"Unknown constraint type: {type}")
+    return model.get_constraint_raw_attribute_int(constraint, attr_name) > 0
+
+
 constraint_attribute_get_func_map = {
     ConstraintAttribute.Name: get_constraint_name,
     ConstraintAttribute.Primal: get_constraint_primal,
     ConstraintAttribute.Dual: get_constraint_dual,
+    ConstraintAttribute.IIS: get_constraint_IIS,
 }
 
 constraint_attribute_set_func_map = {

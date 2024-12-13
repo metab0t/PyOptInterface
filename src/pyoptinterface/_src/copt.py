@@ -80,6 +80,14 @@ variable_attribute_get_func_map = {
     VariableAttribute.PrimalStart: lambda model, v: model.mip_start_values.get(v, None),
     VariableAttribute.Domain: lambda model, v: model.get_variable_type(v),
     VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
+    VariableAttribute.IISLowerBound: lambda model, v: model._get_variable_lowerbound_IIS(
+        v
+    )
+    > 0,
+    VariableAttribute.IISUpperBound: lambda model, v: model._get_variable_upperbound_IIS(
+        v
+    )
+    > 0,
 }
 
 variable_attribute_set_func_map = {
@@ -326,6 +334,9 @@ constraint_attribute_get_func_map = {
     ),
     ConstraintAttribute.Dual: lambda model, constraint: model.get_constraint_info(
         constraint, "Dual"
+    ),
+    ConstraintAttribute.IIS: lambda model, constraint: model._get_constraint_IIS(
+        constraint
     ),
 }
 

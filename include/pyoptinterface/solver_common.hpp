@@ -56,6 +56,7 @@ class CommercialSolverMixin : public T
 	std::string pprint_expression(const ExprBuilder &function, int precision = 4);
 
 	void set_objective_as_constant(CoeffT c, ObjectiveSense sense);
+	void set_objective_as_variable(const VariableIndex &variable, ObjectiveSense sense);
 };
 
 template <CommercialSolverConstraint T>
@@ -324,6 +325,14 @@ template <CommercialSolverConstraint T>
 void CommercialSolverMixin<T>::set_objective_as_constant(CoeffT c, ObjectiveSense sense)
 {
 	ScalarAffineFunction f(c);
+	get_base()->set_objective(f, sense);
+}
+
+template <CommercialSolverConstraint T>
+void CommercialSolverMixin<T>::set_objective_as_variable(const VariableIndex &variable,
+                                                         ObjectiveSense sense)
+{
+	ScalarAffineFunction f(variable);
 	get_base()->set_objective(f, sense);
 }
 

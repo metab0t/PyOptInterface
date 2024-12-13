@@ -107,6 +107,10 @@ NB_MODULE(mosek_model_ext, m)
 	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&MOSEKModelMixin::set_objective),
 	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
+	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
+	             &MOSEKModelMixin::set_objective_as_variable),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&MOSEKModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 

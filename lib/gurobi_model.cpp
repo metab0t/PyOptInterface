@@ -956,6 +956,12 @@ void GurobiModel::_converttofixed()
 	check_error(error);
 }
 
+void GurobiModel::computeIIS()
+{
+	int error = gurobi::GRBcomputeIIS(m_model.get());
+	check_error(error);
+}
+
 int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 {
 	_update_for_constraint_index(constraint.type);

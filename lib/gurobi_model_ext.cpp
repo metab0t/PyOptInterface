@@ -38,19 +38,19 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
 	    // clang-format off
-	    BIND_F(init)
-	    BIND_F(write)
+		BIND_F(init)
+		BIND_F(write)
 	    // clang-format on
 
 	    .def("add_variable", &GurobiModelMixin::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
 	         nb::arg("ub") = GRB_INFINITY, nb::arg("name") = "")
 	    // clang-format off
-	    BIND_F(delete_variable)
-	    BIND_F(delete_variables)
-	    BIND_F(is_variable_active)
+		BIND_F(delete_variable)
+		BIND_F(delete_variables)
+		BIND_F(is_variable_active)
 	    // clang-format on
-		.def("set_variable_bounds", &GurobiModelMixin::set_variable_bounds, nb::arg("variable"),
+	    .def("set_variable_bounds", &GurobiModelMixin::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
 	    .def("get_value",
@@ -122,6 +122,10 @@ NB_MODULE(gurobi_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
 	             &GurobiModelMixin::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
+	             &GurobiModelMixin::set_objective_as_variable),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def(
 	        "set_objective",
 	        nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModelMixin::set_objective_as_constant),
@@ -144,12 +148,12 @@ NB_MODULE(gurobi_model_ext, m)
 	             &GurobiModelMixin::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 
-		.def("optimize", &GurobiModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("optimize", &GurobiModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
 
 	    // clang-format off
-	    BIND_F(update)
-	    BIND_F(version_string)
-	    BIND_F(get_raw_model)
+		BIND_F(update)
+		BIND_F(version_string)
+		BIND_F(get_raw_model)
 
 		BIND_F(set_callback)
 		BIND_F(cb_get_info_int)
@@ -160,42 +164,42 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(cb_submit_solution)
 		BIND_F(cb_exit)
 
-	    BIND_F(raw_parameter_type)
-	    BIND_F(set_raw_parameter_int)
-	    BIND_F(set_raw_parameter_double)
-	    BIND_F(set_raw_parameter_string)
-	    BIND_F(get_raw_parameter_int)
-	    BIND_F(get_raw_parameter_double)
-	    BIND_F(get_raw_parameter_string)
+		BIND_F(raw_parameter_type)
+		BIND_F(set_raw_parameter_int)
+		BIND_F(set_raw_parameter_double)
+		BIND_F(set_raw_parameter_string)
+		BIND_F(get_raw_parameter_int)
+		BIND_F(get_raw_parameter_double)
+		BIND_F(get_raw_parameter_string)
 
-	    BIND_F(raw_attribute_type)
+		BIND_F(raw_attribute_type)
 
-	    BIND_F(set_model_raw_attribute_int)
-	    BIND_F(set_model_raw_attribute_double)
-	    BIND_F(set_model_raw_attribute_string)
-	    BIND_F(get_model_raw_attribute_int)
-	    BIND_F(get_model_raw_attribute_double)
-	    BIND_F(get_model_raw_attribute_string)
-	    BIND_F(get_model_raw_attribute_vector_double)
-	    BIND_F(get_model_raw_attribute_list_double)
+		BIND_F(set_model_raw_attribute_int)
+		BIND_F(set_model_raw_attribute_double)
+		BIND_F(set_model_raw_attribute_string)
+		BIND_F(get_model_raw_attribute_int)
+		BIND_F(get_model_raw_attribute_double)
+		BIND_F(get_model_raw_attribute_string)
+		BIND_F(get_model_raw_attribute_vector_double)
+		BIND_F(get_model_raw_attribute_list_double)
 
-	    BIND_F(set_variable_raw_attribute_int)
-	    BIND_F(set_variable_raw_attribute_char)
-	    BIND_F(set_variable_raw_attribute_double)
-	    BIND_F(set_variable_raw_attribute_string)
-	    BIND_F(get_variable_raw_attribute_int)
-	    BIND_F(get_variable_raw_attribute_char)
-	    BIND_F(get_variable_raw_attribute_double)
-	    BIND_F(get_variable_raw_attribute_string)
+		BIND_F(set_variable_raw_attribute_int)
+		BIND_F(set_variable_raw_attribute_char)
+		BIND_F(set_variable_raw_attribute_double)
+		BIND_F(set_variable_raw_attribute_string)
+		BIND_F(get_variable_raw_attribute_int)
+		BIND_F(get_variable_raw_attribute_char)
+		BIND_F(get_variable_raw_attribute_double)
+		BIND_F(get_variable_raw_attribute_string)
 
-	    BIND_F(set_constraint_raw_attribute_int)
-	    BIND_F(set_constraint_raw_attribute_char)
-	    BIND_F(set_constraint_raw_attribute_double)
-	    BIND_F(set_constraint_raw_attribute_string)
-	    BIND_F(get_constraint_raw_attribute_int)
-	    BIND_F(get_constraint_raw_attribute_char)
-	    BIND_F(get_constraint_raw_attribute_double)
-	    BIND_F(get_constraint_raw_attribute_string)
+		BIND_F(set_constraint_raw_attribute_int)
+		BIND_F(set_constraint_raw_attribute_char)
+		BIND_F(set_constraint_raw_attribute_double)
+		BIND_F(set_constraint_raw_attribute_string)
+		BIND_F(get_constraint_raw_attribute_int)
+		BIND_F(get_constraint_raw_attribute_char)
+		BIND_F(get_constraint_raw_attribute_double)
+		BIND_F(get_constraint_raw_attribute_string)
 
 		BIND_F(get_normalized_rhs)
 		BIND_F(set_normalized_rhs)
@@ -205,6 +209,8 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(set_objective_coefficient)
 
 		BIND_F(_converttofixed)
+
+		BIND_F(computeIIS)
 	    // clang-format on
 	    ;
 }

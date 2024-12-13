@@ -41,7 +41,7 @@ NB_MODULE(copt_model_ext, m)
 	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
-		.def("set_variable_bounds", &COPTModelMixin::set_variable_bounds, nb::arg("variable"),
+	    .def("set_variable_bounds", &COPTModelMixin::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
 	    .def("get_value",
@@ -112,6 +112,10 @@ NB_MODULE(copt_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModelMixin::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
+	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
+	             &COPTModelMixin::set_objective_as_variable),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
@@ -180,6 +184,11 @@ NB_MODULE(copt_model_ext, m)
 		BIND_F(set_normalized_coefficient)
 		BIND_F(get_objective_coefficient)
 		BIND_F(set_objective_coefficient)
+
+		BIND_F(computeIIS)
+		BIND_F(_get_variable_upperbound_IIS)
+		BIND_F(_get_variable_lowerbound_IIS)
+		BIND_F(_get_constraint_IIS)
 	    // clang-format on
 	    ;
 }

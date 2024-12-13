@@ -84,7 +84,13 @@ extern "C"
 	B(COPT_DeleteEnv);             \
 	B(COPT_CreateEnvConfig);       \
 	B(COPT_DeleteEnvConfig);       \
-	B(COPT_SetEnvConfig);
+	B(COPT_SetEnvConfig);          \
+	B(COPT_ComputeIIS);            \
+	B(COPT_GetColLowerIIS);        \
+	B(COPT_GetColUpperIIS);        \
+	B(COPT_GetRowLowerIIS);        \
+	B(COPT_GetRowUpperIIS);        \
+	B(COPT_GetSOSIIS);
 
 namespace copt
 {
@@ -287,6 +293,12 @@ class COPTModel
 	void cb_add_lazy_constraint(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
 	void cb_add_user_cut(const ScalarAffineFunction &function, ConstraintSense sense, CoeffT rhs);
 	void cb_add_user_cut(const ExprBuilder &function, ConstraintSense sense, CoeffT rhs);
+
+	// IIS related
+	void computeIIS();
+	int _get_variable_upperbound_IIS(const VariableIndex &variable);
+	int _get_variable_lowerbound_IIS(const VariableIndex &variable);
+	int _get_constraint_IIS(const ConstraintIndex &constraint);
 
   private:
 	MonotoneIndexer<int> m_variable_index;

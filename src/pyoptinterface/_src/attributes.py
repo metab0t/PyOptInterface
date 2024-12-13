@@ -9,6 +9,8 @@ class VariableAttribute(Enum):
     Domain = auto()
     PrimalStart = auto()
     Name = auto()
+    IISLowerBound = auto()
+    IISUpperBound = auto()
 
 
 var_attr_type_map = {
@@ -18,6 +20,8 @@ var_attr_type_map = {
     VariableAttribute.PrimalStart: float,
     VariableAttribute.Domain: VariableDomain,
     VariableAttribute.Name: str,
+    VariableAttribute.IISLowerBound: bool,
+    VariableAttribute.IISUpperBound: bool,
 }
 
 
@@ -120,10 +124,12 @@ class ConstraintAttribute(Enum):
     Primal = auto()
     Dual = auto()
     # BasisStatus = auto()
+    IIS = auto()
 
 
 constraint_attr_type_map = {
     ConstraintAttribute.Name: str,
     ConstraintAttribute.Primal: float,
     ConstraintAttribute.Dual: float,
+    ConstraintAttribute.IIS: bool,
 }
