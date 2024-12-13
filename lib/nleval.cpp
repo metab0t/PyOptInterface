@@ -71,27 +71,69 @@ void LinearQuadraticEvaluator::analyze_jacobian_structure(size_t &m_jacobian_nnz
 		auto &f = quadratic_constraints[i];
 		auto row = quadratic_constraint_indices[i];
 		auto N = f.size();
+
+		Hashmap<IndexT, size_t> variable_to_jacobian_nnz;
+
 		for (size_t j = 0; j < N; j++)
 		{
 			auto x1 = f.variable_1s[j];
 			auto x2 = f.variable_2s[j];
 			if (x1 == x2)
 			{
-				m_jacobian_rows.push_back(row);
-				m_jacobian_cols.push_back(x1);
-				jacobian_linear_terms.emplace_back(2.0 * f.coefficients[j], x1, m_jacobian_nnz);
-				m_jacobian_nnz += 1;
+				auto result = variable_to_jacobian_nnz.insert({x1, m_jacobian_nnz});
+				auto iter = result.first;
+				auto has_inserted = result.second;
+
+				if (has_inserted)
+				{
+					m_jacobian_rows.push_back(row);
+					m_jacobian_cols.push_back(x1);
+					jacobian_linear_terms.emplace_back(2.0 * f.coefficients[j], x1, m_jacobian_nnz);
+					m_jacobian_nnz += 1;
+				}
+				else
+				{
+					auto nnz = iter->second;
+					jacobian_linear_terms.emplace_back(2.0 * f.coefficients[j], x1, nnz);
+				}
 			}
 			else
 			{
-				m_jacobian_rows.push_back(row);
-				m_jacobian_cols.push_back(x1);
-				jacobian_linear_terms.emplace_back(f.coefficients[j], x2, m_jacobian_nnz);
-				m_jacobian_nnz += 1;
-				m_jacobian_rows.push_back(row);
-				m_jacobian_cols.push_back(x2);
-				jacobian_linear_terms.emplace_back(f.coefficients[j], x1, m_jacobian_nnz);
-				m_jacobian_nnz += 1;
+				{
+					auto result = variable_to_jacobian_nnz.insert({x1, m_jacobian_nnz});
+					auto iter = result.first;
+					auto has_inserted = result.second;
+
+					if (has_inserted)
+					{
+						m_jacobian_rows.push_back(row);
+						m_jacobian_cols.push_back(x1);
+						jacobian_linear_terms.emplace_back(f.coefficients[j], x2, m_jacobian_nnz);
+						m_jacobian_nnz += 1;
+					}
+					else
+					{
+						auto nnz = iter->second;
+						jacobian_linear_terms.emplace_back(f.coefficients[j], x2, nnz);
+					}
+				}
+				{
+					auto result = variable_to_jacobian_nnz.insert({x2, m_jacobian_nnz});
+					auto iter = result.first;
+					auto has_inserted = result.second;
+					if (has_inserted)
+					{
+						m_jacobian_rows.push_back(row);
+						m_jacobian_cols.push_back(x2);
+						jacobian_linear_terms.emplace_back(f.coefficients[j], x1, m_jacobian_nnz);
+						m_jacobian_nnz += 1;
+					}
+					else
+					{
+						auto nnz = iter->second;
+						jacobian_linear_terms.emplace_back(f.coefficients[j], x1, nnz);
+					}
+				}
 			}
 		}
 		if (f.affine_part)
@@ -100,11 +142,25 @@ void LinearQuadraticEvaluator::analyze_jacobian_structure(size_t &m_jacobian_nnz
 			auto N = af.size();
 			for (size_t j = 0; j < N; j++)
 			{
-				m_jacobian_rows.push_back(row);
-				m_jacobian_cols.push_back(af.variables[j]);
-				jacobian_constants.emplace_back(af.coefficients[j], m_jacobian_nnz + j);
+				auto x = af.variables[j];
+
+				auto result = variable_to_jacobian_nnz.insert({x, m_jacobian_nnz});
+				auto iter = result.first;
+				auto has_inserted = result.second;
+
+				if (has_inserted)
+				{
+					m_jacobian_rows.push_back(row);
+					m_jacobian_cols.push_back(x);
+					jacobian_constants.emplace_back(af.coefficients[j], m_jacobian_nnz);
+					m_jacobian_nnz += 1;
+				}
+				else
+				{
+					auto nnz = iter->second;
+					jacobian_constants.emplace_back(af.coefficients[j], nnz);
+				}
 			}
-			m_jacobian_nnz += N;
 		}
 	}
 }
@@ -170,7 +226,6 @@ void LinearQuadraticEvaluator::analyze_sparse_gradient_structure(
 			{
 				size_t grad_index =
 				    add_gradient_column(x1, gradient_nnz, gradient_cols, gradient_index_map);
-				;
 				gradient_linear_terms.emplace_back(c, x2, grad_index);
 				grad_index =
 				    add_gradient_column(x2, gradient_nnz, gradient_cols, gradient_index_map);
