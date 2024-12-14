@@ -39,6 +39,7 @@ from .solver_common import (
     _direct_get_entity_attribute,
     _direct_set_entity_attribute,
 )
+from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_variable_tupledict, make_variable_ndarray
 from .matrix import add_matrix_constraints
 
@@ -732,3 +733,4 @@ class Model(RawModel):
 Model.add_variables = make_variable_tupledict
 Model.add_m_variables = make_variable_ndarray
 Model.add_m_linear_constraints = add_matrix_constraints
+Model.add_second_order_cone_constraint = bridge_soc_quadratic_constraint
