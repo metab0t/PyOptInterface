@@ -337,7 +337,8 @@ constraint_attribute_get_func_map = {
     ),
     ConstraintAttribute.IIS: lambda model, constraint: model._get_constraint_IIS(
         constraint
-    ),
+    )
+    > 0,
 }
 
 constraint_attribute_set_func_map = {
