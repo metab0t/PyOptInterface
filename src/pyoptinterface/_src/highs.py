@@ -222,7 +222,7 @@ model_attribute_get_func_map = {
     ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),
     ModelAttribute.SolveTimeSec: lambda model: model.getruntime(),
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_option_int("threads"),
-    ModelAttribute.RelativeGap: lambda model: model.get_raw_option_double("mip_gap"),
+    ModelAttribute.RelativeGap: lambda model: model.get_raw_option_double("mip_rel_gap"),
     ModelAttribute.TimeLimitSec: lambda model: model.get_raw_option_double(
         "time_limit"
     ),
@@ -241,7 +241,7 @@ model_attribute_set_func_map = {
         "threads", v
     ),
     ModelAttribute.RelativeGap: lambda model, v: model.set_raw_option_double(
-        "mip_gap", v
+        "mip_rel_gap", v
     ),
     ModelAttribute.TimeLimitSec: lambda model, v: model.set_raw_option_double(
         "time_limit", v

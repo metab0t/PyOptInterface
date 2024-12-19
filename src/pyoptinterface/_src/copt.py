@@ -284,7 +284,7 @@ model_attribute_get_func_map = {
     ModelAttribute.SimplexIterations: lambda model: model.get_model_raw_attribute_int(
         "SimplexIter"
     ),
-    ModelAttribute.SolveTimeSec: lambda model: model.get_raw_parameter_double(
+    ModelAttribute.SolveTimeSec: lambda model: model.get_raw_attribute_double(
         "SolvingTime"
     ),
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter_int(
