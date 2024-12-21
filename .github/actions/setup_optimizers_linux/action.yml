@@ -43,7 +43,7 @@ runs:
         curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
         curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.2/linux64/CardinalOptimizer-7.2.2-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
-        curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2004-x86_64.tar.gz
+        curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-x86_64.tar.gz
 
     - name: Setup Gurobi Installation
       shell: bash
