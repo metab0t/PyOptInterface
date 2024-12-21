@@ -117,6 +117,7 @@ runs:
     - name: Setup IPOPT Installation
       shell: bash
       run: |
+        sudo apt-get install -y libopenblas-dev liblapack3 libgfortran5
         mkdir -p ~/ipopt
         tar xfz ~/installers/idaes-solvers.tar.gz -C ~/ipopt
         echo "PATH=${PATH}:${HOME}/ipopt" >> $GITHUB_ENV
