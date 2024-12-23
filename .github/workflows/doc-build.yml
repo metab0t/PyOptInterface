@@ -38,7 +38,7 @@ jobs:
       - name: Build
         run: |
           python -m pip list
-          python -m pip install nanobind scikit-build-core[pyproject]
+          python -m pip install nanobind scikit-build-core[pyproject] typing_extensions
           python -m pip install --no-build-isolation -v .
           python -c "import pyoptinterface as poi; print(dir(poi))"
 
