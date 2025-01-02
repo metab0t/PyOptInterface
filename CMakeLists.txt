@@ -207,7 +207,6 @@ lib/highs_model.cpp
 )
 target_include_directories(highs_model PUBLIC thirdparty/solvers/highs)
 target_link_libraries(highs_model PUBLIC core)
-# target_link_libraries(highs_model PUBLIC HiGHS::HiGHS)
 
 nanobind_add_module(
 highs_model_ext
@@ -237,6 +236,25 @@ nanobind_add_module(
 )
 target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+# Mindopt
+add_library(mindopt_model STATIC)
+target_sources(mindopt_model PRIVATE
+include/pyoptinterface/mindopt_model.hpp
+lib/mindopt_model.cpp
+)
+target_include_directories(mindopt_model PUBLIC thirdparty/solvers/mindopt)
+target_link_libraries(mindopt_model PUBLIC core)
+
+nanobind_add_module(
+mindopt_model_ext
+
+STABLE_ABI NB_STATIC
+
+lib/mindopt_model_ext.cpp
+)
+target_link_libraries(mindopt_model_ext PUBLIC mindopt_model)
+install(TARGETS mindopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
 # stub
 nanobind_add_stub(
