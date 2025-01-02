@@ -529,6 +529,17 @@ void IpoptModel::optimize()
 	m_status = ipopt::IpoptSolve(problem_ptr, m_result.x.data(), m_result.g.data(),
 	                             &m_result.obj_val, m_result.mult_g.data(),
 	                             m_result.mult_x_L.data(), m_result.mult_x_U.data(), (void *)this);
+	m_result.is_valid = true;
+}
+
+void IpoptModel::load_current_solution()
+{
+	if (!m_result.is_valid)
+	{
+		throw std::runtime_error("No valid solution to load");
+	}
+
+	std::copy(m_result.x.begin(), m_result.x.end(), m_var_init.begin());
 }
 
 void IpoptModel::set_raw_option_int(const std::string &name, int value)

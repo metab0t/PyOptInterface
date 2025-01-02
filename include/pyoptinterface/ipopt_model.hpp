@@ -34,6 +34,7 @@ struct IpoptfreeproblemT
 
 struct IpoptResult
 {
+	bool is_valid = false;
 	// store results
 	std::vector<double> x, g, mult_g, mult_x_L, mult_x_U;
 	double obj_val;
@@ -145,6 +146,9 @@ struct IpoptModel
 
 	void analyze_structure();
 	void optimize();
+
+	// load current solution as	initial guess
+	void load_current_solution();
 
 	// set options
 	void set_raw_option_int(const std::string &name, int value);

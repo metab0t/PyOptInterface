@@ -153,6 +153,9 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("_add_nl_constraint_eq", &IpoptModel::_add_nl_constraint_eq)
 
 	    .def("_optimize", &IpoptModel::optimize, nb::call_guard<nb::gil_scoped_release>())
+
+	    .def("load_current_solution", &IpoptModel::load_current_solution)
+
 	    .def("set_raw_option_int", &IpoptModel::set_raw_option_int)
 	    .def("set_raw_option_double", &IpoptModel::set_raw_option_double)
 	    .def("set_raw_option_string", &IpoptModel::set_raw_option_string);
