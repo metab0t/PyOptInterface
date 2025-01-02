@@ -132,7 +132,7 @@ def get_objsense(model):
 
 def get_objval(model):
     if model._is_mip():
-        attr_name = "BestBnd"
+        attr_name = "BestObj"
     else:
         attr_name = "LpObjval"
     obj = model.get_raw_attribute_double(attr_name)
