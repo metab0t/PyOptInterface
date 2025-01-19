@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Optimal Power Flow - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -314,13 +314,13 @@
 <p>We notice that the branch power flow equations with respect to <span class="math notranslate nohighlight">\(P_{ij}\)</span>, <span class="math notranslate nohighlight">\(Q_{ij}\)</span>, <span class="math notranslate nohighlight">\(P_{ji}\)</span> and <span class="math notranslate nohighlight">\(Q_{ji}\)</span> are nonlinear equations and have the same structure for each branch. We will use a single function to model the nonlinear power flow equations of one branch.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">branch_flow</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">branch_flow</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
     <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Bc</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">Bc</span>
     <span class="n">Vi</span><span class="p">,</span> <span class="n">Vj</span><span class="p">,</span> <span class="n">theta_i</span><span class="p">,</span> <span class="n">theta_j</span><span class="p">,</span> <span class="n">Pij</span><span class="p">,</span> <span class="n">Qij</span><span class="p">,</span> <span class="n">Pji</span><span class="p">,</span> <span class="n">Qji</span> <span class="o">=</span> <span class="p">(</span>
         <span class="nb">vars</span><span class="o">.</span><span class="n">Vi</span><span class="p">,</span>
@@ -607,7 +607,7 @@ Number of inequality constraint evaluations          = 33
 Number of equality constraint Jacobian evaluations   = 19
 Number of inequality constraint Jacobian evaluations = 19
 Number of Lagrangian Hessian evaluations             = 18
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.011
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.009
 Total CPU secs in NLP function evaluations           =      0.001
 
 EXIT: Optimal Solution Found.

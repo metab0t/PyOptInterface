@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Building Bigger Optimization Model - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -292,7 +292,7 @@
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">types</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
 
 <span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
 <span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
@@ -311,12 +311,12 @@
 <p>Thus, we can define a class to represent the optimization model and use the container to store the variables and constraints.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyoptinterface</span> <span class="k">as</span> <span class="nn">poi</span>
-<span class="kn">from</span> <span class="nn">pyoptinterface</span> <span class="kn">import</span> <span class="n">highs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">highs</span>
 
-<span class="k">class</span> <span class="nc">OptModel</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptModel</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
@@ -326,7 +326,7 @@
 <p>Then we can define small functions to declare the variables and constraints and add them to the model. We take the N-queens problem as an example.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
@@ -336,7 +336,7 @@
     <span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
     <span class="n">container</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
 
-<span class="k">def</span> <span class="nf">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
     <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
@@ -347,7 +347,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
     <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
@@ -419,6 +419,7 @@ Solving report
                     0 (bound viol.)
                     0 (int. viol.)
                     0 (row viol.)
+Termination status: TerminationStatusCode.OPTIMAL
   Timing            0.07 (total)
                     0.00 (presolve)
                     0.00 (solve)
@@ -430,7 +431,6 @@ Solving report
                     0 (strong br.)
                     184 (separation)
                     54 (heuristics)
-Termination status: TerminationStatusCode.OPTIMAL
 </pre></div>
 </div>
 </div>
