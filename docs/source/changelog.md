@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Add `model.add_m_variables` and `model.add_m_linear_constraints` matrix modeling API
+- Add `model.computeIIS` and IIS related attributes for constraint and variable
+- Implement constraint based on compare operators, now you can use `model.add_linear_constraint(x + y <= 1.0)` directly
 
 ## 0.3.0
 - Add `model.set_variable_bounds(variable, lb, ub)` to make it easier to change variable bounds
