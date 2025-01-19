@@ -119,21 +119,6 @@ double IpoptModel::get_variable_value(const VariableIndex &variable)
 	return m_result.x[variable.index];
 }
 
-double IpoptModel::get_expression_value(const ScalarAffineFunction &function)
-{
-	return ::get_affine_expression_value(this, function);
-}
-
-double IpoptModel::get_expression_value(const ScalarQuadraticFunction &function)
-{
-	return ::get_quadratic_expression_value(this, function);
-}
-
-double IpoptModel::get_expression_value(const ExprBuilder &function)
-{
-	return ::get_expression_builder_value(this, function);
-}
-
 std::string IpoptModel::get_variable_name(const VariableIndex &variable)
 {
 	auto iter = m_var_names.find(variable.index);
@@ -155,21 +140,6 @@ void IpoptModel::set_variable_name(const VariableIndex &variable, const std::str
 std::string IpoptModel::pprint_variable(const VariableIndex &variable)
 {
 	return get_variable_name(variable);
-}
-
-std::string IpoptModel::pprint_expression(const ScalarAffineFunction &function, int precision)
-{
-	return ::pprint_affine_expression(this, function, precision);
-}
-
-std::string IpoptModel::pprint_expression(const ScalarQuadraticFunction &function, int precision)
-{
-	return ::pprint_quadratic_expression(this, function, precision);
-}
-
-std::string IpoptModel::pprint_expression(const ExprBuilder &function, int precision)
-{
-	return ::pprint_expression_builder(this, function, precision);
 }
 
 ParameterIndex IpoptModel::add_parameter(double value)

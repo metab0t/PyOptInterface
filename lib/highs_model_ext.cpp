@@ -77,18 +77,14 @@ NB_MODULE(highs_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, int>(&HighsModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
-	             &HighsModelMixin::add_linear_constraint),
+	    .def("add_linear_constraint", &HighsModelMixin::add_linear_constraint, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_linear_constraint", &HighsModelMixin::add_linear_constraint_from_var,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, const char *>(
-	             &HighsModelMixin::add_linear_constraint_from_var),
+	    .def("add_linear_constraint", &HighsModelMixin::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
-	             &HighsModelMixin::add_linear_constraint_from_expr),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_linear_constraint", &HighsModelMixin::add_linear_constraint_from_comparison,
+	         nb::arg("con"), nb::arg("name") = "")
 	    .def("delete_constraint", &HighsModelMixin::delete_constraint)
 	    .def("is_constraint_active", &HighsModelMixin::is_constraint_active)
 

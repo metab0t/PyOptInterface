@@ -80,26 +80,21 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(set_constraint_name)
 	    // clang-format on
 
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
-	             &GurobiModelMixin::add_linear_constraint),
+	    .def("add_linear_constraint", &GurobiModelMixin::add_linear_constraint, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("add_linear_constraint", &GurobiModelMixin::add_linear_constraint_from_var,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, const char *>(
-	             &GurobiModelMixin::add_linear_constraint_from_var),
+	    .def("add_linear_constraint", &GurobiModelMixin::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
-	             &GurobiModelMixin::add_linear_constraint_from_expr),
+	    .def("add_linear_constraint", &GurobiModelMixin::add_linear_constraint_from_comparison,
+	         nb::arg("con"), nb::arg("name") = "")
+	    .def("add_quadratic_constraint", &GurobiModelMixin::add_quadratic_constraint,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
-	                           const char *>(&GurobiModelMixin::add_quadratic_constraint),
+	    .def("add_quadratic_constraint", &GurobiModelMixin::add_quadratic_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
-	             &GurobiModelMixin::add_quadratic_constraint_from_expr),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	         &GurobiModelMixin::add_quadratic_constraint_from_comparison, nb::arg("con"),
+	         nb::arg("name") = "")
 	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
 	                                   &GurobiModelMixin::add_sos_constraint))
 	    .def("add_sos_constraint",

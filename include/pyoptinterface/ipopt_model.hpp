@@ -3,6 +3,7 @@
 #include "solvers/ipopt/IpStdCInterface.h"
 #include "pyoptinterface/nleval.hpp"
 #include "pyoptinterface/dylib.hpp"
+#include "pyoptinterface/solver_common.hpp"
 #include <cmath>
 
 #define APILIST            \
@@ -60,14 +61,8 @@ struct IpoptModel
 	void set_variable_name(const VariableIndex &variable, const std::string &name);
 
 	double get_variable_value(const VariableIndex &variable);
-	double get_expression_value(const ScalarAffineFunction &function);
-	double get_expression_value(const ScalarQuadraticFunction &function);
-	double get_expression_value(const ExprBuilder &function);
 
 	std::string pprint_variable(const VariableIndex &variable);
-	std::string pprint_expression(const ScalarAffineFunction &function, int precision = 4);
-	std::string pprint_expression(const ScalarQuadraticFunction &function, int precision = 4);
-	std::string pprint_expression(const ExprBuilder &function, int precision = 4);
 
 	ParameterIndex add_parameter(double value = 0.0);
 	void set_parameter(const ParameterIndex &parameter, double value);
@@ -185,3 +180,5 @@ struct IpoptModel
 
 	std::unique_ptr<IpoptProblemInfo, IpoptfreeproblemT> m_problem = nullptr;
 };
+
+using IpoptModelMixin = CommercialSolverMixin<IpoptModel>;

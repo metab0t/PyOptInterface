@@ -1282,3 +1282,443 @@ auto operator/(const ExprBuilder &a, CoeffT b) -> ExprBuilder
 	e.operator/=(b);
 	return e;
 }
+
+auto vi_compare_constant(const VariableIndex &lhs, CoeffT rhs,
+                         ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ScalarAffineFunction;
+	constraint.lhs_saf = ScalarAffineFunction(lhs);
+	constraint.sense = sense;
+	constraint.rhs = rhs;
+	return constraint;
+}
+
+auto saf_compare_constant(const ScalarAffineFunction &lhs, CoeffT rhs,
+                          ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ScalarAffineFunctionPointer;
+	constraint.lhs_saf_ptr = &lhs;
+	constraint.sense = sense;
+	constraint.rhs = rhs;
+	return constraint;
+}
+
+auto sqf_compare_constant(const ScalarQuadraticFunction &lhs, CoeffT rhs,
+                          ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ScalarQuadraticFunctionPointer;
+	constraint.lhs_sqf_ptr = &lhs;
+	constraint.sense = sense;
+	constraint.rhs = rhs;
+	return constraint;
+}
+
+auto eb_compare_constant(const ExprBuilder &lhs, CoeffT rhs,
+                         ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ExprBuilderPointer;
+	constraint.lhs_eb_ptr = &lhs;
+	constraint.sense = sense;
+	constraint.rhs = rhs;
+	return constraint;
+}
+
+template <typename T1, typename T2>
+auto saf_compare(const T1 &lhs, const T2 &rhs, ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ScalarAffineFunction;
+	constraint.lhs_saf = lhs - rhs;
+	constraint.sense = sense;
+	return constraint;
+}
+
+template <typename T1, typename T2>
+auto sqf_compare(const T1 &lhs, const T2 &rhs, ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ScalarQuadraticFunction;
+	constraint.lhs_sqf = lhs - rhs;
+	constraint.sense = sense;
+	return constraint;
+}
+
+template <typename T1, typename T2>
+auto eb_compare(const T1 &lhs, const T2 &rhs, ConstraintSense sense) -> ComparisonConstraint
+{
+	ComparisonConstraint constraint;
+	constraint.expr_kind = ComparisonConstraintExprKind::ExprBuilder;
+	constraint.lhs_eb = lhs - rhs;
+	constraint.sense = sense;
+	return constraint;
+}
+
+// <= Operator
+
+auto operator<=(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(rhs, lhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator<=(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(rhs, lhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator<=(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(rhs, lhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator<=(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(rhs, lhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator<=(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarQuadraticFunction &lhs,
+                const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarAffineFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarQuadraticFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const VariableIndex &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarAffineFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ScalarQuadraticFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+auto operator<=(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+auto operator<=(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::LessEqual);
+}
+
+// >= Operator
+
+auto operator>=(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(rhs, lhs, ConstraintSense::LessEqual);
+}
+
+auto operator>=(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(rhs, lhs, ConstraintSense::LessEqual);
+}
+
+auto operator>=(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(rhs, lhs, ConstraintSense::LessEqual);
+}
+
+auto operator>=(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(rhs, lhs, ConstraintSense::LessEqual);
+}
+
+auto operator>=(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarQuadraticFunction &lhs,
+                const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarAffineFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarQuadraticFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const VariableIndex &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarAffineFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ScalarQuadraticFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+auto operator>=(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+auto operator>=(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::GreaterEqual);
+}
+
+// == Operator
+
+auto operator==(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return vi_compare_constant(rhs, lhs, ConstraintSense::Equal);
+}
+
+auto operator==(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare_constant(rhs, lhs, ConstraintSense::Equal);
+}
+
+auto operator==(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare_constant(rhs, lhs, ConstraintSense::Equal);
+}
+
+auto operator==(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare_constant(rhs, lhs, ConstraintSense::Equal);
+}
+
+auto operator==(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarQuadraticFunction &lhs,
+                const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarAffineFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return saf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarQuadraticFunction &lhs,
+                const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const VariableIndex &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarAffineFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ScalarQuadraticFunction &lhs,
+                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return sqf_compare(lhs, rhs, ConstraintSense::Equal);
+}
+
+auto operator==(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
+auto operator==(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint
+{
+	return eb_compare(lhs, rhs, ConstraintSense::Equal);
+}
