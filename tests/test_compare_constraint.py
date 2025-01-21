@@ -52,11 +52,60 @@ def test_compare_constraint(model_interface):
         assert expr_value == pytest.approx(3.0, abs=1e-6)
         model.delete_constraint(con)
 
+    def t_binary_expr(lhs, rhs):
+        expr = lhs - rhs
+
+        con = model.add_linear_constraint(lhs >= rhs + 1.0)
+        model.set_objective(expr)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(1.0, abs=1e-6)
+        model.delete_constraint(con)
+
+        con = model.add_linear_constraint(lhs <= rhs + 2.0)
+        model.set_objective(expr, poi.ObjectiveSense.Maximize)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(2.0, abs=1e-6)
+        model.delete_constraint(con)
+
+        con = model.add_linear_constraint(lhs == rhs + 3.0)
+        model.set_objective(expr, poi.ObjectiveSense.Maximize)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(3.0, abs=1e-6)
+        model.delete_constraint(con)
+
+        con = model.add_linear_constraint(1.0 + rhs <= lhs)
+        model.set_objective(expr)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(1.0, abs=1e-6)
+        model.delete_constraint(con)
+
+        con = model.add_linear_constraint(2.0 + rhs >= lhs)
+        model.set_objective(expr, poi.ObjectiveSense.Maximize)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(2.0, abs=1e-6)
+        model.delete_constraint(con)
+
+        con = model.add_linear_constraint(3.0 + rhs == lhs)
+        model.set_objective(expr, poi.ObjectiveSense.Maximize)
+        model.optimize()
+        expr_value = model.get_value(expr)
+        assert expr_value == pytest.approx(3.0, abs=1e-6)
+        model.delete_constraint(con)
+
     expr = x + y
     t_expr(expr)
 
     expr = poi.ExprBuilder(x + y)
     t_expr(expr)
+
+    for lhs in [x, poi.ScalarAffineFunction(x), poi.ExprBuilder(x)]:
+        for rhs in [y, poi.ScalarAffineFunction(y), poi.ExprBuilder(y)]:
+            t_binary_expr(lhs, rhs)
 
     if hasattr(model, "add_quadratic_constraint"):
         con_expr = x * x + y * y
