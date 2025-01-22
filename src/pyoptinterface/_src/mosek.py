@@ -40,15 +40,16 @@ def detected_libraries():
     }[platform.system()]
 
     # Environment
-    home = os.environ.get("MOSEK_10_2_BINDIR", None)
-    if home is None:
-        home = os.environ.get("MOSEK_10_1_BINDIR", None)
-    if home and os.path.exists(home):
-        dir = Path(home)
-        for path in dir.glob(suffix_pattern):
-            match = re.match(libname_pattern, path.name)
-            if match:
-                libs.append(str(path))
+    possible_envs = ["MOSEK_11_0_BINDIR", "MOSEK_10_2_BINDIR", "MOSEK_10_1_BINDIR"]
+    for env in possible_envs:
+        home = os.environ.get(env, None)
+        if home and os.path.exists(home):
+            dir = Path(home)
+            for path in dir.glob(suffix_pattern):
+                match = re.match(libname_pattern, path.name)
+                if match:
+                    libs.append(str(path))
+            break
 
     # mosekpy installation
     try:
@@ -78,7 +79,7 @@ def detected_libraries():
     default_libname = {
         "Linux": ["libmosek64.so"],
         "Darwin": ["libmosek64.dylib"],
-        "Windows": ["mosek64_10_2.dll", "mosek64_10_1.dll"],
+        "Windows": ["mosek64_11_0.dll", "mosek64_10_2.dll", "mosek64_10_1.dll"],
     }[platform.system()]
     libs.extend(default_libname)
 

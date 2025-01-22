@@ -4,7 +4,7 @@
 /******************************************************************************
  ** Module : mosek.h
  **
- ** Generated 2024
+ ** Generated 2025
  **
  ** Copyright (c) MOSEK ApS, Denmark.
  **
@@ -22,9 +22,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define MSK_VERSION_MAJOR    10
-#define MSK_VERSION_MINOR    2
-#define MSK_VERSION_REVISION 0
+#define MSK_VERSION_MAJOR    11
+#define MSK_VERSION_MINOR    0
+#define MSK_VERSION_REVISION 4
 #define MSK_VERSION_STATE    ""
 
 #define MSK_INFINITY 1.0e30
@@ -65,6 +65,14 @@ enum MSKmark_enum {
 };
 #define MSK_MARK_BEGIN MSK_MARK_LO
 #define MSK_MARK_END   (1+MSK_MARK_UP)
+
+
+enum MSKsimprecision_enum {
+  MSK_SIM_PRECISION_NORMAL   = 0,
+  MSK_SIM_PRECISION_EXTENDED = 1
+};
+#define MSK_SIM_PRECISION_BEGIN MSK_SIM_PRECISION_NORMAL
+#define MSK_SIM_PRECISION_END   (1+MSK_SIM_PRECISION_EXTENDED)
 
 
 enum MSKsimdegen_enum {
@@ -132,112 +140,115 @@ enum MSKintpnthotstart_enum {
 #define MSK_INTPNT_HOTSTART_END   (1+MSK_INTPNT_HOTSTART_PRIMAL_DUAL)
 
 
-enum MSKpurify_enum {
-  MSK_PURIFY_NONE        = 0,
-  MSK_PURIFY_PRIMAL      = 1,
-  MSK_PURIFY_DUAL        = 2,
-  MSK_PURIFY_PRIMAL_DUAL = 3,
-  MSK_PURIFY_AUTO        = 4
-};
-#define MSK_PURIFY_BEGIN MSK_PURIFY_NONE
-#define MSK_PURIFY_END   (1+MSK_PURIFY_AUTO)
-
-
 enum MSKcallbackcode_enum {
-  MSK_CALLBACK_BEGIN_BI                 = 0,
-  MSK_CALLBACK_BEGIN_CONIC              = 1,
-  MSK_CALLBACK_BEGIN_DUAL_BI            = 2,
-  MSK_CALLBACK_BEGIN_DUAL_SENSITIVITY   = 3,
-  MSK_CALLBACK_BEGIN_DUAL_SETUP_BI      = 4,
-  MSK_CALLBACK_BEGIN_DUAL_SIMPLEX       = 5,
-  MSK_CALLBACK_BEGIN_DUAL_SIMPLEX_BI    = 6,
-  MSK_CALLBACK_BEGIN_INFEAS_ANA         = 7,
-  MSK_CALLBACK_BEGIN_INTPNT             = 8,
-  MSK_CALLBACK_BEGIN_LICENSE_WAIT       = 9,
-  MSK_CALLBACK_BEGIN_MIO                = 10,
-  MSK_CALLBACK_BEGIN_OPTIMIZER          = 11,
-  MSK_CALLBACK_BEGIN_PRESOLVE           = 12,
-  MSK_CALLBACK_BEGIN_PRIMAL_BI          = 13,
-  MSK_CALLBACK_BEGIN_PRIMAL_REPAIR      = 14,
-  MSK_CALLBACK_BEGIN_PRIMAL_SENSITIVITY = 15,
-  MSK_CALLBACK_BEGIN_PRIMAL_SETUP_BI    = 16,
-  MSK_CALLBACK_BEGIN_PRIMAL_SIMPLEX     = 17,
-  MSK_CALLBACK_BEGIN_PRIMAL_SIMPLEX_BI  = 18,
-  MSK_CALLBACK_BEGIN_QCQO_REFORMULATE   = 19,
-  MSK_CALLBACK_BEGIN_READ               = 20,
-  MSK_CALLBACK_BEGIN_ROOT_CUTGEN        = 21,
-  MSK_CALLBACK_BEGIN_SIMPLEX            = 22,
-  MSK_CALLBACK_BEGIN_SIMPLEX_BI         = 23,
-  MSK_CALLBACK_BEGIN_SOLVE_ROOT_RELAX   = 24,
-  MSK_CALLBACK_BEGIN_TO_CONIC           = 25,
-  MSK_CALLBACK_BEGIN_WRITE              = 26,
-  MSK_CALLBACK_CONIC                    = 27,
-  MSK_CALLBACK_DUAL_SIMPLEX             = 28,
-  MSK_CALLBACK_END_BI                   = 29,
-  MSK_CALLBACK_END_CONIC                = 30,
-  MSK_CALLBACK_END_DUAL_BI              = 31,
-  MSK_CALLBACK_END_DUAL_SENSITIVITY     = 32,
-  MSK_CALLBACK_END_DUAL_SETUP_BI        = 33,
-  MSK_CALLBACK_END_DUAL_SIMPLEX         = 34,
-  MSK_CALLBACK_END_DUAL_SIMPLEX_BI      = 35,
-  MSK_CALLBACK_END_INFEAS_ANA           = 36,
-  MSK_CALLBACK_END_INTPNT               = 37,
-  MSK_CALLBACK_END_LICENSE_WAIT         = 38,
-  MSK_CALLBACK_END_MIO                  = 39,
-  MSK_CALLBACK_END_OPTIMIZER            = 40,
-  MSK_CALLBACK_END_PRESOLVE             = 41,
-  MSK_CALLBACK_END_PRIMAL_BI            = 42,
-  MSK_CALLBACK_END_PRIMAL_REPAIR        = 43,
-  MSK_CALLBACK_END_PRIMAL_SENSITIVITY   = 44,
-  MSK_CALLBACK_END_PRIMAL_SETUP_BI      = 45,
-  MSK_CALLBACK_END_PRIMAL_SIMPLEX       = 46,
-  MSK_CALLBACK_END_PRIMAL_SIMPLEX_BI    = 47,
-  MSK_CALLBACK_END_QCQO_REFORMULATE     = 48,
-  MSK_CALLBACK_END_READ                 = 49,
-  MSK_CALLBACK_END_ROOT_CUTGEN          = 50,
-  MSK_CALLBACK_END_SIMPLEX              = 51,
-  MSK_CALLBACK_END_SIMPLEX_BI           = 52,
-  MSK_CALLBACK_END_SOLVE_ROOT_RELAX     = 53,
-  MSK_CALLBACK_END_TO_CONIC             = 54,
-  MSK_CALLBACK_END_WRITE                = 55,
-  MSK_CALLBACK_IM_BI                    = 56,
-  MSK_CALLBACK_IM_CONIC                 = 57,
-  MSK_CALLBACK_IM_DUAL_BI               = 58,
-  MSK_CALLBACK_IM_DUAL_SENSIVITY        = 59,
-  MSK_CALLBACK_IM_DUAL_SIMPLEX          = 60,
-  MSK_CALLBACK_IM_INTPNT                = 61,
-  MSK_CALLBACK_IM_LICENSE_WAIT          = 62,
-  MSK_CALLBACK_IM_LU                    = 63,
-  MSK_CALLBACK_IM_MIO                   = 64,
-  MSK_CALLBACK_IM_MIO_DUAL_SIMPLEX      = 65,
-  MSK_CALLBACK_IM_MIO_INTPNT            = 66,
-  MSK_CALLBACK_IM_MIO_PRIMAL_SIMPLEX    = 67,
-  MSK_CALLBACK_IM_ORDER                 = 68,
-  MSK_CALLBACK_IM_PRESOLVE              = 69,
-  MSK_CALLBACK_IM_PRIMAL_BI             = 70,
-  MSK_CALLBACK_IM_PRIMAL_SENSIVITY      = 71,
-  MSK_CALLBACK_IM_PRIMAL_SIMPLEX        = 72,
-  MSK_CALLBACK_IM_QO_REFORMULATE        = 73,
-  MSK_CALLBACK_IM_READ                  = 74,
-  MSK_CALLBACK_IM_ROOT_CUTGEN           = 75,
-  MSK_CALLBACK_IM_SIMPLEX               = 76,
-  MSK_CALLBACK_IM_SIMPLEX_BI            = 77,
-  MSK_CALLBACK_INTPNT                   = 78,
-  MSK_CALLBACK_NEW_INT_MIO              = 79,
-  MSK_CALLBACK_PRIMAL_SIMPLEX           = 80,
-  MSK_CALLBACK_READ_OPF                 = 81,
-  MSK_CALLBACK_READ_OPF_SECTION         = 82,
-  MSK_CALLBACK_RESTART_MIO              = 83,
-  MSK_CALLBACK_SOLVING_REMOTE           = 84,
-  MSK_CALLBACK_UPDATE_DUAL_BI           = 85,
-  MSK_CALLBACK_UPDATE_DUAL_SIMPLEX      = 86,
-  MSK_CALLBACK_UPDATE_DUAL_SIMPLEX_BI   = 87,
-  MSK_CALLBACK_UPDATE_PRESOLVE          = 88,
-  MSK_CALLBACK_UPDATE_PRIMAL_BI         = 89,
-  MSK_CALLBACK_UPDATE_PRIMAL_SIMPLEX    = 90,
-  MSK_CALLBACK_UPDATE_PRIMAL_SIMPLEX_BI = 91,
-  MSK_CALLBACK_UPDATE_SIMPLEX           = 92,
-  MSK_CALLBACK_WRITE_OPF                = 93
+  MSK_CALLBACK_BEGIN_BI                    = 0,
+  MSK_CALLBACK_BEGIN_CONIC                 = 1,
+  MSK_CALLBACK_BEGIN_DUAL_BI               = 2,
+  MSK_CALLBACK_BEGIN_DUAL_SENSITIVITY      = 3,
+  MSK_CALLBACK_BEGIN_DUAL_SETUP_BI         = 4,
+  MSK_CALLBACK_BEGIN_DUAL_SIMPLEX          = 5,
+  MSK_CALLBACK_BEGIN_DUAL_SIMPLEX_BI       = 6,
+  MSK_CALLBACK_BEGIN_FOLDING               = 7,
+  MSK_CALLBACK_BEGIN_FOLDING_BI            = 8,
+  MSK_CALLBACK_BEGIN_FOLDING_BI_DUAL       = 9,
+  MSK_CALLBACK_BEGIN_FOLDING_BI_INITIALIZE = 10,
+  MSK_CALLBACK_BEGIN_FOLDING_BI_OPTIMIZER  = 11,
+  MSK_CALLBACK_BEGIN_FOLDING_BI_PRIMAL     = 12,
+  MSK_CALLBACK_BEGIN_INFEAS_ANA            = 13,
+  MSK_CALLBACK_BEGIN_INITIALIZE_BI         = 14,
+  MSK_CALLBACK_BEGIN_INTPNT                = 15,
+  MSK_CALLBACK_BEGIN_LICENSE_WAIT          = 16,
+  MSK_CALLBACK_BEGIN_MIO                   = 17,
+  MSK_CALLBACK_BEGIN_OPTIMIZE_BI           = 18,
+  MSK_CALLBACK_BEGIN_OPTIMIZER             = 19,
+  MSK_CALLBACK_BEGIN_PRESOLVE              = 20,
+  MSK_CALLBACK_BEGIN_PRIMAL_BI             = 21,
+  MSK_CALLBACK_BEGIN_PRIMAL_REPAIR         = 22,
+  MSK_CALLBACK_BEGIN_PRIMAL_SENSITIVITY    = 23,
+  MSK_CALLBACK_BEGIN_PRIMAL_SETUP_BI       = 24,
+  MSK_CALLBACK_BEGIN_PRIMAL_SIMPLEX        = 25,
+  MSK_CALLBACK_BEGIN_PRIMAL_SIMPLEX_BI     = 26,
+  MSK_CALLBACK_BEGIN_QCQO_REFORMULATE      = 27,
+  MSK_CALLBACK_BEGIN_READ                  = 28,
+  MSK_CALLBACK_BEGIN_ROOT_CUTGEN           = 29,
+  MSK_CALLBACK_BEGIN_SIMPLEX               = 30,
+  MSK_CALLBACK_BEGIN_SOLVE_ROOT_RELAX      = 31,
+  MSK_CALLBACK_BEGIN_TO_CONIC              = 32,
+  MSK_CALLBACK_BEGIN_WRITE                 = 33,
+  MSK_CALLBACK_CONIC                       = 34,
+  MSK_CALLBACK_DECOMP_MIO                  = 35,
+  MSK_CALLBACK_DUAL_SIMPLEX                = 36,
+  MSK_CALLBACK_END_BI                      = 37,
+  MSK_CALLBACK_END_CONIC                   = 38,
+  MSK_CALLBACK_END_DUAL_BI                 = 39,
+  MSK_CALLBACK_END_DUAL_SENSITIVITY        = 40,
+  MSK_CALLBACK_END_DUAL_SETUP_BI           = 41,
+  MSK_CALLBACK_END_DUAL_SIMPLEX            = 42,
+  MSK_CALLBACK_END_DUAL_SIMPLEX_BI         = 43,
+  MSK_CALLBACK_END_FOLDING                 = 44,
+  MSK_CALLBACK_END_FOLDING_BI              = 45,
+  MSK_CALLBACK_END_FOLDING_BI_DUAL         = 46,
+  MSK_CALLBACK_END_FOLDING_BI_INITIALIZE   = 47,
+  MSK_CALLBACK_END_FOLDING_BI_OPTIMIZER    = 48,
+  MSK_CALLBACK_END_FOLDING_BI_PRIMAL       = 49,
+  MSK_CALLBACK_END_INFEAS_ANA              = 50,
+  MSK_CALLBACK_END_INITIALIZE_BI           = 51,
+  MSK_CALLBACK_END_INTPNT                  = 52,
+  MSK_CALLBACK_END_LICENSE_WAIT            = 53,
+  MSK_CALLBACK_END_MIO                     = 54,
+  MSK_CALLBACK_END_OPTIMIZE_BI             = 55,
+  MSK_CALLBACK_END_OPTIMIZER               = 56,
+  MSK_CALLBACK_END_PRESOLVE                = 57,
+  MSK_CALLBACK_END_PRIMAL_BI               = 58,
+  MSK_CALLBACK_END_PRIMAL_REPAIR           = 59,
+  MSK_CALLBACK_END_PRIMAL_SENSITIVITY      = 60,
+  MSK_CALLBACK_END_PRIMAL_SETUP_BI         = 61,
+  MSK_CALLBACK_END_PRIMAL_SIMPLEX          = 62,
+  MSK_CALLBACK_END_PRIMAL_SIMPLEX_BI       = 63,
+  MSK_CALLBACK_END_QCQO_REFORMULATE        = 64,
+  MSK_CALLBACK_END_READ                    = 65,
+  MSK_CALLBACK_END_ROOT_CUTGEN             = 66,
+  MSK_CALLBACK_END_SIMPLEX                 = 67,
+  MSK_CALLBACK_END_SIMPLEX_BI              = 68,
+  MSK_CALLBACK_END_SOLVE_ROOT_RELAX        = 69,
+  MSK_CALLBACK_END_TO_CONIC                = 70,
+  MSK_CALLBACK_END_WRITE                   = 71,
+  MSK_CALLBACK_FOLDING_BI_DUAL             = 72,
+  MSK_CALLBACK_FOLDING_BI_OPTIMIZER        = 73,
+  MSK_CALLBACK_FOLDING_BI_PRIMAL           = 74,
+  MSK_CALLBACK_HEARTBEAT                   = 75,
+  MSK_CALLBACK_IM_DUAL_SENSIVITY           = 76,
+  MSK_CALLBACK_IM_DUAL_SIMPLEX             = 77,
+  MSK_CALLBACK_IM_LICENSE_WAIT             = 78,
+  MSK_CALLBACK_IM_LU                       = 79,
+  MSK_CALLBACK_IM_MIO                      = 80,
+  MSK_CALLBACK_IM_MIO_DUAL_SIMPLEX         = 81,
+  MSK_CALLBACK_IM_MIO_INTPNT               = 82,
+  MSK_CALLBACK_IM_MIO_PRIMAL_SIMPLEX       = 83,
+  MSK_CALLBACK_IM_ORDER                    = 84,
+  MSK_CALLBACK_IM_PRIMAL_SENSIVITY         = 85,
+  MSK_CALLBACK_IM_PRIMAL_SIMPLEX           = 86,
+  MSK_CALLBACK_IM_READ                     = 87,
+  MSK_CALLBACK_IM_ROOT_CUTGEN              = 88,
+  MSK_CALLBACK_IM_SIMPLEX                  = 89,
+  MSK_CALLBACK_INTPNT                      = 90,
+  MSK_CALLBACK_NEW_INT_MIO                 = 91,
+  MSK_CALLBACK_OPTIMIZE_BI                 = 92,
+  MSK_CALLBACK_PRIMAL_SIMPLEX              = 93,
+  MSK_CALLBACK_QO_REFORMULATE              = 94,
+  MSK_CALLBACK_READ_OPF                    = 95,
+  MSK_CALLBACK_READ_OPF_SECTION            = 96,
+  MSK_CALLBACK_RESTART_MIO                 = 97,
+  MSK_CALLBACK_SOLVING_REMOTE              = 98,
+  MSK_CALLBACK_UPDATE_DUAL_BI              = 99,
+  MSK_CALLBACK_UPDATE_DUAL_SIMPLEX         = 100,
+  MSK_CALLBACK_UPDATE_DUAL_SIMPLEX_BI      = 101,
+  MSK_CALLBACK_UPDATE_PRESOLVE             = 102,
+  MSK_CALLBACK_UPDATE_PRIMAL_BI            = 103,
+  MSK_CALLBACK_UPDATE_PRIMAL_SIMPLEX       = 104,
+  MSK_CALLBACK_UPDATE_PRIMAL_SIMPLEX_BI    = 105,
+  MSK_CALLBACK_UPDATE_SIMPLEX              = 106,
+  MSK_CALLBACK_WRITE_OPF                   = 107
 };
 #define MSK_CALLBACK_BEGIN MSK_CALLBACK_BEGIN_BI
 #define MSK_CALLBACK_END   (1+MSK_CALLBACK_WRITE_OPF)
@@ -328,116 +339,121 @@ enum MSKsolformat_enum {
 
 enum MSKdinfitem_enum {
   MSK_DINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_DENSITY   = 0,
-  MSK_DINF_BI_CLEAN_DUAL_TIME                             = 1,
-  MSK_DINF_BI_CLEAN_PRIMAL_TIME                           = 2,
-  MSK_DINF_BI_CLEAN_TIME                                  = 3,
-  MSK_DINF_BI_DUAL_TIME                                   = 4,
-  MSK_DINF_BI_PRIMAL_TIME                                 = 5,
-  MSK_DINF_BI_TIME                                        = 6,
-  MSK_DINF_INTPNT_DUAL_FEAS                               = 7,
-  MSK_DINF_INTPNT_DUAL_OBJ                                = 8,
-  MSK_DINF_INTPNT_FACTOR_NUM_FLOPS                        = 9,
-  MSK_DINF_INTPNT_OPT_STATUS                              = 10,
-  MSK_DINF_INTPNT_ORDER_TIME                              = 11,
-  MSK_DINF_INTPNT_PRIMAL_FEAS                             = 12,
-  MSK_DINF_INTPNT_PRIMAL_OBJ                              = 13,
-  MSK_DINF_INTPNT_TIME                                    = 14,
-  MSK_DINF_MIO_CLIQUE_SELECTION_TIME                      = 15,
-  MSK_DINF_MIO_CLIQUE_SEPARATION_TIME                     = 16,
-  MSK_DINF_MIO_CMIR_SELECTION_TIME                        = 17,
-  MSK_DINF_MIO_CMIR_SEPARATION_TIME                       = 18,
-  MSK_DINF_MIO_CONSTRUCT_SOLUTION_OBJ                     = 19,
-  MSK_DINF_MIO_DUAL_BOUND_AFTER_PRESOLVE                  = 20,
-  MSK_DINF_MIO_GMI_SELECTION_TIME                         = 21,
-  MSK_DINF_MIO_GMI_SEPARATION_TIME                        = 22,
-  MSK_DINF_MIO_IMPLIED_BOUND_SELECTION_TIME               = 23,
-  MSK_DINF_MIO_IMPLIED_BOUND_SEPARATION_TIME              = 24,
-  MSK_DINF_MIO_INITIAL_FEASIBLE_SOLUTION_OBJ              = 25,
-  MSK_DINF_MIO_KNAPSACK_COVER_SELECTION_TIME              = 26,
-  MSK_DINF_MIO_KNAPSACK_COVER_SEPARATION_TIME             = 27,
-  MSK_DINF_MIO_LIPRO_SELECTION_TIME                       = 28,
-  MSK_DINF_MIO_LIPRO_SEPARATION_TIME                      = 29,
-  MSK_DINF_MIO_OBJ_ABS_GAP                                = 30,
-  MSK_DINF_MIO_OBJ_BOUND                                  = 31,
-  MSK_DINF_MIO_OBJ_INT                                    = 32,
-  MSK_DINF_MIO_OBJ_REL_GAP                                = 33,
-  MSK_DINF_MIO_PROBING_TIME                               = 34,
-  MSK_DINF_MIO_ROOT_CUT_SELECTION_TIME                    = 35,
-  MSK_DINF_MIO_ROOT_CUT_SEPARATION_TIME                   = 36,
-  MSK_DINF_MIO_ROOT_OPTIMIZER_TIME                        = 37,
-  MSK_DINF_MIO_ROOT_PRESOLVE_TIME                         = 38,
-  MSK_DINF_MIO_ROOT_TIME                                  = 39,
-  MSK_DINF_MIO_SYMMETRY_DETECTION_TIME                    = 40,
-  MSK_DINF_MIO_SYMMETRY_FACTOR                            = 41,
-  MSK_DINF_MIO_TIME                                       = 42,
-  MSK_DINF_MIO_USER_OBJ_CUT                               = 43,
-  MSK_DINF_OPTIMIZER_TICKS                                = 44,
-  MSK_DINF_OPTIMIZER_TIME                                 = 45,
-  MSK_DINF_PRESOLVE_ELI_TIME                              = 46,
-  MSK_DINF_PRESOLVE_LINDEP_TIME                           = 47,
-  MSK_DINF_PRESOLVE_TIME                                  = 48,
-  MSK_DINF_PRESOLVE_TOTAL_PRIMAL_PERTURBATION             = 49,
-  MSK_DINF_PRIMAL_REPAIR_PENALTY_OBJ                      = 50,
-  MSK_DINF_QCQO_REFORMULATE_MAX_PERTURBATION              = 51,
-  MSK_DINF_QCQO_REFORMULATE_TIME                          = 52,
-  MSK_DINF_QCQO_REFORMULATE_WORST_CHOLESKY_COLUMN_SCALING = 53,
-  MSK_DINF_QCQO_REFORMULATE_WORST_CHOLESKY_DIAG_SCALING   = 54,
-  MSK_DINF_READ_DATA_TIME                                 = 55,
-  MSK_DINF_REMOTE_TIME                                    = 56,
-  MSK_DINF_SIM_DUAL_TIME                                  = 57,
-  MSK_DINF_SIM_FEAS                                       = 58,
-  MSK_DINF_SIM_OBJ                                        = 59,
-  MSK_DINF_SIM_PRIMAL_TIME                                = 60,
-  MSK_DINF_SIM_TIME                                       = 61,
-  MSK_DINF_SOL_BAS_DUAL_OBJ                               = 62,
-  MSK_DINF_SOL_BAS_DVIOLCON                               = 63,
-  MSK_DINF_SOL_BAS_DVIOLVAR                               = 64,
-  MSK_DINF_SOL_BAS_NRM_BARX                               = 65,
-  MSK_DINF_SOL_BAS_NRM_SLC                                = 66,
-  MSK_DINF_SOL_BAS_NRM_SLX                                = 67,
-  MSK_DINF_SOL_BAS_NRM_SUC                                = 68,
-  MSK_DINF_SOL_BAS_NRM_SUX                                = 69,
-  MSK_DINF_SOL_BAS_NRM_XC                                 = 70,
-  MSK_DINF_SOL_BAS_NRM_XX                                 = 71,
-  MSK_DINF_SOL_BAS_NRM_Y                                  = 72,
-  MSK_DINF_SOL_BAS_PRIMAL_OBJ                             = 73,
-  MSK_DINF_SOL_BAS_PVIOLCON                               = 74,
-  MSK_DINF_SOL_BAS_PVIOLVAR                               = 75,
-  MSK_DINF_SOL_ITG_NRM_BARX                               = 76,
-  MSK_DINF_SOL_ITG_NRM_XC                                 = 77,
-  MSK_DINF_SOL_ITG_NRM_XX                                 = 78,
-  MSK_DINF_SOL_ITG_PRIMAL_OBJ                             = 79,
-  MSK_DINF_SOL_ITG_PVIOLACC                               = 80,
-  MSK_DINF_SOL_ITG_PVIOLBARVAR                            = 81,
-  MSK_DINF_SOL_ITG_PVIOLCON                               = 82,
-  MSK_DINF_SOL_ITG_PVIOLCONES                             = 83,
-  MSK_DINF_SOL_ITG_PVIOLDJC                               = 84,
-  MSK_DINF_SOL_ITG_PVIOLITG                               = 85,
-  MSK_DINF_SOL_ITG_PVIOLVAR                               = 86,
-  MSK_DINF_SOL_ITR_DUAL_OBJ                               = 87,
-  MSK_DINF_SOL_ITR_DVIOLACC                               = 88,
-  MSK_DINF_SOL_ITR_DVIOLBARVAR                            = 89,
-  MSK_DINF_SOL_ITR_DVIOLCON                               = 90,
-  MSK_DINF_SOL_ITR_DVIOLCONES                             = 91,
-  MSK_DINF_SOL_ITR_DVIOLVAR                               = 92,
-  MSK_DINF_SOL_ITR_NRM_BARS                               = 93,
-  MSK_DINF_SOL_ITR_NRM_BARX                               = 94,
-  MSK_DINF_SOL_ITR_NRM_SLC                                = 95,
-  MSK_DINF_SOL_ITR_NRM_SLX                                = 96,
-  MSK_DINF_SOL_ITR_NRM_SNX                                = 97,
-  MSK_DINF_SOL_ITR_NRM_SUC                                = 98,
-  MSK_DINF_SOL_ITR_NRM_SUX                                = 99,
-  MSK_DINF_SOL_ITR_NRM_XC                                 = 100,
-  MSK_DINF_SOL_ITR_NRM_XX                                 = 101,
-  MSK_DINF_SOL_ITR_NRM_Y                                  = 102,
-  MSK_DINF_SOL_ITR_PRIMAL_OBJ                             = 103,
-  MSK_DINF_SOL_ITR_PVIOLACC                               = 104,
-  MSK_DINF_SOL_ITR_PVIOLBARVAR                            = 105,
-  MSK_DINF_SOL_ITR_PVIOLCON                               = 106,
-  MSK_DINF_SOL_ITR_PVIOLCONES                             = 107,
-  MSK_DINF_SOL_ITR_PVIOLVAR                               = 108,
-  MSK_DINF_TO_CONIC_TIME                                  = 109,
-  MSK_DINF_WRITE_DATA_TIME                                = 110
+  MSK_DINF_BI_CLEAN_TIME                                  = 1,
+  MSK_DINF_BI_DUAL_TIME                                   = 2,
+  MSK_DINF_BI_PRIMAL_TIME                                 = 3,
+  MSK_DINF_BI_TIME                                        = 4,
+  MSK_DINF_FOLDING_BI_OPTIMIZE_TIME                       = 5,
+  MSK_DINF_FOLDING_BI_UNFOLD_DUAL_TIME                    = 6,
+  MSK_DINF_FOLDING_BI_UNFOLD_INITIALIZE_TIME              = 7,
+  MSK_DINF_FOLDING_BI_UNFOLD_PRIMAL_TIME                  = 8,
+  MSK_DINF_FOLDING_BI_UNFOLD_TIME                         = 9,
+  MSK_DINF_FOLDING_FACTOR                                 = 10,
+  MSK_DINF_FOLDING_TIME                                   = 11,
+  MSK_DINF_INTPNT_DUAL_FEAS                               = 12,
+  MSK_DINF_INTPNT_DUAL_OBJ                                = 13,
+  MSK_DINF_INTPNT_FACTOR_NUM_FLOPS                        = 14,
+  MSK_DINF_INTPNT_OPT_STATUS                              = 15,
+  MSK_DINF_INTPNT_ORDER_TIME                              = 16,
+  MSK_DINF_INTPNT_PRIMAL_FEAS                             = 17,
+  MSK_DINF_INTPNT_PRIMAL_OBJ                              = 18,
+  MSK_DINF_INTPNT_TIME                                    = 19,
+  MSK_DINF_MIO_CLIQUE_SELECTION_TIME                      = 20,
+  MSK_DINF_MIO_CLIQUE_SEPARATION_TIME                     = 21,
+  MSK_DINF_MIO_CMIR_SELECTION_TIME                        = 22,
+  MSK_DINF_MIO_CMIR_SEPARATION_TIME                       = 23,
+  MSK_DINF_MIO_CONSTRUCT_SOLUTION_OBJ                     = 24,
+  MSK_DINF_MIO_DUAL_BOUND_AFTER_PRESOLVE                  = 25,
+  MSK_DINF_MIO_GMI_SELECTION_TIME                         = 26,
+  MSK_DINF_MIO_GMI_SEPARATION_TIME                        = 27,
+  MSK_DINF_MIO_IMPLIED_BOUND_SELECTION_TIME               = 28,
+  MSK_DINF_MIO_IMPLIED_BOUND_SEPARATION_TIME              = 29,
+  MSK_DINF_MIO_INITIAL_FEASIBLE_SOLUTION_OBJ              = 30,
+  MSK_DINF_MIO_KNAPSACK_COVER_SELECTION_TIME              = 31,
+  MSK_DINF_MIO_KNAPSACK_COVER_SEPARATION_TIME             = 32,
+  MSK_DINF_MIO_LIPRO_SELECTION_TIME                       = 33,
+  MSK_DINF_MIO_LIPRO_SEPARATION_TIME                      = 34,
+  MSK_DINF_MIO_OBJ_ABS_GAP                                = 35,
+  MSK_DINF_MIO_OBJ_BOUND                                  = 36,
+  MSK_DINF_MIO_OBJ_INT                                    = 37,
+  MSK_DINF_MIO_OBJ_REL_GAP                                = 38,
+  MSK_DINF_MIO_PROBING_TIME                               = 39,
+  MSK_DINF_MIO_ROOT_CUT_SELECTION_TIME                    = 40,
+  MSK_DINF_MIO_ROOT_CUT_SEPARATION_TIME                   = 41,
+  MSK_DINF_MIO_ROOT_OPTIMIZER_TIME                        = 42,
+  MSK_DINF_MIO_ROOT_PRESOLVE_TIME                         = 43,
+  MSK_DINF_MIO_ROOT_TIME                                  = 44,
+  MSK_DINF_MIO_SYMMETRY_DETECTION_TIME                    = 45,
+  MSK_DINF_MIO_SYMMETRY_FACTOR                            = 46,
+  MSK_DINF_MIO_TIME                                       = 47,
+  MSK_DINF_MIO_USER_OBJ_CUT                               = 48,
+  MSK_DINF_OPTIMIZER_TICKS                                = 49,
+  MSK_DINF_OPTIMIZER_TIME                                 = 50,
+  MSK_DINF_PRESOLVE_ELI_TIME                              = 51,
+  MSK_DINF_PRESOLVE_LINDEP_TIME                           = 52,
+  MSK_DINF_PRESOLVE_TIME                                  = 53,
+  MSK_DINF_PRESOLVE_TOTAL_PRIMAL_PERTURBATION             = 54,
+  MSK_DINF_PRIMAL_REPAIR_PENALTY_OBJ                      = 55,
+  MSK_DINF_QCQO_REFORMULATE_MAX_PERTURBATION              = 56,
+  MSK_DINF_QCQO_REFORMULATE_TIME                          = 57,
+  MSK_DINF_QCQO_REFORMULATE_WORST_CHOLESKY_COLUMN_SCALING = 58,
+  MSK_DINF_QCQO_REFORMULATE_WORST_CHOLESKY_DIAG_SCALING   = 59,
+  MSK_DINF_READ_DATA_TIME                                 = 60,
+  MSK_DINF_REMOTE_TIME                                    = 61,
+  MSK_DINF_SIM_DUAL_TIME                                  = 62,
+  MSK_DINF_SIM_FEAS                                       = 63,
+  MSK_DINF_SIM_OBJ                                        = 64,
+  MSK_DINF_SIM_PRIMAL_TIME                                = 65,
+  MSK_DINF_SIM_TIME                                       = 66,
+  MSK_DINF_SOL_BAS_DUAL_OBJ                               = 67,
+  MSK_DINF_SOL_BAS_DVIOLCON                               = 68,
+  MSK_DINF_SOL_BAS_DVIOLVAR                               = 69,
+  MSK_DINF_SOL_BAS_NRM_BARX                               = 70,
+  MSK_DINF_SOL_BAS_NRM_SLC                                = 71,
+  MSK_DINF_SOL_BAS_NRM_SLX                                = 72,
+  MSK_DINF_SOL_BAS_NRM_SUC                                = 73,
+  MSK_DINF_SOL_BAS_NRM_SUX                                = 74,
+  MSK_DINF_SOL_BAS_NRM_XC                                 = 75,
+  MSK_DINF_SOL_BAS_NRM_XX                                 = 76,
+  MSK_DINF_SOL_BAS_NRM_Y                                  = 77,
+  MSK_DINF_SOL_BAS_PRIMAL_OBJ                             = 78,
+  MSK_DINF_SOL_BAS_PVIOLCON                               = 79,
+  MSK_DINF_SOL_BAS_PVIOLVAR                               = 80,
+  MSK_DINF_SOL_ITG_NRM_BARX                               = 81,
+  MSK_DINF_SOL_ITG_NRM_XC                                 = 82,
+  MSK_DINF_SOL_ITG_NRM_XX                                 = 83,
+  MSK_DINF_SOL_ITG_PRIMAL_OBJ                             = 84,
+  MSK_DINF_SOL_ITG_PVIOLACC                               = 85,
+  MSK_DINF_SOL_ITG_PVIOLBARVAR                            = 86,
+  MSK_DINF_SOL_ITG_PVIOLCON                               = 87,
+  MSK_DINF_SOL_ITG_PVIOLCONES                             = 88,
+  MSK_DINF_SOL_ITG_PVIOLDJC                               = 89,
+  MSK_DINF_SOL_ITG_PVIOLITG                               = 90,
+  MSK_DINF_SOL_ITG_PVIOLVAR                               = 91,
+  MSK_DINF_SOL_ITR_DUAL_OBJ                               = 92,
+  MSK_DINF_SOL_ITR_DVIOLACC                               = 93,
+  MSK_DINF_SOL_ITR_DVIOLBARVAR                            = 94,
+  MSK_DINF_SOL_ITR_DVIOLCON                               = 95,
+  MSK_DINF_SOL_ITR_DVIOLCONES                             = 96,
+  MSK_DINF_SOL_ITR_DVIOLVAR                               = 97,
+  MSK_DINF_SOL_ITR_NRM_BARS                               = 98,
+  MSK_DINF_SOL_ITR_NRM_BARX                               = 99,
+  MSK_DINF_SOL_ITR_NRM_SLC                                = 100,
+  MSK_DINF_SOL_ITR_NRM_SLX                                = 101,
+  MSK_DINF_SOL_ITR_NRM_SNX                                = 102,
+  MSK_DINF_SOL_ITR_NRM_SUC                                = 103,
+  MSK_DINF_SOL_ITR_NRM_SUX                                = 104,
+  MSK_DINF_SOL_ITR_NRM_XC                                 = 105,
+  MSK_DINF_SOL_ITR_NRM_XX                                 = 106,
+  MSK_DINF_SOL_ITR_NRM_Y                                  = 107,
+  MSK_DINF_SOL_ITR_PRIMAL_OBJ                             = 108,
+  MSK_DINF_SOL_ITR_PVIOLACC                               = 109,
+  MSK_DINF_SOL_ITR_PVIOLBARVAR                            = 110,
+  MSK_DINF_SOL_ITR_PVIOLCON                               = 111,
+  MSK_DINF_SOL_ITR_PVIOLCONES                             = 112,
+  MSK_DINF_SOL_ITR_PVIOLVAR                               = 113,
+  MSK_DINF_TO_CONIC_TIME                                  = 114,
+  MSK_DINF_WRITE_DATA_TIME                                = 115
 };
 #define MSK_DINF_BEGIN MSK_DINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_DENSITY
 #define MSK_DINF_END   (1+MSK_DINF_WRITE_DATA_TIME)
@@ -456,18 +472,18 @@ enum MSKdparam_enum {
   MSK_DPAR_BASIS_REL_TOL_S                         = 1,
   MSK_DPAR_BASIS_TOL_S                             = 2,
   MSK_DPAR_BASIS_TOL_X                             = 3,
-  MSK_DPAR_CHECK_CONVEXITY_REL_TOL                 = 4,
-  MSK_DPAR_DATA_SYM_MAT_TOL                        = 5,
-  MSK_DPAR_DATA_SYM_MAT_TOL_HUGE                   = 6,
-  MSK_DPAR_DATA_SYM_MAT_TOL_LARGE                  = 7,
-  MSK_DPAR_DATA_TOL_AIJ_HUGE                       = 8,
-  MSK_DPAR_DATA_TOL_AIJ_LARGE                      = 9,
-  MSK_DPAR_DATA_TOL_BOUND_INF                      = 10,
-  MSK_DPAR_DATA_TOL_BOUND_WRN                      = 11,
-  MSK_DPAR_DATA_TOL_C_HUGE                         = 12,
-  MSK_DPAR_DATA_TOL_CJ_LARGE                       = 13,
-  MSK_DPAR_DATA_TOL_QIJ                            = 14,
-  MSK_DPAR_DATA_TOL_X                              = 15,
+  MSK_DPAR_DATA_SYM_MAT_TOL                        = 4,
+  MSK_DPAR_DATA_SYM_MAT_TOL_HUGE                   = 5,
+  MSK_DPAR_DATA_SYM_MAT_TOL_LARGE                  = 6,
+  MSK_DPAR_DATA_TOL_AIJ_HUGE                       = 7,
+  MSK_DPAR_DATA_TOL_AIJ_LARGE                      = 8,
+  MSK_DPAR_DATA_TOL_BOUND_INF                      = 9,
+  MSK_DPAR_DATA_TOL_BOUND_WRN                      = 10,
+  MSK_DPAR_DATA_TOL_C_HUGE                         = 11,
+  MSK_DPAR_DATA_TOL_CJ_LARGE                       = 12,
+  MSK_DPAR_DATA_TOL_QIJ                            = 13,
+  MSK_DPAR_DATA_TOL_X                              = 14,
+  MSK_DPAR_FOLDING_TOL_EQ                          = 15,
   MSK_DPAR_INTPNT_CO_TOL_DFEAS                     = 16,
   MSK_DPAR_INTPNT_CO_TOL_INFEAS                    = 17,
   MSK_DPAR_INTPNT_CO_TOL_MU_RED                    = 18,
@@ -492,18 +508,18 @@ enum MSKdparam_enum {
   MSK_DPAR_INTPNT_TOL_STEP_SIZE                    = 37,
   MSK_DPAR_LOWER_OBJ_CUT                           = 38,
   MSK_DPAR_LOWER_OBJ_CUT_FINITE_TRH                = 39,
-  MSK_DPAR_MIO_DJC_MAX_BIGM                        = 40,
-  MSK_DPAR_MIO_MAX_TIME                            = 41,
-  MSK_DPAR_MIO_REL_GAP_CONST                       = 42,
-  MSK_DPAR_MIO_TOL_ABS_GAP                         = 43,
-  MSK_DPAR_MIO_TOL_ABS_RELAX_INT                   = 44,
-  MSK_DPAR_MIO_TOL_FEAS                            = 45,
-  MSK_DPAR_MIO_TOL_REL_DUAL_BOUND_IMPROVEMENT      = 46,
-  MSK_DPAR_MIO_TOL_REL_GAP                         = 47,
-  MSK_DPAR_OPTIMIZER_MAX_TICKS                     = 48,
-  MSK_DPAR_OPTIMIZER_MAX_TIME                      = 49,
-  MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP                 = 50,
-  MSK_DPAR_PRESOLVE_TOL_AIJ                        = 51,
+  MSK_DPAR_MIO_CLIQUE_TABLE_SIZE_FACTOR            = 40,
+  MSK_DPAR_MIO_DJC_MAX_BIGM                        = 41,
+  MSK_DPAR_MIO_MAX_TIME                            = 42,
+  MSK_DPAR_MIO_REL_GAP_CONST                       = 43,
+  MSK_DPAR_MIO_TOL_ABS_GAP                         = 44,
+  MSK_DPAR_MIO_TOL_ABS_RELAX_INT                   = 45,
+  MSK_DPAR_MIO_TOL_FEAS                            = 46,
+  MSK_DPAR_MIO_TOL_REL_DUAL_BOUND_IMPROVEMENT      = 47,
+  MSK_DPAR_MIO_TOL_REL_GAP                         = 48,
+  MSK_DPAR_OPTIMIZER_MAX_TICKS                     = 49,
+  MSK_DPAR_OPTIMIZER_MAX_TIME                      = 50,
+  MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP                 = 51,
   MSK_DPAR_PRESOLVE_TOL_PRIMAL_INFEAS_PERTURBATION = 52,
   MSK_DPAR_PRESOLVE_TOL_REL_LINDEP                 = 53,
   MSK_DPAR_PRESOLVE_TOL_S                          = 54,
@@ -511,9 +527,11 @@ enum MSKdparam_enum {
   MSK_DPAR_QCQO_REFORMULATE_REL_DROP_TOL           = 56,
   MSK_DPAR_SEMIDEFINITE_TOL_APPROX                 = 57,
   MSK_DPAR_SIM_LU_TOL_REL_PIV                      = 58,
-  MSK_DPAR_SIMPLEX_ABS_TOL_PIV                     = 59,
-  MSK_DPAR_UPPER_OBJ_CUT                           = 60,
-  MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH                = 61
+  MSK_DPAR_SIM_PRECISION_SCALING_EXTENDED          = 59,
+  MSK_DPAR_SIM_PRECISION_SCALING_NORMAL            = 60,
+  MSK_DPAR_SIMPLEX_ABS_TOL_PIV                     = 61,
+  MSK_DPAR_UPPER_OBJ_CUT                           = 62,
+  MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH                = 63
 };
 #define MSK_DPAR_BEGIN MSK_DPAR_ANA_SOL_INFEAS_TOL
 #define MSK_DPAR_END   (1+MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH)
@@ -523,24 +541,25 @@ enum MSKliinfitem_enum {
   MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_COLUMNS = 0,
   MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_NZ      = 1,
   MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_ROWS    = 2,
-  MSK_LIINF_BI_CLEAN_DUAL_DEG_ITER                           = 3,
-  MSK_LIINF_BI_CLEAN_DUAL_ITER                               = 4,
-  MSK_LIINF_BI_CLEAN_PRIMAL_DEG_ITER                         = 5,
-  MSK_LIINF_BI_CLEAN_PRIMAL_ITER                             = 6,
-  MSK_LIINF_BI_DUAL_ITER                                     = 7,
-  MSK_LIINF_BI_PRIMAL_ITER                                   = 8,
+  MSK_LIINF_BI_CLEAN_ITER                                    = 3,
+  MSK_LIINF_BI_DUAL_ITER                                     = 4,
+  MSK_LIINF_BI_PRIMAL_ITER                                   = 5,
+  MSK_LIINF_FOLDING_BI_DUAL_ITER                             = 6,
+  MSK_LIINF_FOLDING_BI_OPTIMIZER_ITER                        = 7,
+  MSK_LIINF_FOLDING_BI_PRIMAL_ITER                           = 8,
   MSK_LIINF_INTPNT_FACTOR_NUM_NZ                             = 9,
   MSK_LIINF_MIO_ANZ                                          = 10,
-  MSK_LIINF_MIO_INTPNT_ITER                                  = 11,
-  MSK_LIINF_MIO_NUM_DUAL_ILLPOSED_CER                        = 12,
-  MSK_LIINF_MIO_NUM_PRIM_ILLPOSED_CER                        = 13,
-  MSK_LIINF_MIO_PRESOLVED_ANZ                                = 14,
-  MSK_LIINF_MIO_SIMPLEX_ITER                                 = 15,
-  MSK_LIINF_RD_NUMACC                                        = 16,
-  MSK_LIINF_RD_NUMANZ                                        = 17,
-  MSK_LIINF_RD_NUMDJC                                        = 18,
-  MSK_LIINF_RD_NUMQNZ                                        = 19,
-  MSK_LIINF_SIMPLEX_ITER                                     = 20
+  MSK_LIINF_MIO_FINAL_ANZ                                    = 11,
+  MSK_LIINF_MIO_INTPNT_ITER                                  = 12,
+  MSK_LIINF_MIO_NUM_DUAL_ILLPOSED_CER                        = 13,
+  MSK_LIINF_MIO_NUM_PRIM_ILLPOSED_CER                        = 14,
+  MSK_LIINF_MIO_PRESOLVED_ANZ                                = 15,
+  MSK_LIINF_MIO_SIMPLEX_ITER                                 = 16,
+  MSK_LIINF_RD_NUMACC                                        = 17,
+  MSK_LIINF_RD_NUMANZ                                        = 18,
+  MSK_LIINF_RD_NUMDJC                                        = 19,
+  MSK_LIINF_RD_NUMQNZ                                        = 20,
+  MSK_LIINF_SIMPLEX_ITER                                     = 21
 };
 #define MSK_LIINF_BEGIN MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_COLUMNS
 #define MSK_LIINF_END   (1+MSK_LIINF_SIMPLEX_ITER)
@@ -562,108 +581,128 @@ enum MSKiinfitem_enum {
   MSK_IINF_ANA_PRO_NUM_VAR_LO                    = 12,
   MSK_IINF_ANA_PRO_NUM_VAR_RA                    = 13,
   MSK_IINF_ANA_PRO_NUM_VAR_UP                    = 14,
-  MSK_IINF_INTPNT_FACTOR_DIM_DENSE               = 15,
-  MSK_IINF_INTPNT_ITER                           = 16,
-  MSK_IINF_INTPNT_NUM_THREADS                    = 17,
-  MSK_IINF_INTPNT_SOLVE_DUAL                     = 18,
-  MSK_IINF_MIO_ABSGAP_SATISFIED                  = 19,
-  MSK_IINF_MIO_CLIQUE_TABLE_SIZE                 = 20,
-  MSK_IINF_MIO_CONSTRUCT_SOLUTION                = 21,
-  MSK_IINF_MIO_INITIAL_FEASIBLE_SOLUTION         = 22,
-  MSK_IINF_MIO_NODE_DEPTH                        = 23,
-  MSK_IINF_MIO_NUM_ACTIVE_NODES                  = 24,
-  MSK_IINF_MIO_NUM_ACTIVE_ROOT_CUTS              = 25,
-  MSK_IINF_MIO_NUM_BRANCH                        = 26,
-  MSK_IINF_MIO_NUM_INT_SOLUTIONS                 = 27,
-  MSK_IINF_MIO_NUM_RELAX                         = 28,
-  MSK_IINF_MIO_NUM_REPEATED_PRESOLVE             = 29,
-  MSK_IINF_MIO_NUM_RESTARTS                      = 30,
-  MSK_IINF_MIO_NUM_ROOT_CUT_ROUNDS               = 31,
-  MSK_IINF_MIO_NUM_SELECTED_CLIQUE_CUTS          = 32,
-  MSK_IINF_MIO_NUM_SELECTED_CMIR_CUTS            = 33,
-  MSK_IINF_MIO_NUM_SELECTED_GOMORY_CUTS          = 34,
-  MSK_IINF_MIO_NUM_SELECTED_IMPLIED_BOUND_CUTS   = 35,
-  MSK_IINF_MIO_NUM_SELECTED_KNAPSACK_COVER_CUTS  = 36,
-  MSK_IINF_MIO_NUM_SELECTED_LIPRO_CUTS           = 37,
-  MSK_IINF_MIO_NUM_SEPARATED_CLIQUE_CUTS         = 38,
-  MSK_IINF_MIO_NUM_SEPARATED_CMIR_CUTS           = 39,
-  MSK_IINF_MIO_NUM_SEPARATED_GOMORY_CUTS         = 40,
-  MSK_IINF_MIO_NUM_SEPARATED_IMPLIED_BOUND_CUTS  = 41,
-  MSK_IINF_MIO_NUM_SEPARATED_KNAPSACK_COVER_CUTS = 42,
-  MSK_IINF_MIO_NUM_SEPARATED_LIPRO_CUTS          = 43,
-  MSK_IINF_MIO_NUM_SOLVED_NODES                  = 44,
-  MSK_IINF_MIO_NUMBIN                            = 45,
-  MSK_IINF_MIO_NUMBINCONEVAR                     = 46,
-  MSK_IINF_MIO_NUMCON                            = 47,
-  MSK_IINF_MIO_NUMCONE                           = 48,
-  MSK_IINF_MIO_NUMCONEVAR                        = 49,
-  MSK_IINF_MIO_NUMCONT                           = 50,
-  MSK_IINF_MIO_NUMCONTCONEVAR                    = 51,
-  MSK_IINF_MIO_NUMDEXPCONES                      = 52,
-  MSK_IINF_MIO_NUMDJC                            = 53,
-  MSK_IINF_MIO_NUMDPOWCONES                      = 54,
-  MSK_IINF_MIO_NUMINT                            = 55,
-  MSK_IINF_MIO_NUMINTCONEVAR                     = 56,
-  MSK_IINF_MIO_NUMPEXPCONES                      = 57,
-  MSK_IINF_MIO_NUMPPOWCONES                      = 58,
-  MSK_IINF_MIO_NUMQCONES                         = 59,
-  MSK_IINF_MIO_NUMRQCONES                        = 60,
-  MSK_IINF_MIO_NUMVAR                            = 61,
-  MSK_IINF_MIO_OBJ_BOUND_DEFINED                 = 62,
-  MSK_IINF_MIO_PRESOLVED_NUMBIN                  = 63,
-  MSK_IINF_MIO_PRESOLVED_NUMBINCONEVAR           = 64,
-  MSK_IINF_MIO_PRESOLVED_NUMCON                  = 65,
-  MSK_IINF_MIO_PRESOLVED_NUMCONE                 = 66,
-  MSK_IINF_MIO_PRESOLVED_NUMCONEVAR              = 67,
-  MSK_IINF_MIO_PRESOLVED_NUMCONT                 = 68,
-  MSK_IINF_MIO_PRESOLVED_NUMCONTCONEVAR          = 69,
-  MSK_IINF_MIO_PRESOLVED_NUMDEXPCONES            = 70,
-  MSK_IINF_MIO_PRESOLVED_NUMDJC                  = 71,
-  MSK_IINF_MIO_PRESOLVED_NUMDPOWCONES            = 72,
-  MSK_IINF_MIO_PRESOLVED_NUMINT                  = 73,
-  MSK_IINF_MIO_PRESOLVED_NUMINTCONEVAR           = 74,
-  MSK_IINF_MIO_PRESOLVED_NUMPEXPCONES            = 75,
-  MSK_IINF_MIO_PRESOLVED_NUMPPOWCONES            = 76,
-  MSK_IINF_MIO_PRESOLVED_NUMQCONES               = 77,
-  MSK_IINF_MIO_PRESOLVED_NUMRQCONES              = 78,
-  MSK_IINF_MIO_PRESOLVED_NUMVAR                  = 79,
-  MSK_IINF_MIO_RELGAP_SATISFIED                  = 80,
-  MSK_IINF_MIO_TOTAL_NUM_SELECTED_CUTS           = 81,
-  MSK_IINF_MIO_TOTAL_NUM_SEPARATED_CUTS          = 82,
-  MSK_IINF_MIO_USER_OBJ_CUT                      = 83,
-  MSK_IINF_OPT_NUMCON                            = 84,
-  MSK_IINF_OPT_NUMVAR                            = 85,
-  MSK_IINF_OPTIMIZE_RESPONSE                     = 86,
-  MSK_IINF_PRESOLVE_NUM_PRIMAL_PERTURBATIONS     = 87,
-  MSK_IINF_PURIFY_DUAL_SUCCESS                   = 88,
-  MSK_IINF_PURIFY_PRIMAL_SUCCESS                 = 89,
-  MSK_IINF_RD_NUMBARVAR                          = 90,
-  MSK_IINF_RD_NUMCON                             = 91,
-  MSK_IINF_RD_NUMCONE                            = 92,
-  MSK_IINF_RD_NUMINTVAR                          = 93,
-  MSK_IINF_RD_NUMQ                               = 94,
-  MSK_IINF_RD_NUMVAR                             = 95,
-  MSK_IINF_RD_PROTYPE                            = 96,
-  MSK_IINF_SIM_DUAL_DEG_ITER                     = 97,
-  MSK_IINF_SIM_DUAL_HOTSTART                     = 98,
-  MSK_IINF_SIM_DUAL_HOTSTART_LU                  = 99,
-  MSK_IINF_SIM_DUAL_INF_ITER                     = 100,
-  MSK_IINF_SIM_DUAL_ITER                         = 101,
-  MSK_IINF_SIM_NUMCON                            = 102,
-  MSK_IINF_SIM_NUMVAR                            = 103,
-  MSK_IINF_SIM_PRIMAL_DEG_ITER                   = 104,
-  MSK_IINF_SIM_PRIMAL_HOTSTART                   = 105,
-  MSK_IINF_SIM_PRIMAL_HOTSTART_LU                = 106,
-  MSK_IINF_SIM_PRIMAL_INF_ITER                   = 107,
-  MSK_IINF_SIM_PRIMAL_ITER                       = 108,
-  MSK_IINF_SIM_SOLVE_DUAL                        = 109,
-  MSK_IINF_SOL_BAS_PROSTA                        = 110,
-  MSK_IINF_SOL_BAS_SOLSTA                        = 111,
-  MSK_IINF_SOL_ITG_PROSTA                        = 112,
-  MSK_IINF_SOL_ITG_SOLSTA                        = 113,
-  MSK_IINF_SOL_ITR_PROSTA                        = 114,
-  MSK_IINF_SOL_ITR_SOLSTA                        = 115,
-  MSK_IINF_STO_NUM_A_REALLOC                     = 116
+  MSK_IINF_FOLDING_APPLIED                       = 15,
+  MSK_IINF_INTPNT_FACTOR_DIM_DENSE               = 16,
+  MSK_IINF_INTPNT_ITER                           = 17,
+  MSK_IINF_INTPNT_NUM_THREADS                    = 18,
+  MSK_IINF_INTPNT_SOLVE_DUAL                     = 19,
+  MSK_IINF_MIO_ABSGAP_SATISFIED                  = 20,
+  MSK_IINF_MIO_CLIQUE_TABLE_SIZE                 = 21,
+  MSK_IINF_MIO_CONSTRUCT_SOLUTION                = 22,
+  MSK_IINF_MIO_FINAL_NUMBIN                      = 23,
+  MSK_IINF_MIO_FINAL_NUMBINCONEVAR               = 24,
+  MSK_IINF_MIO_FINAL_NUMCON                      = 25,
+  MSK_IINF_MIO_FINAL_NUMCONE                     = 26,
+  MSK_IINF_MIO_FINAL_NUMCONEVAR                  = 27,
+  MSK_IINF_MIO_FINAL_NUMCONT                     = 28,
+  MSK_IINF_MIO_FINAL_NUMCONTCONEVAR              = 29,
+  MSK_IINF_MIO_FINAL_NUMDEXPCONES                = 30,
+  MSK_IINF_MIO_FINAL_NUMDJC                      = 31,
+  MSK_IINF_MIO_FINAL_NUMDPOWCONES                = 32,
+  MSK_IINF_MIO_FINAL_NUMINT                      = 33,
+  MSK_IINF_MIO_FINAL_NUMINTCONEVAR               = 34,
+  MSK_IINF_MIO_FINAL_NUMPEXPCONES                = 35,
+  MSK_IINF_MIO_FINAL_NUMPPOWCONES                = 36,
+  MSK_IINF_MIO_FINAL_NUMQCONES                   = 37,
+  MSK_IINF_MIO_FINAL_NUMRQCONES                  = 38,
+  MSK_IINF_MIO_FINAL_NUMVAR                      = 39,
+  MSK_IINF_MIO_INITIAL_FEASIBLE_SOLUTION         = 40,
+  MSK_IINF_MIO_NODE_DEPTH                        = 41,
+  MSK_IINF_MIO_NUM_ACTIVE_NODES                  = 42,
+  MSK_IINF_MIO_NUM_ACTIVE_ROOT_CUTS              = 43,
+  MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_BB           = 44,
+  MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_PRESOLVE     = 45,
+  MSK_IINF_MIO_NUM_BRANCH                        = 46,
+  MSK_IINF_MIO_NUM_INT_SOLUTIONS                 = 47,
+  MSK_IINF_MIO_NUM_RELAX                         = 48,
+  MSK_IINF_MIO_NUM_REPEATED_PRESOLVE             = 49,
+  MSK_IINF_MIO_NUM_RESTARTS                      = 50,
+  MSK_IINF_MIO_NUM_ROOT_CUT_ROUNDS               = 51,
+  MSK_IINF_MIO_NUM_SELECTED_CLIQUE_CUTS          = 52,
+  MSK_IINF_MIO_NUM_SELECTED_CMIR_CUTS            = 53,
+  MSK_IINF_MIO_NUM_SELECTED_GOMORY_CUTS          = 54,
+  MSK_IINF_MIO_NUM_SELECTED_IMPLIED_BOUND_CUTS   = 55,
+  MSK_IINF_MIO_NUM_SELECTED_KNAPSACK_COVER_CUTS  = 56,
+  MSK_IINF_MIO_NUM_SELECTED_LIPRO_CUTS           = 57,
+  MSK_IINF_MIO_NUM_SEPARATED_CLIQUE_CUTS         = 58,
+  MSK_IINF_MIO_NUM_SEPARATED_CMIR_CUTS           = 59,
+  MSK_IINF_MIO_NUM_SEPARATED_GOMORY_CUTS         = 60,
+  MSK_IINF_MIO_NUM_SEPARATED_IMPLIED_BOUND_CUTS  = 61,
+  MSK_IINF_MIO_NUM_SEPARATED_KNAPSACK_COVER_CUTS = 62,
+  MSK_IINF_MIO_NUM_SEPARATED_LIPRO_CUTS          = 63,
+  MSK_IINF_MIO_NUM_SOLVED_NODES                  = 64,
+  MSK_IINF_MIO_NUMBIN                            = 65,
+  MSK_IINF_MIO_NUMBINCONEVAR                     = 66,
+  MSK_IINF_MIO_NUMCON                            = 67,
+  MSK_IINF_MIO_NUMCONE                           = 68,
+  MSK_IINF_MIO_NUMCONEVAR                        = 69,
+  MSK_IINF_MIO_NUMCONT                           = 70,
+  MSK_IINF_MIO_NUMCONTCONEVAR                    = 71,
+  MSK_IINF_MIO_NUMDEXPCONES                      = 72,
+  MSK_IINF_MIO_NUMDJC                            = 73,
+  MSK_IINF_MIO_NUMDPOWCONES                      = 74,
+  MSK_IINF_MIO_NUMINT                            = 75,
+  MSK_IINF_MIO_NUMINTCONEVAR                     = 76,
+  MSK_IINF_MIO_NUMPEXPCONES                      = 77,
+  MSK_IINF_MIO_NUMPPOWCONES                      = 78,
+  MSK_IINF_MIO_NUMQCONES                         = 79,
+  MSK_IINF_MIO_NUMRQCONES                        = 80,
+  MSK_IINF_MIO_NUMVAR                            = 81,
+  MSK_IINF_MIO_OBJ_BOUND_DEFINED                 = 82,
+  MSK_IINF_MIO_PRESOLVED_NUMBIN                  = 83,
+  MSK_IINF_MIO_PRESOLVED_NUMBINCONEVAR           = 84,
+  MSK_IINF_MIO_PRESOLVED_NUMCON                  = 85,
+  MSK_IINF_MIO_PRESOLVED_NUMCONE                 = 86,
+  MSK_IINF_MIO_PRESOLVED_NUMCONEVAR              = 87,
+  MSK_IINF_MIO_PRESOLVED_NUMCONT                 = 88,
+  MSK_IINF_MIO_PRESOLVED_NUMCONTCONEVAR          = 89,
+  MSK_IINF_MIO_PRESOLVED_NUMDEXPCONES            = 90,
+  MSK_IINF_MIO_PRESOLVED_NUMDJC                  = 91,
+  MSK_IINF_MIO_PRESOLVED_NUMDPOWCONES            = 92,
+  MSK_IINF_MIO_PRESOLVED_NUMINT                  = 93,
+  MSK_IINF_MIO_PRESOLVED_NUMINTCONEVAR           = 94,
+  MSK_IINF_MIO_PRESOLVED_NUMPEXPCONES            = 95,
+  MSK_IINF_MIO_PRESOLVED_NUMPPOWCONES            = 96,
+  MSK_IINF_MIO_PRESOLVED_NUMQCONES               = 97,
+  MSK_IINF_MIO_PRESOLVED_NUMRQCONES              = 98,
+  MSK_IINF_MIO_PRESOLVED_NUMVAR                  = 99,
+  MSK_IINF_MIO_RELGAP_SATISFIED                  = 100,
+  MSK_IINF_MIO_TOTAL_NUM_SELECTED_CUTS           = 101,
+  MSK_IINF_MIO_TOTAL_NUM_SEPARATED_CUTS          = 102,
+  MSK_IINF_MIO_USER_OBJ_CUT                      = 103,
+  MSK_IINF_OPT_NUMCON                            = 104,
+  MSK_IINF_OPT_NUMVAR                            = 105,
+  MSK_IINF_OPTIMIZE_RESPONSE                     = 106,
+  MSK_IINF_PRESOLVE_NUM_PRIMAL_PERTURBATIONS     = 107,
+  MSK_IINF_PURIFY_DUAL_SUCCESS                   = 108,
+  MSK_IINF_PURIFY_PRIMAL_SUCCESS                 = 109,
+  MSK_IINF_RD_NUMBARVAR                          = 110,
+  MSK_IINF_RD_NUMCON                             = 111,
+  MSK_IINF_RD_NUMCONE                            = 112,
+  MSK_IINF_RD_NUMINTVAR                          = 113,
+  MSK_IINF_RD_NUMQ                               = 114,
+  MSK_IINF_RD_NUMVAR                             = 115,
+  MSK_IINF_RD_PROTYPE                            = 116,
+  MSK_IINF_SIM_DUAL_DEG_ITER                     = 117,
+  MSK_IINF_SIM_DUAL_HOTSTART                     = 118,
+  MSK_IINF_SIM_DUAL_HOTSTART_LU                  = 119,
+  MSK_IINF_SIM_DUAL_INF_ITER                     = 120,
+  MSK_IINF_SIM_DUAL_ITER                         = 121,
+  MSK_IINF_SIM_NUMCON                            = 122,
+  MSK_IINF_SIM_NUMVAR                            = 123,
+  MSK_IINF_SIM_PRIMAL_DEG_ITER                   = 124,
+  MSK_IINF_SIM_PRIMAL_HOTSTART                   = 125,
+  MSK_IINF_SIM_PRIMAL_HOTSTART_LU                = 126,
+  MSK_IINF_SIM_PRIMAL_INF_ITER                   = 127,
+  MSK_IINF_SIM_PRIMAL_ITER                       = 128,
+  MSK_IINF_SIM_SOLVE_DUAL                        = 129,
+  MSK_IINF_SOL_BAS_PROSTA                        = 130,
+  MSK_IINF_SOL_BAS_SOLSTA                        = 131,
+  MSK_IINF_SOL_ITG_PROSTA                        = 132,
+  MSK_IINF_SOL_ITG_SOLSTA                        = 133,
+  MSK_IINF_SOL_ITR_PROSTA                        = 134,
+  MSK_IINF_SOL_ITR_SOLSTA                        = 135,
+  MSK_IINF_STO_NUM_A_REALLOC                     = 136
 };
 #define MSK_IINF_BEGIN MSK_IINF_ANA_PRO_NUM_CON
 #define MSK_IINF_END   (1+MSK_IINF_STO_NUM_A_REALLOC)
@@ -699,20 +738,20 @@ enum MSKiparam_enum {
   MSK_IPAR_BI_MAX_ITERATIONS                  = 8,
   MSK_IPAR_CACHE_LICENSE                      = 9,
   MSK_IPAR_COMPRESS_STATFILE                  = 10,
-  MSK_IPAR_INFEAS_GENERIC_NAMES               = 11,
-  MSK_IPAR_INFEAS_PREFER_PRIMAL               = 12,
-  MSK_IPAR_INFEAS_REPORT_AUTO                 = 13,
-  MSK_IPAR_INFEAS_REPORT_LEVEL                = 14,
-  MSK_IPAR_INTPNT_BASIS                       = 15,
-  MSK_IPAR_INTPNT_DIFF_STEP                   = 16,
-  MSK_IPAR_INTPNT_HOTSTART                    = 17,
-  MSK_IPAR_INTPNT_MAX_ITERATIONS              = 18,
-  MSK_IPAR_INTPNT_MAX_NUM_COR                 = 19,
-  MSK_IPAR_INTPNT_MAX_NUM_REFINEMENT_STEPS    = 20,
-  MSK_IPAR_INTPNT_OFF_COL_TRH                 = 21,
-  MSK_IPAR_INTPNT_ORDER_GP_NUM_SEEDS          = 22,
-  MSK_IPAR_INTPNT_ORDER_METHOD                = 23,
-  MSK_IPAR_INTPNT_PURIFY                      = 24,
+  MSK_IPAR_FOLDING_USE                        = 11,
+  MSK_IPAR_GETDUAL_CONVERT_LMIS               = 12,
+  MSK_IPAR_HEARTBEAT_SIM_FREQ_TICKS           = 13,
+  MSK_IPAR_INFEAS_GENERIC_NAMES               = 14,
+  MSK_IPAR_INFEAS_REPORT_AUTO                 = 15,
+  MSK_IPAR_INFEAS_REPORT_LEVEL                = 16,
+  MSK_IPAR_INTPNT_BASIS                       = 17,
+  MSK_IPAR_INTPNT_DIFF_STEP                   = 18,
+  MSK_IPAR_INTPNT_HOTSTART                    = 19,
+  MSK_IPAR_INTPNT_MAX_ITERATIONS              = 20,
+  MSK_IPAR_INTPNT_MAX_NUM_COR                 = 21,
+  MSK_IPAR_INTPNT_OFF_COL_TRH                 = 22,
+  MSK_IPAR_INTPNT_ORDER_GP_NUM_SEEDS          = 23,
+  MSK_IPAR_INTPNT_ORDER_METHOD                = 24,
   MSK_IPAR_INTPNT_REGULARIZATION_USE          = 25,
   MSK_IPAR_INTPNT_SCALING                     = 26,
   MSK_IPAR_INTPNT_SOLVE_FORM                  = 27,
@@ -738,149 +777,148 @@ enum MSKiparam_enum {
   MSK_IPAR_LOG_MIO_FREQ                       = 47,
   MSK_IPAR_LOG_ORDER                          = 48,
   MSK_IPAR_LOG_PRESOLVE                       = 49,
-  MSK_IPAR_LOG_RESPONSE                       = 50,
-  MSK_IPAR_LOG_SENSITIVITY                    = 51,
-  MSK_IPAR_LOG_SENSITIVITY_OPT                = 52,
-  MSK_IPAR_LOG_SIM                            = 53,
-  MSK_IPAR_LOG_SIM_FREQ                       = 54,
-  MSK_IPAR_LOG_SIM_MINOR                      = 55,
-  MSK_IPAR_LOG_STORAGE                        = 56,
-  MSK_IPAR_MAX_NUM_WARNINGS                   = 57,
-  MSK_IPAR_MIO_BRANCH_DIR                     = 58,
+  MSK_IPAR_LOG_SENSITIVITY                    = 50,
+  MSK_IPAR_LOG_SENSITIVITY_OPT                = 51,
+  MSK_IPAR_LOG_SIM                            = 52,
+  MSK_IPAR_LOG_SIM_FREQ                       = 53,
+  MSK_IPAR_LOG_SIM_FREQ_GIGA_TICKS            = 54,
+  MSK_IPAR_LOG_STORAGE                        = 55,
+  MSK_IPAR_MAX_NUM_WARNINGS                   = 56,
+  MSK_IPAR_MIO_BRANCH_DIR                     = 57,
+  MSK_IPAR_MIO_CONFLICT_ANALYSIS_LEVEL        = 58,
   MSK_IPAR_MIO_CONIC_OUTER_APPROXIMATION      = 59,
   MSK_IPAR_MIO_CONSTRUCT_SOL                  = 60,
-  MSK_IPAR_MIO_CUT_CLIQUE                     = 61,
-  MSK_IPAR_MIO_CUT_CMIR                       = 62,
-  MSK_IPAR_MIO_CUT_GMI                        = 63,
-  MSK_IPAR_MIO_CUT_IMPLIED_BOUND              = 64,
-  MSK_IPAR_MIO_CUT_KNAPSACK_COVER             = 65,
-  MSK_IPAR_MIO_CUT_LIPRO                      = 66,
-  MSK_IPAR_MIO_CUT_SELECTION_LEVEL            = 67,
-  MSK_IPAR_MIO_DATA_PERMUTATION_METHOD        = 68,
-  MSK_IPAR_MIO_DUAL_RAY_ANALYSIS_LEVEL        = 69,
-  MSK_IPAR_MIO_FEASPUMP_LEVEL                 = 70,
-  MSK_IPAR_MIO_HEURISTIC_LEVEL                = 71,
-  MSK_IPAR_MIO_MAX_NUM_BRANCHES               = 72,
-  MSK_IPAR_MIO_MAX_NUM_RELAXS                 = 73,
-  MSK_IPAR_MIO_MAX_NUM_RESTARTS               = 74,
-  MSK_IPAR_MIO_MAX_NUM_ROOT_CUT_ROUNDS        = 75,
-  MSK_IPAR_MIO_MAX_NUM_SOLUTIONS              = 76,
-  MSK_IPAR_MIO_MEMORY_EMPHASIS_LEVEL          = 77,
-  MSK_IPAR_MIO_MIN_REL                        = 78,
-  MSK_IPAR_MIO_MODE                           = 79,
-  MSK_IPAR_MIO_NODE_OPTIMIZER                 = 80,
-  MSK_IPAR_MIO_NODE_SELECTION                 = 81,
-  MSK_IPAR_MIO_NUMERICAL_EMPHASIS_LEVEL       = 82,
-  MSK_IPAR_MIO_PERSPECTIVE_REFORMULATE        = 83,
-  MSK_IPAR_MIO_PRESOLVE_AGGREGATOR_USE        = 84,
-  MSK_IPAR_MIO_PROBING_LEVEL                  = 85,
-  MSK_IPAR_MIO_PROPAGATE_OBJECTIVE_CONSTRAINT = 86,
-  MSK_IPAR_MIO_QCQO_REFORMULATION_METHOD      = 87,
-  MSK_IPAR_MIO_RINS_MAX_NODES                 = 88,
-  MSK_IPAR_MIO_ROOT_OPTIMIZER                 = 89,
-  MSK_IPAR_MIO_ROOT_REPEAT_PRESOLVE_LEVEL     = 90,
-  MSK_IPAR_MIO_SEED                           = 91,
-  MSK_IPAR_MIO_SYMMETRY_LEVEL                 = 92,
-  MSK_IPAR_MIO_VAR_SELECTION                  = 93,
-  MSK_IPAR_MIO_VB_DETECTION_LEVEL             = 94,
-  MSK_IPAR_MT_SPINCOUNT                       = 95,
-  MSK_IPAR_NG                                 = 96,
-  MSK_IPAR_NUM_THREADS                        = 97,
-  MSK_IPAR_OPF_WRITE_HEADER                   = 98,
-  MSK_IPAR_OPF_WRITE_HINTS                    = 99,
-  MSK_IPAR_OPF_WRITE_LINE_LENGTH              = 100,
-  MSK_IPAR_OPF_WRITE_PARAMETERS               = 101,
-  MSK_IPAR_OPF_WRITE_PROBLEM                  = 102,
-  MSK_IPAR_OPF_WRITE_SOL_BAS                  = 103,
-  MSK_IPAR_OPF_WRITE_SOL_ITG                  = 104,
-  MSK_IPAR_OPF_WRITE_SOL_ITR                  = 105,
-  MSK_IPAR_OPF_WRITE_SOLUTIONS                = 106,
-  MSK_IPAR_OPTIMIZER                          = 107,
-  MSK_IPAR_PARAM_READ_CASE_NAME               = 108,
-  MSK_IPAR_PARAM_READ_IGN_ERROR               = 109,
-  MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_FILL       = 110,
-  MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES  = 111,
-  MSK_IPAR_PRESOLVE_LEVEL                     = 112,
-  MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH       = 113,
-  MSK_IPAR_PRESOLVE_LINDEP_NEW                = 114,
-  MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH       = 115,
-  MSK_IPAR_PRESOLVE_LINDEP_USE                = 116,
-  MSK_IPAR_PRESOLVE_MAX_NUM_PASS              = 117,
-  MSK_IPAR_PRESOLVE_MAX_NUM_REDUCTIONS        = 118,
-  MSK_IPAR_PRESOLVE_USE                       = 119,
-  MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER            = 120,
-  MSK_IPAR_PTF_WRITE_PARAMETERS               = 121,
-  MSK_IPAR_PTF_WRITE_SOLUTIONS                = 122,
-  MSK_IPAR_PTF_WRITE_TRANSFORM                = 123,
-  MSK_IPAR_READ_DEBUG                         = 124,
-  MSK_IPAR_READ_KEEP_FREE_CON                 = 125,
-  MSK_IPAR_READ_MPS_FORMAT                    = 126,
-  MSK_IPAR_READ_MPS_WIDTH                     = 127,
-  MSK_IPAR_READ_TASK_IGNORE_PARAM             = 128,
-  MSK_IPAR_REMOTE_USE_COMPRESSION             = 129,
-  MSK_IPAR_REMOVE_UNUSED_SOLUTIONS            = 130,
-  MSK_IPAR_SENSITIVITY_ALL                    = 131,
-  MSK_IPAR_SENSITIVITY_OPTIMIZER              = 132,
-  MSK_IPAR_SENSITIVITY_TYPE                   = 133,
-  MSK_IPAR_SIM_BASIS_FACTOR_USE               = 134,
-  MSK_IPAR_SIM_DEGEN                          = 135,
-  MSK_IPAR_SIM_DETECT_PWL                     = 136,
-  MSK_IPAR_SIM_DUAL_CRASH                     = 137,
-  MSK_IPAR_SIM_DUAL_PHASEONE_METHOD           = 138,
-  MSK_IPAR_SIM_DUAL_RESTRICT_SELECTION        = 139,
-  MSK_IPAR_SIM_DUAL_SELECTION                 = 140,
-  MSK_IPAR_SIM_EXPLOIT_DUPVEC                 = 141,
-  MSK_IPAR_SIM_HOTSTART                       = 142,
-  MSK_IPAR_SIM_HOTSTART_LU                    = 143,
-  MSK_IPAR_SIM_MAX_ITERATIONS                 = 144,
-  MSK_IPAR_SIM_MAX_NUM_SETBACKS               = 145,
-  MSK_IPAR_SIM_NON_SINGULAR                   = 146,
-  MSK_IPAR_SIM_PRIMAL_CRASH                   = 147,
-  MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD         = 148,
-  MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION      = 149,
-  MSK_IPAR_SIM_PRIMAL_SELECTION               = 150,
-  MSK_IPAR_SIM_REFACTOR_FREQ                  = 151,
-  MSK_IPAR_SIM_REFORMULATION                  = 152,
-  MSK_IPAR_SIM_SAVE_LU                        = 153,
-  MSK_IPAR_SIM_SCALING                        = 154,
-  MSK_IPAR_SIM_SCALING_METHOD                 = 155,
-  MSK_IPAR_SIM_SEED                           = 156,
-  MSK_IPAR_SIM_SOLVE_FORM                     = 157,
-  MSK_IPAR_SIM_STABILITY_PRIORITY             = 158,
-  MSK_IPAR_SIM_SWITCH_OPTIMIZER               = 159,
-  MSK_IPAR_SOL_FILTER_KEEP_BASIC              = 160,
-  MSK_IPAR_SOL_FILTER_KEEP_RANGED             = 161,
-  MSK_IPAR_SOL_READ_NAME_WIDTH                = 162,
-  MSK_IPAR_SOL_READ_WIDTH                     = 163,
-  MSK_IPAR_SOLUTION_CALLBACK                  = 164,
-  MSK_IPAR_TIMING_LEVEL                       = 165,
-  MSK_IPAR_WRITE_BAS_CONSTRAINTS              = 166,
-  MSK_IPAR_WRITE_BAS_HEAD                     = 167,
-  MSK_IPAR_WRITE_BAS_VARIABLES                = 168,
-  MSK_IPAR_WRITE_COMPRESSION                  = 169,
-  MSK_IPAR_WRITE_DATA_PARAM                   = 170,
-  MSK_IPAR_WRITE_FREE_CON                     = 171,
-  MSK_IPAR_WRITE_GENERIC_NAMES                = 172,
-  MSK_IPAR_WRITE_GENERIC_NAMES_IO             = 173,
-  MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS    = 174,
-  MSK_IPAR_WRITE_INT_CONSTRAINTS              = 175,
-  MSK_IPAR_WRITE_INT_HEAD                     = 176,
-  MSK_IPAR_WRITE_INT_VARIABLES                = 177,
-  MSK_IPAR_WRITE_JSON_INDENTATION             = 178,
-  MSK_IPAR_WRITE_LP_FULL_OBJ                  = 179,
-  MSK_IPAR_WRITE_LP_LINE_WIDTH                = 180,
-  MSK_IPAR_WRITE_MPS_FORMAT                   = 181,
-  MSK_IPAR_WRITE_MPS_INT                      = 182,
-  MSK_IPAR_WRITE_SOL_BARVARIABLES             = 183,
-  MSK_IPAR_WRITE_SOL_CONSTRAINTS              = 184,
-  MSK_IPAR_WRITE_SOL_HEAD                     = 185,
-  MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES     = 186,
-  MSK_IPAR_WRITE_SOL_VARIABLES                = 187,
-  MSK_IPAR_WRITE_TASK_INC_SOL                 = 188,
-  MSK_IPAR_WRITE_XML_MODE                     = 189
+  MSK_IPAR_MIO_CROSSOVER_MAX_NODES            = 61,
+  MSK_IPAR_MIO_CUT_CLIQUE                     = 62,
+  MSK_IPAR_MIO_CUT_CMIR                       = 63,
+  MSK_IPAR_MIO_CUT_GMI                        = 64,
+  MSK_IPAR_MIO_CUT_IMPLIED_BOUND              = 65,
+  MSK_IPAR_MIO_CUT_KNAPSACK_COVER             = 66,
+  MSK_IPAR_MIO_CUT_LIPRO                      = 67,
+  MSK_IPAR_MIO_CUT_SELECTION_LEVEL            = 68,
+  MSK_IPAR_MIO_DATA_PERMUTATION_METHOD        = 69,
+  MSK_IPAR_MIO_DUAL_RAY_ANALYSIS_LEVEL        = 70,
+  MSK_IPAR_MIO_FEASPUMP_LEVEL                 = 71,
+  MSK_IPAR_MIO_HEURISTIC_LEVEL                = 72,
+  MSK_IPAR_MIO_INDEPENDENT_BLOCK_LEVEL        = 73,
+  MSK_IPAR_MIO_MAX_NUM_BRANCHES               = 74,
+  MSK_IPAR_MIO_MAX_NUM_RELAXS                 = 75,
+  MSK_IPAR_MIO_MAX_NUM_RESTARTS               = 76,
+  MSK_IPAR_MIO_MAX_NUM_ROOT_CUT_ROUNDS        = 77,
+  MSK_IPAR_MIO_MAX_NUM_SOLUTIONS              = 78,
+  MSK_IPAR_MIO_MEMORY_EMPHASIS_LEVEL          = 79,
+  MSK_IPAR_MIO_MIN_REL                        = 80,
+  MSK_IPAR_MIO_MODE                           = 81,
+  MSK_IPAR_MIO_NODE_OPTIMIZER                 = 82,
+  MSK_IPAR_MIO_NODE_SELECTION                 = 83,
+  MSK_IPAR_MIO_NUMERICAL_EMPHASIS_LEVEL       = 84,
+  MSK_IPAR_MIO_OPT_FACE_MAX_NODES             = 85,
+  MSK_IPAR_MIO_PERSPECTIVE_REFORMULATE        = 86,
+  MSK_IPAR_MIO_PRESOLVE_AGGREGATOR_USE        = 87,
+  MSK_IPAR_MIO_PROBING_LEVEL                  = 88,
+  MSK_IPAR_MIO_PROPAGATE_OBJECTIVE_CONSTRAINT = 89,
+  MSK_IPAR_MIO_QCQO_REFORMULATION_METHOD      = 90,
+  MSK_IPAR_MIO_RENS_MAX_NODES                 = 91,
+  MSK_IPAR_MIO_RINS_MAX_NODES                 = 92,
+  MSK_IPAR_MIO_ROOT_OPTIMIZER                 = 93,
+  MSK_IPAR_MIO_SEED                           = 94,
+  MSK_IPAR_MIO_SYMMETRY_LEVEL                 = 95,
+  MSK_IPAR_MIO_VAR_SELECTION                  = 96,
+  MSK_IPAR_MIO_VB_DETECTION_LEVEL             = 97,
+  MSK_IPAR_MT_SPINCOUNT                       = 98,
+  MSK_IPAR_NG                                 = 99,
+  MSK_IPAR_NUM_THREADS                        = 100,
+  MSK_IPAR_OPF_WRITE_HEADER                   = 101,
+  MSK_IPAR_OPF_WRITE_HINTS                    = 102,
+  MSK_IPAR_OPF_WRITE_LINE_LENGTH              = 103,
+  MSK_IPAR_OPF_WRITE_PARAMETERS               = 104,
+  MSK_IPAR_OPF_WRITE_PROBLEM                  = 105,
+  MSK_IPAR_OPF_WRITE_SOL_BAS                  = 106,
+  MSK_IPAR_OPF_WRITE_SOL_ITG                  = 107,
+  MSK_IPAR_OPF_WRITE_SOL_ITR                  = 108,
+  MSK_IPAR_OPF_WRITE_SOLUTIONS                = 109,
+  MSK_IPAR_OPTIMIZER                          = 110,
+  MSK_IPAR_PARAM_READ_CASE_NAME               = 111,
+  MSK_IPAR_PARAM_READ_IGN_ERROR               = 112,
+  MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_FILL       = 113,
+  MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES  = 114,
+  MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH       = 115,
+  MSK_IPAR_PRESOLVE_LINDEP_NEW                = 116,
+  MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH       = 117,
+  MSK_IPAR_PRESOLVE_LINDEP_USE                = 118,
+  MSK_IPAR_PRESOLVE_MAX_NUM_PASS              = 119,
+  MSK_IPAR_PRESOLVE_MAX_NUM_REDUCTIONS        = 120,
+  MSK_IPAR_PRESOLVE_USE                       = 121,
+  MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER            = 122,
+  MSK_IPAR_PTF_WRITE_PARAMETERS               = 123,
+  MSK_IPAR_PTF_WRITE_SINGLE_PSD_TERMS         = 124,
+  MSK_IPAR_PTF_WRITE_SOLUTIONS                = 125,
+  MSK_IPAR_PTF_WRITE_TRANSFORM                = 126,
+  MSK_IPAR_READ_ASYNC                         = 127,
+  MSK_IPAR_READ_DEBUG                         = 128,
+  MSK_IPAR_READ_KEEP_FREE_CON                 = 129,
+  MSK_IPAR_READ_MPS_FORMAT                    = 130,
+  MSK_IPAR_READ_MPS_WIDTH                     = 131,
+  MSK_IPAR_READ_TASK_IGNORE_PARAM             = 132,
+  MSK_IPAR_REMOTE_USE_COMPRESSION             = 133,
+  MSK_IPAR_REMOVE_UNUSED_SOLUTIONS            = 134,
+  MSK_IPAR_SENSITIVITY_ALL                    = 135,
+  MSK_IPAR_SENSITIVITY_TYPE                   = 136,
+  MSK_IPAR_SIM_BASIS_FACTOR_USE               = 137,
+  MSK_IPAR_SIM_DEGEN                          = 138,
+  MSK_IPAR_SIM_DETECT_PWL                     = 139,
+  MSK_IPAR_SIM_DUAL_CRASH                     = 140,
+  MSK_IPAR_SIM_DUAL_PHASEONE_METHOD           = 141,
+  MSK_IPAR_SIM_DUAL_RESTRICT_SELECTION        = 142,
+  MSK_IPAR_SIM_DUAL_SELECTION                 = 143,
+  MSK_IPAR_SIM_EXPLOIT_DUPVEC                 = 144,
+  MSK_IPAR_SIM_HOTSTART                       = 145,
+  MSK_IPAR_SIM_HOTSTART_LU                    = 146,
+  MSK_IPAR_SIM_MAX_ITERATIONS                 = 147,
+  MSK_IPAR_SIM_MAX_NUM_SETBACKS               = 148,
+  MSK_IPAR_SIM_NON_SINGULAR                   = 149,
+  MSK_IPAR_SIM_PRECISION                      = 150,
+  MSK_IPAR_SIM_PRECISION_BOOST                = 151,
+  MSK_IPAR_SIM_PRIMAL_CRASH                   = 152,
+  MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD         = 153,
+  MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION      = 154,
+  MSK_IPAR_SIM_PRIMAL_SELECTION               = 155,
+  MSK_IPAR_SIM_REFACTOR_FREQ                  = 156,
+  MSK_IPAR_SIM_REFORMULATION                  = 157,
+  MSK_IPAR_SIM_SAVE_LU                        = 158,
+  MSK_IPAR_SIM_SCALING                        = 159,
+  MSK_IPAR_SIM_SCALING_METHOD                 = 160,
+  MSK_IPAR_SIM_SEED                           = 161,
+  MSK_IPAR_SIM_SOLVE_FORM                     = 162,
+  MSK_IPAR_SIM_SWITCH_OPTIMIZER               = 163,
+  MSK_IPAR_SOL_FILTER_KEEP_BASIC              = 164,
+  MSK_IPAR_SOL_READ_NAME_WIDTH                = 165,
+  MSK_IPAR_SOL_READ_WIDTH                     = 166,
+  MSK_IPAR_TIMING_LEVEL                       = 167,
+  MSK_IPAR_WRITE_ASYNC                        = 168,
+  MSK_IPAR_WRITE_BAS_CONSTRAINTS              = 169,
+  MSK_IPAR_WRITE_BAS_HEAD                     = 170,
+  MSK_IPAR_WRITE_BAS_VARIABLES                = 171,
+  MSK_IPAR_WRITE_COMPRESSION                  = 172,
+  MSK_IPAR_WRITE_FREE_CON                     = 173,
+  MSK_IPAR_WRITE_GENERIC_NAMES                = 174,
+  MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS    = 175,
+  MSK_IPAR_WRITE_INT_CONSTRAINTS              = 176,
+  MSK_IPAR_WRITE_INT_HEAD                     = 177,
+  MSK_IPAR_WRITE_INT_VARIABLES                = 178,
+  MSK_IPAR_WRITE_JSON_INDENTATION             = 179,
+  MSK_IPAR_WRITE_LP_FULL_OBJ                  = 180,
+  MSK_IPAR_WRITE_LP_LINE_WIDTH                = 181,
+  MSK_IPAR_WRITE_MPS_FORMAT                   = 182,
+  MSK_IPAR_WRITE_MPS_INT                      = 183,
+  MSK_IPAR_WRITE_SOL_BARVARIABLES             = 184,
+  MSK_IPAR_WRITE_SOL_CONSTRAINTS              = 185,
+  MSK_IPAR_WRITE_SOL_HEAD                     = 186,
+  MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES     = 187,
+  MSK_IPAR_WRITE_SOL_VARIABLES                = 188
 };
 #define MSK_IPAR_BEGIN MSK_IPAR_ANA_SOL_BASIS
-#define MSK_IPAR_END   (1+MSK_IPAR_WRITE_XML_MODE)
+#define MSK_IPAR_END   (1+MSK_IPAR_WRITE_SOL_VARIABLES)
 
 
 enum MSKbranchdir_enum {
@@ -982,13 +1020,15 @@ enum MSKonoffkey_enum {
 
 
 enum MSKoptimizertype_enum {
-  MSK_OPTIMIZER_CONIC          = 0,
-  MSK_OPTIMIZER_DUAL_SIMPLEX   = 1,
-  MSK_OPTIMIZER_FREE           = 2,
-  MSK_OPTIMIZER_FREE_SIMPLEX   = 3,
-  MSK_OPTIMIZER_INTPNT         = 4,
-  MSK_OPTIMIZER_MIXED_INT      = 5,
-  MSK_OPTIMIZER_PRIMAL_SIMPLEX = 6
+  MSK_OPTIMIZER_CONIC              = 0,
+  MSK_OPTIMIZER_DUAL_SIMPLEX       = 1,
+  MSK_OPTIMIZER_FREE               = 2,
+  MSK_OPTIMIZER_FREE_SIMPLEX       = 3,
+  MSK_OPTIMIZER_INTPNT             = 4,
+  MSK_OPTIMIZER_MIXED_INT          = 5,
+  MSK_OPTIMIZER_NEW_DUAL_SIMPLEX   = 6,
+  MSK_OPTIMIZER_NEW_PRIMAL_SIMPLEX = 7,
+  MSK_OPTIMIZER_PRIMAL_SIMPLEX     = 8
 };
 #define MSK_OPTIMIZER_BEGIN MSK_OPTIMIZER_CONIC
 #define MSK_OPTIMIZER_END   (1+MSK_OPTIMIZER_PRIMAL_SIMPLEX)
@@ -1013,6 +1053,16 @@ enum MSKpresolvemode_enum {
 };
 #define MSK_PRESOLVE_MODE_BEGIN MSK_PRESOLVE_MODE_OFF
 #define MSK_PRESOLVE_MODE_END   (1+MSK_PRESOLVE_MODE_FREE)
+
+
+enum MSKfoldingmode_enum {
+  MSK_FOLDING_MODE_OFF               = 0,
+  MSK_FOLDING_MODE_FREE              = 1,
+  MSK_FOLDING_MODE_FREE_UNLESS_BASIC = 2,
+  MSK_FOLDING_MODE_FORCE             = 3
+};
+#define MSK_FOLDING_MODE_BEGIN MSK_FOLDING_MODE_OFF
+#define MSK_FOLDING_MODE_END   (1+MSK_FOLDING_MODE_FORCE)
 
 
 enum MSKparametertype_enum {
@@ -1060,14 +1110,6 @@ enum MSKprosta_enum {
 #define MSK_PRO_STA_END   (1+MSK_PRO_STA_PRIM_INFEAS_OR_UNBOUNDED)
 
 
-enum MSKxmlwriteroutputtype_enum {
-  MSK_WRITE_XML_MODE_ROW = 0,
-  MSK_WRITE_XML_MODE_COL = 1
-};
-#define MSK_WRITE_XML_MODE_BEGIN MSK_WRITE_XML_MODE_ROW
-#define MSK_WRITE_XML_MODE_END   (1+MSK_WRITE_XML_MODE_COL)
-
-
 enum MSKrescode_enum {
   MSK_RES_OK                                                   = 0,
   MSK_RES_WRN_OPEN_PARAM_FILE                                  = 50,
@@ -1113,27 +1155,25 @@ enum MSKrescode_enum {
   MSK_RES_WRN_INCOMPLETE_LINEAR_DEPENDENCY_CHECK               = 800,
   MSK_RES_WRN_ELIMINATOR_SPACE                                 = 801,
   MSK_RES_WRN_PRESOLVE_OUTOFSPACE                              = 802,
-  MSK_RES_WRN_PRESOLVE_PRIMAL_PERTUBATIONS                     = 803,
+  MSK_RES_WRN_PRESOLVE_PRIMAL_PERTURBATIONS                    = 803,
   MSK_RES_WRN_WRITE_CHANGED_NAMES                              = 830,
   MSK_RES_WRN_WRITE_DISCARDED_CFIX                             = 831,
   MSK_RES_WRN_DUPLICATE_CONSTRAINT_NAMES                       = 850,
   MSK_RES_WRN_DUPLICATE_VARIABLE_NAMES                         = 851,
   MSK_RES_WRN_DUPLICATE_BARVARIABLE_NAMES                      = 852,
   MSK_RES_WRN_DUPLICATE_CONE_NAMES                             = 853,
-  MSK_RES_WRN_WRITE_LP_INVALID_VAR_NAMES                       = 854,
-  MSK_RES_WRN_WRITE_LP_DUPLICATE_VAR_NAMES                     = 855,
-  MSK_RES_WRN_WRITE_LP_INVALID_CON_NAMES                       = 856,
-  MSK_RES_WRN_WRITE_LP_DUPLICATE_CON_NAMES                     = 857,
   MSK_RES_WRN_ANA_LARGE_BOUNDS                                 = 900,
   MSK_RES_WRN_ANA_C_ZERO                                       = 901,
   MSK_RES_WRN_ANA_EMPTY_COLS                                   = 902,
   MSK_RES_WRN_ANA_CLOSE_BOUNDS                                 = 903,
   MSK_RES_WRN_ANA_ALMOST_INT_BOUNDS                            = 904,
   MSK_RES_WRN_NO_INFEASIBILITY_REPORT_WHEN_MATRIX_VARIABLES    = 930,
+  MSK_RES_WRN_GETDUAL_IGNORES_INTEGRALITY                      = 940,
   MSK_RES_WRN_NO_DUALIZER                                      = 950,
   MSK_RES_WRN_SYM_MAT_LARGE                                    = 960,
   MSK_RES_WRN_MODIFIED_DOUBLE_PARAMETER                        = 970,
   MSK_RES_WRN_LARGE_FIJ                                        = 980,
+  MSK_RES_WRN_PTF_UNKNOWN_SECTION                              = 981,
   MSK_RES_ERR_LICENSE                                          = 1000,
   MSK_RES_ERR_LICENSE_EXPIRED                                  = 1001,
   MSK_RES_ERR_LICENSE_VERSION                                  = 1002,
@@ -1184,6 +1224,7 @@ enum MSKrescode_enum {
   MSK_RES_ERR_LIVING_TASKS                                     = 1066,
   MSK_RES_ERR_READ_GZIP                                        = 1067,
   MSK_RES_ERR_READ_ZSTD                                        = 1068,
+  MSK_RES_ERR_READ_ASYNC                                       = 1069,
   MSK_RES_ERR_BLANK_NAME                                       = 1070,
   MSK_RES_ERR_DUP_NAME                                         = 1071,
   MSK_RES_ERR_FORMAT_STRING                                    = 1072,
@@ -1198,7 +1239,12 @@ enum MSKrescode_enum {
   MSK_RES_ERR_SPACE_NO_INFO                                    = 1081,
   MSK_RES_ERR_DIMENSION_SPECIFICATION                          = 1082,
   MSK_RES_ERR_AXIS_NAME_SPECIFICATION                          = 1083,
+  MSK_RES_ERR_READ_PREMATURE_EOF                               = 1089,
   MSK_RES_ERR_READ_FORMAT                                      = 1090,
+  MSK_RES_ERR_WRITE_LP_INVALID_VAR_NAMES                       = 1091,
+  MSK_RES_ERR_WRITE_LP_DUPLICATE_VAR_NAMES                     = 1092,
+  MSK_RES_ERR_WRITE_LP_INVALID_CON_NAMES                       = 1093,
+  MSK_RES_ERR_WRITE_LP_DUPLICATE_CON_NAMES                     = 1094,
   MSK_RES_ERR_MPS_FILE                                         = 1100,
   MSK_RES_ERR_MPS_INV_FIELD                                    = 1101,
   MSK_RES_ERR_MPS_INV_MARKER                                   = 1102,
@@ -1256,6 +1302,7 @@ enum MSKrescode_enum {
   MSK_RES_ERR_LP_DUPLICATE_SECTION                             = 1164,
   MSK_RES_ERR_READ_LP_DELAYED_ROWS_NOT_SUPPORTED               = 1165,
   MSK_RES_ERR_WRITING_FILE                                     = 1166,
+  MSK_RES_ERR_WRITE_ASYNC                                      = 1167,
   MSK_RES_ERR_INVALID_NAME_IN_SOL_FILE                         = 1170,
   MSK_RES_ERR_JSON_SYNTAX                                      = 1175,
   MSK_RES_ERR_JSON_STRING                                      = 1176,
@@ -1432,6 +1479,8 @@ enum MSKrescode_enum {
   MSK_RES_ERR_TASK_INCOMPATIBLE                                = 2560,
   MSK_RES_ERR_TASK_INVALID                                     = 2561,
   MSK_RES_ERR_TASK_WRITE                                       = 2562,
+  MSK_RES_ERR_READ_WRITE                                       = 2563,
+  MSK_RES_ERR_TASK_PREMATURE_EOF                               = 2564,
   MSK_RES_ERR_LU_MAX_NUM_TRIES                                 = 2800,
   MSK_RES_ERR_INVALID_UTF8                                     = 2900,
   MSK_RES_ERR_INVALID_WCHAR                                    = 2901,
@@ -1455,10 +1504,7 @@ enum MSKrescode_enum {
   MSK_RES_ERR_IDENTICAL_TASKS                                  = 3101,
   MSK_RES_ERR_AD_INVALID_CODELIST                              = 3102,
   MSK_RES_ERR_INTERNAL_TEST_FAILED                             = 3500,
-  MSK_RES_ERR_XML_INVALID_PROBLEM_TYPE                         = 3600,
-  MSK_RES_ERR_INVALID_AMPL_STUB                                = 3700,
   MSK_RES_ERR_INT64_TO_INT32_CAST                              = 3800,
-  MSK_RES_ERR_SIZE_LICENSE_NUMCORES                            = 3900,
   MSK_RES_ERR_INFEAS_UNDEFINED                                 = 3910,
   MSK_RES_ERR_NO_BARX_FOR_SOLUTION                             = 3915,
   MSK_RES_ERR_NO_BARS_FOR_SOLUTION                             = 3916,
@@ -1566,6 +1612,7 @@ enum MSKrescode_enum {
   MSK_RES_ERR_TOCONIC_CONSTRAINT_RA                            = 7802,
   MSK_RES_ERR_TOCONIC_CONSTR_NOT_CONIC                         = 7803,
   MSK_RES_ERR_TOCONIC_OBJECTIVE_NOT_PSD                        = 7804,
+  MSK_RES_ERR_GETDUAL_NOT_AVAILABLE                            = 7820,
   MSK_RES_ERR_SERVER_CONNECT                                   = 8000,
   MSK_RES_ERR_SERVER_PROTOCOL                                  = 8001,
   MSK_RES_ERR_SERVER_STATUS                                    = 8002,
@@ -1575,6 +1622,7 @@ enum MSKrescode_enum {
   MSK_RES_ERR_SERVER_TLS_CLIENT                                = 8006,
   MSK_RES_ERR_SERVER_ACCESS_TOKEN                              = 8007,
   MSK_RES_ERR_SERVER_PROBLEM_SIZE                              = 8008,
+  MSK_RES_ERR_SERVER_HARD_TIMEOUT                              = 8009,
   MSK_RES_ERR_DUPLICATE_INDEX_IN_A_SPARSE_MATRIX               = 20050,
   MSK_RES_ERR_DUPLICATE_INDEX_IN_AFEIDX_LIST                   = 20060,
   MSK_RES_ERR_DUPLICATE_FIJ                                    = 20100,
@@ -1613,7 +1661,9 @@ enum MSKrescode_enum {
   MSK_RES_TRM_NUMERICAL_PROBLEM                                = 100025,
   MSK_RES_TRM_LOST_RACE                                        = 100027,
   MSK_RES_TRM_INTERNAL                                         = 100030,
-  MSK_RES_TRM_INTERNAL_STOP                                    = 100031
+  MSK_RES_TRM_INTERNAL_STOP                                    = 100031,
+  MSK_RES_TRM_SERVER_MAX_TIME                                  = 100032,
+  MSK_RES_TRM_SERVER_MAX_MEMORY                                = 100033
 };
 
 
@@ -1735,11 +1785,10 @@ enum MSKsparam_enum {
   MSK_SPAR_SOL_FILTER_XX_LOW         = 20,
   MSK_SPAR_SOL_FILTER_XX_UPR         = 21,
   MSK_SPAR_STAT_KEY                  = 22,
-  MSK_SPAR_STAT_NAME                 = 23,
-  MSK_SPAR_WRITE_LP_GEN_VAR_NAME     = 24
+  MSK_SPAR_STAT_NAME                 = 23
 };
 #define MSK_SPAR_BEGIN MSK_SPAR_BAS_SOL_FILE_NAME
-#define MSK_SPAR_END   (1+MSK_SPAR_WRITE_LP_GEN_VAR_NAME)
+#define MSK_SPAR_END   (1+MSK_SPAR_STAT_NAME)
 
 
 enum MSKstakey_enum {
@@ -1793,6 +1842,74 @@ enum MSKvariabletype_enum {
 #define MSK_FIRST_ERR_CODE 1000 
 #define MSK_LAST_ERR_CODE  9999 
 /**************************************************/
+typedef enum MSK_whichenum_enum {
+  MSK_WHICHENUM_LANGUAGE,
+  MSK_WHICHENUM_BASINDTYPE,
+  MSK_WHICHENUM_BOUNDKEY,
+  MSK_WHICHENUM_MARK,
+  MSK_WHICHENUM_SIMPRECISION,
+  MSK_WHICHENUM_SIMDEGEN,
+  MSK_WHICHENUM_TRANSPOSE,
+  MSK_WHICHENUM_UPLO,
+  MSK_WHICHENUM_SIMREFORM,
+  MSK_WHICHENUM_SIMDUPVEC,
+  MSK_WHICHENUM_SIMHOTSTART,
+  MSK_WHICHENUM_INTPNTHOTSTART,
+  MSK_WHICHENUM_CALLBACKCODE,
+  MSK_WHICHENUM_COMPRESSTYPE,
+  MSK_WHICHENUM_CONETYPE,
+  MSK_WHICHENUM_DOMAINTYPE,
+  MSK_WHICHENUM_NAMETYPE,
+  MSK_WHICHENUM_SYMMATTYPE,
+  MSK_WHICHENUM_DATAFORMAT,
+  MSK_WHICHENUM_SOLFORMAT,
+  MSK_WHICHENUM_DINFITEM,
+  MSK_WHICHENUM_FEATURE,
+  MSK_WHICHENUM_DPARAM,
+  MSK_WHICHENUM_LIINFITEM,
+  MSK_WHICHENUM_INTERNAL_LIINF,
+  MSK_WHICHENUM_IINFITEM,
+  MSK_WHICHENUM_INFTYPE,
+  MSK_WHICHENUM_INTERNAL_DINF,
+  MSK_WHICHENUM_INTERNAL_IINF,
+  MSK_WHICHENUM_IOMODE,
+  MSK_WHICHENUM_IPARAM,
+  MSK_WHICHENUM_BRANCHDIR,
+  MSK_WHICHENUM_MIQCQOREFORMMETHOD,
+  MSK_WHICHENUM_MIODATAPERMMETHOD,
+  MSK_WHICHENUM_MIOCONTSOLTYPE,
+  MSK_WHICHENUM_MIOMODE,
+  MSK_WHICHENUM_MIONODESELTYPE,
+  MSK_WHICHENUM_MIOVARSELTYPE,
+  MSK_WHICHENUM_MPSFORMAT,
+  MSK_WHICHENUM_OBJSENSE,
+  MSK_WHICHENUM_ONOFFKEY,
+  MSK_WHICHENUM_OPTIMIZERTYPE,
+  MSK_WHICHENUM_ORDERINGTYPE,
+  MSK_WHICHENUM_PRESOLVEMODE,
+  MSK_WHICHENUM_FOLDINGMODE,
+  MSK_WHICHENUM_PARAMETERTYPE,
+  MSK_WHICHENUM_PROBLEMITEM,
+  MSK_WHICHENUM_PROBLEMTYPE,
+  MSK_WHICHENUM_PROSTA,
+  MSK_WHICHENUM_RESCODE,
+  MSK_WHICHENUM_RESCODETYPE,
+  MSK_WHICHENUM_SCALINGTYPE,
+  MSK_WHICHENUM_SCALINGMETHOD,
+  MSK_WHICHENUM_SENSITIVITYTYPE,
+  MSK_WHICHENUM_SIMSELTYPE,
+  MSK_WHICHENUM_SOLITEM,
+  MSK_WHICHENUM_SOLSTA,
+  MSK_WHICHENUM_SOLTYPE,
+  MSK_WHICHENUM_SOLVEFORM,
+  MSK_WHICHENUM_SPARAM,
+  MSK_WHICHENUM_STAKEY,
+  MSK_WHICHENUM_STARTPOINTTYPE,
+  MSK_WHICHENUM_STREAMTYPE,
+  MSK_WHICHENUM_VARIABLETYPE,
+  MSK_WHICHENUM_LAST
+} /* MSKwhichenum_enum */
+MSKwhichenume;
 
 
 
@@ -1820,13 +1937,11 @@ enum MSKvariabletype_enum {
 #define MSK_SPAR_SOL_FILTER_XX_UPR_                         "MSK_SPAR_SOL_FILTER_XX_UPR"
 #define MSK_SPAR_STAT_KEY_                                  "MSK_SPAR_STAT_KEY"
 #define MSK_SPAR_STAT_NAME_                                 "MSK_SPAR_STAT_NAME"
-#define MSK_SPAR_WRITE_LP_GEN_VAR_NAME_                     "MSK_SPAR_WRITE_LP_GEN_VAR_NAME"
 
 #define MSK_DPAR_ANA_SOL_INFEAS_TOL_                        "MSK_DPAR_ANA_SOL_INFEAS_TOL"
 #define MSK_DPAR_BASIS_REL_TOL_S_                           "MSK_DPAR_BASIS_REL_TOL_S"
 #define MSK_DPAR_BASIS_TOL_S_                               "MSK_DPAR_BASIS_TOL_S"
 #define MSK_DPAR_BASIS_TOL_X_                               "MSK_DPAR_BASIS_TOL_X"
-#define MSK_DPAR_CHECK_CONVEXITY_REL_TOL_                   "MSK_DPAR_CHECK_CONVEXITY_REL_TOL"
 #define MSK_DPAR_DATA_SYM_MAT_TOL_                          "MSK_DPAR_DATA_SYM_MAT_TOL"
 #define MSK_DPAR_DATA_SYM_MAT_TOL_HUGE_                     "MSK_DPAR_DATA_SYM_MAT_TOL_HUGE"
 #define MSK_DPAR_DATA_SYM_MAT_TOL_LARGE_                    "MSK_DPAR_DATA_SYM_MAT_TOL_LARGE"
@@ -1838,6 +1953,7 @@ enum MSKvariabletype_enum {
 #define MSK_DPAR_DATA_TOL_CJ_LARGE_                         "MSK_DPAR_DATA_TOL_CJ_LARGE"
 #define MSK_DPAR_DATA_TOL_QIJ_                              "MSK_DPAR_DATA_TOL_QIJ"
 #define MSK_DPAR_DATA_TOL_X_                                "MSK_DPAR_DATA_TOL_X"
+#define MSK_DPAR_FOLDING_TOL_EQ_                            "MSK_DPAR_FOLDING_TOL_EQ"
 #define MSK_DPAR_INTPNT_CO_TOL_DFEAS_                       "MSK_DPAR_INTPNT_CO_TOL_DFEAS"
 #define MSK_DPAR_INTPNT_CO_TOL_INFEAS_                      "MSK_DPAR_INTPNT_CO_TOL_INFEAS"
 #define MSK_DPAR_INTPNT_CO_TOL_MU_RED_                      "MSK_DPAR_INTPNT_CO_TOL_MU_RED"
@@ -1862,6 +1978,7 @@ enum MSKvariabletype_enum {
 #define MSK_DPAR_INTPNT_TOL_STEP_SIZE_                      "MSK_DPAR_INTPNT_TOL_STEP_SIZE"
 #define MSK_DPAR_LOWER_OBJ_CUT_                             "MSK_DPAR_LOWER_OBJ_CUT"
 #define MSK_DPAR_LOWER_OBJ_CUT_FINITE_TRH_                  "MSK_DPAR_LOWER_OBJ_CUT_FINITE_TRH"
+#define MSK_DPAR_MIO_CLIQUE_TABLE_SIZE_FACTOR_              "MSK_DPAR_MIO_CLIQUE_TABLE_SIZE_FACTOR"
 #define MSK_DPAR_MIO_DJC_MAX_BIGM_                          "MSK_DPAR_MIO_DJC_MAX_BIGM"
 #define MSK_DPAR_MIO_MAX_TIME_                              "MSK_DPAR_MIO_MAX_TIME"
 #define MSK_DPAR_MIO_REL_GAP_CONST_                         "MSK_DPAR_MIO_REL_GAP_CONST"
@@ -1873,7 +1990,6 @@ enum MSKvariabletype_enum {
 #define MSK_DPAR_OPTIMIZER_MAX_TICKS_                       "MSK_DPAR_OPTIMIZER_MAX_TICKS"
 #define MSK_DPAR_OPTIMIZER_MAX_TIME_                        "MSK_DPAR_OPTIMIZER_MAX_TIME"
 #define MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP_                   "MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP"
-#define MSK_DPAR_PRESOLVE_TOL_AIJ_                          "MSK_DPAR_PRESOLVE_TOL_AIJ"
 #define MSK_DPAR_PRESOLVE_TOL_PRIMAL_INFEAS_PERTURBATION_   "MSK_DPAR_PRESOLVE_TOL_PRIMAL_INFEAS_PERTURBATION"
 #define MSK_DPAR_PRESOLVE_TOL_REL_LINDEP_                   "MSK_DPAR_PRESOLVE_TOL_REL_LINDEP"
 #define MSK_DPAR_PRESOLVE_TOL_S_                            "MSK_DPAR_PRESOLVE_TOL_S"
@@ -1881,6 +1997,8 @@ enum MSKvariabletype_enum {
 #define MSK_DPAR_QCQO_REFORMULATE_REL_DROP_TOL_             "MSK_DPAR_QCQO_REFORMULATE_REL_DROP_TOL"
 #define MSK_DPAR_SEMIDEFINITE_TOL_APPROX_                   "MSK_DPAR_SEMIDEFINITE_TOL_APPROX"
 #define MSK_DPAR_SIM_LU_TOL_REL_PIV_                        "MSK_DPAR_SIM_LU_TOL_REL_PIV"
+#define MSK_DPAR_SIM_PRECISION_SCALING_EXTENDED_            "MSK_DPAR_SIM_PRECISION_SCALING_EXTENDED"
+#define MSK_DPAR_SIM_PRECISION_SCALING_NORMAL_              "MSK_DPAR_SIM_PRECISION_SCALING_NORMAL"
 #define MSK_DPAR_SIMPLEX_ABS_TOL_PIV_                       "MSK_DPAR_SIMPLEX_ABS_TOL_PIV"
 #define MSK_DPAR_UPPER_OBJ_CUT_                             "MSK_DPAR_UPPER_OBJ_CUT"
 #define MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH_                  "MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH"
@@ -1896,8 +2014,10 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_BI_MAX_ITERATIONS_                         "MSK_IPAR_BI_MAX_ITERATIONS"
 #define MSK_IPAR_CACHE_LICENSE_                             "MSK_IPAR_CACHE_LICENSE"
 #define MSK_IPAR_COMPRESS_STATFILE_                         "MSK_IPAR_COMPRESS_STATFILE"
+#define MSK_IPAR_FOLDING_USE_                               "MSK_IPAR_FOLDING_USE"
+#define MSK_IPAR_GETDUAL_CONVERT_LMIS_                      "MSK_IPAR_GETDUAL_CONVERT_LMIS"
+#define MSK_IPAR_HEARTBEAT_SIM_FREQ_TICKS_                  "MSK_IPAR_HEARTBEAT_SIM_FREQ_TICKS"
 #define MSK_IPAR_INFEAS_GENERIC_NAMES_                      "MSK_IPAR_INFEAS_GENERIC_NAMES"
-#define MSK_IPAR_INFEAS_PREFER_PRIMAL_                      "MSK_IPAR_INFEAS_PREFER_PRIMAL"
 #define MSK_IPAR_INFEAS_REPORT_AUTO_                        "MSK_IPAR_INFEAS_REPORT_AUTO"
 #define MSK_IPAR_INFEAS_REPORT_LEVEL_                       "MSK_IPAR_INFEAS_REPORT_LEVEL"
 #define MSK_IPAR_INTPNT_BASIS_                              "MSK_IPAR_INTPNT_BASIS"
@@ -1905,11 +2025,9 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_INTPNT_HOTSTART_                           "MSK_IPAR_INTPNT_HOTSTART"
 #define MSK_IPAR_INTPNT_MAX_ITERATIONS_                     "MSK_IPAR_INTPNT_MAX_ITERATIONS"
 #define MSK_IPAR_INTPNT_MAX_NUM_COR_                        "MSK_IPAR_INTPNT_MAX_NUM_COR"
-#define MSK_IPAR_INTPNT_MAX_NUM_REFINEMENT_STEPS_           "MSK_IPAR_INTPNT_MAX_NUM_REFINEMENT_STEPS"
 #define MSK_IPAR_INTPNT_OFF_COL_TRH_                        "MSK_IPAR_INTPNT_OFF_COL_TRH"
 #define MSK_IPAR_INTPNT_ORDER_GP_NUM_SEEDS_                 "MSK_IPAR_INTPNT_ORDER_GP_NUM_SEEDS"
 #define MSK_IPAR_INTPNT_ORDER_METHOD_                       "MSK_IPAR_INTPNT_ORDER_METHOD"
-#define MSK_IPAR_INTPNT_PURIFY_                             "MSK_IPAR_INTPNT_PURIFY"
 #define MSK_IPAR_INTPNT_REGULARIZATION_USE_                 "MSK_IPAR_INTPNT_REGULARIZATION_USE"
 #define MSK_IPAR_INTPNT_SCALING_                            "MSK_IPAR_INTPNT_SCALING"
 #define MSK_IPAR_INTPNT_SOLVE_FORM_                         "MSK_IPAR_INTPNT_SOLVE_FORM"
@@ -1935,17 +2053,18 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_LOG_MIO_FREQ_                              "MSK_IPAR_LOG_MIO_FREQ"
 #define MSK_IPAR_LOG_ORDER_                                 "MSK_IPAR_LOG_ORDER"
 #define MSK_IPAR_LOG_PRESOLVE_                              "MSK_IPAR_LOG_PRESOLVE"
-#define MSK_IPAR_LOG_RESPONSE_                              "MSK_IPAR_LOG_RESPONSE"
 #define MSK_IPAR_LOG_SENSITIVITY_                           "MSK_IPAR_LOG_SENSITIVITY"
 #define MSK_IPAR_LOG_SENSITIVITY_OPT_                       "MSK_IPAR_LOG_SENSITIVITY_OPT"
 #define MSK_IPAR_LOG_SIM_                                   "MSK_IPAR_LOG_SIM"
 #define MSK_IPAR_LOG_SIM_FREQ_                              "MSK_IPAR_LOG_SIM_FREQ"
-#define MSK_IPAR_LOG_SIM_MINOR_                             "MSK_IPAR_LOG_SIM_MINOR"
+#define MSK_IPAR_LOG_SIM_FREQ_GIGA_TICKS_                   "MSK_IPAR_LOG_SIM_FREQ_GIGA_TICKS"
 #define MSK_IPAR_LOG_STORAGE_                               "MSK_IPAR_LOG_STORAGE"
 #define MSK_IPAR_MAX_NUM_WARNINGS_                          "MSK_IPAR_MAX_NUM_WARNINGS"
 #define MSK_IPAR_MIO_BRANCH_DIR_                            "MSK_IPAR_MIO_BRANCH_DIR"
+#define MSK_IPAR_MIO_CONFLICT_ANALYSIS_LEVEL_               "MSK_IPAR_MIO_CONFLICT_ANALYSIS_LEVEL"
 #define MSK_IPAR_MIO_CONIC_OUTER_APPROXIMATION_             "MSK_IPAR_MIO_CONIC_OUTER_APPROXIMATION"
 #define MSK_IPAR_MIO_CONSTRUCT_SOL_                         "MSK_IPAR_MIO_CONSTRUCT_SOL"
+#define MSK_IPAR_MIO_CROSSOVER_MAX_NODES_                   "MSK_IPAR_MIO_CROSSOVER_MAX_NODES"
 #define MSK_IPAR_MIO_CUT_CLIQUE_                            "MSK_IPAR_MIO_CUT_CLIQUE"
 #define MSK_IPAR_MIO_CUT_CMIR_                              "MSK_IPAR_MIO_CUT_CMIR"
 #define MSK_IPAR_MIO_CUT_GMI_                               "MSK_IPAR_MIO_CUT_GMI"
@@ -1957,6 +2076,7 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_MIO_DUAL_RAY_ANALYSIS_LEVEL_               "MSK_IPAR_MIO_DUAL_RAY_ANALYSIS_LEVEL"
 #define MSK_IPAR_MIO_FEASPUMP_LEVEL_                        "MSK_IPAR_MIO_FEASPUMP_LEVEL"
 #define MSK_IPAR_MIO_HEURISTIC_LEVEL_                       "MSK_IPAR_MIO_HEURISTIC_LEVEL"
+#define MSK_IPAR_MIO_INDEPENDENT_BLOCK_LEVEL_               "MSK_IPAR_MIO_INDEPENDENT_BLOCK_LEVEL"
 #define MSK_IPAR_MIO_MAX_NUM_BRANCHES_                      "MSK_IPAR_MIO_MAX_NUM_BRANCHES"
 #define MSK_IPAR_MIO_MAX_NUM_RELAXS_                        "MSK_IPAR_MIO_MAX_NUM_RELAXS"
 #define MSK_IPAR_MIO_MAX_NUM_RESTARTS_                      "MSK_IPAR_MIO_MAX_NUM_RESTARTS"
@@ -1968,14 +2088,15 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_MIO_NODE_OPTIMIZER_                        "MSK_IPAR_MIO_NODE_OPTIMIZER"
 #define MSK_IPAR_MIO_NODE_SELECTION_                        "MSK_IPAR_MIO_NODE_SELECTION"
 #define MSK_IPAR_MIO_NUMERICAL_EMPHASIS_LEVEL_              "MSK_IPAR_MIO_NUMERICAL_EMPHASIS_LEVEL"
+#define MSK_IPAR_MIO_OPT_FACE_MAX_NODES_                    "MSK_IPAR_MIO_OPT_FACE_MAX_NODES"
 #define MSK_IPAR_MIO_PERSPECTIVE_REFORMULATE_               "MSK_IPAR_MIO_PERSPECTIVE_REFORMULATE"
 #define MSK_IPAR_MIO_PRESOLVE_AGGREGATOR_USE_               "MSK_IPAR_MIO_PRESOLVE_AGGREGATOR_USE"
 #define MSK_IPAR_MIO_PROBING_LEVEL_                         "MSK_IPAR_MIO_PROBING_LEVEL"
 #define MSK_IPAR_MIO_PROPAGATE_OBJECTIVE_CONSTRAINT_        "MSK_IPAR_MIO_PROPAGATE_OBJECTIVE_CONSTRAINT"
 #define MSK_IPAR_MIO_QCQO_REFORMULATION_METHOD_             "MSK_IPAR_MIO_QCQO_REFORMULATION_METHOD"
+#define MSK_IPAR_MIO_RENS_MAX_NODES_                        "MSK_IPAR_MIO_RENS_MAX_NODES"
 #define MSK_IPAR_MIO_RINS_MAX_NODES_                        "MSK_IPAR_MIO_RINS_MAX_NODES"
 #define MSK_IPAR_MIO_ROOT_OPTIMIZER_                        "MSK_IPAR_MIO_ROOT_OPTIMIZER"
-#define MSK_IPAR_MIO_ROOT_REPEAT_PRESOLVE_LEVEL_            "MSK_IPAR_MIO_ROOT_REPEAT_PRESOLVE_LEVEL"
 #define MSK_IPAR_MIO_SEED_                                  "MSK_IPAR_MIO_SEED"
 #define MSK_IPAR_MIO_SYMMETRY_LEVEL_                        "MSK_IPAR_MIO_SYMMETRY_LEVEL"
 #define MSK_IPAR_MIO_VAR_SELECTION_                         "MSK_IPAR_MIO_VAR_SELECTION"
@@ -1997,7 +2118,6 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_PARAM_READ_IGN_ERROR_                      "MSK_IPAR_PARAM_READ_IGN_ERROR"
 #define MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_FILL_              "MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_FILL"
 #define MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES_         "MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES"
-#define MSK_IPAR_PRESOLVE_LEVEL_                            "MSK_IPAR_PRESOLVE_LEVEL"
 #define MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH_              "MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH"
 #define MSK_IPAR_PRESOLVE_LINDEP_NEW_                       "MSK_IPAR_PRESOLVE_LINDEP_NEW"
 #define MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH_              "MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH"
@@ -2007,8 +2127,10 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_PRESOLVE_USE_                              "MSK_IPAR_PRESOLVE_USE"
 #define MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER_                   "MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER"
 #define MSK_IPAR_PTF_WRITE_PARAMETERS_                      "MSK_IPAR_PTF_WRITE_PARAMETERS"
+#define MSK_IPAR_PTF_WRITE_SINGLE_PSD_TERMS_                "MSK_IPAR_PTF_WRITE_SINGLE_PSD_TERMS"
 #define MSK_IPAR_PTF_WRITE_SOLUTIONS_                       "MSK_IPAR_PTF_WRITE_SOLUTIONS"
 #define MSK_IPAR_PTF_WRITE_TRANSFORM_                       "MSK_IPAR_PTF_WRITE_TRANSFORM"
+#define MSK_IPAR_READ_ASYNC_                                "MSK_IPAR_READ_ASYNC"
 #define MSK_IPAR_READ_DEBUG_                                "MSK_IPAR_READ_DEBUG"
 #define MSK_IPAR_READ_KEEP_FREE_CON_                        "MSK_IPAR_READ_KEEP_FREE_CON"
 #define MSK_IPAR_READ_MPS_FORMAT_                           "MSK_IPAR_READ_MPS_FORMAT"
@@ -2017,7 +2139,6 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_REMOTE_USE_COMPRESSION_                    "MSK_IPAR_REMOTE_USE_COMPRESSION"
 #define MSK_IPAR_REMOVE_UNUSED_SOLUTIONS_                   "MSK_IPAR_REMOVE_UNUSED_SOLUTIONS"
 #define MSK_IPAR_SENSITIVITY_ALL_                           "MSK_IPAR_SENSITIVITY_ALL"
-#define MSK_IPAR_SENSITIVITY_OPTIMIZER_                     "MSK_IPAR_SENSITIVITY_OPTIMIZER"
 #define MSK_IPAR_SENSITIVITY_TYPE_                          "MSK_IPAR_SENSITIVITY_TYPE"
 #define MSK_IPAR_SIM_BASIS_FACTOR_USE_                      "MSK_IPAR_SIM_BASIS_FACTOR_USE"
 #define MSK_IPAR_SIM_DEGEN_                                 "MSK_IPAR_SIM_DEGEN"
@@ -2032,6 +2153,8 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_SIM_MAX_ITERATIONS_                        "MSK_IPAR_SIM_MAX_ITERATIONS"
 #define MSK_IPAR_SIM_MAX_NUM_SETBACKS_                      "MSK_IPAR_SIM_MAX_NUM_SETBACKS"
 #define MSK_IPAR_SIM_NON_SINGULAR_                          "MSK_IPAR_SIM_NON_SINGULAR"
+#define MSK_IPAR_SIM_PRECISION_                             "MSK_IPAR_SIM_PRECISION"
+#define MSK_IPAR_SIM_PRECISION_BOOST_                       "MSK_IPAR_SIM_PRECISION_BOOST"
 #define MSK_IPAR_SIM_PRIMAL_CRASH_                          "MSK_IPAR_SIM_PRIMAL_CRASH"
 #define MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD_                "MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD"
 #define MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION_             "MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION"
@@ -2043,22 +2166,18 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_SIM_SCALING_METHOD_                        "MSK_IPAR_SIM_SCALING_METHOD"
 #define MSK_IPAR_SIM_SEED_                                  "MSK_IPAR_SIM_SEED"
 #define MSK_IPAR_SIM_SOLVE_FORM_                            "MSK_IPAR_SIM_SOLVE_FORM"
-#define MSK_IPAR_SIM_STABILITY_PRIORITY_                    "MSK_IPAR_SIM_STABILITY_PRIORITY"
 #define MSK_IPAR_SIM_SWITCH_OPTIMIZER_                      "MSK_IPAR_SIM_SWITCH_OPTIMIZER"
 #define MSK_IPAR_SOL_FILTER_KEEP_BASIC_                     "MSK_IPAR_SOL_FILTER_KEEP_BASIC"
-#define MSK_IPAR_SOL_FILTER_KEEP_RANGED_                    "MSK_IPAR_SOL_FILTER_KEEP_RANGED"
 #define MSK_IPAR_SOL_READ_NAME_WIDTH_                       "MSK_IPAR_SOL_READ_NAME_WIDTH"
 #define MSK_IPAR_SOL_READ_WIDTH_                            "MSK_IPAR_SOL_READ_WIDTH"
-#define MSK_IPAR_SOLUTION_CALLBACK_                         "MSK_IPAR_SOLUTION_CALLBACK"
 #define MSK_IPAR_TIMING_LEVEL_                              "MSK_IPAR_TIMING_LEVEL"
+#define MSK_IPAR_WRITE_ASYNC_                               "MSK_IPAR_WRITE_ASYNC"
 #define MSK_IPAR_WRITE_BAS_CONSTRAINTS_                     "MSK_IPAR_WRITE_BAS_CONSTRAINTS"
 #define MSK_IPAR_WRITE_BAS_HEAD_                            "MSK_IPAR_WRITE_BAS_HEAD"
 #define MSK_IPAR_WRITE_BAS_VARIABLES_                       "MSK_IPAR_WRITE_BAS_VARIABLES"
 #define MSK_IPAR_WRITE_COMPRESSION_                         "MSK_IPAR_WRITE_COMPRESSION"
-#define MSK_IPAR_WRITE_DATA_PARAM_                          "MSK_IPAR_WRITE_DATA_PARAM"
 #define MSK_IPAR_WRITE_FREE_CON_                            "MSK_IPAR_WRITE_FREE_CON"
 #define MSK_IPAR_WRITE_GENERIC_NAMES_                       "MSK_IPAR_WRITE_GENERIC_NAMES"
-#define MSK_IPAR_WRITE_GENERIC_NAMES_IO_                    "MSK_IPAR_WRITE_GENERIC_NAMES_IO"
 #define MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS_           "MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS"
 #define MSK_IPAR_WRITE_INT_CONSTRAINTS_                     "MSK_IPAR_WRITE_INT_CONSTRAINTS"
 #define MSK_IPAR_WRITE_INT_HEAD_                            "MSK_IPAR_WRITE_INT_HEAD"
@@ -2073,8 +2192,6 @@ enum MSKvariabletype_enum {
 #define MSK_IPAR_WRITE_SOL_HEAD_                            "MSK_IPAR_WRITE_SOL_HEAD"
 #define MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES_            "MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES"
 #define MSK_IPAR_WRITE_SOL_VARIABLES_                       "MSK_IPAR_WRITE_SOL_VARIABLES"
-#define MSK_IPAR_WRITE_TASK_INC_SOL_                        "MSK_IPAR_WRITE_TASK_INC_SOL"
-#define MSK_IPAR_WRITE_XML_MODE_                            "MSK_IPAR_WRITE_XML_MODE"
 
 #define MSK_IINF_ANA_PRO_NUM_CON_                           "MSK_IINF_ANA_PRO_NUM_CON"
 #define MSK_IINF_ANA_PRO_NUM_CON_EQ_                        "MSK_IINF_ANA_PRO_NUM_CON_EQ"
@@ -2091,6 +2208,7 @@ enum MSKvariabletype_enum {
 #define MSK_IINF_ANA_PRO_NUM_VAR_LO_                        "MSK_IINF_ANA_PRO_NUM_VAR_LO"
 #define MSK_IINF_ANA_PRO_NUM_VAR_RA_                        "MSK_IINF_ANA_PRO_NUM_VAR_RA"
 #define MSK_IINF_ANA_PRO_NUM_VAR_UP_                        "MSK_IINF_ANA_PRO_NUM_VAR_UP"
+#define MSK_IINF_FOLDING_APPLIED_                           "MSK_IINF_FOLDING_APPLIED"
 #define MSK_IINF_INTPNT_FACTOR_DIM_DENSE_                   "MSK_IINF_INTPNT_FACTOR_DIM_DENSE"
 #define MSK_IINF_INTPNT_ITER_                               "MSK_IINF_INTPNT_ITER"
 #define MSK_IINF_INTPNT_NUM_THREADS_                        "MSK_IINF_INTPNT_NUM_THREADS"
@@ -2098,10 +2216,29 @@ enum MSKvariabletype_enum {
 #define MSK_IINF_MIO_ABSGAP_SATISFIED_                      "MSK_IINF_MIO_ABSGAP_SATISFIED"
 #define MSK_IINF_MIO_CLIQUE_TABLE_SIZE_                     "MSK_IINF_MIO_CLIQUE_TABLE_SIZE"
 #define MSK_IINF_MIO_CONSTRUCT_SOLUTION_                    "MSK_IINF_MIO_CONSTRUCT_SOLUTION"
+#define MSK_IINF_MIO_FINAL_NUMBIN_                          "MSK_IINF_MIO_FINAL_NUMBIN"
+#define MSK_IINF_MIO_FINAL_NUMBINCONEVAR_                   "MSK_IINF_MIO_FINAL_NUMBINCONEVAR"
+#define MSK_IINF_MIO_FINAL_NUMCON_                          "MSK_IINF_MIO_FINAL_NUMCON"
+#define MSK_IINF_MIO_FINAL_NUMCONE_                         "MSK_IINF_MIO_FINAL_NUMCONE"
+#define MSK_IINF_MIO_FINAL_NUMCONEVAR_                      "MSK_IINF_MIO_FINAL_NUMCONEVAR"
+#define MSK_IINF_MIO_FINAL_NUMCONT_                         "MSK_IINF_MIO_FINAL_NUMCONT"
+#define MSK_IINF_MIO_FINAL_NUMCONTCONEVAR_                  "MSK_IINF_MIO_FINAL_NUMCONTCONEVAR"
+#define MSK_IINF_MIO_FINAL_NUMDEXPCONES_                    "MSK_IINF_MIO_FINAL_NUMDEXPCONES"
+#define MSK_IINF_MIO_FINAL_NUMDJC_                          "MSK_IINF_MIO_FINAL_NUMDJC"
+#define MSK_IINF_MIO_FINAL_NUMDPOWCONES_                    "MSK_IINF_MIO_FINAL_NUMDPOWCONES"
+#define MSK_IINF_MIO_FINAL_NUMINT_                          "MSK_IINF_MIO_FINAL_NUMINT"
+#define MSK_IINF_MIO_FINAL_NUMINTCONEVAR_                   "MSK_IINF_MIO_FINAL_NUMINTCONEVAR"
+#define MSK_IINF_MIO_FINAL_NUMPEXPCONES_                    "MSK_IINF_MIO_FINAL_NUMPEXPCONES"
+#define MSK_IINF_MIO_FINAL_NUMPPOWCONES_                    "MSK_IINF_MIO_FINAL_NUMPPOWCONES"
+#define MSK_IINF_MIO_FINAL_NUMQCONES_                       "MSK_IINF_MIO_FINAL_NUMQCONES"
+#define MSK_IINF_MIO_FINAL_NUMRQCONES_                      "MSK_IINF_MIO_FINAL_NUMRQCONES"
+#define MSK_IINF_MIO_FINAL_NUMVAR_                          "MSK_IINF_MIO_FINAL_NUMVAR"
 #define MSK_IINF_MIO_INITIAL_FEASIBLE_SOLUTION_             "MSK_IINF_MIO_INITIAL_FEASIBLE_SOLUTION"
 #define MSK_IINF_MIO_NODE_DEPTH_                            "MSK_IINF_MIO_NODE_DEPTH"
 #define MSK_IINF_MIO_NUM_ACTIVE_NODES_                      "MSK_IINF_MIO_NUM_ACTIVE_NODES"
 #define MSK_IINF_MIO_NUM_ACTIVE_ROOT_CUTS_                  "MSK_IINF_MIO_NUM_ACTIVE_ROOT_CUTS"
+#define MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_BB_               "MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_BB"
+#define MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_PRESOLVE_         "MSK_IINF_MIO_NUM_BLOCKS_SOLVED_IN_PRESOLVE"
 #define MSK_IINF_MIO_NUM_BRANCH_                            "MSK_IINF_MIO_NUM_BRANCH"
 #define MSK_IINF_MIO_NUM_INT_SOLUTIONS_                     "MSK_IINF_MIO_NUM_INT_SOLUTIONS"
 #define MSK_IINF_MIO_NUM_RELAX_                             "MSK_IINF_MIO_NUM_RELAX"
@@ -2195,12 +2332,17 @@ enum MSKvariabletype_enum {
 #define MSK_IINF_STO_NUM_A_REALLOC_                         "MSK_IINF_STO_NUM_A_REALLOC"
 
 #define MSK_DINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_DENSITY_ "MSK_DINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_DENSITY"
-#define MSK_DINF_BI_CLEAN_DUAL_TIME_                        "MSK_DINF_BI_CLEAN_DUAL_TIME"
-#define MSK_DINF_BI_CLEAN_PRIMAL_TIME_                      "MSK_DINF_BI_CLEAN_PRIMAL_TIME"
 #define MSK_DINF_BI_CLEAN_TIME_                             "MSK_DINF_BI_CLEAN_TIME"
 #define MSK_DINF_BI_DUAL_TIME_                              "MSK_DINF_BI_DUAL_TIME"
 #define MSK_DINF_BI_PRIMAL_TIME_                            "MSK_DINF_BI_PRIMAL_TIME"
 #define MSK_DINF_BI_TIME_                                   "MSK_DINF_BI_TIME"
+#define MSK_DINF_FOLDING_BI_OPTIMIZE_TIME_                  "MSK_DINF_FOLDING_BI_OPTIMIZE_TIME"
+#define MSK_DINF_FOLDING_BI_UNFOLD_DUAL_TIME_               "MSK_DINF_FOLDING_BI_UNFOLD_DUAL_TIME"
+#define MSK_DINF_FOLDING_BI_UNFOLD_INITIALIZE_TIME_         "MSK_DINF_FOLDING_BI_UNFOLD_INITIALIZE_TIME"
+#define MSK_DINF_FOLDING_BI_UNFOLD_PRIMAL_TIME_             "MSK_DINF_FOLDING_BI_UNFOLD_PRIMAL_TIME"
+#define MSK_DINF_FOLDING_BI_UNFOLD_TIME_                    "MSK_DINF_FOLDING_BI_UNFOLD_TIME"
+#define MSK_DINF_FOLDING_FACTOR_                            "MSK_DINF_FOLDING_FACTOR"
+#define MSK_DINF_FOLDING_TIME_                              "MSK_DINF_FOLDING_TIME"
 #define MSK_DINF_INTPNT_DUAL_FEAS_                          "MSK_DINF_INTPNT_DUAL_FEAS"
 #define MSK_DINF_INTPNT_DUAL_OBJ_                           "MSK_DINF_INTPNT_DUAL_OBJ"
 #define MSK_DINF_INTPNT_FACTOR_NUM_FLOPS_                   "MSK_DINF_INTPNT_FACTOR_NUM_FLOPS"
@@ -2309,14 +2451,15 @@ enum MSKvariabletype_enum {
 #define MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_COLUMNS_ "MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_COLUMNS"
 #define MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_NZ_ "MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_NZ"
 #define MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_ROWS_ "MSK_LIINF_ANA_PRO_SCALARIZED_CONSTRAINT_MATRIX_NUM_ROWS"
-#define MSK_LIINF_BI_CLEAN_DUAL_DEG_ITER_                   "MSK_LIINF_BI_CLEAN_DUAL_DEG_ITER"
-#define MSK_LIINF_BI_CLEAN_DUAL_ITER_                       "MSK_LIINF_BI_CLEAN_DUAL_ITER"
-#define MSK_LIINF_BI_CLEAN_PRIMAL_DEG_ITER_                 "MSK_LIINF_BI_CLEAN_PRIMAL_DEG_ITER"
-#define MSK_LIINF_BI_CLEAN_PRIMAL_ITER_                     "MSK_LIINF_BI_CLEAN_PRIMAL_ITER"
+#define MSK_LIINF_BI_CLEAN_ITER_                            "MSK_LIINF_BI_CLEAN_ITER"
 #define MSK_LIINF_BI_DUAL_ITER_                             "MSK_LIINF_BI_DUAL_ITER"
 #define MSK_LIINF_BI_PRIMAL_ITER_                           "MSK_LIINF_BI_PRIMAL_ITER"
+#define MSK_LIINF_FOLDING_BI_DUAL_ITER_                     "MSK_LIINF_FOLDING_BI_DUAL_ITER"
+#define MSK_LIINF_FOLDING_BI_OPTIMIZER_ITER_                "MSK_LIINF_FOLDING_BI_OPTIMIZER_ITER"
+#define MSK_LIINF_FOLDING_BI_PRIMAL_ITER_                   "MSK_LIINF_FOLDING_BI_PRIMAL_ITER"
 #define MSK_LIINF_INTPNT_FACTOR_NUM_NZ_                     "MSK_LIINF_INTPNT_FACTOR_NUM_NZ"
 #define MSK_LIINF_MIO_ANZ_                                  "MSK_LIINF_MIO_ANZ"
+#define MSK_LIINF_MIO_FINAL_ANZ_                            "MSK_LIINF_MIO_FINAL_ANZ"
 #define MSK_LIINF_MIO_INTPNT_ITER_                          "MSK_LIINF_MIO_INTPNT_ITER"
 #define MSK_LIINF_MIO_NUM_DUAL_ILLPOSED_CER_                "MSK_LIINF_MIO_NUM_DUAL_ILLPOSED_CER"
 #define MSK_LIINF_MIO_NUM_PRIM_ILLPOSED_CER_                "MSK_LIINF_MIO_NUM_PRIM_ILLPOSED_CER"
@@ -2366,6 +2509,7 @@ typedef enum MSKdinfitem_enum        MSKdinfiteme;
 typedef enum MSKdomaintype_enum      MSKdomaintypee;
 typedef enum MSKdparam_enum          MSKdparame;
 typedef enum MSKfeature_enum         MSKfeaturee;
+typedef int                     MSKfoldingmodee;
 typedef enum MSKiinfitem_enum        MSKiinfiteme;
 typedef enum MSKinftype_enum         MSKinftypee;
 typedef enum MSKintpnthotstart_enum  MSKintpnthotstarte;
@@ -2390,7 +2534,6 @@ typedef int                     MSKpresolvemodee;
 typedef enum MSKproblemitem_enum     MSKproblemiteme;
 typedef enum MSKproblemtype_enum     MSKproblemtypee;
 typedef enum MSKprosta_enum          MSKprostae;
-typedef enum MSKpurify_enum          MSKpurifye;
 typedef enum MSKrescode_enum         MSKrescodee;
 typedef enum MSKrescodetype_enum     MSKrescodetypee;
 typedef int                     MSKscalingmethode;
@@ -2399,6 +2542,7 @@ typedef int                     MSKsensitivitytypee;
 typedef enum MSKsimdegen_enum        MSKsimdegene;
 typedef enum MSKsimdupvec_enum       MSKsimdupvece;
 typedef enum MSKsimhotstart_enum     MSKsimhotstarte;
+typedef enum MSKsimprecision_enum    MSKsimprecisione;
 typedef enum MSKsimreform_enum       MSKsimreforme;
 typedef int                     MSKsimseltypee;
 typedef enum MSKsolformat_enum       MSKsolformate;
@@ -2415,7 +2559,6 @@ typedef enum MSKtranspose_enum       MSKtransposee;
 typedef enum MSKuplo_enum            MSKuploe;
 typedef int                     MSKvaluee;
 typedef enum MSKvariabletype_enum    MSKvariabletypee;
-typedef enum MSKxmlwriteroutputtype_enum MSKxmlwriteroutputtypee;
 #else
 typedef int                     MSKbasindtypee;
 typedef int                     MSKboundkeye;
@@ -2428,6 +2571,7 @@ typedef int                     MSKdinfiteme;
 typedef int                     MSKdomaintypee;
 typedef int                     MSKdparame;
 typedef int                     MSKfeaturee;
+typedef int                     MSKfoldingmodee;
 typedef int                     MSKiinfiteme;
 typedef int                     MSKinftypee;
 typedef int                     MSKintpnthotstarte;
@@ -2452,7 +2596,6 @@ typedef int                     MSKpresolvemodee;
 typedef int                     MSKproblemiteme;
 typedef int                     MSKproblemtypee;
 typedef int                     MSKprostae;
-typedef int                     MSKpurifye;
 typedef int                     MSKrescodee;
 typedef int                     MSKrescodetypee;
 typedef int                     MSKscalingmethode;
@@ -2461,6 +2604,7 @@ typedef int                     MSKsensitivitytypee;
 typedef int                     MSKsimdegene;
 typedef int                     MSKsimdupvece;
 typedef int                     MSKsimhotstarte;
+typedef int                     MSKsimprecisione;
 typedef int                     MSKsimreforme;
 typedef int                     MSKsimseltypee;
 typedef int                     MSKsolformate;
@@ -2477,7 +2621,6 @@ typedef int                     MSKtransposee;
 typedef int                     MSKuploe;
 typedef int                     MSKvaluee;
 typedef int                     MSKvariabletypee;
-typedef int                     MSKxmlwriteroutputtypee;
 #endif
 
 /* Simple typedefs */
@@ -2749,6 +2892,13 @@ MSKrescodee (MSKAPI MSK_appendsvecpsdconedomain) (
 MSKrescodee (MSKAPI MSK_appendvars) (
 	MSKtask_t task,
 	MSKint32t num);
+
+/* MSK_asyncgetlog */
+MSKrescodee (MSKAPI MSK_asyncgetlog) (
+	MSKtask_t task,
+	const char * addr,
+	const char * accesstoken,
+	const char * token);
 
 /* MSK_asyncgetresult */
 MSKrescodee (MSKAPI MSK_asyncgetresult) (
@@ -3708,6 +3858,11 @@ MSKrescodee (MSKAPI MSK_getdualobj) (
 	MSKsoltypee whichsol,
 	MSKrealt * dualobj);
 
+/* MSK_getdualproblem */
+MSKrescodee (MSKAPI MSK_getdualproblem) (
+	MSKtask_t task,
+	MSKtask_t * dualtask);
+
 /* MSK_getdualsolutionnorms */
 MSKrescodee (MSKAPI MSK_getdualsolutionnorms) (
 	MSKtask_t task,
@@ -3830,6 +3985,12 @@ MSKrescodee (MSKAPI MSK_getlintinf) (
 	MSKtask_t task,
 	MSKliinfiteme whichliinf,
 	MSKint64t * ivalue);
+
+/* MSK_getlintparam */
+MSKrescodee (MSKAPI MSK_getlintparam) (
+	MSKtask_t task,
+	MSKiparame param,
+	MSKint64t * parvalue);
 
 /* MSK_getmaxnamelen */
 MSKrescodee (MSKAPI MSK_getmaxnamelen) (
@@ -5205,6 +5366,12 @@ MSKrescodee (MSKAPI MSK_putintparam) (
 	MSKiparame param,
 	MSKint32t parvalue);
 
+/* MSK_putlintparam */
+MSKrescodee (MSKAPI MSK_putlintparam) (
+	MSKtask_t task,
+	MSKiparame param,
+	MSKint64t parvalue);
+
 /* MSK_putmaxnumacc */
 MSKrescodee (MSKAPI MSK_putmaxnumacc) (
 	MSKtask_t task,
@@ -5614,21 +5781,21 @@ MSKrescodee (MSKAPI MSK_readdataautoformat) (
 	MSKtask_t task,
 	const char * filename);
 
-/* MSK_readdatacb */
-MSKrescodee (MSKAPI MSK_readdatacb) (
-	MSKtask_t task,
-	MSKhreadfunc hread,
-	MSKuserhandle_t h,
-	MSKdataformate format,
-	MSKcompresstypee compress,
-	const char * path);
-
 /* MSK_readdataformat */
 MSKrescodee (MSKAPI MSK_readdataformat) (
 	MSKtask_t task,
 	const char * filename,
 	MSKdataformate format,
 	MSKcompresstypee compress);
+
+/* MSK_readdatahandle */
+MSKrescodee (MSKAPI MSK_readdatahandle) (
+	MSKtask_t task,
+	MSKhreadfunc hread,
+	MSKuserhandle_t h,
+	MSKdataformate format,
+	MSKcompresstypee compress,
+	const char * path);
 
 /* MSK_readjsonsol */
 MSKrescodee (MSKAPI MSK_readjsonsol) (
@@ -5705,6 +5872,25 @@ MSKrescodee (MSKAPI MSK_removevars) (
 	MSKint32t num,
 	const MSKint32t * subset);
 
+/* MSK_resetdouparam */
+MSKrescodee (MSKAPI MSK_resetdouparam) (
+	MSKtask_t task,
+	MSKdparame param);
+
+/* MSK_resetintparam */
+MSKrescodee (MSKAPI MSK_resetintparam) (
+	MSKtask_t task,
+	MSKiparame param);
+
+/* MSK_resetparameters */
+MSKrescodee (MSKAPI MSK_resetparameters) (
+	MSKtask_t task);
+
+/* MSK_resetstrparam */
+MSKrescodee (MSKAPI MSK_resetstrparam) (
+	MSKtask_t task,
+	MSKsparame param);
+
 /* MSK_resizetask */
 MSKrescodee (MSKAPI MSK_resizetask) (
 	MSKtask_t task,
@@ -5718,10 +5904,6 @@ MSKrescodee (MSKAPI MSK_resizetask) (
 MSKrescodee (MSKAPI MSK_sensitivityreport) (
 	MSKtask_t task,
 	MSKstreamtypee whichstream);
-
-/* MSK_setdefaults */
-MSKrescodee (MSKAPI MSK_setdefaults) (
-	MSKtask_t task);
 
 /* MSK_sktostr */
 MSKrescodee (MSKAPI MSK_sktostr) (
@@ -6012,6 +6194,15 @@ MSKrescodee (MSKAPI MSK_getversion) (
 	MSKint32t * major,
 	MSKint32t * minor,
 	MSKint32t * revision);
+
+/* MSK_globalenvfinalize */
+MSKrescodee (MSKAPI MSK_globalenvfinalize) (
+void);
+
+/* MSK_globalenvinitialize */
+MSKrescodee (MSKAPI MSK_globalenvinitialize) (
+	MSKint64t maxnumalloc,
+	const char * dbgfile);
 
 /* MSK_iinfitemtostr */
 MSKrescodee (MSKAPI MSK_iinfitemtostr) (
