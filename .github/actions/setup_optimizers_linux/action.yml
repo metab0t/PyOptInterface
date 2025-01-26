@@ -40,9 +40,9 @@ runs:
         cache-name: cache-installers-linux
       with:
         path: ~/installers
-        key: ${{ runner.os }}--${{ runner.arch }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.cache-name }}-${{ hashFiles('optimizer_version.toml') }}
         restore-keys: |
-          ${{ runner.os }}--${{ runner.arch }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-${{ runner.arch }}-build-${{ env.cache-name }}-
 
     - if: ${{ (steps.cache-installers-linux.outputs.cache-hit != 'true') && (inputs.ARCH == 'X64') }}
       shell: bash
