@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-12, macos-14]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -29,11 +29,12 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           # Select wheels
-          CIBW_BUILD: "*-manylinux_x86_64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
-          CIBW_SKIP: "cp36-* cp37-* cp38-* pp* cp38-macosx_arm64"
+          CIBW_BUILD: "*-manylinux_x86_64 *-manylinux_aarch64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
+          CIBW_SKIP: "cp36-* cp37-* cp38-* pp*"
           CIBW_ARCHS: "native"
           # use manylinux2014
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_X86_64_IMAGE: "quay.io/pypa/manylinux2014_x86_64"
+          CIBW_MANYLINUX_AARCH64_IMAGE: "quay.io/pypa/manylinux2014_aarch64"
           CIBW_ENVIRONMENT_MACOS: >
             MACOSX_DEPLOYMENT_TARGET=10.14
           CIBW_TEST_COMMAND: "python -c \"import pyoptinterface as poi; print(dir(poi))\""
