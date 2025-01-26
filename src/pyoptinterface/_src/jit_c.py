@@ -37,6 +37,8 @@ if system == "Linux":
             "/usr/include",
             "/usr/local/include",
             "/usr/include/x86_64-linux-gnu",
+            # arm
+            "/usr/include/aarch64-linux-gnu",
         ]
     )
     libtcc_extra_lib_paths.extend(
@@ -44,6 +46,8 @@ if system == "Linux":
             "/usr/lib",
             "/usr/local/lib",
             "/usr/lib/x86_64-linux-gnu",
+            # arm
+            "/usr/lib/aarch64-linux-gnu",
         ]
     )
 
