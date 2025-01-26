@@ -52,7 +52,7 @@ runs:
       name: Download Installers
       run: |
         curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.2/win64/CardinalOptimizer-7.2.2-win64.zip
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.4/win64/CardinalOptimizer-7.2.4-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
         curl -L -o D:\installers\idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-windows-x86_64.tar.gz
 
