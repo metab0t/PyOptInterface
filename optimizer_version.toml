@@ -1,5 +1,5 @@
 Gurobi = "11.0.0"
 COPT = "7.2.4"
 MOSEK = "10.2.0"
-HiGHS = "1.8.1"
+HiGHS = "1.9.0"
 IPOPT = "3.13.2"
