@@ -91,6 +91,12 @@
 *   - Name
     - ✅
     - ✅
+*   - IISLowerBound
+    - ✅
+    - ❌
+*   - IISUpperBound
+    - ✅
+    - ❌
 :::
 
 ### Supported [constraint attribute](#pyoptinterface.ConstraintAttribute)
@@ -108,6 +114,9 @@
     - ✅
     - ❌
 *   - Dual
+    - ✅
+    - ❌
+*   - IIS
     - ✅
     - ❌
 :::
