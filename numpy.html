@@ -450,28 +450,21 @@ Termination status: TerminationStatusCode.OPTIMAL
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.9.0 (git hash: 66f735e): Copyright (c) 2024 HiGHS under MIT licence terms
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">9</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">b_ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">b_lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">9</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">b_ub</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="n">b_lb</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.12.8/x64/lib/python3.12/site-packages/pyoptinterface/_src/matrix.py:35,</span> in <span class="ni">add_matrix_constraints</span><span class="nt">(model, A, x, sense, b)</span>
-<span class="g g-Whitespace">     </span><span class="mi">26</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span><span class="sd"> add constraints Ax &lt;= / = / &gt;= b</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span><span class="sd"> </span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">     </span><span class="mi">32</span><span class="sd"> b is an iterable of values or a single scalar</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">34</span> <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="ne">---&gt; </span><span class="mi">35</span> <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparray</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span> <span class="n">is_ndarray</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">38</span> <span class="n">is_sparse</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sparray</span><span class="p">)</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;scipy&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hessian has dimension 8 but no nonzeros, so is ignored
+Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [1e+00, 1e+00]
+  Bound  [0e+00, 0e+00]
+  RHS    [1e+00, 1e+00]
+Presolving model
+0 rows, 0 cols, 0 nonzeros  0s
+0 rows, 0 cols, 0 nonzeros  0s
+Presolve : Reductions: rows 0(-16); columns 0(-8); elements 0(-16) - Reduced to empty
+Solving the original LP from the solution after postsolve
+Model status        : Optimal
+Objective value     :  8.0000000000e+00
+Relative P-D gap    :  0.0000000000e+00
+HiGHS run time      :          0.00
 </pre></div>
 </div>
 </div>
