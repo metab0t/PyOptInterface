@@ -4,13 +4,15 @@ kernelspec:
   name: python3
 ---
 
-# Numpy Container and N-queens Problem
+# Matrix Modeling
 
-In the previous [container](container.md) section, we have introduced the `tupledict` container to store and manipulate multi-dimensional data.
+In the previous [container](container.md) section, we have introduced the `tupledict` container to store and manipulate multidimensional data.
 
-However, due to the Bring Your Own Container (BYOC) principle, variables and constraints in PyOptInterface can just simple Python objects that can be stored in Numpy `ndarrays` directly as a multi-dimensional array, and you can enjoy the features of Numpy such like [fancy-indexing](https://numpy.org/doc/stable/user/basics.indexing.html) automatically. 
+However, due to the Bring Your Own Container (BYOC) principle, variables and constraints in PyOptInterface can just simple Python objects that can be stored in Numpy `ndarray` directly as a multidimensional array, and you can enjoy the features of Numpy such like [fancy-indexing](https://numpy.org/doc/stable/user/basics.indexing.html) automatically.
 
-We will use N-queens problem as example to show how to use Numpy `ndarrays` as container to store 2-dimensional variables and construct optimization model.
+## N-queen problem
+
+We will use N-queens problem as example to show how to use Numpy `ndarray` as container to store 2-dimensional variables and construct optimization model.
 
 Firstly, we import the necessary modules:
 
@@ -63,3 +65,32 @@ x_value = get_v(x)
 
 print(x_value.astype(int))
 ```
+
+## Built-in functions to add variables and constraints as Numpy `ndarray`
+
+Although you can construct the `ndarray` of variables and constraints manually, PyOptInterface provides built-in functions to simplify the process. The following code snippet shows how to use the built-in functions to add variables and constraints as Numpy `ndarray`:
+
+```{code-cell}
+model = highs.Model()
+
+x = model.add_m_variables(N)
+
+A = np.eye(N)
+b_ub = np.ones(N)
+b_lb = np.ones(N)
+
+model.add_m_linear_constraints(A, x, poi.Leq, b_ub)
+model.add_m_linear_constraints(A, x, poi.Geq, b_lb)
+
+model.set_objective(poi.quicksum(x))
+
+model.optimize()
+```
+
+Here we use two built-in functions `add_m_variables` and `add_m_linear_constraints` to add variables and constraints as Numpy `ndarray` respectively.
+
+The reference of these functions are listed in <project:#model.add_m_variables> and <project:#model.add_m_linear_constraints>.
+
+`add_m_variables` returns a `ndarray` of variables with the specified shape.
+
+`add_m_linear_constraints` adds multiple linear constraints to the model at once formulated as $Ax \le b$ or $Ax = b$ or $Ax \ge b$ where the matrix $A$ can be a dense `numpy.ndarray` or a sparse matrix `scipy.sparse.sparray`.

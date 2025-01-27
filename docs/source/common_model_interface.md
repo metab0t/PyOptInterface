@@ -39,11 +39,11 @@ continuous
 :return: the handle of the variable
 ```
 
-### Add multi-dimensional variables to the model as <project:#pyoptinterface.tupledict>
+### Add multidimensional variables to the model as <project:#pyoptinterface.tupledict>
 
 ```{py:function} model.add_variables(*coords, [lb=-inf, ub=+inf, domain=pyoptinterface.VariableDomain.Continuous, name=""])
 
-add a multi-dimensional variable to the model
+add a multidimensional variable to the model
 
 :param coords: the coordinates of the variable, can be a list of Iterables
 :param float lb: the lower bound of the variable, optional, defaults to $-\infty$
@@ -53,6 +53,22 @@ continuous
 :param str name: the name of the variable, optional
 :return: the multi-dimensional variable
 :rtype: pyoptinterface.tupledict
+```
+
+### Add multidimensional variables to the model as `numpy.ndarray`
+
+```{py:function} model.add_m_variables(shape, [lb=-inf, ub=+inf, domain=pyoptinterface.VariableDomain.Continuous, name=""])
+
+add a multidimensional variable to the model as `numpy.ndarray`
+
+:param shape: the shape of the variable, can be a tuple of integers or an integer
+:param float lb: the lower bound of the variable, optional, defaults to $-\infty$
+:param float ub: the upper bound of the variable, optional, defaults to $+\infty$
+:param pyoptinterface.VariableDomain domain: the domain of the variable, optional, defaults to 
+continuous
+:param str name: the name of the variable, optional
+:return: the multidimensional variable
+:rtype: numpy.ndarray
 ```
 
 ### Get/set variable attributes
@@ -137,6 +153,20 @@ pretty print an expression in a human-readable format
 - <project:#model.add_second_order_cone_constraint>
 - <project:#model.add_sos_constraint>
 
+### Add linear constraints as matrix form to the model
+
+```{py:function} model.add_m_linear_constraints(A, vars, sense, b, [name=""])
+
+add linear constraints as matrix form to the model $Ax \le b$ or $Ax = b$ or $Ax \ge b$
+
+:param A: the matrix of coefficients, can be a dense `numpy.ndarray` or a sparse matrix `scipy.sparse.sparray`
+:param vars: the variables in the constraints, can be a list or a 1-d `numpy.ndarray` returned by `add_m_variables`
+:param pyoptinterface.ConstraintSense sense: the sense of the constraints
+:param b: the right-hand side of the constraints, should be a 1-d `numpy.ndarray`
+:param str name: the name of the constraints, optional
+:return: the handles of linear constraints
+:rtype: numpy.ndarray
+```
 
 ### Get/set constraint attributes
 

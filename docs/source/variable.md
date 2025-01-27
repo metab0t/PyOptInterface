@@ -32,6 +32,10 @@ After a variable is created, we can query or modify its attributes. The followin
     - float
 *   - Value
     - float
+*   - IISLowerBound
+    - bool
+*   - IISUpperBound
+    - bool
 :::
 
 ```python
