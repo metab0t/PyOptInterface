@@ -4,6 +4,7 @@ myst-nb
 sphinx-copybutton
 furo
 numpy
+scipy
 highsbox
 tccbox
 llvmlite
