@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyoptinterface"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python interface to multiple optimization solvers"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -33,6 +33,6 @@ cmake.build-type = "Release"
 wheel.py-api = "cp312"
 
 [tool.scikit-build.cmake.define]
-PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.8" }
+PYTHON_VERSION = { env = "PYTHON_VERSION", default = "3.9" }
 CMAKE_FIND_DEBUG_MODE = "OFF"
 ENABLE_TEST_MAIN = "OFF"
