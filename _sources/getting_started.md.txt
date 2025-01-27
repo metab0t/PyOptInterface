@@ -245,7 +245,7 @@ con = model.add_linear_constraint(x1+x2, poi.ConstraintSense.Equal, 1, name="con
 ```
 `model.add_linear_constraint` adds a linear constraint to the model.
 - The first argument `x1+x2` is the left-hand side of the constraint.
-- The second argument is the sense of the constraint. It can be `poi.ConstraintSense.Equal`, `poi.ConstraintSense.LessEqual` or `poi.ConstraintSense.GreaterEqual`.
+- The second argument is the sense of the constraint. It can be `poi.ConstraintSense.Equal`, `poi.ConstraintSense.LessEqual` or `poi.ConstraintSense.GreaterEqual` which can also be written as `poi.Eq`, `poi.Leq`, and `poi.Geq`.
 - The third argument is the right-hand side of the constraint. It must be a constant.
 - The fourth argument is optional and can be used to specify the name of the constraint.
 

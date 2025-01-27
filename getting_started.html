@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -535,7 +536,7 @@ As the first step, we will solve the following simple Quadratic Programming (QP)
 <p><code class="docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code> adds a linear constraint to the model.</p>
 <ul class="simple">
 <li><p>The first argument <code class="docutils literal notranslate"><span class="pre">x1+x2</span></code> is the left-hand side of the constraint.</p></li>
-<li><p>The second argument is the sense of the constraint. It can be <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.LessEqual</span></code> or <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.GreaterEqual</span></code>.</p></li>
+<li><p>The second argument is the sense of the constraint. It can be <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.LessEqual</span></code> or <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.GreaterEqual</span></code> which can also be written as <code class="docutils literal notranslate"><span class="pre">poi.Eq</span></code>, <code class="docutils literal notranslate"><span class="pre">poi.Leq</span></code>, and <code class="docutils literal notranslate"><span class="pre">poi.Geq</span></code>.</p></li>
 <li><p>The third argument is the right-hand side of the constraint. It must be a constant.</p></li>
 <li><p>The fourth argument is optional and can be used to specify the name of the constraint.</p></li>
 </ul>

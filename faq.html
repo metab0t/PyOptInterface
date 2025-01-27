@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -314,112 +315,7 @@
 <section id="how-to-add-linear-constraints-in-matrix-form-like-ax-leq-b">
 <h2>How to add linear constraints in matrix form like <span class="math notranslate nohighlight">\(Ax \leq b\)</span>?<a class="headerlink" href="#how-to-add-linear-constraints-in-matrix-form-like-ax-leq-b" title="Link to this heading">¶</a></h2>
 <p>In YALMIP, you can use the matrix form <span class="math notranslate nohighlight">\(Ax \leq b\)</span> to add linear constraints, which is quite convenient.</p>
-<p>In PyOptInterface, you can use the following code to add linear constraints in matrix form:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">gurobi</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_array</span><span class="p">,</span> <span class="n">sparray</span><span class="p">,</span> <span class="n">eye_array</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">iterate_sparse_matrix_rows</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Iterate over rows of a sparse matrix and get non-zero elements for each row.</span>
-
-<span class="sd">    A is a 2-dimensional scipy sparse matrix</span>
-<span class="sd">    isinstance(A, scipy.sparse.sparray) = True and A.ndim = 2</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">csr_array</span><span class="p">):</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">csr_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># Convert to CSR format if not already</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-        <span class="n">row_start</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">row_end</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">row_indices</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_end</span><span class="p">]</span>
-        <span class="n">row_data</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_end</span><span class="p">]</span>
-        <span class="k">yield</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">row_data</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">add_matrix_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">sense</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    add constraints Ax &lt;= / = / &gt;= b</span>
-
-<span class="sd">    A is a 2-dimensional numpy array or scipy sparse matrix</span>
-<span class="sd">    x is an iterable of variables</span>
-<span class="sd">    sense is one of (poi.Leq, poi.Eq, poi.Geq)</span>
-<span class="sd">    b is an iterable of values or a single scalar</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">is_ndarray</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-    <span class="n">is_sparse</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sparray</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ndarray</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_sparse</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A must be a numpy array or scipy.sparse array&quot;</span><span class="p">)</span>
-
-    <span class="n">ndim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">ndim</span>
-    <span class="k">if</span> <span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A must be a 2-dimensional array&quot;</span><span class="p">)</span>
-
-    <span class="n">M</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
-
-    <span class="c1"># turn x into a list if x is an iterable</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">tupledict</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="n">N</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x must have length equal to the number of columns of A&quot;</span><span class="p">)</span>
-
-    <span class="c1"># check b</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="n">M</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;b must have length equal to the number of rows of A&quot;</span><span class="p">)</span>
-
-    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">if</span> <span class="n">is_ndarray</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
-            <span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">ScalarAffineFunction</span><span class="p">()</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">coef</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-                <span class="n">expr</span><span class="o">.</span><span class="n">add_term</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">coef</span><span class="p">)</span>
-            <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">sense</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">is_sparse</span><span class="p">:</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="n">row_data</span><span class="p">),</span> <span class="n">rhs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iterate_sparse_matrix_rows</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">b</span><span class="p">):</span>
-            <span class="n">expr</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">ScalarAffineFunction</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">coef</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="n">row_data</span><span class="p">):</span>
-                <span class="n">expr</span><span class="o">.</span><span class="n">add_term</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">coef</span><span class="p">)</span>
-            <span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">sense</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
-            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">constraints</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="mi">200</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-    <span class="n">ub</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">lb</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">A_sparse</span> <span class="o">=</span> <span class="n">eye_array</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-    <span class="n">add_matrix_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">ub</span><span class="p">)</span>
-    <span class="n">add_matrix_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">A_sparse</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="n">lb</span><span class="p">)</span>
-
-    <span class="n">obj</span> <span class="o">=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
-
-    <span class="n">obj_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">ObjectiveValue</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objective value: &quot;</span><span class="p">,</span> <span class="n">obj_value</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
-</div>
+<p>In PyOptInterface, you can use <a class="reference internal" href="common_model_interface.html#model.add_m_linear_constraints" title="model.add_m_linear_constraints"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">model.add_m_linear_constraints</span></code></span></a> to add linear constraints in matrix form.</p>
 </section>
 </section>
 

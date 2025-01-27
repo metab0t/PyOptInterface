@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Building Bigger Optimization Model" href="structure.html" /><link rel="prev" title="Container" href="container.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Numpy Container and N-queens Problem - PyOptInterface documentation</title>
+        <title>Matrix Modeling - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -276,17 +277,19 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="numpy-container-and-n-queens-problem">
-<h1>Numpy Container and N-queens Problem<a class="headerlink" href="#numpy-container-and-n-queens-problem" title="Link to this heading">¶</a></h1>
-<p>In the previous <a class="reference internal" href="container.html"><span class="std std-doc">container</span></a> section, we have introduced the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> container to store and manipulate multi-dimensional data.</p>
-<p>However, due to the Bring Your Own Container (BYOC) principle, variables and constraints in PyOptInterface can just simple Python objects that can be stored in Numpy <code class="docutils literal notranslate"><span class="pre">ndarrays</span></code> directly as a multi-dimensional array, and you can enjoy the features of Numpy such like <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">fancy-indexing</a> automatically.</p>
-<p>We will use N-queens problem as example to show how to use Numpy <code class="docutils literal notranslate"><span class="pre">ndarrays</span></code> as container to store 2-dimensional variables and construct optimization model.</p>
+          <section class="tex2jax_ignore mathjax_ignore" id="matrix-modeling">
+<h1>Matrix Modeling<a class="headerlink" href="#matrix-modeling" title="Link to this heading">¶</a></h1>
+<p>In the previous <a class="reference internal" href="container.html"><span class="std std-doc">container</span></a> section, we have introduced the <code class="docutils literal notranslate"><span class="pre">tupledict</span></code> container to store and manipulate multidimensional data.</p>
+<p>However, due to the Bring Your Own Container (BYOC) principle, variables and constraints in PyOptInterface can just simple Python objects that can be stored in Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> directly as a multidimensional array, and you can enjoy the features of Numpy such like <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">fancy-indexing</a> automatically.</p>
+<section id="n-queen-problem">
+<h2>N-queen problem<a class="headerlink" href="#n-queen-problem" title="Link to this heading">¶</a></h2>
+<p>We will use N-queens problem as example to show how to use Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> as container to store 2-dimensional variables and construct optimization model.</p>
 <p>Firstly, we import the necessary modules:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -421,6 +424,64 @@ Termination status: TerminationStatusCode.OPTIMAL
 </div>
 </div>
 </section>
+<section id="built-in-functions-to-add-variables-and-constraints-as-numpy-ndarray">
+<h2>Built-in functions to add variables and constraints as Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code><a class="headerlink" href="#built-in-functions-to-add-variables-and-constraints-as-numpy-ndarray" title="Link to this heading">¶</a></h2>
+<p>Although you can construct the <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> of variables and constraints manually, PyOptInterface provides built-in functions to simplify the process. The following code snippet shows how to use the built-in functions to add variables and constraints as Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">b_ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">b_lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">b_ub</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="n">b_lb</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.9.0 (git hash: 66f735e): Copyright (c) 2024 HiGHS under MIT licence terms
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">9</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">b_ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">b_lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">9</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="n">b_ub</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_linear_constraints</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="n">b_lb</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.12.8/x64/lib/python3.12/site-packages/pyoptinterface/_src/matrix.py:35,</span> in <span class="ni">add_matrix_constraints</span><span class="nt">(model, A, x, sense, b)</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span><span class="sd"> add constraints Ax &lt;= / = / &gt;= b</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">32</span><span class="sd"> b is an iterable of values or a single scalar</span>
+<span class="g g-Whitespace">     </span><span class="mi">33</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">34</span> <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="ne">---&gt; </span><span class="mi">35</span> <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparray</span>
+<span class="g g-Whitespace">     </span><span class="mi">37</span> <span class="n">is_ndarray</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">38</span> <span class="n">is_sparse</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sparray</span><span class="p">)</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;scipy&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here we use two built-in functions <code class="docutils literal notranslate"><span class="pre">add_m_variables</span></code> and <code class="docutils literal notranslate"><span class="pre">add_m_linear_constraints</span></code> to add variables and constraints as Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> respectively.</p>
+<p>The reference of these functions are listed in <a class="reference internal" href="common_model_interface.html#model.add_m_variables" title="model.add_m_variables"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_m_variables</span></code></a> and <a class="reference internal" href="common_model_interface.html#model.add_m_linear_constraints" title="model.add_m_linear_constraints"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_m_linear_constraints</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_m_variables</span></code> returns a <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> of variables with the specified shape.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_m_linear_constraints</span></code> adds multiple linear constraints to the model at once formulated as <span class="math notranslate nohighlight">\(Ax \le b\)</span> or <span class="math notranslate nohighlight">\(Ax = b\)</span> or <span class="math notranslate nohighlight">\(Ax \ge b\)</span> where the matrix <span class="math notranslate nohighlight">\(A\)</span> can be a dense <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> or a sparse matrix <code class="docutils literal notranslate"><span class="pre">scipy.sparse.sparray</span></code>.</p>
+</section>
+</section>
 
         </article>
       </div>
@@ -465,8 +526,28 @@ Termination status: TerminationStatusCode.OPTIMAL
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Matrix Modeling</a><ul>
+<li><a class="reference internal" href="#n-queen-problem">N-queen problem</a></li>
+<li><a class="reference internal" href="#built-in-functions-to-add-variables-and-constraints-as-numpy-ndarray">Built-in functions to add variables and constraints as Numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

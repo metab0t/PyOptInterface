@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Common Model Interface" href="common_model_interface.html" /><link rel="prev" title="Matrix Modeling" href="numpy.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Callback" href="callback.html" /><link rel="prev" title="Common Model Interface" href="common_model_interface.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Building Bigger Optimization Model - PyOptInterface documentation</title>
+        <title>Infeasibility Analysis - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -213,9 +213,9 @@
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
 <li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Building Bigger Optimization Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -263,7 +263,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/structure.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/infeasibility.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -283,154 +283,127 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="building-bigger-optimization-model">
-<h1>Building Bigger Optimization Model<a class="headerlink" href="#building-bigger-optimization-model" title="Link to this heading">¶</a></h1>
-<p>In this document, we will introduce how to decompose the process of building a large optimization model into smaller parts and how to compose them together. This is a common practice in optimization modeling to make the code more readable and maintainable.</p>
-<p>Generally speaking, we need two important parts to build an optimization model:</p>
-<ol class="arabic simple">
-<li><p>A <a class="reference internal" href="model.html"><span class="std std-doc">model</span></a> object that represents the optimization problem and communicates with the underlying optimizer. Due to the lightweight design philosophy of PyOptInterface, the model object is just a thin wrapper around the optimizer API, and it does not store the optimization problem itself. The model object is responsible for creating and managing variables, constraints, and the objective function, as well as solving the optimization problem.</p></li>
-<li><p>A dict-like container to store the variables and constraints. We recommend the <a class="reference external" href="https://docs.python.org/3/library/types.html#types.SimpleNamespace"><code class="docutils literal notranslate"><span class="pre">types.SimpleNamespace</span></code></a> object as the container to store the variables and constraints. It is a simple way to store and manipulate the optimization problem in Python. You can use attribute access to get and set the variables and constraints.</p></li>
-</ol>
+          <section class="tex2jax_ignore mathjax_ignore" id="infeasibility-analysis">
+<h1>Infeasibility Analysis<a class="headerlink" href="#infeasibility-analysis" title="Link to this heading">¶</a></h1>
+<p>The optimization model is not ways feasible, and the optimizer may tell us some information about the infeasibility to diagnose the problem. There are two ways to  handle the infeasibilities:</p>
+<ul class="simple">
+<li><p>Find the IIS (Irreducible Infeasible Set) to identify the minimal set of constraints that cause the infeasibility.</p></li>
+<li><p>Relax the constraints and solve a weaker problem to find out which constraints are violated and how much.</p></li>
+</ul>
+<p>PyOptInterface currently supports the first method to find the IIS (only with Gurobi and COPT). The following code snippet shows how to find the IIS of an infeasible model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">copt</span>
 
-<span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
-<span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">container</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">con1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="n">con2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">computeIIS</span><span class="p">()</span>
+
+<span class="n">con1_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_attribute</span><span class="p">(</span><span class="n">con1</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintAttribute</span><span class="o">.</span><span class="n">IIS</span><span class="p">)</span>
+<span class="n">con2_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_attribute</span><span class="p">(</span><span class="n">con2</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintAttribute</span><span class="o">.</span><span class="n">IIS</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Constraint 1 IIS: </span><span class="si">{</span><span class="n">con1_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Constraint 2 IIS: </span><span class="si">{</span><span class="n">con2_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1 2
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constraint 1 IIS: True2025-01-27 09:01:13 [INFO] checks license for COPT v7.2.4 20241206
+2025-01-27 09:01:13 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2025-01-27 09:01:13 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.8/x64/bin
+2025-01-27 09:01:13 [WARN] no license files in HOME folder: /home/runner/copt
+2025-01-27 09:01:13 [INFO] empty environment variable: COPT_LICENSE_DIR
+2025-01-27 09:01:13 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+
+No license found. Starting COPT with size limitations for non-commercial use
+Please apply for a license from www.shanshu.ai/copt
+
+
+Constraint 2 IIS: True
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>No license found. LP size is limited to 10000 variables and 10000 constraints
+Please apply for a license from www.shanshu.ai/copt
+
+Model fingerprint: 43b22f9c
+
+Start the IIS computation for an LP
+
+ Iteration  Min RowBnd  Max RowBnd  Min ColBnd  Max ColBnd      Time
+         0           0           2           0           2      0.00s
+         2           0           2           0           2      0.00s
+         3           1           2           0           2      0.00s
+         4           2           2           0           2      0.00s
+         5           2           2           0           1      0.00s
+         6           2           2           0           0      0.00s
+
+IIS summary: 2 rows, 0 bounds of columns
+IIS computation finished (0.001s)
 </pre></div>
 </div>
 </div>
 </div>
-<p>Thus, we can define a class to represent the optimization model and use the container to store the variables and constraints.</p>
+<p>This code snippet creates an infeasible model with two constraints and finds the IIS of the model. Obviously, the constraints are contradictory because <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">y</span> <span class="pre">&lt;=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span> <span class="pre">&gt;=</span> <span class="pre">5</span></code> cannot be satisfied at the same time when <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are non-negative. The optimizer will detect that the model is infeasible and return the IIS, which is the set of constraints that cause the infeasibility. We can query whether a constraint is in the IIS by calling <code class="docutils literal notranslate"><span class="pre">get_constraint_attribute</span></code> with the <code class="docutils literal notranslate"><span class="pre">ConstraintAttribute.IIS</span></code> attribute.</p>
+<p>Sometimes, the bounds of the variables are not consistent with the constraints, and we need to query the IIS of the bounds of variables by calling <code class="docutils literal notranslate"><span class="pre">get_variable_attribute</span></code> with the <code class="docutils literal notranslate"><span class="pre">VariableAttribute.IISLowerBound</span></code> and <code class="docutils literal notranslate"><span class="pre">VariableAttribute.IISUpperBound</span></code> attributes.</p>
+<p>The following code snippet shows how to tell if the bounds of a variable are in the IIS:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">highs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">OptModel</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then we can define small functions to declare the variables and constraints and add them to the model. We take the N-queens problem as an example.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">poi</span><span class="o">.</span><span class="n">VariableDomain</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
+<span class="n">con1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="c1"># Row and column</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span><span class="n">OptModel</span><span class="p">):</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">x</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">computeIIS</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-        <span class="c1"># Diagonal</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="c1"># Anti-diagonal</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Finally, we can compose these functions to build the optimization model and solve it.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">OptModel</span><span class="p">()</span>
+<span class="n">con1_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_attribute</span><span class="p">(</span><span class="n">con1</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintAttribute</span><span class="o">.</span><span class="n">IIS</span><span class="p">)</span>
+<span class="n">x_lb_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">IISLowerBound</span><span class="p">)</span>
+<span class="n">x_ub_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">IISUpperBound</span><span class="p">)</span>
+<span class="n">y_lb_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">IISLowerBound</span><span class="p">)</span>
+<span class="n">y_ub_iis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_attribute</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">VariableAttribute</span><span class="o">.</span><span class="n">IISUpperBound</span><span class="p">)</span>
 
-<span class="n">N</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">declare_queen_variables</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-<span class="n">add_row_column_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-<span class="n">add_diagonal_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-
-<span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Termination status:&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_model_attribute</span><span class="p">(</span><span class="n">poi</span><span class="o">.</span><span class="n">ModelAttribute</span><span class="o">.</span><span class="n">TerminationStatus</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Constraint 1 IIS: </span><span class="si">{</span><span class="n">con1_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable x lower bound IIS: </span><span class="si">{</span><span class="n">x_lb_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable x upper bound IIS: </span><span class="si">{</span><span class="n">x_ub_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable y lower bound IIS: </span><span class="si">{</span><span class="n">y_lb_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable y upper bound IIS: </span><span class="si">{</span><span class="n">y_ub_iis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.9.0 (git hash: 66f735e): Copyright (c) 2024 HiGHS under MIT licence terms
-Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [0e+00, 0e+00]
-  Bound  [1e+00, 1e+00]
-  RHS    [1e+00, 1e+00]
-Presolving model
-42 rows, 64 cols, 252 nonzeros  0s
-42 rows, 64 cols, 270 nonzeros  0s
-Objective function is integral with scale 1
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constraint 1 IIS: True
+Variable x lower bound IIS: False
+Variable x upper bound IIS: True
+Variable y lower bound IIS: False
+Variable y upper bound IIS: True
+No license found. LP size is limited to 10000 variables and 10000 constraints
+Please apply for a license from www.shanshu.ai/copt
 
-Solving MIP model with:
-   42 rows
-   64 cols (64 binary, 0 integer, 0 implied int., 0 continuous)
-   270 nonzeros
+Model fingerprint: 6e53fbd7
 
-Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&gt; Heuristic; L =&gt; Sub-MIP;
-     P =&gt; Empty MIP; R =&gt; Randomized rounding; S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded;
-     z =&gt; Trivial zero; l =&gt; Trivial lower; u =&gt; Trivial upper; p =&gt; Trivial point
+Start the IIS computation for an LP
 
-        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
-Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+ Iteration  Min RowBnd  Max RowBnd  Min ColBnd  Max ColBnd      Time
+         0           0           1           0           2      0.00s
+         1           0           1           0           2      0.00s
+         2           1           1           0           2      0.00s
+         3           1           1           1           2      0.00s
+         4           1           1           2           2      0.00s
 
-         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
-         0       0         0   0.00%   0               inf                  inf        0      0      6        29     0.0s
- L       0       0         0 100.00%   0               0                  0.00%     1564     28     84       213     0.1s
-         1       0         1 100.00%   0               0                  0.00%     1564     28     84       267     0.1s
-
-Solving report
-  Status            Optimal
-  Primal bound      0
-  Dual bound        0
-  Gap               0% (tolerance: 0.01%)
-  P-D integral      0
-  Solution status   feasible
-                    0 (objective)
-                    0 (bound viol.)
-                    0 (int. viol.)
-                    0 (row viol.)
-  Timing            0.07 (total)
-                    0.00 (presolve)
-                    0.00 (solve)
-                    0.00 (postsolve)
-  Max sub-MIP depth 1
-  Nodes             1
-  Repair LPs        0 (0 feasible; 0 iterations)
-  LP iterations     267 (total)
-                    0 (strong br.)
-                    184 (separation)
-                    54 (heuristics)
-Termination status: TerminationStatusCode.OPTIMAL
+IIS summary: 1 rows, 2 bounds of columns
+IIS computation finished (0.001s)
 </pre></div>
 </div>
 </div>
@@ -442,23 +415,23 @@ Termination status: TerminationStatusCode.OPTIMAL
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="common_model_interface.html">
+          <a class="next-page" href="callback.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Common Model Interface</div>
+                <div class="title">Callback</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="numpy.html">
+          <a class="prev-page" href="common_model_interface.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Matrix Modeling</div>
+                <div class="title">Common Model Interface</div>
                 
               </div>
             </a>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Callback" href="callback.html" /><link rel="prev" title="Building Bigger Optimization Model" href="structure.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Infeasibility Analysis" href="infeasibility.html" /><link rel="prev" title="Building Bigger Optimization Model" href="structure.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Common Model Interface - PyOptInterface documentation</title>
@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -345,12 +346,12 @@ continuous</p></li>
 </dd></dl>
 
 </section>
-<section id="add-multi-dimensional-variables-to-the-model-as">
-<h3>Add multi-dimensional variables to the model as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.tupledict</span></code></a><a class="headerlink" href="#add-multi-dimensional-variables-to-the-model-as" title="Link to this heading">¶</a></h3>
+<section id="add-multidimensional-variables-to-the-model-as">
+<h3>Add multidimensional variables to the model as <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.tupledict</span></code></a><a class="headerlink" href="#add-multidimensional-variables-to-the-model-as" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.add_variables">
 <span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*coords</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_variables" title="Link to this definition">¶</a></dt>
-<dd><p>add a multi-dimensional variable to the model</p>
+<dd><p>add a multidimensional variable to the model</p>
 <dl class="myst field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -367,6 +368,33 @@ continuous</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.tupledict" title="pyoptinterface.tupledict">pyoptinterface.tupledict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="add-multidimensional-variables-to-the-model-as-numpy-ndarray">
+<h3>Add multidimensional variables to the model as <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code><a class="headerlink" href="#add-multidimensional-variables-to-the-model-as-numpy-ndarray" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.add_m_variables">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_m_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">lb=-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=+inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain=pyoptinterface.VariableDomain.Continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_m_variables" title="Link to this definition">¶</a></dt>
+<dd><p>add a multidimensional variable to the model as <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shape</strong> – the shape of the variable, can be a tuple of integers or an integer</p></li>
+<li><p><strong>lb</strong> (<em>float</em>) – the lower bound of the variable, optional, defaults to <span class="math notranslate nohighlight">\(-\infty\)</span></p></li>
+<li><p><strong>ub</strong> (<em>float</em>) – the upper bound of the variable, optional, defaults to <span class="math notranslate nohighlight">\(+\infty\)</span></p></li>
+<li><p><strong>domain</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.VariableDomain" title="pyoptinterface.VariableDomain"><em>pyoptinterface.VariableDomain</em></a>) – the domain of the variable, optional, defaults to
+continuous</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – the name of the variable, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the multidimensional variable</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -510,6 +538,32 @@ continuous</p></li>
 <li><p><a class="reference internal" href="constraint.html#model.add_second_order_cone_constraint" title="model.add_second_order_cone_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_second_order_cone_constraint</span></code></a></p></li>
 <li><p><a class="reference internal" href="constraint.html#model.add_sos_constraint" title="model.add_sos_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_sos_constraint</span></code></a></p></li>
 </ul>
+</section>
+<section id="add-linear-constraints-as-matrix-form-to-the-model">
+<h3>Add linear constraints as matrix form to the model<a class="headerlink" href="#add-linear-constraints-as-matrix-form-to-the-model" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.add_m_linear_constraints">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_m_linear_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_m_linear_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>add linear constraints as matrix form to the model <span class="math notranslate nohighlight">\(Ax \le b\)</span> or <span class="math notranslate nohighlight">\(Ax = b\)</span> or <span class="math notranslate nohighlight">\(Ax \ge b\)</span></p>
+<dl class="myst field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – the matrix of coefficients, can be a dense <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> or a sparse matrix <code class="docutils literal notranslate"><span class="pre">scipy.sparse.sparray</span></code></p></li>
+<li><p><strong>vars</strong> – the variables in the constraints, can be a list or a 1-d <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> returned by <code class="docutils literal notranslate"><span class="pre">add_m_variables</span></code></p></li>
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense of the constraints</p></li>
+<li><p><strong>b</strong> – the right-hand side of the constraints, should be a 1-d <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></li>
+<li><p><strong>name</strong> (<em>str</em>) – the name of the constraints, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the handles of linear constraints</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="get-set-constraint-attributes">
 <h3>Get/set constraint attributes<a class="headerlink" href="#get-set-constraint-attributes" title="Link to this heading">¶</a></h3>
@@ -699,12 +753,12 @@ continuous</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="callback.html">
+          <a class="next-page" href="infeasibility.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Callback</div>
+                <div class="title">Infeasibility Analysis</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -763,8 +817,12 @@ continuous</p></li>
 <li><a class="reference internal" href="#model.add_variable"><code class="docutils literal notranslate"><span class="pre">model.add_variable()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#add-multi-dimensional-variables-to-the-model-as">Add multi-dimensional variables to the model as <span class="xref myst"></span></a><ul>
+<li><a class="reference internal" href="#add-multidimensional-variables-to-the-model-as">Add multidimensional variables to the model as <span class="xref myst"></span></a><ul>
 <li><a class="reference internal" href="#model.add_variables"><code class="docutils literal notranslate"><span class="pre">model.add_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-multidimensional-variables-to-the-model-as-numpy-ndarray">Add multidimensional variables to the model as <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a><ul>
+<li><a class="reference internal" href="#model.add_m_variables"><code class="docutils literal notranslate"><span class="pre">model.add_m_variables()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#get-set-variable-attributes">Get/set variable attributes</a><ul>
@@ -796,6 +854,10 @@ continuous</p></li>
 </li>
 <li><a class="reference internal" href="#constraint">Constraint</a><ul>
 <li><a class="reference internal" href="#add-a-constraint-to-the-model">Add a constraint to the model</a></li>
+<li><a class="reference internal" href="#add-linear-constraints-as-matrix-form-to-the-model">Add linear constraints as matrix form to the model</a><ul>
+<li><a class="reference internal" href="#model.add_m_linear_constraints"><code class="docutils literal notranslate"><span class="pre">model.add_m_linear_constraints()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#get-set-constraint-attributes">Get/set constraint attributes</a><ul>
 <li><a class="reference internal" href="#model.set_constraint_attribute"><code class="docutils literal notranslate"><span class="pre">model.set_constraint_attribute()</span></code></a></li>
 <li><a class="reference internal" href="#model.get_constraint_attribute"><code class="docutils literal notranslate"><span class="pre">model.get_constraint_attribute()</span></code></a></li>

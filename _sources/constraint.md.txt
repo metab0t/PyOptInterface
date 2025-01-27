@@ -25,6 +25,16 @@ from pyoptinterface import copt
 model = copt.Model()
 ```
 
+## Constraint Sense
+
+The sense of a constraint can be one of the following:
+
+- `poi.Eq`: equal
+- `poi.Leq`: less than or equal
+- `poi.Geq`: greater than or equal
+
+They are the abbreviations of `poi.ConstraintSense.Equal`, `poi.ConstraintSense.LessEqual` or `poi.ConstraintSense.GreaterEqual` and can be used in the `sense` argument of the constraint creation functions.
+
 ## Linear Constraint
 It is defined as:
 
@@ -42,7 +52,7 @@ It can be added to the model using the `add_linear_constraint` method of the `Mo
 x = model.add_variable(name="x")
 y = model.add_variable(name="y")
 
-con = model.add_linear_constraint(2.0*x + 3.0*y, poi.ConstraintSense.LessEqual, 1.0)
+con = model.add_linear_constraint(2.0*x + 3.0*y, poi.Leq, 1.0)
 ```
 
 ```{py:function} model.add_linear_constraint(expr, sense, rhs, [name=""])
@@ -50,8 +60,7 @@ con = model.add_linear_constraint(2.0*x + 3.0*y, poi.ConstraintSense.LessEqual, 
 add a linear constraint to the model
 
 :param expr: the expression of the constraint
-:param pyoptinterface.ConstraintSense sense: the sense 
-of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
+:param pyoptinterface.ConstraintSense sense: the sense of the constraint
 :param float rhs: the right-hand side of the constraint
 :param str name: the name of the constraint, optional
 :return: the handle of the constraint
@@ -88,8 +97,7 @@ con = model.add_quadratic_constraint(expr, poi.ConstraintSense.LessEqual, 1.0)
 add a quadratic constraint to the model
 
 :param expr: the expression of the constraint
-:param pyoptinterface.ConstraintSense sense: the sense 
-of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
+:param pyoptinterface.ConstraintSense sense: the sense of the constraint, which can be `GreaterEqual`, `Equal`, or `LessEqual`
 :param float rhs: the right-hand side of the constraint
 :param str name: the name of the constraint, optional
 :return: the handle of the constraint
@@ -193,6 +201,8 @@ standard [constraint attributes](#pyoptinterface.ConstraintAttribute):
     - float
 *   - Dual
     - float
+*   - IIS
+    - bool
 :::
 
 The most common attribute we will use is the `Dual` attribute, which represents the dual multiplier of the constraint after optimization.
@@ -235,3 +245,26 @@ model.set_normalized_rhs(con, 2.0)
 # modify the coefficient of the linear part of the constraint
 model.set_normalized_coefficient(con, x, 2.0)
 ```
+
+## Create constraint with comparison operator
+
+In other modeling languages, we can create a constraint with a comparison operator, like:
+
+```python
+model.addConsr(x + y <= 1)
+```
+
+This is quite convenient, so PyOptInterface now supports to create constraint with comparison operators `<=`, `==`, `>=` as a shortcut to create a linear or quadratic constraint.
+
+```{code-cell}
+model.add_linear_constraint(x + y <= 1)
+model.add_linear_constraint(x <= y)
+model.add_quadratic_constraint(x*x + y*y <= 1)
+```
+
+:::{note}
+
+Creating constraint with comparison operator may cause performance issue especially the left-hand side and right-hand side of the constraint are complex expressions. PyOptInterface needs to create a new expression by subtracting the right-hand side from the left-hand side, which may be time-consuming.
+
+If that becomes the bottleneck of performance, it is recommended to construct the left-hand side expression with `ExprBuilder` and call `add_linear_constraint` or `add_quadratic_constraint` method to create constraints explicitly.
+:::

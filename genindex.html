@@ -210,9 +210,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -424,6 +425,10 @@
           <li><a href="constraint.html#model.add_exp_cone_constraint">model.add_exp_cone_constraint()</a>
 </li>
           <li><a href="constraint.html#model.add_linear_constraint">model.add_linear_constraint()</a>
+</li>
+          <li><a href="common_model_interface.html#model.add_m_linear_constraints">model.add_m_linear_constraints()</a>
+</li>
+          <li><a href="common_model_interface.html#model.add_m_variables">model.add_m_variables()</a>
 </li>
           <li><a href="nonlinear.html#model.add_nl_constraint">model.add_nl_constraint()</a>
 </li>
@@ -1095,6 +1100,20 @@
 </li>
         </ul></li>
         <li>
+    model.add_m_linear_constraints()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.add_m_linear_constraints">built-in function</a>
+</li>
+        </ul></li>
+        <li>
+    model.add_m_variables()
+
+        <ul>
+          <li><a href="common_model_interface.html#model.add_m_variables">built-in function</a>
+</li>
+        </ul></li>
+        <li>
     model.add_nl_constraint()
 
         <ul>
@@ -1171,6 +1190,8 @@
           <li><a href="common_model_interface.html#model.get_model_attribute">built-in function</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     model.get_normalized_coefficient()
 
@@ -1178,8 +1199,6 @@
           <li><a href="common_model_interface.html#model.get_normalized_coefficient">built-in function</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     model.get_normalized_rhs()
 

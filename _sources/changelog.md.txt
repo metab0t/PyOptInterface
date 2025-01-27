@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 - Add `model.add_m_variables` and `model.add_m_linear_constraints` matrix modeling API
 - Add `model.computeIIS` and IIS related attributes for constraint and variable
 - Implement constraint based on compare operators, now you can use `model.add_linear_constraint(x + y <= 1.0)` directly
+- Drop support for Python 3.8
+- Add wheels for Linux ARM64
+- Supports HiGHS 1.9.0 and Mosek 11
 
 ## 0.3.0
 - Add `model.set_variable_bounds(variable, lb, ub)` to make it easier to change variable bounds

@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
@@ -306,12 +307,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-26 14:15:51 [INFO] checks license for COPT v7.2.4 20241206
-2025-01-26 14:15:51 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
-2025-01-26 14:15:51 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.8/x64/bin
-2025-01-26 14:15:51 [WARN] no license files in HOME folder: /home/runner/copt
-2025-01-26 14:15:51 [INFO] empty environment variable: COPT_LICENSE_DIR
-2025-01-26 14:15:51 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-01-27 09:01:04 [INFO] checks license for COPT v7.2.4 20241206
+2025-01-27 09:01:04 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2025-01-27 09:01:04 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.8/x64/bin
+2025-01-27 09:01:04 [WARN] no license files in HOME folder: /home/runner/copt
+2025-01-27 09:01:04 [INFO] empty environment variable: COPT_LICENSE_DIR
+2025-01-27 09:01:04 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
 No license found. Starting COPT with size limitations for non-commercial use
 Please apply for a license from www.shanshu.ai/copt
@@ -319,6 +320,16 @@ Please apply for a license from www.shanshu.ai/copt
 </div>
 </div>
 </div>
+<section id="constraint-sense">
+<h2>Constraint Sense<a class="headerlink" href="#constraint-sense" title="Link to this heading">¶</a></h2>
+<p>The sense of a constraint can be one of the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">poi.Eq</span></code>: equal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poi.Leq</span></code>: less than or equal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poi.Geq</span></code>: greater than or equal</p></li>
+</ul>
+<p>They are the abbreviations of <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.LessEqual</span></code> or <code class="docutils literal notranslate"><span class="pre">poi.ConstraintSense.GreaterEqual</span></code> and can be used in the <code class="docutils literal notranslate"><span class="pre">sense</span></code> argument of the constraint creation functions.</p>
+</section>
 <section id="linear-constraint">
 <h2>Linear Constraint<a class="headerlink" href="#linear-constraint" title="Link to this heading">¶</a></h2>
 <p>It is defined as:</p>
@@ -338,7 +349,7 @@ Please apply for a license from www.shanshu.ai/copt
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
-<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">con</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -351,8 +362,7 @@ Please apply for a license from www.shanshu.ai/copt
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> – the expression of the constraint</p></li>
-<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense
-of the constraint, which can be <code class="docutils literal notranslate"><span class="pre">GreaterEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, or <code class="docutils literal notranslate"><span class="pre">LessEqual</span></code></p></li>
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense of the constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – the right-hand side of the constraint</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
 </ul>
@@ -401,8 +411,7 @@ of the constraint, which can be <code class="docutils literal notranslate"><span
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> – the expression of the constraint</p></li>
-<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense
-of the constraint, which can be <code class="docutils literal notranslate"><span class="pre">GreaterEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, or <code class="docutils literal notranslate"><span class="pre">LessEqual</span></code></p></li>
+<li><p><strong>sense</strong> (<a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><em>pyoptinterface.ConstraintSense</em></a>) – the sense of the constraint, which can be <code class="docutils literal notranslate"><span class="pre">GreaterEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, or <code class="docutils literal notranslate"><span class="pre">LessEqual</span></code></p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – the right-hand side of the constraint</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
 </ul>
@@ -557,6 +566,9 @@ standard <a class="reference internal" href="api/pyoptinterface.html#pyoptinterf
 <tr class="row-even"><td><p>Dual</p></td>
 <td><p>float</p></td>
 </tr>
+<tr class="row-odd"><td><p>IIS</p></td>
+<td><p>bool</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -594,6 +606,33 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 <span class="c1"># modify the coefficient of the linear part of the constraint</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_normalized_coefficient</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 </pre></div>
+</div>
+</section>
+<section id="create-constraint-with-comparison-operator">
+<h2>Create constraint with comparison operator<a class="headerlink" href="#create-constraint-with-comparison-operator" title="Link to this heading">¶</a></h2>
+<p>In other modeling languages, we can create a constraint with a comparison operator, like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">addConsr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is quite convenient, so PyOptInterface now supports to create constraint with comparison operators <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> as a shortcut to create a linear or quadratic constraint.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pyoptinterface._src.core_ext.ConstraintIndex at 0x7f04d0cf4a10&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Creating constraint with comparison operator may cause performance issue especially the left-hand side and right-hand side of the constraint are complex expressions. PyOptInterface needs to create a new expression by subtracting the right-hand side from the left-hand side, which may be time-consuming.</p>
+<p>If that becomes the bottleneck of performance, it is recommended to construct the left-hand side expression with <code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code> and call <code class="docutils literal notranslate"><span class="pre">add_linear_constraint</span></code> or <code class="docutils literal notranslate"><span class="pre">add_quadratic_constraint</span></code> method to create constraints explicitly.</p>
 </div>
 </section>
 </section>
@@ -654,6 +693,7 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Constraint</a><ul>
+<li><a class="reference internal" href="#constraint-sense">Constraint Sense</a></li>
 <li><a class="reference internal" href="#linear-constraint">Linear Constraint</a><ul>
 <li><a class="reference internal" href="#model.add_linear_constraint"><code class="docutils literal notranslate"><span class="pre">model.add_linear_constraint()</span></code></a></li>
 </ul>
@@ -677,6 +717,7 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 <li><a class="reference internal" href="#constraint-attributes">Constraint Attributes</a></li>
 <li><a class="reference internal" href="#delete-constraint">Delete constraint</a></li>
 <li><a class="reference internal" href="#modify-constraint">Modify constraint</a></li>
+<li><a class="reference internal" href="#create-constraint-with-comparison-operator">Create constraint with comparison operator</a></li>
 </ul>
 </li>
 </ul>

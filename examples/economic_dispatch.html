@@ -212,9 +212,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../objective.html">Objective</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nonlinear.html">Nonlinear Programming</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../container.html">Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../numpy.html">Numpy Container and N-queens Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../numpy.html">Matrix Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Building Bigger Optimization Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../common_model_interface.html">Common Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gurobi.html">Gurobi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../copt.html">COPT</a></li>
@@ -487,13 +488,9 @@ Objective value:  12684.0
   RHS    [2e+01, 2e+02]
   Iteration        Objective     NullspaceDim
           0        15430.248                0      0.00s
-        100        14091.031                3      0.00s
+        100        14091.031                3      0.01s
         169        13740.237               10      0.01s
 Model status        : Optimal
-Simplex   iterations: 86
-QP ASM    iterations: 169
-Objective value     :  1.3740213571e+04
-HiGHS run time      :          0.01
 TerminationStatusCode.OPTIMAL
 Objective value:  13740.213571429404
 [[100.         100.         100.         100.         100.
@@ -511,6 +508,12 @@ Objective value:  13740.213571429404
    50.          50.          50.          50.          50.28576204
    50.71433367  51.14290531  51.57147694  52.00004857  52.4286202
    52.85719184  53.28576347  53.7143351   54.14290673]]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simplex   iterations: 86
+QP ASM    iterations: 169
+Objective value     :  1.3740213571e+04
+HiGHS run time      :          0.01
 </pre></div>
 </div>
 </div>
