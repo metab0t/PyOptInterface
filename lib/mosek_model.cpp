@@ -184,7 +184,7 @@ void MOSEKModel::close()
 void MOSEKModel::write(const std::string &filename)
 {
 	bool is_solution = false;
-	if (filename.ends_with(".sol") || filename.ends_with(".bas") || filename.ends_with("int"))
+	if (filename.ends_with(".sol") || filename.ends_with(".bas") || filename.ends_with(".int"))
 	{
 		is_solution = true;
 	}

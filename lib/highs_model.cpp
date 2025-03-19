@@ -119,9 +119,25 @@ void POIHighsModel::close()
 	m_model.reset();
 }
 
-void POIHighsModel::write(const std::string &filename)
+void POIHighsModel::write(const std::string &filename, bool pretty)
 {
-	auto error = highs::Highs_writeModel(m_model.get(), filename.c_str());
+	bool is_solution = false;
+	if (filename.ends_with(".sol"))
+	{
+		is_solution = true;
+	}
+	HighsInt error;
+	if (is_solution)
+	{
+		if (pretty)
+			error = highs::Highs_writeSolutionPretty(m_model.get(), filename.c_str());
+		else
+			error = highs::Highs_writeSolution(m_model.get(), filename.c_str());
+	}
+	else
+	{
+		error = highs::Highs_writeModel(m_model.get(), filename.c_str());
+	}
 	check_error(error);
 }
 

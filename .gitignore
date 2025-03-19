@@ -17,3 +17,4 @@ docs/jupyter_execute
 docs/build
 
 *.lp
+*.sol

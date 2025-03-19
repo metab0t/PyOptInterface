@@ -14,6 +14,8 @@
 	B(Highs_create);                \
 	B(Highs_destroy);               \
 	B(Highs_writeModel);            \
+	B(Highs_writeSolution);         \
+	B(Highs_writeSolutionPretty);   \
 	B(Highs_addCol);                \
 	B(Highs_getNumCol);             \
 	B(Highs_changeColIntegrality);  \
@@ -112,7 +114,7 @@ class POIHighsModel
 	void init();
 	void close();
 
-	void write(const std::string &filename);
+	void write(const std::string &filename, bool pretty);
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -kHighsInf, double ub = kHighsInf,

@@ -39,9 +39,9 @@ NB_MODULE(highs_model_ext, m)
 	    .def_ro("m_n_constraints", &HighsModelMixin::m_n_constraints)
 	    // clang-format off
 	    BIND_F(init)
-	    BIND_F(write)
 	    BIND_F(close)
 	    // clang-format on
+	    .def("write", &HighsModelMixin::write, nb::arg("filename"), nb::arg("pretty") = false)
 
 	    .def_ro("solution", &HighsModelMixin::m_solution)
 
