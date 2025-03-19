@@ -23,6 +23,7 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<bool>(), nb::arg("empty") = false)
 	    // clang-format off
 		BIND_F(start)
+		BIND_F(close)
 		BIND_F(raw_parameter_type)
 		BIND_F(set_raw_parameter_int)
 		BIND_F(set_raw_parameter_double)
@@ -39,6 +40,7 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def(nb::init<const GurobiEnv &>())
 	    // clang-format off
 		BIND_F(init)
+		BIND_F(close)
 		BIND_F(write)
 	    // clang-format on
 

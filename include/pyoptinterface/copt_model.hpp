@@ -124,6 +124,8 @@ class COPTEnv
 	COPTEnv(COPTEnvConfig &config);
 	~COPTEnv();
 
+	void close();
+
   private:
 	copt_env *m_env;
 
@@ -166,6 +168,7 @@ class COPTModel
 	COPTModel() = default;
 	COPTModel(const COPTEnv &env);
 	void init(const COPTEnv &env);
+	void close();
 
 	void write(const std::string &filename);
 

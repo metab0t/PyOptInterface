@@ -94,11 +94,12 @@ class GurobiEnv
 	void set_raw_parameter_string(const char *param_name, const char *value);
 
 	void start();
+	void close();
 
 	void check_error(int error);
 
   private:
-	GRBenv *m_env;
+	GRBenv *m_env = nullptr;
 
 	friend class GurobiModel;
 };
@@ -137,6 +138,7 @@ class GurobiModel
 	GurobiModel() = default;
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
+	void close();
 
 	void write(const std::string &filename);
 

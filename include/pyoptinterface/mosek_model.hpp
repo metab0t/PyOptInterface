@@ -103,6 +103,7 @@ class MOSEKEnv
   public:
 	MOSEKEnv();
 	~MOSEKEnv();
+	void close();
 
 	void putlicensecode(const std::vector<MSKint32t> &code);
 
@@ -126,6 +127,7 @@ class MOSEKModel
 	MOSEKModel() = default;
 	MOSEKModel(const MOSEKEnv &env);
 	void init(const MOSEKEnv &env);
+	void close();
 
 	void write(const std::string &filename);
 

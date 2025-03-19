@@ -110,6 +110,7 @@ class POIHighsModel
   public:
 	POIHighsModel();
 	void init();
+	void close();
 
 	void write(const std::string &filename);
 

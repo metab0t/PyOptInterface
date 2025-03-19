@@ -20,7 +20,10 @@ NB_MODULE(copt_model_ext, m)
 
 	nb::class_<COPTEnvConfig>(m, "EnvConfig").def(nb::init<>()).def("set", &COPTEnvConfig::set);
 
-	nb::class_<COPTEnv>(m, "Env").def(nb::init<>()).def(nb::init<COPTEnvConfig &>());
+	nb::class_<COPTEnv>(m, "Env")
+	    .def(nb::init<>())
+	    .def(nb::init<COPTEnvConfig &>())
+	    .def("close", &COPTEnv::close);
 
 	nb::class_<COPTModel>(m, "_RawModelBase");
 
@@ -31,6 +34,7 @@ NB_MODULE(copt_model_ext, m)
 	    // clang-format off
 	    BIND_F(init)
 	    BIND_F(write)
+	    BIND_F(close)
 	    // clang-format on
 
 	    .def("add_variable", &COPTModelMixin::add_variable,

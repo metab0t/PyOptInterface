@@ -42,6 +42,7 @@ NB_MODULE(ipopt_model_ext, m)
 
 	nb::class_<IpoptModelMixin>(m, "RawModel")
 	    .def(nb::init<>())
+	    .def("close", &IpoptModelMixin::close)
 	    .def_ro("m_status", &IpoptModelMixin::m_status)
 	    .def("add_variable", &IpoptModelMixin::add_variable, nb::arg("lb") = -INFINITY,
 	         nb::arg("ub") = INFINITY, nb::arg("start") = 0.0, nb::arg("name") = "")

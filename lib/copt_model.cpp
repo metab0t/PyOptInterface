@@ -143,6 +143,11 @@ void COPTModel::init(const COPTEnv &env)
 	m_model = std::unique_ptr<copt_prob, COPTfreemodelT>(model);
 }
 
+void COPTModel::close()
+{
+	m_model.reset();
+}
+
 void COPTModel::write(const std::string &filename)
 {
 	int error;
@@ -1019,6 +1024,15 @@ COPTEnv::~COPTEnv()
 {
 	int error = copt::COPT_DeleteEnv(&m_env);
 	check_error(error);
+}
+
+void COPTEnv::close()
+{
+	if (m_env != nullptr)
+	{
+		copt::COPT_DeleteEnv(&m_env);
+	}
+	m_env = nullptr;
 }
 
 COPTEnvConfig::COPTEnvConfig()

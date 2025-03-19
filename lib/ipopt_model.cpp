@@ -62,6 +62,11 @@ IpoptModel::IpoptModel()
 	}
 }
 
+void IpoptModel::close()
+{
+	m_problem.reset();
+}
+
 VariableIndex IpoptModel::add_variable(double lb, double ub, double start, const char *name)
 {
 	VariableIndex vi(n_variables);

@@ -19,6 +19,7 @@ NB_MODULE(mosek_model_ext, m)
 
 	nb::class_<MOSEKEnv>(m, "Env")
 	    .def(nb::init<>())
+	    .def("close", &MOSEKEnv::close)
 	    .def("putlicensecode", &MOSEKEnv::putlicensecode);
 
 	nb::class_<MOSEKModel>(m, "_RawModelBase");
@@ -30,6 +31,7 @@ NB_MODULE(mosek_model_ext, m)
 	    // clang-format off
 	    BIND_F(init)
 	    BIND_F(write)
+	    BIND_F(close)
 	    // clang-format on
 
 	    .def("add_variable", &MOSEKModelMixin::add_variable,

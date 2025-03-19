@@ -180,6 +180,11 @@ void GurobiModel::init(const GurobiEnv &env)
 	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model);
 }
 
+void GurobiModel::close()
+{
+	m_model.reset();
+}
+
 void GurobiModel::write(const std::string &filename)
 {
 	int error = gurobi::GRBwrite(m_model.get(), filename.c_str());
@@ -1069,7 +1074,7 @@ GurobiEnv::GurobiEnv(bool empty)
 
 GurobiEnv::~GurobiEnv()
 {
-	gurobi::GRBfreeenv(m_env);
+	close();
 }
 
 int GurobiEnv::raw_parameter_type(const char *param_name)
@@ -1099,6 +1104,15 @@ void GurobiEnv::start()
 {
 	int error = gurobi::GRBstartenv(m_env);
 	check_error(error);
+}
+
+void GurobiEnv::close()
+{
+	if (m_env != nullptr)
+	{
+		gurobi::GRBfreeenv(m_env);
+	}
+	m_env = nullptr;
 }
 
 void GurobiEnv::check_error(int error)

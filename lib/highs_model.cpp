@@ -114,6 +114,11 @@ void POIHighsModel::init()
 	m_model = std::unique_ptr<void, HighsfreemodelT>(model);
 }
 
+void POIHighsModel::close()
+{
+	m_model.reset();
+}
+
 void POIHighsModel::write(const std::string &filename)
 {
 	auto error = highs::Highs_writeModel(m_model.get(), filename.c_str());

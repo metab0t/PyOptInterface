@@ -45,6 +45,7 @@ struct IpoptModel
 {
 	/* Methods */
 	IpoptModel();
+	void close();
 
 	VariableIndex add_variable(double lb = -INFINITY, double ub = INFINITY, double start = 0.0,
 	                           const char *name = nullptr);

@@ -176,6 +176,11 @@ void MOSEKModel::init(const MOSEKEnv &env)
 	m_model = std::unique_ptr<MSKtask, MOSEKfreemodelT>(model);
 }
 
+void MOSEKModel::close()
+{
+	m_model.reset();
+}
+
 void MOSEKModel::write(const std::string &filename)
 {
 	bool is_solution = false;
@@ -1425,6 +1430,15 @@ MOSEKEnv::~MOSEKEnv()
 {
 	auto error = mosek::MSK_deleteenv(&m_env);
 	check_error(error);
+}
+
+void MOSEKEnv::close()
+{
+	if (m_env != nullptr)
+	{
+		mosek::MSK_deleteenv(&m_env);
+	}
+	m_env = nullptr;
 }
 
 void MOSEKEnv::putlicensecode(const std::vector<MSKint32t> &code)
