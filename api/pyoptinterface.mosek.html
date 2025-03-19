@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pyoptinterface.highs package" href="pyoptinterface.highs.html" /><link rel="prev" title="pyoptinterface.copt package" href="pyoptinterface.copt.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>pyoptinterface.mosek package - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
@@ -287,8 +287,13 @@
 <span id="pyoptinterface-mosek-package"></span><h1>pyoptinterface.mosek package<a class="headerlink" href="#module-pyoptinterface.mosek" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Env">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.mosek.</span></span><span class="sig-name descname"><span class="pre">Env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Env" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.mosek.</span></span><span class="sig-name descname"><span class="pre">Env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Env" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.mosek.Env.close">
+<span class="sig-name descname"><span class="pre">close</span></span><a class="headerlink" href="#pyoptinterface.mosek.Env.close" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Env.putlicensecode">
 <span class="sig-name descname"><span class="pre">putlicensecode</span></span><a class="headerlink" href="#pyoptinterface.mosek.Env.putlicensecode" title="Link to this definition">¶</a></dt>
@@ -298,7 +303,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.mosek.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyoptinterface.mosek.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RawModel</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model.add_exp_cone_constraint">
@@ -343,6 +348,11 @@ b is an iterable of values or a single scalar</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model.add_variables">
 <span class="sig-name descname"><span class="pre">add_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.add_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.mosek.Model.close">
+<span class="sig-name descname"><span class="pre">close</span></span><a class="headerlink" href="#pyoptinterface.mosek.Model.close" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -652,17 +662,17 @@ b is an iterable of values or a single scalar</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model.supports_constraint_attribute">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface._src.attributes.ConstraintAttribute"><span class="pre">ConstraintAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_constraint_attribute" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_constraint_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ConstraintAttribute" title="pyoptinterface._src.attributes.ConstraintAttribute"><span class="pre">ConstraintAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_constraint_attribute" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model.supports_model_attribute">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface._src.attributes.ModelAttribute"><span class="pre">ModelAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_model_attribute" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_model_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ModelAttribute" title="pyoptinterface._src.attributes.ModelAttribute"><span class="pre">ModelAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_model_attribute" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.mosek.Model.supports_variable_attribute">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface._src.attributes.VariableAttribute"><span class="pre">VariableAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_variable_attribute" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_variable_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.VariableAttribute" title="pyoptinterface._src.attributes.VariableAttribute"><span class="pre">VariableAttribute</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.mosek.Model.supports_variable_attribute" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -741,6 +751,7 @@ b is an iterable of values or a single scalar</p>
             <ul>
 <li><a class="reference internal" href="#">pyoptinterface.mosek package</a><ul>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Env"><code class="docutils literal notranslate"><span class="pre">Env</span></code></a><ul>
+<li><a class="reference internal" href="#pyoptinterface.mosek.Env.close"><code class="docutils literal notranslate"><span class="pre">Env.close</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Env.putlicensecode"><code class="docutils literal notranslate"><span class="pre">Env.putlicensecode</span></code></a></li>
 </ul>
 </li>
@@ -753,6 +764,7 @@ b is an iterable of values or a single scalar</p>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.add_second_order_cone_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_second_order_cone_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.add_variable"><code class="docutils literal notranslate"><span class="pre">Model.add_variable</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.add_variables"><code class="docutils literal notranslate"><span class="pre">Model.add_variables()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.mosek.Model.close"><code class="docutils literal notranslate"><span class="pre">Model.close</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.delete_constraint"><code class="docutils literal notranslate"><span class="pre">Model.delete_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.delete_variable"><code class="docutils literal notranslate"><span class="pre">Model.delete_variable</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.mosek.Model.delete_variables"><code class="docutils literal notranslate"><span class="pre">Model.delete_variables</span></code></a></li>

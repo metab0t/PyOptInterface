@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Optimal Power Flow" href="optimal_power_flow.html" /><link rel="prev" title="Changelog" href="../changelog.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>Economic Dispatch - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
@@ -417,14 +417,14 @@
   Iteration        Objective     NullspaceDim
           0         14328.52                0      0.00s
         100        12722.021                1      0.00s
-TerminationStatusCode.OPTIMAL
-Objective value:  12684.0
         108        12684.021                0      0.00s
 Model status        : Optimal
 Simplex   iterations: 63
 QP ASM    iterations: 108
 Objective value     :  1.2684000000e+04
 HiGHS run time      :          0.00
+TerminationStatusCode.OPTIMAL
+Objective value:  12684.0
 </pre></div>
 </div>
 </div>
@@ -487,10 +487,14 @@ HiGHS run time      :          0.00
   Bound  [5e+01, 1e+02]
   RHS    [2e+01, 2e+02]
   Iteration        Objective     NullspaceDim
-          0        15430.248                0      0.01s
-        100        14091.031                3      0.01s
+          0        15430.248                0      0.00s
+        100        14091.031                3      0.00s
         169        13740.237               10      0.01s
 Model status        : Optimal
+Simplex   iterations: 86
+QP ASM    iterations: 169
+Objective value     :  1.3740213571e+04
+HiGHS run time      :          0.01
 TerminationStatusCode.OPTIMAL
 Objective value:  13740.213571429404
 [[100.         100.         100.         100.         100.
@@ -508,12 +512,6 @@ Objective value:  13740.213571429404
    50.          50.          50.          50.          50.28576204
    50.71433367  51.14290531  51.57147694  52.00004857  52.4286202
    52.85719184  53.28576347  53.7143351   54.14290673]]
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simplex   iterations: 86
-QP ASM    iterations: 169
-Objective value     :  1.3740213571e+04
-HiGHS run time      :          0.01
 </pre></div>
 </div>
 </div>
