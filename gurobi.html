@@ -308,6 +308,16 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>For users who want to release the license immediately after the optimization, you can call the <code class="docutils literal notranslate"><span class="pre">close</span></code> method of all models created and the <code class="docutils literal notranslate"><span class="pre">gurobi.Env</span></code> object. It applies to other commercial solvers supported as well.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+<span class="c1"># do something with the model</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
 <section id="the-capability-of-gurobi-model">
 <h2>The capability of <code class="docutils literal notranslate"><span class="pre">gurobi.Model</span></code><a class="headerlink" href="#the-capability-of-gurobi-model" title="Link to this heading">¶</a></h2>

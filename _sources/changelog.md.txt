@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+- Support writing solution files in HiGHS
+- Pass the names of variables and constraints to HiGHS
+- Add `model.close()` and `env.close()` methods to allow users release the license of commercial solvers manually
+
 ## 0.4.0
 - Add `model.add_m_variables` and `model.add_m_linear_constraints` matrix modeling API
 - Add `model.computeIIS` and IIS related attributes for constraint and variable
