@@ -17,10 +17,14 @@
 	B(Highs_writeSolution);         \
 	B(Highs_writeSolutionPretty);   \
 	B(Highs_addCol);                \
+	B(Highs_passColName);           \
+	B(Highs_getColName);            \
 	B(Highs_getNumCol);             \
 	B(Highs_changeColIntegrality);  \
 	B(Highs_deleteColsBySet);       \
 	B(Highs_addRow);                \
+	B(Highs_passRowName);           \
+	B(Highs_getRowName);            \
 	B(Highs_getNumRow);             \
 	B(Highs_deleteRowsBySet);       \
 	B(Highs_passHessian);           \
@@ -215,9 +219,6 @@ class POIHighsModel
 	// Highs does not discriminate between integer variable and binary variable
 	// So we need to keep track of binary variables
 	Hashset<IndexT> binary_variables;
-
-	// Store the names internally because use HiGHS API to set them is very expensive
-	Hashmap<IndexT, std::string> m_var_names, m_con_names;
 
 	/* Highs part */
 	std::unique_ptr<void, HighsfreemodelT> m_model;

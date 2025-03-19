@@ -174,7 +174,8 @@ VariableIndex POIHighsModel::add_variable(VariableDomain domain, double lb, doub
 	}
 	if (name)
 	{
-		m_var_names.insert({variable.index, name});
+		error = highs::Highs_passColName(m_model.get(), column, name);
+		check_error(error);
 	}
 
 	m_n_variables++;
@@ -196,7 +197,6 @@ void POIHighsModel::delete_variable(const VariableIndex &variable)
 	binary_variables.erase(variable.index);
 
 	m_n_variables--;
-	m_var_names.erase(variable.index);
 }
 
 void POIHighsModel::delete_variables(const Vector<VariableIndex> &variables)
@@ -223,7 +223,6 @@ void POIHighsModel::delete_variables(const Vector<VariableIndex> &variables)
 	for (int i = 0; i < n_variables; i++)
 	{
 		m_variable_index.delete_index(variables[i].index);
-		m_var_names.erase(variables[i].index);
 	}
 	m_n_variables -= columns.size();
 }
@@ -297,7 +296,8 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 	}
 	if (name)
 	{
-		m_con_names.insert({constraint.index, name});
+		error = highs::Highs_passRowName(m_model.get(), row, name);
+		check_error(error);
 	}
 
 	m_n_constraints++;
@@ -324,7 +324,6 @@ void POIHighsModel::delete_constraint(const ConstraintIndex &constraint)
 	check_error(error);
 
 	m_linear_constraint_index.delete_index(constraint.index);
-	m_con_names.erase(constraint.index);
 
 	m_n_constraints--;
 }
@@ -632,20 +631,18 @@ double POIHighsModel::get_raw_info_double(const char *info_name)
 
 std::string POIHighsModel::get_variable_name(const VariableIndex &variable)
 {
-	auto iter = m_var_names.find(variable.index);
-	if (iter != m_var_names.end())
-	{
-		return iter->second;
-	}
-	else
-	{
-		return fmt::format("x{}", variable.index);
-	}
+	auto column = _checked_variable_index(variable);
+	char name[kHighsMaximumStringLength];
+	auto error = highs::Highs_getColName(m_model.get(), column, name);
+	check_error(error);
+	return std::string(name);
 }
 
 void POIHighsModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
-	m_var_names[variable.index] = name;
+	auto column = _checked_variable_index(variable);
+	auto error = highs::Highs_passColName(m_model.get(), column, name);
+	check_error(error);
 }
 
 VariableDomain POIHighsModel::get_variable_type(const VariableIndex &variable)
@@ -732,20 +729,18 @@ void POIHighsModel::set_variable_upper_bound(const VariableIndex &variable, doub
 
 std::string POIHighsModel::get_constraint_name(const ConstraintIndex &constraint)
 {
-	auto iter = m_con_names.find(constraint.index);
-	if (iter != m_con_names.end())
-	{
-		return iter->second;
-	}
-	else
-	{
-		return fmt::format("con{}", constraint.index);
-	}
+	auto row = _checked_constraint_index(constraint);
+	char name[kHighsMaximumStringLength];
+	auto error = highs::Highs_getRowName(m_model.get(), row, name);
+	check_error(error);
+	return std::string(name);
 }
 
 void POIHighsModel::set_constraint_name(const ConstraintIndex &constraint, const char *name)
 {
-	m_con_names[constraint.index] = name;
+	auto row = _checked_constraint_index(constraint);
+	auto error = highs::Highs_passRowName(m_model.get(), row, name);
+	check_error(error);
 }
 
 double POIHighsModel::get_constraint_primal(const ConstraintIndex &constraint)
