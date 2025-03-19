@@ -29,6 +29,18 @@ env.start()
 model = gurobi.Model(env)
 ```
 
+For users who want to release the license immediately after the optimization, you can call the `close` method of all models created and the `gurobi.Env` object. It applies to other commercial solvers supported as well.
+
+```python
+env = gurobi.Env()
+model = gurobi.Model(env)
+
+# do something with the model
+
+model.close()
+env.close()
+```
+
 ## The capability of `gurobi.Model`
 
 ### Supported constraints
