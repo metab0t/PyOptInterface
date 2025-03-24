@@ -497,7 +497,7 @@ class Model(RawModel):
         self,
         f,
         vars: Optional[Vars] = None,
-        params: Optional[Vars] = None,
+        params: Optional[Params] = None,
         name: str = None,
     ):
         tracing_result = trace_function(f)
