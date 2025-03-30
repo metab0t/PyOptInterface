@@ -191,11 +191,12 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 		lb = rhs;
 		ub = rhs;
 	}
-	return add_linear_constraint(f, ConstraintSense::Within, lb, ub, name);
+	return add_linear_constraint(f, ConstraintSense::Within, {lb, ub}, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
-                                                  ConstraintSense sense, double lb, double ub,
+                                                  ConstraintSense sense,
+                                                  const std::tuple<double, double> &interval,
                                                   const char *name)
 {
 	if (sense != ConstraintSense::Within)
@@ -205,6 +206,9 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 	}
 	ConstraintIndex con(ConstraintType::Linear, n_constraints);
 	m_lq_model.add_linear_constraint(f, n_constraints);
+
+	auto lb = std::get<0>(interval);
+	auto ub = std::get<1>(interval);
 	m_con_lb.push_back(lb);
 	m_con_ub.push_back(ub);
 	n_constraints += 1;
@@ -224,9 +228,10 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, Constrai
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                  double lb, double ub, const char *name)
+                                                  const std::tuple<double, double> &interval,
+                                                  const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub, name);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, interval, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
@@ -236,9 +241,10 @@ ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, Constr
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
-                                                  double lb, double ub, const char *name)
+                                                  const std::tuple<double, double> &interval,
+                                                  const char *name)
 {
-	return add_linear_constraint(ScalarAffineFunction(f), sense, lb, ub, name);
+	return add_linear_constraint(ScalarAffineFunction(f), sense, interval, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
@@ -264,11 +270,12 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	{
 		throw std::runtime_error("'Within' constraint sense must have both LB and UB");
 	}
-	return add_quadratic_constraint(f, ConstraintSense::Within, lb, ub, name);
+	return add_quadratic_constraint(f, ConstraintSense::Within, {lb, ub}, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
-                                                     ConstraintSense sense, double lb, double ub,
+                                                     ConstraintSense sense,
+                                                     const std::tuple<double, double> &interval,
                                                      const char *name)
 {
 	if (sense != ConstraintSense::Within)
@@ -278,6 +285,9 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	}
 	ConstraintIndex con(ConstraintType::Quadratic, n_constraints);
 	m_lq_model.add_quadratic_constraint(f, n_constraints);
+
+	auto lb = std::get<0>(interval);
+	auto ub = std::get<1>(interval);
 	m_con_lb.push_back(lb);
 	m_con_ub.push_back(ub);
 	n_constraints += 1;
@@ -297,9 +307,10 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, Const
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                     double lb, double ub, const char *name)
+                                                     const std::tuple<double, double> &interval,
+                                                     const char *name)
 {
-	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, lb, ub, name);
+	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, interval, name);
 }
 
 FunctionIndex IpoptModel::_register_function(const AutodiffSymbolicStructure &structure)
@@ -317,7 +328,7 @@ bool IpoptModel::_has_function_evaluator(const FunctionIndex &k)
 	return m_function_model.has_function_evaluator(k);
 }
 
-NLConstraintIndex IpoptModel::_add_nl_constraint_bounds(const FunctionIndex &k,
+NLConstraintIndex IpoptModel::_add_fn_constraint_bounds(const FunctionIndex &k,
                                                         const std::vector<VariableIndex> &xs,
                                                         const std::vector<ParameterIndex> &ps,
                                                         const std::vector<double> &lbs,
@@ -336,15 +347,15 @@ NLConstraintIndex IpoptModel::_add_nl_constraint_bounds(const FunctionIndex &k,
 	return nlcon;
 }
 
-NLConstraintIndex IpoptModel::_add_nl_constraint_eq(const FunctionIndex &k,
+NLConstraintIndex IpoptModel::_add_fn_constraint_eq(const FunctionIndex &k,
                                                     const std::vector<VariableIndex> &xs,
                                                     const std::vector<ParameterIndex> &ps,
                                                     const std::vector<double> &eqs)
 {
-	return _add_nl_constraint_bounds(k, xs, ps, eqs, eqs);
+	return _add_fn_constraint_bounds(k, xs, ps, eqs, eqs);
 }
 
-void IpoptModel::_add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
+void IpoptModel::_add_fn_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
                                    const std::vector<ParameterIndex> &ps)
 {
 	m_function_model.add_nl_objective(k, xs, ps);

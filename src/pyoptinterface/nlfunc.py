@@ -1,6 +1,7 @@
-from pyoptinterface._src.function_tracing import (
+from pyoptinterface._src.nlfunc import (
     Vars,
     Params,
+    ExpressionGraphContext as graph,
     sin,
     cos,
     tan,

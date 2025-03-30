@@ -5,6 +5,7 @@
 #include "pyoptinterface/dylib.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include <cmath>
+#include <tuple>
 
 #define APILIST            \
 	B(CreateIpoptProblem); \
@@ -75,26 +76,31 @@ struct IpoptModel
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
 	                                      double rhs, const char *name = nullptr);
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
-	                                      double lb, double ub, const char *name = nullptr);
+	                                      const std::tuple<double, double> &interval,
+	                                      const char *name = nullptr);
 	ConstraintIndex add_linear_constraint(const ExprBuilder &f, ConstraintSense sense, double rhs,
 	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const ExprBuilder &f, ConstraintSense sense, double lb,
-	                                      double ub, const char *name = nullptr);
+	ConstraintIndex add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
+	                                      const std::tuple<double, double> &interval,
+	                                      const char *name = nullptr);
 	ConstraintIndex add_linear_constraint(const VariableIndex &f, ConstraintSense sense, double rhs,
 	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const VariableIndex &f, ConstraintSense sense, double lb,
-	                                      double ub, const char *name = nullptr);
+	ConstraintIndex add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
+	                                      const std::tuple<double, double> &interval,
+	                                      const char *name = nullptr);
 
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &f,
 	                                         ConstraintSense sense, double rhs,
 	                                         const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &f,
-	                                         ConstraintSense sense, double lb, double ub,
+	                                         ConstraintSense sense,
+	                                         const std::tuple<double, double> &interval,
 	                                         const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
 	                                         double rhs, const char *name = nullptr);
-	ConstraintIndex add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense, double lb,
-	                                         double ub, const char *name = nullptr);
+	ConstraintIndex add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
+	                                         const std::tuple<double, double> &interval,
+	                                         const char *name = nullptr);
 
 	template <typename T>
 	void add_objective(const T &expr)
@@ -124,18 +130,18 @@ struct IpoptModel
 	void _set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
 	bool _has_function_evaluator(const FunctionIndex &k);
 
-	NLConstraintIndex _add_nl_constraint_bounds(const FunctionIndex &k,
+	NLConstraintIndex _add_fn_constraint_bounds(const FunctionIndex &k,
 	                                            const std::vector<VariableIndex> &xs,
 	                                            const std::vector<ParameterIndex> &ps,
 	                                            const std::vector<double> &lbs,
 	                                            const std::vector<double> &ubs);
 
-	NLConstraintIndex _add_nl_constraint_eq(const FunctionIndex &k,
+	NLConstraintIndex _add_fn_constraint_eq(const FunctionIndex &k,
 	                                        const std::vector<VariableIndex> &xs,
 	                                        const std::vector<ParameterIndex> &ps,
 	                                        const std::vector<double> &eqs);
 
-	void _add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
+	void _add_fn_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
 	                       const std::vector<ParameterIndex> &ps);
 
 	void clear_nl_objective();

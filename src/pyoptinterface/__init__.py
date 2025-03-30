@@ -40,6 +40,10 @@ In = ConstraintSense.Within
 """Alias of `ConstraintSense.Within` for range constraints.
 """
 
+from pyoptinterface._src.monkeypatch import _monkeypatch_all
+
+_monkeypatch_all()
+
 __all__ = [
     "VariableIndex",
     "ConstraintIndex",

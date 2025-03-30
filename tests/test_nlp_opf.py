@@ -110,7 +110,7 @@ def test_acopf(ipopt_model_ctor):
         Pji = Pbr_to[k]
         Qji = Qbr_to[k]
 
-        model.add_nl_constraint(
+        model.add_fn_constraint(
             bf,
             vars=nlfunc.Vars(
                 Vi=Vi,
@@ -174,7 +174,7 @@ def test_acopf(ipopt_model_ctor):
         angmin = branch[5] / 180 * math.pi
         angmax = branch[6] / 180 * math.pi
 
-        model.add_linear_constraint(theta_i - theta_j, poi.In, angmin, angmax)
+        model.add_linear_constraint(theta_i - theta_j, poi.In, (angmin, angmax))
 
         Smax = branch[7]
         Pij = Pbr_from[k]

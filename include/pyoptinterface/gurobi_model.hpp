@@ -5,6 +5,7 @@
 #include "solvers/gurobi/gurobi_c.h"
 
 #include "pyoptinterface/core.hpp"
+#include "pyoptinterface/nlexpr.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
@@ -20,9 +21,11 @@
 	B(GRBaddconstr);          \
 	B(GRBaddqconstr);         \
 	B(GRBaddsos);             \
+	B(GRBaddgenconstrNL);     \
 	B(GRBdelconstrs);         \
 	B(GRBdelqconstrs);        \
 	B(GRBdelsos);             \
+	B(GRBdelgenconstrs);      \
 	B(GRBdelq);               \
 	B(GRBsetdblattrarray);    \
 	B(GRBaddqpterms);         \
@@ -165,6 +168,16 @@ class GurobiModel
 	ConstraintIndex add_sos_constraint(const Vector<VariableIndex> &variables, SOSType sos_type,
 	                                   const Vector<CoeffT> &weights);
 
+	// Nonlinear constraint
+	void information_of_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
+	                         int &opcode, double &data);
+	ConstraintIndex add_single_nl_constraint(const ExpressionGraph &graph,
+	                                         const ExpressionHandle &result, double lb, double ub,
+	                                         const char *name = nullptr);
+	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
+	                                                         const ExpressionHandle &result,
+	                                                         const char *name = nullptr);
+
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
 
@@ -297,6 +310,13 @@ class GurobiModel
 	MonotoneIndexer<int> m_quadratic_constraint_index;
 
 	MonotoneIndexer<int> m_sos_constraint_index;
+
+	MonotoneIndexer<int> m_general_constraint_index;
+	// Gurobi only accepts y = f(x) style nonlinear constraint
+	// so for each lb <= f(x) <= ub, we need to convert it to
+	// lb <= y <= ub, and add y = f(x) as a nonlinear constraint
+	// y is called the result variable (resvar)
+	Hashmap<IndexT, IndexT> m_nlcon_resvar_map;
 
 	/* flag to indicate whether the model needs update */
 	enum : std::uint64_t

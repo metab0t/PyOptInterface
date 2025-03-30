@@ -1,10 +1,9 @@
 import os
 import platform
-from typing import Optional
-import types
 from pathlib import Path
 import re
 import logging
+from typing import Optional, Union, overload
 
 from .mosek_model_ext import RawModel, Env, Enum, load_library
 from .attributes import (
@@ -14,7 +13,15 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import ConstraintType
+from .core_ext import (
+    VariableIndex,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    ExprBuilder,
+    ConstraintType,
+    ConstraintSense,
+)
+from .comparison_constraint import ComparisonConstraint
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,
@@ -498,6 +505,54 @@ class Model(RawModel):
     def optimize(self):
         ret = super().optimize()
         self.last_solve_return_code = ret
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_quadratic_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_quadratic_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_quadratic_constraint(arg, *args, **kwargs)
 
 
 Model.add_variables = make_variable_tupledict

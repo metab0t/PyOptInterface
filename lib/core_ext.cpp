@@ -1,7 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/operators.h>
 #include <nanobind/stl/vector.h>
-#include <nanobind/stl/pair.h>
 #include <nanobind/stl/optional.h>
 
 #include "pyoptinterface/core.hpp"
@@ -11,6 +10,8 @@ namespace nb = nanobind;
 
 NB_MODULE(core_ext, m)
 {
+	nb::set_leak_warnings(false);
+
 	// VariableDomain
 	nb::enum_<VariableDomain>(m, "VariableDomain", nb::is_arithmetic())
 	    .value("Continuous", VariableDomain::Continuous)
@@ -39,9 +40,6 @@ NB_MODULE(core_ext, m)
 	    .value("Minimize", ObjectiveSense::Minimize)
 	    .value("Maximize", ObjectiveSense::Maximize);
 
-	nb::class_<ComparisonConstraint>(m, "ComparisonConstraint")
-	    .def_ro("rhs", &ComparisonConstraint::rhs);
-
 	nb::class_<VariableIndex>(m, "VariableIndex")
 	    .def(nb::init<IndexT>())
 	    .def_ro("index", &VariableIndex::index)
@@ -60,22 +58,7 @@ NB_MODULE(core_ext, m)
 	    .def(CoeffT() * nb::self)
 	    .def(nb::self * VariableIndex())
 	    .def(nb::self * ScalarAffineFunction())
-	    .def(nb::self / CoeffT())
-	    .def(nb::self <= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() <= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self <= VariableIndex())
-	    .def(nb::self <= ScalarAffineFunction())
-	    .def(nb::self <= ScalarQuadraticFunction())
-	    .def(nb::self >= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() >= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self >= VariableIndex())
-	    .def(nb::self >= ScalarAffineFunction())
-	    .def(nb::self >= ScalarQuadraticFunction())
-	    .def(nb::self == CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() == nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self == VariableIndex())
-	    .def(nb::self == ScalarAffineFunction())
-	    .def(nb::self == ScalarQuadraticFunction());
+	    .def(nb::self / CoeffT());
 
 	nb::class_<ConstraintIndex>(m, "ConstraintIndex")
 	    .def(nb::init<ConstraintType, IndexT>())
@@ -117,22 +100,7 @@ NB_MODULE(core_ext, m)
 	    .def(CoeffT() * nb::self)
 	    .def(nb::self * VariableIndex())
 	    .def(nb::self * ScalarAffineFunction())
-	    .def(nb::self / CoeffT())
-	    .def(nb::self <= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() <= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self <= VariableIndex())
-	    .def(nb::self <= ScalarAffineFunction())
-	    .def(nb::self <= ScalarQuadraticFunction())
-	    .def(nb::self >= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() >= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self >= VariableIndex())
-	    .def(nb::self >= ScalarAffineFunction())
-	    .def(nb::self >= ScalarQuadraticFunction())
-	    .def(nb::self == CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() == nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self == VariableIndex())
-	    .def(nb::self == ScalarAffineFunction())
-	    .def(nb::self == ScalarQuadraticFunction());
+	    .def(nb::self / CoeffT());
 
 	nb::class_<ScalarQuadraticFunction>(m, "ScalarQuadraticFunction")
 	    .def(nb::init<>())
@@ -167,22 +135,7 @@ NB_MODULE(core_ext, m)
 	    .def(nb::self - ScalarQuadraticFunction())
 	    .def(nb::self * CoeffT())
 	    .def(CoeffT() * nb::self)
-	    .def(nb::self / CoeffT())
-	    .def(nb::self <= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() <= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self <= VariableIndex())
-	    .def(nb::self <= ScalarAffineFunction())
-	    .def(nb::self <= ScalarQuadraticFunction())
-	    .def(nb::self >= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() >= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self >= VariableIndex())
-	    .def(nb::self >= ScalarAffineFunction())
-	    .def(nb::self >= ScalarQuadraticFunction())
-	    .def(nb::self == CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() == nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self == VariableIndex())
-	    .def(nb::self == ScalarAffineFunction())
-	    .def(nb::self == ScalarQuadraticFunction());
+	    .def(nb::self / CoeffT());
 
 	nb::class_<VariablePair>(m, "VariablePair").def(nb::init<IndexT, IndexT>());
 
@@ -247,25 +200,7 @@ NB_MODULE(core_ext, m)
 	    .def(VariableIndex() * nb::self)
 	    .def(ScalarAffineFunction() * nb::self)
 	    .def(ScalarQuadraticFunction() * nb::self)
-	    .def(nb::self / CoeffT())
-	    .def(nb::self <= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() <= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self <= VariableIndex())
-	    .def(nb::self <= ScalarAffineFunction())
-	    .def(nb::self <= ScalarQuadraticFunction())
-	    .def(nb::self <= ExprBuilder())
-	    .def(nb::self >= CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() >= nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self >= VariableIndex())
-	    .def(nb::self >= ScalarAffineFunction())
-	    .def(nb::self >= ScalarQuadraticFunction())
-	    .def(nb::self >= ExprBuilder())
-	    .def(nb::self == CoeffT(), nb::keep_alive<0, 1>())
-	    .def(CoeffT() == nb::self, nb::keep_alive<0, 1>())
-	    .def(nb::self == VariableIndex())
-	    .def(nb::self == ScalarAffineFunction())
-	    .def(nb::self == ScalarQuadraticFunction())
-	    .def(nb::self == ExprBuilder());
+	    .def(nb::self / CoeffT());
 
 	// We need to test the functionality of MonotoneIndexer
 	using IntMonotoneIndexer = MonotoneIndexer<int>;

@@ -1,6 +1,8 @@
 #include "pyoptinterface/gurobi_model.hpp"
 #include "fmt/core.h"
 
+#include <stack>
+
 extern "C"
 {
 	int __stdcall GRBloadenvinternal(GRBenv **envP, const char *logfilename, int major, int minor,
@@ -419,6 +421,213 @@ ConstraintIndex GurobiModel::add_sos_constraint(const Vector<VariableIndex> &var
 	return constraint_index;
 }
 
+int unary_opcode(const UnaryOperator &op)
+{
+	switch (op)
+	{
+	case UnaryOperator::Neg:
+		return GRB_OPCODE_UMINUS;
+	case UnaryOperator::Sin:
+		return GRB_OPCODE_SIN;
+	case UnaryOperator::Cos:
+		return GRB_OPCODE_COS;
+	case UnaryOperator::Tan:
+		return GRB_OPCODE_TAN;
+	case UnaryOperator::Sqrt:
+		return GRB_OPCODE_SQRT;
+	case UnaryOperator::Exp:
+		return GRB_OPCODE_EXP;
+	case UnaryOperator::Log:
+		return GRB_OPCODE_LOG;
+	case UnaryOperator::Log10:
+		return GRB_OPCODE_LOG10;
+	default: {
+		auto opname = unary_operator_to_string(op);
+		auto msg = fmt::format("Unknown unary operator for Gurobi: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+int binary_opcode(const BinaryOperator &op)
+{
+	switch (op)
+	{
+	case BinaryOperator::Sub:
+		return GRB_OPCODE_MINUS;
+	case BinaryOperator::Div:
+		return GRB_OPCODE_DIVIDE;
+	case BinaryOperator::Pow:
+		return GRB_OPCODE_POW;
+	default: {
+		auto opname = binary_operator_to_string(op);
+		auto msg = fmt::format("Unknown binary operator for Gurobi: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+int nary_opcode(const NaryOperator &op)
+{
+	switch (op)
+	{
+	case NaryOperator::Add:
+		return GRB_OPCODE_PLUS;
+	case NaryOperator::Mul:
+		return GRB_OPCODE_MULTIPLY;
+	default: {
+		auto opname = nary_operator_to_string(op);
+		auto msg = fmt::format("Unknown n-ary operator for Gurobi: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+void GurobiModel::information_of_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
+                                      int &opcode, double &data)
+{
+	auto array_type = expr.array;
+	auto index = expr.id;
+	switch (array_type)
+	{
+	case ArrayType::Constant: {
+		opcode = GRB_OPCODE_CONSTANT;
+		data = graph.m_constants[index].value;
+		break;
+	}
+	case ArrayType::Variable: {
+		opcode = GRB_OPCODE_VARIABLE;
+		data = _checked_variable_index(graph.m_variables[index].id);
+		break;
+	}
+	case ArrayType::Parameter: {
+		throw std::runtime_error("Parameter is not supported in Gurobi");
+		break;
+	}
+	case ArrayType::Unary: {
+		auto &unary = graph.m_unaries[index];
+		opcode = unary_opcode(unary.op);
+		data = 0.0;
+		break;
+	}
+	case ArrayType::Binary: {
+		auto &binary = graph.m_binaries[index];
+		opcode = binary_opcode(binary.op);
+		data = 0.0;
+		break;
+	}
+	case ArrayType::Ternary: {
+		throw std::runtime_error("Ternary operator is not supported in Gurobi");
+		break;
+	}
+	case ArrayType::Nary: {
+		auto &nary = graph.m_naries[index];
+		opcode = nary_opcode(nary.op);
+		data = 0.0;
+		break;
+	}
+	}
+}
+
+ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &graph,
+                                                      const ExpressionHandle &result, double lb,
+                                                      double ub, const char *name)
+{
+	std::vector<int> opcodes, parents;
+	std::vector<double> datas;
+
+	std::stack<ExpressionHandle> expr_stack;
+	std::stack<int> parent_stack;
+
+	// init stack
+	expr_stack.push(result);
+	parent_stack.push(-1);
+
+	while (!expr_stack.empty())
+	{
+		auto expr = expr_stack.top();
+		expr_stack.pop();
+		auto parent = parent_stack.top();
+		parent_stack.pop();
+
+		int opcode;
+		double data;
+		information_of_expr(graph, expr, opcode, data);
+
+		auto current_parent = opcodes.size();
+		opcodes.push_back(opcode);
+		parents.push_back(parent);
+		datas.push_back(data);
+
+		auto array_type = expr.array;
+		auto index = expr.id;
+		switch (array_type)
+		{
+		case ArrayType::Unary: {
+			auto &unary = graph.m_unaries[index];
+			expr_stack.push(unary.operand);
+			parent_stack.push(current_parent);
+			break;
+		}
+		case ArrayType::Binary: {
+			auto &binary = graph.m_binaries[index];
+			expr_stack.push(binary.right);
+			expr_stack.push(binary.left);
+			parent_stack.push(current_parent);
+			parent_stack.push(current_parent);
+			break;
+		}
+		case ArrayType::Nary: {
+			auto &nary = graph.m_naries[index];
+			for (int i = nary.operands.size() - 1; i >= 0; i--)
+			{
+				expr_stack.push(nary.operands[i]);
+				parent_stack.push(current_parent);
+			}
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
+	// add a slack variable
+	VariableIndex resvar = add_variable(VariableDomain::Continuous, lb, ub, name);
+	auto resvar_column = _variable_index(resvar);
+
+	// add NL constraint
+	int error = gurobi::GRBaddgenconstrNL(m_model.get(), name, resvar_column, opcodes.size(),
+	                                      opcodes.data(), datas.data(), parents.data());
+	check_error(error);
+
+	IndexT constraint_index = m_general_constraint_index.add_index();
+
+	ConstraintIndex constraint(ConstraintType::Gurobi_General, constraint_index);
+	m_nlcon_resvar_map.emplace(constraint_index, resvar.index);
+
+	m_update_flag |= m_general_constraint_creation;
+
+	return constraint;
+}
+
+ConstraintIndex GurobiModel::add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
+                                                                      const ExpressionHandle &expr,
+                                                                      const char *name)
+{
+	ExpressionHandle real_expr;
+	double lb = -GRB_INFINITY, ub = GRB_INFINITY;
+
+	unpack_comparison_expression(graph, expr, real_expr, lb, ub);
+
+	auto constraint = add_single_nl_constraint(graph, real_expr, lb, ub, name);
+	return constraint;
+}
+
 void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	// Delete the corresponding Gurobi constraint
@@ -443,6 +652,15 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 			error = gurobi::GRBdelsos(m_model.get(), 1, &constraint_row);
 			m_update_flag |= m_sos_constraint_deletion;
 			break;
+		case ConstraintType::Gurobi_General: {
+			m_general_constraint_index.delete_index(constraint.index);
+			error = gurobi::GRBdelgenconstrs(m_model.get(), 1, &constraint_row);
+			// delete the corresponding resvar variable as well
+			auto resvar = m_nlcon_resvar_map.at(constraint.index);
+			delete_variable(VariableIndex(resvar));
+			m_update_flag |= m_general_constraint_deletion;
+			break;
+		}
 		default:
 			throw std::runtime_error("Unknown constraint type");
 		}
@@ -460,6 +678,8 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.has_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
+	case ConstraintType::Gurobi_General:
+		return m_general_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}
@@ -978,6 +1198,8 @@ int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.get_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);
+	case ConstraintType::Gurobi_General:
+		return m_general_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}
@@ -1032,6 +1254,10 @@ void GurobiModel::_update_for_constraint_index(ConstraintType type)
 		break;
 	case ConstraintType::SOS:
 		need_update = m_update_flag & (m_sos_constraint_creation | m_sos_constraint_deletion);
+		break;
+	case ConstraintType::Gurobi_General:
+		need_update =
+		    m_update_flag & (m_general_constraint_creation | m_general_constraint_deletion);
 		break;
 	}
 	if (need_update)

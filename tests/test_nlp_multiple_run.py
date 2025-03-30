@@ -13,15 +13,15 @@ def test_nlp_reopt(ipopt_model_ctor):
         return nlfunc.exp(vars.x) + nlfunc.exp(vars.y)
 
     obj_f = model.register_function(obj)
-    model.add_nl_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
+    model.add_fn_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
 
     def con(vars):
         x = vars.x
         return x**4
 
     con_f = model.register_function(con)
-    model.add_nl_constraint(con_f, vars=nlfunc.Vars(x=x), lb=1.0)
-    model.add_nl_constraint(con_f, vars=nlfunc.Vars(x=y), lb=1.0)
+    model.add_fn_constraint(con_f, vars=nlfunc.Vars(x=x), lb=1.0)
+    model.add_fn_constraint(con_f, vars=nlfunc.Vars(x=y), lb=1.0)
 
     model.optimize()
 
@@ -29,7 +29,7 @@ def test_nlp_reopt(ipopt_model_ctor):
     assert model.get_value(y) == pytest.approx(1.0)
 
     z = model.add_variable(lb=0.2)
-    model.add_nl_objective(con_f, vars=nlfunc.Vars(x=z))
+    model.add_fn_objective(con_f, vars=nlfunc.Vars(x=z))
 
     model.optimize()
 
@@ -40,7 +40,7 @@ def test_nlp_reopt(ipopt_model_ctor):
         return nlfunc.log(x)
 
     con2_f = model.register_function(con2)
-    model.add_nl_constraint(con2_f, vars=nlfunc.Vars(x=z), lb=math.log(4.0))
+    model.add_fn_constraint(con2_f, vars=nlfunc.Vars(x=z), lb=math.log(4.0))
 
     model.optimize()
 

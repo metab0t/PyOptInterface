@@ -270,7 +270,9 @@ enum class ConstraintType
 	Quadratic,
 	SOS,
 	Cone,
-	COPT_ExpCone
+	Gurobi_General,
+	COPT_ExpCone,
+	COPT_NL,
 };
 
 enum class SOSType
@@ -297,143 +299,6 @@ struct ConstraintIndex
 	{
 	}
 };
-
-enum class ComparisonConstraintExprKind
-{
-	ScalarAffineFunction,
-	ScalarQuadraticFunction,
-	ExprBuilder,
-	ScalarAffineFunctionPointer,
-	ScalarQuadraticFunctionPointer,
-	ExprBuilderPointer,
-};
-
-struct ComparisonConstraint
-{
-	ConstraintSense sense;
-	ComparisonConstraintExprKind expr_kind;
-	ScalarAffineFunction lhs_saf;
-	ScalarQuadraticFunction lhs_sqf;
-	ExprBuilder lhs_eb;
-	const ScalarAffineFunction *lhs_saf_ptr = nullptr;
-	const ScalarQuadraticFunction *lhs_sqf_ptr = nullptr;
-	const ExprBuilder *lhs_eb_ptr = nullptr;
-	CoeffT rhs = 0.0;
-};
-
-// <= Operator
-
-auto operator<=(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator<=(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint;
-
-auto operator<=(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator<=(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator<=(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator<=(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-
-auto operator<=(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarQuadraticFunction &lhs,
-                const VariableIndex &rhs) -> ComparisonConstraint;
-
-auto operator<=(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarAffineFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarQuadraticFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-
-auto operator<=(const VariableIndex &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarAffineFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarQuadraticFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-
-auto operator<=(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator<=(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator<=(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator<=(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator<=(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-
-// >= Operator
-
-auto operator>=(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator>=(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint;
-
-auto operator>=(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator>=(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator>=(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator>=(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-
-auto operator>=(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarQuadraticFunction &lhs,
-                const VariableIndex &rhs) -> ComparisonConstraint;
-
-auto operator>=(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarAffineFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarQuadraticFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-
-auto operator>=(const VariableIndex &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarAffineFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarQuadraticFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-
-auto operator>=(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator>=(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator>=(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator>=(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator>=(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-
-// == Operator
-
-auto operator==(const VariableIndex &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator==(const ScalarAffineFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator==(const ScalarQuadraticFunction &lhs, CoeffT rhs) -> ComparisonConstraint;
-auto operator==(const ExprBuilder &lhs, CoeffT rhs) -> ComparisonConstraint;
-
-auto operator==(CoeffT lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator==(CoeffT lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator==(CoeffT lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator==(CoeffT lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-
-auto operator==(const VariableIndex &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarAffineFunction &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarQuadraticFunction &lhs,
-                const VariableIndex &rhs) -> ComparisonConstraint;
-
-auto operator==(const VariableIndex &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarAffineFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarQuadraticFunction &lhs,
-                const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-
-auto operator==(const VariableIndex &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarAffineFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarQuadraticFunction &lhs,
-                const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-
-auto operator==(const ExprBuilder &lhs, const VariableIndex &rhs) -> ComparisonConstraint;
-auto operator==(const ExprBuilder &lhs, const ScalarAffineFunction &rhs) -> ComparisonConstraint;
-auto operator==(const ExprBuilder &lhs, const ScalarQuadraticFunction &rhs) -> ComparisonConstraint;
-auto operator==(const VariableIndex &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarAffineFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator==(const ScalarQuadraticFunction &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
-auto operator==(const ExprBuilder &lhs, const ExprBuilder &rhs) -> ComparisonConstraint;
 
 // struct LinearConstraint
 //{

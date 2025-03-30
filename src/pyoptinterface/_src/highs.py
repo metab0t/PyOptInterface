@@ -1,9 +1,8 @@
 import logging
 import os
 import platform
-import types
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union, overload
 
 from .highs_model_ext import (
     RawModel,
@@ -18,7 +17,14 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import ConstraintType, VariableIndex
+from .core_ext import (
+    VariableIndex,
+    ScalarAffineFunction,
+    ExprBuilder,
+    ConstraintType,
+    ConstraintSense,
+)
+from .comparison_constraint import ComparisonConstraint
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,
@@ -438,6 +444,30 @@ class Model(RawModel):
             self.set_primal_start(variables, values)
             mip_start.clear()
         super().optimize()
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
 
 
 Model.add_variables = make_variable_tupledict

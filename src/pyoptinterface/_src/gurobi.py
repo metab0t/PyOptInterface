@@ -5,6 +5,7 @@ import platform
 from pathlib import Path
 import re
 import logging
+from typing import Union, overload
 
 from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library
 from .attributes import (
@@ -14,7 +15,19 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import VariableDomain, ConstraintType, ObjectiveSense
+from .core_ext import (
+    VariableIndex,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    ExprBuilder,
+    VariableDomain,
+    ConstraintType,
+    ConstraintSense,
+    ObjectiveSense,
+)
+from .nlexpr_ext import ExpressionHandle
+from .nlfunc import ExpressionGraphContext, convert_to_expressionhandle
+from .comparison_constraint import ComparisonConstraint
 from .solver_common import (
     _get_model_attribute,
     _set_model_attribute,
@@ -732,12 +745,89 @@ class Model(RawModel):
         cb_info_type = callback_info_typemap.get(what, None)
         if cb_info_type is None:
             raise ValueError(f"Unknown callback info type: {what}")
-        if cb_info_type == int:
+        if cb_info_type is int:
             return self.cb_get_info_int(what)
-        elif cb_info_type == float:
+        elif cb_info_type is float:
             return self.cb_get_info_double(what)
         else:
             raise ValueError(f"Unknown callback info type: {what}")
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_quadratic_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_quadratic_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_quadratic_constraint(arg, *args, **kwargs)
+
+    def add_nl_constraint(self, expr, eq=None, lb=None, ub=None, name=""):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError(
+                "Expression should be able to be converted to ExpressionHandle"
+            )
+        if eq is not None:
+            if lb is not None or ub is not None:
+                raise ValueError("Cannot specify both equality and inequality bounds")
+            lb = ub = eq
+        else:
+            if lb is None and ub is None:
+                is_comparison = graph.is_compare_expression(expr)
+                if is_comparison:
+                    return self._add_single_nl_constraint_from_comparison(graph, expr, name)
+                else:
+                    raise ValueError(
+                        "Must specify either equality or inequality bounds"
+                    )
+            elif lb is None:
+                lb = -GRB.INFINITY
+            elif ub is None:
+                ub = GRB.INFINITY
+
+        con = self._add_single_nl_constraint(graph, expr, lb, ub, name)
+
+        return con
 
 
 Model.add_variables = make_variable_tupledict

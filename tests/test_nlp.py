@@ -17,7 +17,7 @@ def test_ipopt(ipopt_model_ctor):
         return nlfunc.exp(vars.x) + nlfunc.exp(vars.y)
 
     obj_f = model.register_function(obj)
-    model.add_nl_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
+    model.add_fn_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
 
     def con(vars):
         x = vars.x
@@ -29,7 +29,7 @@ def test_ipopt(ipopt_model_ctor):
         return [z, s]
 
     con_f = model.register_function(con)
-    model.add_nl_constraint(
+    model.add_fn_constraint(
         con_f, vars=nlfunc.Vars(x=x, y=y), lb=[0.36, 0.04], ub=[4.0, 4.0]
     )
 
@@ -64,7 +64,7 @@ def test_ipopt(ipopt_model_ctor):
     all_nlfuncs_f = model.register_function(all_nlfuncs)
     N = len(nl_funcs)
     B = 1e10
-    all_nlfuncs_con = model.add_nl_constraint(
+    all_nlfuncs_con = model.add_fn_constraint(
         all_nlfuncs_f, vars=nlfunc.Vars(x=x), lb=[-B] * N, ub=[B] * N
     )
 
@@ -108,7 +108,7 @@ def test_nlp_param(ipopt_model_ctor):
     obj_f = model.register_function(obj)
 
     for i in range(N):
-        model.add_nl_objective(obj_f, vars=nlfunc.Vars(x=xs[i]))
+        model.add_fn_objective(obj_f, vars=nlfunc.Vars(x=xs[i]))
 
     def con(vars, params):
         x = vars.x
@@ -118,7 +118,7 @@ def test_nlp_param(ipopt_model_ctor):
     con_f = model.register_function(con)
 
     for i in range(N):
-        model.add_nl_constraint(
+        model.add_fn_constraint(
             con_f, vars=nlfunc.Vars(x=xs[i]), params=nlfunc.Params(p=i), lb=[1.0]
         )
 
@@ -146,7 +146,7 @@ def test_nlfunc_ifelse(ipopt_model_ctor):
             return nlfunc.ifelse(x > 1.0, x**2, x)
 
         con_f = model.register_function(con)
-        model.add_nl_constraint(con_f, vars=nlfunc.Vars(x=x), lb=[fx])
+        model.add_fn_constraint(con_f, vars=nlfunc.Vars(x=x), lb=[fx])
 
         model.set_objective(x)
 

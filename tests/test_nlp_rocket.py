@@ -60,7 +60,7 @@ def rocket_model(model: ipopt.Model, nh: int):
 
     dynamic_eq_f = model.register_function(dynamics_eq)
     for i in range(nh - 1):
-        model.add_nl_constraint(
+        model.add_fn_constraint(
             dynamic_eq_f,
             vars=nlfunc.Vars(
                 h1=h[i],

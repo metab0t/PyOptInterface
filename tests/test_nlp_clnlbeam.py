@@ -22,7 +22,7 @@ def test_clnlbeam(ipopt_model_ctor):
 
     obj_f = model.register_function(obj)
     for i in range(N):
-        model.add_nl_objective(
+        model.add_fn_objective(
             obj_f, nlfunc.Vars(t1=t[i], t2=t[i + 1], u1=u[i], u2=u[i + 1])
         )
 
@@ -31,7 +31,7 @@ def test_clnlbeam(ipopt_model_ctor):
 
     con_f = model.register_function(con)
     for i in range(N):
-        model.add_nl_constraint(
+        model.add_fn_constraint(
             con_f, nlfunc.Vars(t1=t[i], t2=t[i + 1], x1=x[i], x2=x[i + 1]), eq=0.0
         )
 

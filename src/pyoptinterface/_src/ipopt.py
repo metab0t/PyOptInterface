@@ -1,8 +1,7 @@
 from io import StringIO
-import types
 import logging
 import platform
-from typing import Optional, Dict, Set
+from typing import Optional, Dict, Set, Union, Tuple, overload
 
 from llvmlite import ir
 
@@ -11,9 +10,17 @@ from .codegen_c import generate_csrc_prelude, generate_csrc_from_graph
 from .jit_c import TCCJITCompiler
 from .codegen_llvm import create_llvmir_basic_functions, generate_llvmir_from_graph
 from .jit_llvm import LLJITCompiler
-from .function_tracing import trace_function, FunctionTracingResult, Vars, Params
+from .nlfunc import trace_function, FunctionTracingResult, Vars, Params
 
-from .core_ext import ConstraintIndex
+from .core_ext import (
+    VariableIndex,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    ExprBuilder,
+    ConstraintSense,
+    ConstraintIndex,
+)
+from .comparison_constraint import ComparisonConstraint
 from .nleval_ext import (
     NLConstraintIndex,
     FunctionIndex,
@@ -529,7 +536,7 @@ class Model(RawModel):
         self.function_autodiff_structures[function_index] = autodiff_structure
         self.function_tracing_results[function_index] = tracing_result
 
-        if name == None:
+        if name is None:
             name = f.__name__
 
         # if it is not a valid identifier, we generate our own name based on numbering
@@ -542,7 +549,7 @@ class Model(RawModel):
 
         return function_index
 
-    def add_nl_constraint(
+    def add_fn_constraint(
         self,
         function_index,
         vars: Vars,
@@ -606,17 +613,17 @@ class Model(RawModel):
                 )
 
         if bounds_constraint:
-            constraint_index = super()._add_nl_constraint_bounds(
+            constraint_index = super()._add_fn_constraint_bounds(
                 function_index, var_values, param_values, lb, ub
             )
         else:
-            constraint_index = super()._add_nl_constraint_eq(
+            constraint_index = super()._add_fn_constraint_eq(
                 function_index, var_values, param_values, eq
             )
 
         return constraint_index
 
-    def add_nl_objective(
+    def add_fn_objective(
         self, function_index, vars: Vars, params: Optional[Params] = None
     ):
         tracing_result = self.function_tracing_results.get(function_index, None)
@@ -638,7 +645,7 @@ class Model(RawModel):
                     "Missing parameters for parameterized nonlinear function"
                 )
 
-        super()._add_nl_objective(function_index, var_values, param_values)
+        super()._add_fn_objective(function_index, var_values, param_values)
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):
@@ -720,14 +727,62 @@ class Model(RawModel):
 
     def set_raw_parameter(self, param_name: str, value):
         ty = type(value)
-        if ty == int:
+        if ty is int:
             self.set_raw_option_int(param_name, value)
-        elif ty == float:
+        elif ty is float:
             self.set_raw_option_double(param_name, value)
-        elif ty == str:
+        elif ty is str:
             self.set_raw_option_string(param_name, value)
         else:
             raise ValueError(f"Unsupported parameter type: {ty}")
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: Union[float, Tuple[float, float]],
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: Union[float, Tuple[float, float]],
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_quadratic_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_quadratic_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_quadratic_constraint(arg, *args, **kwargs)
 
 
 Model.add_variables = make_variable_tupledict

@@ -47,11 +47,6 @@ class CommercialSolverMixin : public T
 	                                                   ConstraintSense sense, CoeffT rhs,
 	                                                   const char *name = nullptr);
 
-	ConstraintIndex add_linear_constraint_from_comparison(const ComparisonConstraint &constraint,
-	                                                      const char *name = nullptr);
-	ConstraintIndex add_quadratic_constraint_from_comparison(const ComparisonConstraint &constraint,
-	                                                         const char *name = nullptr);
-
 	double get_expression_value(const ScalarAffineFunction &function);
 	double get_expression_value(const ScalarQuadraticFunction &function);
 	double get_expression_value(const ExprBuilder &function);
@@ -92,66 +87,6 @@ ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_expr(
 {
 	ScalarQuadraticFunction f(function);
 	return get_base()->add_quadratic_constraint(f, sense, rhs, name);
-}
-
-template <CommercialSolverConstraint T>
-inline ConstraintIndex CommercialSolverMixin<T>::add_linear_constraint_from_comparison(
-    const ComparisonConstraint &constraint, const char *name)
-{
-	auto expr_kind = constraint.expr_kind;
-	switch (expr_kind)
-	{
-	case ComparisonConstraintExprKind::ScalarAffineFunction:
-		return get_base()->add_linear_constraint(constraint.lhs_saf, constraint.sense,
-		                                         constraint.rhs, name);
-		break;
-	case ComparisonConstraintExprKind::ScalarAffineFunctionPointer:
-		return get_base()->add_linear_constraint(*constraint.lhs_saf_ptr, constraint.sense,
-		                                         constraint.rhs, name);
-		break;
-	case ComparisonConstraintExprKind::ScalarQuadraticFunction:
-	case ComparisonConstraintExprKind::ScalarQuadraticFunctionPointer:
-		throw std::runtime_error("Quadratic expression cannot be added as linear constraints");
-		break;
-	case ComparisonConstraintExprKind::ExprBuilder:
-		return add_linear_constraint_from_expr(constraint.lhs_eb, constraint.sense, constraint.rhs,
-		                                       name);
-		break;
-	case ComparisonConstraintExprKind::ExprBuilderPointer:
-		return add_linear_constraint_from_expr(*constraint.lhs_eb_ptr, constraint.sense,
-		                                       constraint.rhs, name);
-		break;
-	}
-}
-
-template <CommercialSolverConstraint T>
-inline ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_comparison(
-    const ComparisonConstraint &constraint, const char *name)
-{
-	auto expr_kind = constraint.expr_kind;
-	switch (expr_kind)
-	{
-	case ComparisonConstraintExprKind::ScalarAffineFunction:
-	case ComparisonConstraintExprKind::ScalarAffineFunctionPointer:
-		throw std::runtime_error("Linear expression cannot be added as quadratic constraints");
-		break;
-	case ComparisonConstraintExprKind::ScalarQuadraticFunction:
-		return get_base()->add_quadratic_constraint(constraint.lhs_sqf, constraint.sense,
-		                                            constraint.rhs, name);
-		break;
-	case ComparisonConstraintExprKind::ScalarQuadraticFunctionPointer:
-		return get_base()->add_quadratic_constraint(*constraint.lhs_sqf_ptr, constraint.sense,
-		                                            constraint.rhs, name);
-		break;
-	case ComparisonConstraintExprKind::ExprBuilder:
-		return add_quadratic_constraint_from_expr(constraint.lhs_eb, constraint.sense,
-		                                          constraint.rhs, name);
-		break;
-	case ComparisonConstraintExprKind::ExprBuilderPointer:
-		return add_quadratic_constraint_from_expr(*constraint.lhs_eb_ptr, constraint.sense,
-		                                          constraint.rhs, name);
-		break;
-	}
 }
 
 template <typename T>

@@ -7,6 +7,8 @@ namespace nb = nanobind;
 
 NB_MODULE(nlexpr_ext, m)
 {
+	m.import_("pyoptinterface._src.core_ext");
+
 	nb::class_<VariableNode>(m, "VariableNode")
 	    .def(nb::init<EntityId>())
 	    .def_ro("id", &VariableNode::id);
@@ -95,5 +97,10 @@ NB_MODULE(nlexpr_ext, m)
 	    .def("add_nary", &ExpressionGraph::add_nary)
 	    .def("add_repeat_nary", &ExpressionGraph::add_repeat_nary)
 	    .def("append_nary", &ExpressionGraph::append_nary)
-	    .def("get_nary_operator", &ExpressionGraph::get_nary_operator);
+	    .def("get_nary_operator", &ExpressionGraph::get_nary_operator)
+	    .def("merge_variableindex", &ExpressionGraph::merge_variableindex)
+	    .def("merge_scalaraffinefunction", &ExpressionGraph::merge_scalaraffinefunction)
+	    .def("merge_scalarquadraticfunction", &ExpressionGraph::merge_scalarquadraticfunction)
+	    .def("merge_exprbuilder", &ExpressionGraph::merge_exprbuilder)
+	    .def("is_compare_expression", &ExpressionGraph::is_compare_expression);
 }

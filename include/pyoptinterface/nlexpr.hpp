@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ankerl/unordered_dense.h"
+#include "core.hpp"
 
 using NodeId = uint32_t;
 using EntityId = uint32_t;
@@ -89,6 +90,11 @@ enum class NaryOperator
 	Add,
 	Mul,
 };
+
+std::string unary_operator_to_string(UnaryOperator op);
+std::string binary_operator_to_string(BinaryOperator op);
+std::string ternary_operator_to_string(TernaryOperator op);
+std::string nary_operator_to_string(NaryOperator op);
 
 struct ExpressionHandle
 {
@@ -196,4 +202,17 @@ struct ExpressionGraph
 	void append_nary(const ExpressionHandle &expression, const ExpressionHandle &operand);
 
 	NaryOperator get_nary_operator(const ExpressionHandle &expression) const;
+
+	// Merge VariableIndex/ScalarAffineFunction/ScalarQuadraticFunction/ExprBuilder into
+	// ExpressionGraph
+	ExpressionHandle merge_variableindex(const VariableIndex &v);
+	ExpressionHandle merge_scalaraffinefunction(const ScalarAffineFunction &f);
+	ExpressionHandle merge_scalarquadraticfunction(const ScalarQuadraticFunction &f);
+	ExpressionHandle merge_exprbuilder(const ExprBuilder &expr);
+
+	// recognize compare expression
+	bool is_compare_expression(const ExpressionHandle &expr) const;
 };
+
+void unpack_comparison_expression(ExpressionGraph &graph, const ExpressionHandle &expr,
+                                  ExpressionHandle &real_expr, double &lb, double &ub);

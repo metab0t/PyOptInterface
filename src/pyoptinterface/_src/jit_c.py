@@ -1,4 +1,3 @@
-import ctypes
 import platform
 import os
 

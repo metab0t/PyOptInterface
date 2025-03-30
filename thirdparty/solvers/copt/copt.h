@@ -25,7 +25,7 @@ extern "C" {
 
 #define COPT_VERSION_MAJOR                      7
 #define COPT_VERSION_MINOR                      2
-#define COPT_VERSION_TECHNICAL                  2
+#define COPT_VERSION_TECHNICAL                  5
 
 
 /*
@@ -141,6 +141,7 @@ extern "C" {
 #define COPT_DBLPARAM_DUALTOL                   "DualTol"
 #define COPT_DBLPARAM_INTTOL                    "IntTol"
 #define COPT_DBLPARAM_PDLPTOL                   "PDLPTol"
+#define COPT_DBLPARAM_NLPTOL                    "NLPTol"
 #define COPT_DBLPARAM_RELGAP                    "RelGap"
 #define COPT_DBLPARAM_ABSGAP                    "AbsGap"
 #define COPT_DBLPARAM_TUNETIMELIMIT             "TuneTimeLimit"
@@ -177,6 +178,10 @@ extern "C" {
 #define COPT_INTPARAM_BARORDER                  "BarOrder"
 #define COPT_INTPARAM_BARSTART                  "BarStart"
 #define COPT_INTPARAM_BARITERLIMIT              "BarIterLimit"
+#define COPT_INTPARAM_NONCONVEX                 "NonConvex"
+#define COPT_INTPARAM_NLPMUUPDATE               "NLPMuUpdate"
+#define COPT_INTPARAM_NLPLINSCALE               "NLPLinScale"
+#define COPT_INTPARAM_NLPITERLIMIT              "NLPIterLimit"
 #define COPT_INTPARAM_THREADS                   "Threads"
 #define COPT_INTPARAM_BARTHREADS                "BarThreads"
 #define COPT_INTPARAM_SIMPLEXTHREADS            "SimplexThreads"
@@ -209,6 +214,7 @@ extern "C" {
 #define COPT_INTATTR_ROWS                       "Rows"
 #define COPT_INTATTR_ELEMS                      "Elems"
 #define COPT_INTATTR_QELEMS                     "QElems"
+#define COPT_INTATTR_NLELEMS                    "NLElems"
 #define COPT_INTATTR_PSDELEMS                   "PSDElems"
 #define COPT_INTATTR_SYMMATS                    "SymMats"
 #define COPT_INTATTR_BINS                       "Bins"
@@ -216,7 +222,9 @@ extern "C" {
 #define COPT_INTATTR_SOSS                       "Soss"
 #define COPT_INTATTR_CONES                      "Cones"
 #define COPT_INTATTR_EXPCONES                   "ExpCones"
+#define COPT_INTATTR_AFFINECONES                "AffineCones"
 #define COPT_INTATTR_QCONSTRS                   "QConstrs"
+#define COPT_INTATTR_NLCONSTRS                  "NLConstrs"
 #define COPT_INTATTR_PSDCONSTRS                 "PSDConstrs"
 #define COPT_INTATTR_LMICONSTRS                 "LMIConstrs"
 #define COPT_INTATTR_INDICATORS                 "Indicators"
@@ -229,6 +237,7 @@ extern "C" {
 #define COPT_INTATTR_MIPSTATUS                  "MipStatus"
 #define COPT_INTATTR_SIMPLEXITER                "SimplexIter"
 #define COPT_INTATTR_BARRIERITER                "BarrierIter"
+#define COPT_INTATTR_PDLPITER                   "PDLPIter"
 #define COPT_INTATTR_NODECNT                    "NodeCnt"
 #define COPT_INTATTR_POOLSOLS                   "PoolSols"
 #define COPT_INTATTR_TUNERESULTS                "TuneResults"
@@ -238,6 +247,7 @@ extern "C" {
 #define COPT_INTATTR_HASBASIS                   "HasBasis"
 #define COPT_INTATTR_HASMIPSOL                  "HasMipSol"
 #define COPT_INTATTR_HASQOBJ                    "HasQObj"
+#define COPT_INTATTR_HASNLOBJ                   "HasNLObj"
 #define COPT_INTATTR_HASPSDOBJ                  "HasPSDObj"
 #define COPT_INTATTR_HASIIS                     "HasIIS"
 #define COPT_INTATTR_HASFEASRELAXSOL            "HasFeasRelaxSol"
@@ -257,6 +267,36 @@ extern "C" {
 #define COPT_DBLINFO_RELAXLB                    "RelaxLB"
 #define COPT_DBLINFO_RELAXUB                    "RelaxUB"
 #define COPT_DBLINFO_RELAXVALUE                 "RelaxValue"
+
+/* Nonlinear operation codes */
+#define COPT_NL_PLUS                            -10
+#define COPT_NL_MINUS                           -11
+#define COPT_NL_MULT                            -12
+#define COPT_NL_DIV                             -13
+#define COPT_NL_POW                             -14
+#define COPT_NL_SQRT                            -15
+#define COPT_NL_EXP                             -16
+#define COPT_NL_LOG                             -17
+#define COPT_NL_LOG10                           -18
+#define COPT_NL_NEG                             -19
+#define COPT_NL_ABS                             -20
+#define COPT_NL_FLOOR                           -21
+#define COPT_NL_CEIL                            -22
+#define COPT_NL_SIN                             -31
+#define COPT_NL_COS                             -32
+#define COPT_NL_TAN                             -33
+#define COPT_NL_SINH                            -34
+#define COPT_NL_COSH                            -35
+#define COPT_NL_TANH                            -36
+#define COPT_NL_ASIN                            -41
+#define COPT_NL_ACOS                            -42
+#define COPT_NL_ATAN                            -43
+#define COPT_NL_ASINH                           -44
+#define COPT_NL_ACOSH                           -45
+#define COPT_NL_ATANH                           -46
+#define COPT_NL_ATAN2                           -47
+#define COPT_NL_SUM                             -50
+#define COPT_NL_GET                             -60
 
 /* COPT client config keywords */
 #define COPT_CLIENT_CAFILE                      "CaFile"
@@ -430,6 +470,22 @@ int COPT_CALL COPT_AddExpCones(copt_prob *prob,
     const int         *coneType,
     const int         *coneIdx);
 
+int COPT_CALL COPT_AddAffineCone(copt_prob *prob,
+    int               coneType,
+    int               nConeDim,
+    int               nAlphaDim,
+    const double      *alphaElem,
+    const int         *psdBeg,
+    const int         *psdCnt,
+    const int         *psdColIdx,
+    const int         *psdMatIdx,
+    const int         *rowMatBeg,
+    const int         *rowMatCnt,
+    const int         *rowMatIdx,
+    const double      *rowMatElem,
+    const double      *rowConst,
+    const char        *name);
+
 int COPT_CALL COPT_AddQConstr(copt_prob *prob,
     int               nRowMatCnt,
     const int         *rowMatIdx,
@@ -441,6 +497,36 @@ int COPT_CALL COPT_AddQConstr(copt_prob *prob,
     char              cRowsense,
     double            dRowBound,
     const char        *name);
+
+int COPT_CALL COPT_AddNLConstr(copt_prob *prob,
+    int               nToken,
+    int               nTokenElem,
+    const int         *token,
+    const double      *tokenElem,
+    int               nRowMatCnt,
+    const int         *rowMatIdx,
+    const double      *rowMatElem,
+    char              cRowSense,
+    double            dRowBound,
+    double            dRowUpper,
+    const char        *name);
+
+int COPT_CALL COPT_AddNLConstrs(copt_prob *prob,
+    int               nConstrs,
+    const int         *tokenBeg,
+    const int         *tokenCnt,
+    const int         *tokenElemBeg,
+    const int         *tokenElemCnt,
+    const int         *token,
+    const double      *tokenElem,
+    const int         *rowMatBeg,
+    const int         *rowMatCnt,
+    const int         *rowMatIdx,
+    const double      *rowMatElem,
+    const char        *rowSense,
+    const double      *rowBound,
+    const double      *rowUpper,
+    char const *const *rowNames);
 
 int COPT_CALL COPT_AddPSDConstr(copt_prob *prob,
     int               nRowMatCnt,
@@ -473,15 +559,15 @@ int COPT_CALL COPT_AddIndicator(copt_prob *prob,
 
 int COPT_CALL COPT_AddIndicators(copt_prob *prob,
     int               nInd,
-    int               *indType,
-    int               *binColIdx,
-    int               *binColVal,
+    const int         *indType,
+    const int         *binColIdx,
+    const int         *binColVal,
     const int         *rowMatBeg,
     const int         *rowMatCnt,
     const int         *rowMatIdx,
     const double      *rowMatElem,
-    char              *cRowSense,
-    double            *dRowBound,
+    const char        *cRowSense,
+    const double      *dRowBound,
     char const *const *indNames);
 
 int COPT_CALL COPT_GetCols(copt_prob *prob,
@@ -496,7 +582,7 @@ int COPT_CALL COPT_GetCols(copt_prob *prob,
 
 int COPT_CALL COPT_GetPSDCols(copt_prob *prob,
     int               nCol,
-    int               *list,
+    const int         *list,
     int               *colDims,
     int               *colLens);
 
@@ -539,6 +625,26 @@ int COPT_CALL COPT_GetExpCones(copt_prob *prob,
     int               nElemSize,
     int               *pReqSize);
 
+int COPT_CALL COPT_GetAffineCone(copt_prob *prob,
+    int               affConeIdx,
+    int               *coneType,
+    int               *nConeDim,
+    int               *nAlphaDim,
+    double            *alphaElem,
+    int               *psdBeg,
+    int               *psdCnt,
+    int               *psdColIdx,
+    int               *psdMatIdx,
+    int               nPsdElemSize,
+    int               *pPsdReqSize,
+    int               *rowMatBeg,
+    int               *rowMatCnt,
+    int               *rowMatIdx,
+    double            *rowMatElem,
+    double            *rowConst,
+    int               nElemSize,
+    int               *pReqSize);
+
 int COPT_CALL COPT_GetQConstr(copt_prob *prob,
     int               qConstrIdx,
     int               *qMatRow,
@@ -552,6 +658,21 @@ int COPT_CALL COPT_GetQConstr(copt_prob *prob,
     double            *dRowBound,
     int               nElemSize,
     int               *pReqSize);
+
+int COPT_CALL COPT_GetNLConstr(copt_prob *prob,
+    int               nlConstrIdx,
+    int               *token,
+    double            *tokenElem,
+    int               nToken,
+    int               nTokenElem,
+    int               *pReqToken,
+    int               *pReqTokenElem,
+    int               *rowMatIdx,
+    double            *rowMatElem,
+    double            *dRowLower,
+    double            *dRowUpper,
+    int               nElemSize,
+    int               *pReqElemSize);
 
 int COPT_CALL COPT_GetPSDConstr(copt_prob *prob,
     int               psdConstrIdx,
@@ -619,20 +740,26 @@ int COPT_CALL COPT_DelRows(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelSOSs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelCones(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelExpCones(copt_prob *prob, int num, const int *list);
+int COPT_CALL COPT_DelAffineCones(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelQConstrs(copt_prob *prob, int num, const int *list);
+int COPT_CALL COPT_DelNLConstrs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelPSDConstrs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelLMIConstrs(copt_prob *prob, int num, const int *list);
 int COPT_CALL COPT_DelIndicators(copt_prob *prob, int num, const int *list);
 
-int COPT_CALL COPT_SetQuadObj(copt_prob* prob, int num, int *qRow, int *qCol, double *qElem);
+int COPT_CALL COPT_SetQuadObj(copt_prob* prob, int num, const int *qRow, const int *qCol, const double *qElem);
 int COPT_CALL COPT_GetQuadObj(copt_prob* prob, int *p_nQElem, int *qRow, int *qCol, double *qElem);
 int COPT_CALL COPT_DelQuadObj(copt_prob* prob);
+
+int COPT_CALL COPT_SetNLObj(copt_prob *prob, int nToken, int nTokenElem, const int *token, const double *tokenElem);
+int COPT_CALL COPT_GetNLObj(copt_prob *prob, int *p_nToken, int *p_nTokenElem, int *token, double *tokenElem);
+int COPT_CALL COPT_DelNLObj(copt_prob *prob);
 
 int COPT_CALL COPT_SetPSDObj(copt_prob *prob, int iCol, int newIdx);
 int COPT_CALL COPT_GetPSDObj(copt_prob *prob, int iCol, int *p_idx);
 int COPT_CALL COPT_DelPSDObj(copt_prob *prob);
 
-int COPT_CALL COPT_AddSymMat(copt_prob *prob, int ndim, int nelem, int *rows, int *cols, double *elems);
+int COPT_CALL COPT_AddSymMat(copt_prob *prob, int ndim, int nelem, const int *rows, const int *cols, const double *elems);
 int COPT_CALL COPT_GetSymMat(copt_prob *prob, int iMat, int *p_nDim, int *p_nElem, int *rows, int *cols, double *elems);
 
 int COPT_CALL COPT_SetObjSense(copt_prob *prob, int iObjSense);
@@ -650,9 +777,15 @@ int COPT_CALL COPT_SetRowLower(copt_prob *prob, int num, const int *list, const 
 int COPT_CALL COPT_SetRowUpper(copt_prob *prob, int num, const int *list, const double *upper);
 int COPT_CALL COPT_SetRowNames(copt_prob *prob, int num, const int *list, char const *const *names);
 
+int COPT_CALL COPT_SetAffineConeNames(copt_prob *prob, int num, const int *list, char const *const *names);
+
 int COPT_CALL COPT_SetQConstrSense(copt_prob *prob, int num, const int *list, const char *sense);
 int COPT_CALL COPT_SetQConstrRhs(copt_prob *prob, int num, const int *list, const double *rhs);
 int COPT_CALL COPT_SetQConstrNames(copt_prob *prob, int num, const int *list, char const *const *names);
+
+int COPT_CALL COPT_SetNLConstrLower(copt_prob *prob, int num, const int *list, const double *lower);
+int COPT_CALL COPT_SetNLConstrUpper(copt_prob *prob, int num, const int *list, const double *upper);
+int COPT_CALL COPT_SetNLConstrNames(copt_prob *prob, int num, const int *list, char const *const *names);
 
 int COPT_CALL COPT_SetPSDConstrLower(copt_prob *prob, int num, const int *list, const double *lower);
 int COPT_CALL COPT_SetPSDConstrUpper(copt_prob *prob, int num, const int *list, const double *upper);
@@ -683,6 +816,7 @@ int COPT_CALL COPT_WriteMps(copt_prob *prob, const char *mpsfilename);
 int COPT_CALL COPT_WriteLp(copt_prob *prob, const char *lpfilename);
 int COPT_CALL COPT_WriteCbf(copt_prob *prob, const char *cbffilename);
 int COPT_CALL COPT_WriteBin(copt_prob *prob, const char *binfilename);
+int COPT_CALL COPT_WriteNL(copt_prob *prob, const char *nlfilename);
 int COPT_CALL COPT_WriteIIS(copt_prob *prob, const char *iisfilename);
 int COPT_CALL COPT_WriteRelax(copt_prob *prob, const char *relaxfilename);
 int COPT_CALL COPT_WriteSol(copt_prob *prob, const char *solfilename);
@@ -695,14 +829,14 @@ int COPT_CALL COPT_WriteMpsStr(copt_prob *prob, char *str, int nStrSize, int *pR
 int COPT_CALL COPT_WriteParamStr(copt_prob *prob, char *str, int nStrSize, int *pReqSize);
 int COPT_CALL COPT_WriteBlob(copt_prob *prob, int tryCompress, void **p_blob, COPT_INT64 *pLen);
 
-int COPT_CALL COPT_AddMipStart(copt_prob *prob, int num, const int *list, double *colVal);
+int COPT_CALL COPT_AddMipStart(copt_prob *prob, int num, const int *list, const double *colVal);
 
 int COPT_CALL COPT_SolveLp(copt_prob *prob);
 int COPT_CALL COPT_Solve(copt_prob *prob);
 
 int COPT_CALL COPT_ComputeIIS(copt_prob *prob);
 
-int COPT_CALL COPT_FeasRelax(copt_prob *prob, double *colLowPen, double *colUppPen, double *rowBndPen, double *rowUppPen);
+int COPT_CALL COPT_FeasRelax(copt_prob *prob, const double *colLowPen, const double *colUppPen, const double *rowBndPen, const double *rowUppPen);
 
 int COPT_CALL COPT_Tune(copt_prob *prob);
 int COPT_CALL COPT_LoadTuneParam(copt_prob *prob, int idx);
@@ -738,14 +872,18 @@ int COPT_CALL COPT_GetDblAttr(copt_prob *prob, const char *attrName, double *p_d
 int COPT_CALL COPT_GetColIdx(copt_prob *prob, const char *colName, int *p_iCol);
 int COPT_CALL COPT_GetPSDColIdx(copt_prob *prob, const char *psdColName, int *p_iPSDCol);
 int COPT_CALL COPT_GetRowIdx(copt_prob *prob, const char *rowName, int *p_iRow);
+int COPT_CALL COPT_GetAffineConeIdx(copt_prob *prob, const char *affConeName, int *p_iAffCone);
 int COPT_CALL COPT_GetQConstrIdx(copt_prob *prob, const char *qConstrName, int *p_iQConstr);
+int COPT_CALL COPT_GetNLConstrIdx(copt_prob *prob, const char *nlConstrName, int *p_iNLConstr);
 int COPT_CALL COPT_GetPSDConstrIdx(copt_prob *prob, const char *psdConstrName, int *p_iPSDConstr);
 int COPT_CALL COPT_GetLMIConstrIdx(copt_prob *prob, const char *lmiConstrName, int *p_iLMIConstr);
 int COPT_CALL COPT_GetIndicatorIdx(copt_prob *prob, const char *indicatorName, int *p_iIndicator);
+
 int COPT_CALL COPT_GetColInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
 int COPT_CALL COPT_GetPSDColInfo(copt_prob *prob, const char *infoName, int iCol, double *info);
 int COPT_CALL COPT_GetRowInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
 int COPT_CALL COPT_GetQConstrInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
+int COPT_CALL COPT_GetNLConstrInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
 int COPT_CALL COPT_GetPSDConstrInfo(copt_prob *prob, const char *infoName, int num, const int *list, double *info);
 int COPT_CALL COPT_GetLMIConstrInfo(copt_prob *prob, const char *infoName, int iLMI, double *info);
 
@@ -766,7 +904,9 @@ int COPT_CALL COPT_GetIndicatorIIS(copt_prob *prob, int num, const int *list, in
 int COPT_CALL COPT_GetColName(copt_prob *prob, int iCol, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetPSDColName(copt_prob *prob, int iPSDCol, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetRowName(copt_prob *prob, int iRow, char *buff, int buffSize, int *pReqSize);
+int COPT_CALL COPT_GetAffineConeName(copt_prob *prob, int iAffCone, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetQConstrName(copt_prob *prob, int iQConstr, char *buff, int buffSize, int *pReqSize);
+int COPT_CALL COPT_GetNLConstrName(copt_prob *prob, int iNLConstr, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetPSDConstrName(copt_prob *prob, int iPSDConstr, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetLMIConstrName(copt_prob *prob, int iLMIConstr, char *buff, int buffSize, int *pReqSize);
 int COPT_CALL COPT_GetIndicatorName(copt_prob *prob, int iIndicator, char *buff, int buffSize, int *pReqSize);

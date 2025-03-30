@@ -1,9 +1,8 @@
 import os
 import platform
-import types
 from pathlib import Path
 import logging
-from typing import Dict
+from typing import Dict, Union, overload
 
 from .copt_model_ext import RawModel, Env, COPT, load_library
 from .attributes import (
@@ -13,7 +12,16 @@ from .attributes import (
     ResultStatusCode,
     TerminationStatusCode,
 )
-from .core_ext import ConstraintType, VariableIndex, ObjectiveSense
+from .core_ext import (
+    VariableIndex,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    ExprBuilder,
+    ConstraintType,
+    ConstraintSense,
+    ObjectiveSense,
+)
+from .comparison_constraint import ComparisonConstraint
 from .solver_common import (
     _direct_get_model_attribute,
     _direct_set_model_attribute,
@@ -530,12 +538,60 @@ class Model(RawModel):
         cb_info_type = callback_info_typemap.get(what, None)
         if cb_info_type is None:
             raise ValueError(f"Unknown callback info type: {what}")
-        if cb_info_type == int:
+        if cb_info_type is int:
             return self.cb_get_info_int(what)
-        elif cb_info_type == float:
+        elif cb_info_type is float:
             return self.cb_get_info_double(what)
         else:
             raise ValueError(f"Unknown callback info type: {what}")
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_quadratic_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_quadratic_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_quadratic_constraint(arg, *args, **kwargs)
 
 
 Model.add_variables = make_variable_tupledict

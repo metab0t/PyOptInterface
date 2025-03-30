@@ -46,7 +46,6 @@ target_sources(core PRIVATE
   include/pyoptinterface/dylib.hpp
   include/pyoptinterface/solver_common.hpp
   lib/core.cpp
-  lib/cache_model.cpp
 )
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)
@@ -57,7 +56,7 @@ target_sources(nlexpr PRIVATE
   lib/nlexpr.cpp
 )
 target_include_directories(nlexpr PUBLIC include thirdparty)
-target_link_libraries(nlexpr PUBLIC fmt)
+target_link_libraries(nlexpr PUBLIC core)
 
 add_library(nleval STATIC)
 target_sources(nleval PRIVATE
@@ -93,7 +92,7 @@ find_package(nanobind CONFIG REQUIRED)
 nanobind_add_module(
   core_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/core_ext.cpp
 )
@@ -103,7 +102,7 @@ install(TARGETS core_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 nanobind_add_module(
   nlexpr_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/nlexpr_ext.cpp
 )
@@ -113,7 +112,7 @@ install(TARGETS nlexpr_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 nanobind_add_module(
   nleval_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/nleval_ext.cpp
 )
@@ -123,7 +122,7 @@ install(TARGETS nleval_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 nanobind_add_module(
   cppad_interface_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/cppad_interface_ext.cpp
 )
@@ -133,7 +132,7 @@ install(TARGETS cppad_interface_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 nanobind_add_module(
   tcc_interface_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/tcc_interface_ext.cpp
 )
@@ -145,18 +144,18 @@ install(TARGETS tcc_interface_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 # Gurobi
 add_library(gurobi_model STATIC)
 target_sources(gurobi_model PRIVATE
-include/pyoptinterface/gurobi_model.hpp
-lib/gurobi_model.cpp
+  include/pyoptinterface/gurobi_model.hpp
+  lib/gurobi_model.cpp
 )
-target_link_libraries(gurobi_model PUBLIC core)
+target_link_libraries(gurobi_model PUBLIC core nlexpr)
 
 nanobind_add_module(
-gurobi_model_ext
+  gurobi_model_ext
 
-STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
-lib/gurobi_model_ext.cpp
-lib/gurobi_model_ext_constants.cpp
+  lib/gurobi_model_ext.cpp
+  lib/gurobi_model_ext_constants.cpp
 )
 target_link_libraries(gurobi_model_ext PUBLIC gurobi_model)
 install(TARGETS gurobi_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
@@ -164,18 +163,18 @@ install(TARGETS gurobi_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 # COPT
 add_library(copt_model STATIC)
 target_sources(copt_model PRIVATE
-include/pyoptinterface/copt_model.hpp
-lib/copt_model.cpp
+  include/pyoptinterface/copt_model.hpp
+  lib/copt_model.cpp
 )
 target_link_libraries(copt_model PUBLIC core)
 
 nanobind_add_module(
-copt_model_ext
+  copt_model_ext
 
-STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
-lib/copt_model_ext.cpp
-lib/copt_model_ext_constants.cpp
+  lib/copt_model_ext.cpp
+  lib/copt_model_ext_constants.cpp
 )
 target_link_libraries(copt_model_ext PUBLIC copt_model)
 install(TARGETS copt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
@@ -183,18 +182,18 @@ install(TARGETS copt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 # MOSEK
 add_library(mosek_model STATIC)
 target_sources(mosek_model PRIVATE
-include/pyoptinterface/mosek_model.hpp
-lib/mosek_model.cpp
+  include/pyoptinterface/mosek_model.hpp
+  lib/mosek_model.cpp
 )
 target_link_libraries(mosek_model PUBLIC core)
 
 nanobind_add_module(
-mosek_model_ext
+  mosek_model_ext
 
-STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
-lib/mosek_model_ext.cpp
-lib/mosek_model_ext_constants.cpp
+  lib/mosek_model_ext.cpp
+  lib/mosek_model_ext_constants.cpp
 )
 target_link_libraries(mosek_model_ext PUBLIC mosek_model)
 install(TARGETS mosek_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
@@ -202,20 +201,20 @@ install(TARGETS mosek_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 # HiGHS
 add_library(highs_model STATIC)
 target_sources(highs_model PRIVATE
-include/pyoptinterface/highs_model.hpp
-lib/highs_model.cpp
+  include/pyoptinterface/highs_model.hpp
+  lib/highs_model.cpp
 )
 target_include_directories(highs_model PUBLIC thirdparty/solvers/highs)
 target_link_libraries(highs_model PUBLIC core)
 # target_link_libraries(highs_model PUBLIC HiGHS::HiGHS)
 
 nanobind_add_module(
-highs_model_ext
+  highs_model_ext
 
-STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
-lib/highs_model_ext.cpp
-lib/highs_model_ext_constants.cpp
+  lib/highs_model_ext.cpp
+  lib/highs_model_ext_constants.cpp
 )
 target_link_libraries(highs_model_ext PUBLIC highs_model)
 install(TARGETS highs_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
@@ -231,7 +230,7 @@ target_link_libraries(ipopt_model PUBLIC nleval)
 nanobind_add_module(
   ipopt_model_ext
 
-  STABLE_ABI NB_STATIC
+  STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
 
   lib/ipopt_model_ext.cpp
 )

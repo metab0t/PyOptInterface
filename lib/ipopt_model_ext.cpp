@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
 
 namespace nb = nanobind;
 
@@ -88,52 +89,52 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("get_constraint_primal", &IpoptModelMixin::get_constraint_primal)
 	    .def("get_constraint_dual", &IpoptModelMixin::get_constraint_dual)
 
-	    .def("add_linear_constraint",
+	    .def("_add_linear_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModelMixin::add_linear_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, CoeffT,
-	                           const char *>(&IpoptModelMixin::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense,
+	                           const std::tuple<double, double> &, const char *>(
+	             &IpoptModelMixin::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
 	         nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModelMixin::add_linear_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def(
-	        "add_linear_constraint",
-	        nb::overload_cast<const VariableIndex &, ConstraintSense, CoeffT, CoeffT, const char *>(
-	            &IpoptModelMixin::add_linear_constraint),
-	        nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const VariableIndex &, ConstraintSense,
+	                           const std::tuple<double, double> &, const char *>(
+	             &IpoptModelMixin::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModelMixin::add_linear_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_linear_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT, const char *>(
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense,
+	                           const std::tuple<double, double> &, const char *>(
 	             &IpoptModelMixin::add_linear_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
-	    .def("add_linear_constraint", &IpoptModelMixin::add_linear_constraint_from_comparison,
-	         nb::arg("con"), nb::arg("name") = "")
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
 
-	    .def("add_quadratic_constraint",
+	    .def("_add_quadratic_constraint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT,
 	                           const char *>(&IpoptModelMixin::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense, CoeffT, CoeffT,
-	                           const char *>(&IpoptModelMixin::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
-	    .def("add_quadratic_constraint",
+	    .def("_add_quadratic_constraint",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ConstraintSense,
+	                           const std::tuple<double, double> &, const char *>(
+	             &IpoptModelMixin::add_quadratic_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
+	    .def("_add_quadratic_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, const char *>(
 	             &IpoptModelMixin::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_quadratic_constraint",
-	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT, CoeffT, const char *>(
+	    .def("_add_quadratic_constraint",
+	         nb::overload_cast<const ExprBuilder &, ConstraintSense,
+	                           const std::tuple<double, double> &, const char *>(
 	             &IpoptModelMixin::add_quadratic_constraint),
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("lb"), nb::arg("ub"), nb::arg("name") = "")
-	    .def("add_quadratic_constraint", &IpoptModelMixin::add_quadratic_constraint_from_comparison,
-	         nb::arg("con"), nb::arg("name") = "")
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
 
 	    .def("add_objective", &IpoptModelMixin::add_objective<ExprBuilder>)
 	    .def("add_objective", &IpoptModelMixin::add_objective<ScalarQuadraticFunction>)
@@ -154,7 +155,7 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("set_objective", &IpoptModelMixin::set_objective<double>, nb::arg("expr"),
 	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
 
-	    .def("_add_nl_objective", &IpoptModelMixin::_add_nl_objective)
+	    .def("_add_fn_objective", &IpoptModelMixin::_add_fn_objective)
 
 	    .def("clear_nl_objective", &IpoptModelMixin::clear_nl_objective)
 
@@ -162,8 +163,8 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def("_set_function_evaluator", &IpoptModelMixin::_set_function_evaluator)
 	    .def("_has_function_evaluator", &IpoptModelMixin::_has_function_evaluator)
 
-	    .def("_add_nl_constraint_bounds", &IpoptModelMixin::_add_nl_constraint_bounds)
-	    .def("_add_nl_constraint_eq", &IpoptModelMixin::_add_nl_constraint_eq)
+	    .def("_add_fn_constraint_bounds", &IpoptModelMixin::_add_fn_constraint_bounds)
+	    .def("_add_fn_constraint_eq", &IpoptModelMixin::_add_fn_constraint_eq)
 
 	    .def("_optimize", &IpoptModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
 
