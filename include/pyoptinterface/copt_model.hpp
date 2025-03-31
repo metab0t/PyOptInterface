@@ -6,6 +6,7 @@
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
+#include "pyoptinterface/nlexpr.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
 
@@ -33,6 +34,7 @@ extern "C"
 	B(COPT_AddSOSs);               \
 	B(COPT_AddCones);              \
 	B(COPT_AddExpCones);           \
+	B(COPT_AddNLConstr);           \
 	B(COPT_DelRows);               \
 	B(COPT_DelQConstrs);           \
 	B(COPT_DelSOSs);               \
@@ -199,6 +201,15 @@ class COPTModel
 	ConstraintIndex add_exp_cone_constraint(const Vector<VariableIndex> &variables,
 	                                        const char *name, bool dual = false);
 
+	// Nonlinear constraint
+	void decode_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
+	                 std::vector<int> &opcodes, std::vector<double> &constants);
+	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
+	                                         double lb, double ub, const char *name = nullptr);
+	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
+	                                                         const ExpressionHandle &result,
+	                                                         const char *name = nullptr);
+
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
 
@@ -315,6 +326,8 @@ class COPTModel
 	MonotoneIndexer<int> m_cone_constraint_index;
 
 	MonotoneIndexer<int> m_exp_cone_constraint_index;
+
+	MonotoneIndexer<int> m_nl_constraint_index;
 
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;

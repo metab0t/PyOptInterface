@@ -67,9 +67,10 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("UNSTARTED") = 0;
 	COPT.attr("VERSION_MAJOR") = 7;
 	COPT.attr("VERSION_MINOR") = 2;
-	COPT.attr("VERSION_TECHNICAL") = 3;
+	COPT.attr("VERSION_TECHNICAL") = 5;
 
 	nb::module_ Attr = COPT.def_submodule("Attr");
+	Attr.attr("AffineCones") = "AffineCones";
 	Attr.attr("BarrierIter") = "BarrierIter";
 	Attr.attr("BestBnd") = "BestBnd";
 	Attr.attr("BestGap") = "BestGap";
@@ -86,6 +87,7 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("HasIIS") = "HasIIS";
 	Attr.attr("HasLpSol") = "HasLpSol";
 	Attr.attr("HasMipSol") = "HasMipSol";
+	Attr.attr("HasNLObj") = "HasNLObj";
 	Attr.attr("HasPrimalRay") = "HasPrimalRay";
 	Attr.attr("HasPsdObj") = "HasPSDObj";
 	Attr.attr("HasQObj") = "HasQObj";
@@ -101,9 +103,12 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("LpObjVal") = "LpObjVal";
 	Attr.attr("LpStatus") = "LpStatus";
 	Attr.attr("MipStatus") = "MipStatus";
+	Attr.attr("NLConstrs") = "NLConstrs";
+	Attr.attr("NLElems") = "NLElems";
 	Attr.attr("NodeCnt") = "NodeCnt";
 	Attr.attr("ObjConst") = "ObjConst";
 	Attr.attr("ObjSense") = "ObjSense";
+	Attr.attr("PDLPIter") = "PDLPIter";
 	Attr.attr("PoolSols") = "PoolSols";
 	Attr.attr("PsdCols") = "PSDCols";
 	Attr.attr("PsdConstrs") = "PSDConstrs";
@@ -149,8 +154,13 @@ void bind_copt_constants(nb::module_ &m)
 	Param.attr("MipStartMode") = "MipStartMode";
 	Param.attr("MipStartNodeLimit") = "MipStartNodeLimit";
 	Param.attr("MipTasks") = "MipTasks";
+	Param.attr("NLPIterLimit") = "NLPIterLimit";
+	Param.attr("NLPLinScale") = "NLPLinScale";
+	Param.attr("NLPMuUpdate") = "NLPMuUpdate";
+	Param.attr("NLPTol") = "NLPTol";
 	Param.attr("NodeCutRounds") = "NodeCutRounds";
 	Param.attr("NodeLimit") = "NodeLimit";
+	Param.attr("NonConvex") = "NonConvex";
 	Param.attr("PDLPTol") = "PDLPTol";
 	Param.attr("Presolve") = "Presolve";
 	Param.attr("RelGap") = "RelGap";

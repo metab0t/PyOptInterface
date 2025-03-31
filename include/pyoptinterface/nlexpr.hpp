@@ -76,6 +76,9 @@ enum class BinaryOperator
 	NotEqual,
 	GreaterEqual,
 	GreaterThan,
+
+	// Compability issue where some solvers only accepts two-arg multiplication
+	Mul2
 };
 
 bool is_binary_compare_op(BinaryOperator op);

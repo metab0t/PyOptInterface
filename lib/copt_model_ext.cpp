@@ -76,8 +76,8 @@ NB_MODULE(copt_model_ext, m)
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &COPTModelMixin::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_quadratic_constraint", &COPTModelMixin::add_quadratic_constraint, nb::arg("expr"),
-	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_quadratic_constraint", &COPTModelMixin::add_quadratic_constraint,
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("_add_quadratic_constraint", &COPTModelMixin::add_quadratic_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_second_order_cone_constraint", &COPTModelMixin::add_second_order_cone_constraint,
@@ -89,6 +89,9 @@ NB_MODULE(copt_model_ext, m)
 	    .def("add_sos_constraint",
 	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
 	             &COPTModelMixin::add_sos_constraint))
+	    .def("_add_single_nl_constraint", &COPTModelMixin::add_single_nl_constraint)
+	    .def("_add_single_nl_constraint_from_comparison",
+	         &COPTModelMixin::add_single_nl_constraint_from_comparison)
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)

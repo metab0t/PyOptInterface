@@ -5,8 +5,8 @@
 #include "solvers/gurobi/gurobi_c.h"
 
 #include "pyoptinterface/core.hpp"
-#include "pyoptinterface/nlexpr.hpp"
 #include "pyoptinterface/container.hpp"
+#include "pyoptinterface/nlexpr.hpp"
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
 

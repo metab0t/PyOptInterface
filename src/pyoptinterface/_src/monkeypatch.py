@@ -6,7 +6,6 @@ from .core_ext import (
     ConstraintSense,
 )
 from .comparison_constraint import ComparisonConstraint
-
 from .nlexpr_ext import (
     ExpressionHandle,
     BinaryOperator,
@@ -47,6 +46,61 @@ def patch_core_compararison_operator(cls):
     cls.__eq__ = __eq__
     cls.__le__ = __le__
     cls.__ge__ = __ge__
+
+
+def patch_quadratic_mul(cls):
+    old_mul = getattr(cls, "__mul__", None)
+    old_rmul = getattr(cls, "__rmul__", None)
+
+    assert old_mul is not None, f"{cls} does not have __mul__ method"
+    assert old_rmul is not None, f"{cls} does not have __rmul__ method"
+
+    def __mul__(self, other):
+        original_result = NotImplemented
+
+        try:
+            original_result = old_mul(self, other)
+        except TypeError:
+            original_result = NotImplemented
+
+        if original_result is not NotImplemented:
+            return original_result
+
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        converted_other = convert_to_expressionhandle(graph, other)
+        if isinstance(converted_other, ExpressionHandle):
+            fallback_result = converted_other * self
+            return fallback_result
+        else:
+            return NotImplemented
+
+    def __rmul__(self, other):
+        original_result = NotImplemented
+
+        try:
+            original_result = old_rmul(self, other)
+        except TypeError:
+            original_result = NotImplemented
+
+        if original_result is not NotImplemented:
+            return original_result
+
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        converted_other = convert_to_expressionhandle(graph, other)
+        if isinstance(converted_other, ExpressionHandle):
+            fallback_result = converted_other * self
+            return fallback_result
+        else:
+            return NotImplemented
+
+    cls.__mul__ = __mul__
+    cls.__rmul__ = __rmul__
 
 
 def pow_int(graph, expr, N):
@@ -180,5 +234,8 @@ def _monkeypatch_all():
     patch_core_compararison_operator(ScalarAffineFunction)
     patch_core_compararison_operator(ScalarQuadraticFunction)
     patch_core_compararison_operator(ExprBuilder)
+
+    patch_quadratic_mul(ScalarQuadraticFunction)
+    patch_quadratic_mul(ExprBuilder)
 
     patch_expressionhandle(ExpressionHandle)

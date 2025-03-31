@@ -166,7 +166,7 @@ target_sources(copt_model PRIVATE
   include/pyoptinterface/copt_model.hpp
   lib/copt_model.cpp
 )
-target_link_libraries(copt_model PUBLIC core)
+target_link_libraries(copt_model PUBLIC core nlexpr)
 
 nanobind_add_module(
   copt_model_ext

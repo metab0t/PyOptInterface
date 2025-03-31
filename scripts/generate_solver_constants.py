@@ -160,12 +160,14 @@ def export_copt_constants(io: IO[str], copt_constants):
 
 
 if __name__ == "__main__":
-    with open("gurobi_constants.txt", "w") as io:
+    current_dir = Path(__file__).parent.resolve()
+
+    with open(current_dir / "gurobi_constants.txt", "w") as io:
         gurobi_constants = extract_gurobi_constants()
         export_gurobi_constants(io, gurobi_constants)
         print("Done!")
 
-    with open("copt_constants.txt", "w") as io:
+    with open(current_dir / "copt_constants.txt", "w") as io:
         copt_constants = extract_copt_constants()
         export_copt_constants(io, copt_constants)
         print("Done!")

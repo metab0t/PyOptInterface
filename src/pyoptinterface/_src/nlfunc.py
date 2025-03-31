@@ -39,6 +39,16 @@ class ExpressionGraphContext:
         self._thread_local._graph_stack.pop()
 
     @classmethod
+    def current_graph_no_exception(cls):
+        _thread_local = cls._thread_local
+        if not hasattr(_thread_local, "_graph_stack"):
+            return None
+        stack = _thread_local._graph_stack
+        if not stack:
+            return None
+        return stack[-1]
+    
+    @classmethod
     def current_graph(cls):
         _thread_local = cls._thread_local
         if not hasattr(_thread_local, "_graph_stack"):
@@ -64,6 +74,24 @@ def convert_to_expressionhandle(graph, expr):
         return graph.merge_exprbuilder(expr)
     else:
         return expr
+
+
+def to_nlexpr(expr):
+    if isinstance(expr, ExpressionHandle):
+        return expr
+    graph = ExpressionGraphContext.current_graph()
+    if isinstance(expr, (int, float)):
+        return graph.add_constant(expr)
+    elif isinstance(expr, VariableIndex):
+        return graph.merge_variableindex(expr)
+    elif isinstance(expr, ScalarAffineFunction):
+        return graph.merge_scalaraffinefunction(expr)
+    elif isinstance(expr, ScalarQuadraticFunction):
+        return graph.merge_scalarquadraticfunction(expr)
+    elif isinstance(expr, ExprBuilder):
+        return graph.merge_exprbuilder(expr)
+    else:
+        raise TypeError(f"Unsupported expression type: {type(expr)}")
 
 
 # Implement unary mathematical functions

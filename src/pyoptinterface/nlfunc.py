@@ -2,6 +2,7 @@ from pyoptinterface._src.nlfunc import (
     Vars,
     Params,
     ExpressionGraphContext as graph,
+    to_nlexpr,
     sin,
     cos,
     tan,

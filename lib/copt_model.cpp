@@ -1,6 +1,8 @@
 #include "pyoptinterface/copt_model.hpp"
 #include "fmt/core.h"
 
+#include <stack>
+
 namespace copt
 {
 #define B DYLIB_DECLARE
@@ -441,6 +443,233 @@ ConstraintIndex COPTModel::add_exp_cone_constraint(const Vector<VariableIndex> &
 	// COPT does not support name for cone constraints
 
 	return constraint_index;
+}
+
+int unary_opcode(const UnaryOperator &op)
+{
+	switch (op)
+	{
+	case UnaryOperator::Neg:
+		return COPT_NL_NEG;
+	case UnaryOperator::Sin:
+		return COPT_NL_SIN;
+	case UnaryOperator::Cos:
+		return COPT_NL_COS;
+	case UnaryOperator::Tan:
+		return COPT_NL_TAN;
+	case UnaryOperator::Asin:
+		return COPT_NL_ASIN;
+	case UnaryOperator::Acos:
+		return COPT_NL_ACOS;
+	case UnaryOperator::Atan:
+		return COPT_NL_ATAN;
+	case UnaryOperator::Abs:
+		return COPT_NL_ABS;
+	case UnaryOperator::Sqrt:
+		return COPT_NL_SQRT;
+	case UnaryOperator::Exp:
+		return COPT_NL_EXP;
+	case UnaryOperator::Log:
+		return COPT_NL_LOG;
+	case UnaryOperator::Log10:
+		return COPT_NL_LOG10;
+	default: {
+		auto opname = unary_operator_to_string(op);
+		auto msg = fmt::format("Unknown unary operator for COPT: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+int binary_opcode(const BinaryOperator &op)
+{
+	switch (op)
+	{
+	case BinaryOperator::Sub:
+		return COPT_NL_MINUS;
+	case BinaryOperator::Div:
+		return COPT_NL_DIV;
+	case BinaryOperator::Pow:
+		return COPT_NL_POW;
+	case BinaryOperator::Mul2:
+		return COPT_NL_MULT;
+	default: {
+		auto opname = binary_operator_to_string(op);
+		auto msg = fmt::format("Unknown binary operator for COPT: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+int nary_opcode(const NaryOperator &op)
+{
+	switch (op)
+	{
+	case NaryOperator::Add:
+		return COPT_NL_SUM;
+	default: {
+		auto opname = nary_operator_to_string(op);
+		auto msg = fmt::format("Unknown n-ary operator for COPT: {}", opname);
+		throw std::runtime_error(msg);
+	}
+	}
+}
+
+void COPTModel::decode_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
+                            std::vector<int> &opcodes, std::vector<double> &constants)
+{
+	auto array_type = expr.array;
+	auto index = expr.id;
+	switch (array_type)
+	{
+	case ArrayType::Constant: {
+		opcodes.push_back(COPT_NL_GET);
+		constants.push_back(graph.m_constants[index].value);
+		break;
+	}
+	case ArrayType::Variable: {
+		auto column = _checked_variable_index(graph.m_variables[index].id);
+		opcodes.push_back(column);
+		break;
+	}
+	case ArrayType::Parameter: {
+		throw std::runtime_error("Parameter is not supported in COPT");
+		break;
+	}
+	case ArrayType::Unary: {
+		auto &unary = graph.m_unaries[index];
+		int opcode = unary_opcode(unary.op);
+		opcodes.push_back(opcode);
+		break;
+	}
+	case ArrayType::Binary: {
+		auto &binary = graph.m_binaries[index];
+		int opcode = binary_opcode(binary.op);
+		opcodes.push_back(opcode);
+		break;
+	}
+	case ArrayType::Ternary: {
+		throw std::runtime_error("Ternary operator is not supported in Gurobi");
+		break;
+	}
+	case ArrayType::Nary: {
+		auto &nary = graph.m_naries[index];
+		int opcode = nary_opcode(nary.op);
+		int n_operands = nary.operands.size();
+
+		if (opcode == COPT_NL_SUM && n_operands == 1)
+		{
+			// COPT errors when sum 1 operand
+		}
+		else
+		{
+			opcodes.push_back(opcode);
+			opcodes.push_back(n_operands);
+		}
+	}
+	break;
+	}
+}
+
+ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
+                                                    const ExpressionHandle &result, double lb,
+                                                    double ub, const char *name)
+{
+	std::vector<int> opcodes;
+	std::vector<double> constants;
+
+	std::stack<ExpressionHandle> expr_stack;
+
+	// init stack
+	expr_stack.push(result);
+
+	while (!expr_stack.empty())
+	{
+		auto expr = expr_stack.top();
+		expr_stack.pop();
+
+		// We need to convert the n-arg multiplication to 2-arg multiplication
+		if (expr.array == ArrayType::Nary && graph.m_naries[expr.id].op == NaryOperator::Mul)
+		{
+			auto &nary = graph.m_naries[expr.id];
+			int n_operands = nary.operands.size();
+
+			if (n_operands == 1)
+			{
+				expr = nary.operands[0];
+			}
+			else if (n_operands >= 2)
+			{
+				ExpressionHandle left = nary.operands[0];
+				ExpressionHandle right = nary.operands[1];
+				ExpressionHandle new_expr = graph.add_binary(BinaryOperator::Mul2, left, right);
+				for (int i = 2; i < n_operands; i++)
+				{
+					new_expr = graph.add_binary(BinaryOperator::Mul2, new_expr, nary.operands[i]);
+				}
+				expr = new_expr;
+			}
+		}
+
+		decode_expr(graph, expr, opcodes, constants);
+
+		auto array_type = expr.array;
+		auto index = expr.id;
+		switch (array_type)
+		{
+		case ArrayType::Unary: {
+			auto &unary = graph.m_unaries[index];
+			expr_stack.push(unary.operand);
+			break;
+		}
+		case ArrayType::Binary: {
+			auto &binary = graph.m_binaries[index];
+			expr_stack.push(binary.right);
+			expr_stack.push(binary.left);
+			break;
+		}
+		case ArrayType::Nary: {
+			auto &nary = graph.m_naries[index];
+			for (int i = nary.operands.size() - 1; i >= 0; i--)
+			{
+				expr_stack.push(nary.operands[i]);
+			}
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
+	// add NL constraint
+	int error =
+	    copt::COPT_AddNLConstr(m_model.get(), opcodes.size(), constants.size(), opcodes.data(),
+	                           constants.data(), 0, nullptr, nullptr, 0, lb, ub, name);
+	check_error(error);
+
+	IndexT constraint_index = m_nl_constraint_index.add_index();
+
+	ConstraintIndex constraint(ConstraintType::COPT_NL, constraint_index);
+
+	return constraint;
+}
+
+ConstraintIndex COPTModel::add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
+                                                                    const ExpressionHandle &expr,
+                                                                    const char *name)
+{
+	ExpressionHandle real_expr;
+	double lb = -COPT_INFINITY, ub = COPT_INFINITY;
+
+	unpack_comparison_expression(graph, expr, real_expr, lb, ub);
+
+	auto constraint = add_single_nl_constraint(graph, real_expr, lb, ub, name);
+	return constraint;
 }
 
 void COPTModel::delete_constraint(const ConstraintIndex &constraint)

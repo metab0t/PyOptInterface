@@ -18,6 +18,9 @@ def test_nlp_expressiontree(model_interface):
         z = nlfunc.exp(x) + nlfunc.exp(2 * y)
         model.add_nl_constraint(z <= 2 * math.exp(1.0))
 
+        z = x * x * x
+        model.add_nl_constraint(z >= 0.8**3)
+
     model.set_objective(x + 2 * y, poi.ObjectiveSense.Maximize)
     model.optimize()
 
