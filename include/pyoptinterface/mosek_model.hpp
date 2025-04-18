@@ -121,7 +121,11 @@ struct MOSEKfreemodelT
 	};
 };
 
-class MOSEKModel
+class MOSEKModel:public OnesideLinearConstraintMixin<MOSEKModel>,
+                  public OnesideQuadraticConstraintMixin<MOSEKModel>,
+                  public LinearObjectiveMixin<MOSEKModel>,
+                  public PPrintMixin<MOSEKModel>,
+                  public GetValueMixin<MOSEKModel>
 {
   public:
 	MOSEKModel() = default;
@@ -258,5 +262,3 @@ class MOSEKModel
 	/* MOSEK part */
 	std::unique_ptr<MSKtask, MOSEKfreemodelT> m_model;
 };
-
-using MOSEKModelMixin = CommercialSolverMixin<MOSEKModel>;

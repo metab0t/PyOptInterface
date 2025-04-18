@@ -43,7 +43,13 @@ struct IpoptResult
 	double obj_val;
 };
 
-struct IpoptModel
+struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
+                    public TwosideLinearConstraintMixin<IpoptModel>,
+                    public OnesideQuadraticConstraintMixin<IpoptModel>,
+                    public TwosideQuadraticConstraintMixin<IpoptModel>,
+                    public LinearObjectiveMixin<IpoptModel>,
+                    public PPrintMixin<IpoptModel>,
+                    public GetValueMixin<IpoptModel>
 {
 	/* Methods */
 	IpoptModel();
@@ -74,17 +80,7 @@ struct IpoptModel
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
 	                                      double rhs, const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
-	                                      const std::tuple<double, double> &interval,
-	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const ExprBuilder &f, ConstraintSense sense, double rhs,
-	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-	                                      const std::tuple<double, double> &interval,
-	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const VariableIndex &f, ConstraintSense sense, double rhs,
-	                                      const char *name = nullptr);
-	ConstraintIndex add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
+	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f,
 	                                      const std::tuple<double, double> &interval,
 	                                      const char *name = nullptr);
 
@@ -92,16 +88,9 @@ struct IpoptModel
 	                                         ConstraintSense sense, double rhs,
 	                                         const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &f,
-	                                         ConstraintSense sense,
-	                                         const std::tuple<double, double> &interval,
-	                                         const char *name = nullptr);
-	ConstraintIndex add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-	                                         double rhs, const char *name = nullptr);
-	ConstraintIndex add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
 	                                         const std::tuple<double, double> &interval,
 	                                         const char *name = nullptr);
 
-	void set_objective(const VariableIndex &expr, ObjectiveSense sense);
 	void set_objective(const ScalarAffineFunction &expr, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &expr, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
@@ -248,5 +237,3 @@ struct IpoptModel
 
 	std::unique_ptr<IpoptProblemInfo, IpoptfreeproblemT> m_problem = nullptr;
 };
-
-using IpoptModelMixin = CommercialSolverMixin<IpoptModel>;

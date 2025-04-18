@@ -1353,7 +1353,7 @@ void GurobiEnv::check_error(int error)
 int RealGurobiCallbackFunction(GRBmodel *, void *cbdata, int where, void *usrdata)
 {
 	auto real_userdata = static_cast<GurobiCallbackUserdata *>(usrdata);
-	auto model = static_cast<GurobiModelMixin *>(real_userdata->model);
+	auto model = static_cast<GurobiModel *>(real_userdata->model);
 	auto &callback = real_userdata->callback;
 
 	model->m_cbdata = cbdata;

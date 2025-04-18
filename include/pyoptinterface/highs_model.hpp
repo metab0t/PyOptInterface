@@ -111,7 +111,10 @@ struct POIHighsSolution
 	std::vector<double> dual_ray;
 };
 
-class POIHighsModel
+class POIHighsModel : public OnesideLinearConstraintMixin<POIHighsModel>,
+                      public LinearObjectiveMixin<POIHighsModel>,
+                      public PPrintMixin<POIHighsModel>,
+                      public GetValueMixin<POIHighsModel>
 {
   public:
 	POIHighsModel();
@@ -231,5 +234,3 @@ class POIHighsModel
 	HighsInt m_n_variables = 0;
 	HighsInt m_n_constraints = 0;
 };
-
-using HighsModelMixin = CommercialSolverMixin<POIHighsModel>;

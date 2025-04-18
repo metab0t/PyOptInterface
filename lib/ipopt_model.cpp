@@ -201,19 +201,13 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 		lb = rhs;
 		ub = rhs;
 	}
-	return add_linear_constraint(f, ConstraintSense::Within, {lb, ub}, name);
+	return add_linear_constraint(f, {lb, ub}, name);
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
-                                                  ConstraintSense sense,
                                                   const std::tuple<double, double> &interval,
                                                   const char *name)
 {
-	if (sense != ConstraintSense::Within)
-	{
-		throw std::runtime_error(
-		    "Only 'Within' constraint sense is supported when LB and UB is used together");
-	}
 	ConstraintIndex con(ConstraintType::Linear, m_linear_con_evaluator.n_constraints);
 	m_linear_con_evaluator.add_row(f);
 
@@ -223,32 +217,6 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 	m_linear_con_ub.push_back(ub);
 
 	return con;
-}
-
-ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                  double rhs, const char *name)
-{
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, name);
-}
-
-ConstraintIndex IpoptModel::add_linear_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                  const std::tuple<double, double> &interval,
-                                                  const char *name)
-{
-	return add_linear_constraint(ScalarAffineFunction(f), sense, interval, name);
-}
-
-ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
-                                                  double rhs, const char *name)
-{
-	return add_linear_constraint(ScalarAffineFunction(f), sense, rhs, name);
-}
-
-ConstraintIndex IpoptModel::add_linear_constraint(const VariableIndex &f, ConstraintSense sense,
-                                                  const std::tuple<double, double> &interval,
-                                                  const char *name)
-{
-	return add_linear_constraint(ScalarAffineFunction(f), sense, interval, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
@@ -274,19 +242,13 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	{
 		throw std::runtime_error("'Within' constraint sense must have both LB and UB");
 	}
-	return add_quadratic_constraint(f, ConstraintSense::Within, {lb, ub}, name);
+	return add_quadratic_constraint(f, {lb, ub}, name);
 }
 
 ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFunction &f,
-                                                     ConstraintSense sense,
                                                      const std::tuple<double, double> &interval,
                                                      const char *name)
 {
-	if (sense != ConstraintSense::Within)
-	{
-		throw std::runtime_error(
-		    "Only 'Within' constraint sense is supported when LB and UB is used together");
-	}
 	ConstraintIndex con(ConstraintType::Quadratic, m_quadratic_con_evaluator.n_constraints);
 	m_quadratic_con_evaluator.add_row(f);
 
@@ -296,24 +258,6 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	m_quadratic_con_ub.push_back(ub);
 
 	return con;
-}
-
-ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                     double rhs, const char *name)
-{
-	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, rhs, name);
-}
-
-ConstraintIndex IpoptModel::add_quadratic_constraint(const ExprBuilder &f, ConstraintSense sense,
-                                                     const std::tuple<double, double> &interval,
-                                                     const char *name)
-{
-	return add_quadratic_constraint(ScalarQuadraticFunction(f), sense, interval, name);
-}
-
-void IpoptModel::set_objective(const VariableIndex &expr, ObjectiveSense sense)
-{
-	_set_linear_objective(expr);
 }
 
 void IpoptModel::set_objective(const ScalarAffineFunction &expr, ObjectiveSense sense)

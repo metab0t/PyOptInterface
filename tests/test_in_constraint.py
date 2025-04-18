@@ -10,7 +10,7 @@ def test_in_constraint_sense(nlp_model_ctor):
     y = model.add_variable(lb=0.0)
 
     expr = x + y
-    model.add_linear_constraint(expr, poi.In, (0, 1.0))
+    model.add_linear_constraint(expr, (0, 1.0))
     model.set_objective(expr)
     model.optimize()
 

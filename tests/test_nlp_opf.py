@@ -155,7 +155,7 @@ def test_acopf(nlp_model_ctor):
         angmin = branch[5] / 180 * math.pi
         angmax = branch[6] / 180 * math.pi
 
-        model.add_linear_constraint(theta_i - theta_j, poi.In, (angmin, angmax))
+        model.add_linear_constraint(theta_i - theta_j, (angmin, angmax))
 
         Smax = branch[7]
         Pij = Pbr_from[k]

@@ -396,7 +396,15 @@ class Model(RawModel):
         self,
         expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
         sense: ConstraintSense,
-        rhs: Union[float, Tuple[float, float]],
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        interval: Tuple[float, float],
         name: str = "",
     ): ...
 
@@ -420,7 +428,15 @@ class Model(RawModel):
         self,
         expr: Union[ScalarQuadraticFunction, ExprBuilder],
         sense: ConstraintSense,
-        rhs: Union[float, Tuple[float, float]],
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        interval: Tuple[float, float],
         name: str = "",
     ): ...
 

@@ -30,22 +30,22 @@ NB_MODULE(highs_model_ext, m)
 	    .def_ro("has_primal_ray", &POIHighsSolution::has_primal_ray)
 	    .def_ro("has_dual_ray", &POIHighsSolution::has_dual_ray);
 
-	nb::class_<POIHighsModel>(m, "_RawModelBase");
+	using HighsModel = POIHighsModel;
 
-#define BIND_F(f) .def(#f, &HighsModelMixin::f)
-	nb::class_<HighsModelMixin, POIHighsModel>(m, "RawModel")
+#define BIND_F(f) .def(#f, &HighsModel::f)
+	nb::class_<HighsModel>(m, "RawModel")
 	    .def(nb::init<>())
-	    .def_ro("m_n_variables", &HighsModelMixin::m_n_variables)
-	    .def_ro("m_n_constraints", &HighsModelMixin::m_n_constraints)
+	    .def_ro("m_n_variables", &HighsModel::m_n_variables)
+	    .def_ro("m_n_constraints", &HighsModel::m_n_constraints)
 	    // clang-format off
 	    BIND_F(init)
 	    BIND_F(close)
 	    // clang-format on
-	    .def("write", &HighsModelMixin::write, nb::arg("filename"), nb::arg("pretty") = false)
+	    .def("write", &HighsModel::write, nb::arg("filename"), nb::arg("pretty") = false)
 
-	    .def_ro("solution", &HighsModelMixin::m_solution)
+	    .def_ro("solution", &HighsModel::m_solution)
 
-	    .def("add_variable", &HighsModelMixin::add_variable,
+	    .def("add_variable", &HighsModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -kHighsInf,
 	         nb::arg("ub") = kHighsInf, nb::arg("name") = "")
 	    // clang-format off
@@ -53,61 +53,61 @@ NB_MODULE(highs_model_ext, m)
 	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
-	    .def("set_variable_bounds", &HighsModelMixin::set_variable_bounds, nb::arg("variable"),
+	    .def("set_variable_bounds", &HighsModel::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
 	    .def("get_value",
-	         nb::overload_cast<const VariableIndex &>(&HighsModelMixin::get_variable_value))
+	         nb::overload_cast<const VariableIndex &>(&HighsModel::get_variable_value))
 	    .def("get_value", nb::overload_cast<const ScalarAffineFunction &>(
-	                          &HighsModelMixin::get_expression_value))
+	                          &HighsModel::get_expression_value))
 	    .def("get_value", nb::overload_cast<const ScalarQuadraticFunction &>(
-	                          &HighsModelMixin::get_expression_value))
+	                          &HighsModel::get_expression_value))
 	    .def("get_value",
-	         nb::overload_cast<const ExprBuilder &>(&HighsModelMixin::get_expression_value))
+	         nb::overload_cast<const ExprBuilder &>(&HighsModel::get_expression_value))
 
-	    .def("pprint", &HighsModelMixin::pprint_variable)
+	    .def("pprint", &HighsModel::pprint_variable)
 	    .def("pprint",
 	         nb::overload_cast<const ScalarAffineFunction &, int>(
-	             &HighsModelMixin::pprint_expression),
+	             &HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
-	             &HighsModelMixin::pprint_expression),
+	             &HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint",
-	         nb::overload_cast<const ExprBuilder &, int>(&HighsModelMixin::pprint_expression),
+	         nb::overload_cast<const ExprBuilder &, int>(&HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("_add_linear_constraint", &HighsModelMixin::add_linear_constraint, nb::arg("expr"),
+	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &HighsModelMixin::add_linear_constraint_from_var,
+	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint_from_var,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &HighsModelMixin::add_linear_constraint_from_expr,
+	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("delete_constraint", &HighsModelMixin::delete_constraint)
-	    .def("is_constraint_active", &HighsModelMixin::is_constraint_active)
+	    .def("delete_constraint", &HighsModel::delete_constraint)
+	    .def("is_constraint_active", &HighsModel::is_constraint_active)
 
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
-	             &HighsModelMixin::set_objective),
+	             &HighsModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
-	             &HighsModelMixin::set_objective),
+	             &HighsModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def(
 	        "set_objective",
-	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&HighsModelMixin::set_objective),
+	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&HighsModel::set_objective),
 	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
-	             &HighsModelMixin::set_objective_as_variable),
+	             &HighsModel::set_objective_as_variable),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
-	         nb::overload_cast<CoeffT, ObjectiveSense>(&HighsModelMixin::set_objective_as_constant),
+	         nb::overload_cast<CoeffT, ObjectiveSense>(&HighsModel::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
-	    .def("optimize", &HighsModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("optimize", &HighsModel::optimize, nb::call_guard<nb::gil_scoped_release>())
 
 	    // clang-format off
 	    BIND_F(version_string)

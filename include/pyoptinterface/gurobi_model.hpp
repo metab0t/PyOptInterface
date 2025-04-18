@@ -135,7 +135,11 @@ struct GurobiCallbackUserdata
 	bool cb_requires_submit_solution = false;
 };
 
-class GurobiModel
+class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
+                    public OnesideQuadraticConstraintMixin<GurobiModel>,
+                    public LinearObjectiveMixin<GurobiModel>,
+                    public PPrintMixin<GurobiModel>,
+                    public GetValueMixin<GurobiModel>
 {
   public:
 	GurobiModel() = default;
@@ -344,5 +348,3 @@ class GurobiModel
 	GRBenv *m_env = nullptr;
 	std::unique_ptr<GRBmodel, GRBfreemodelT> m_model;
 };
-
-using GurobiModelMixin = CommercialSolverMixin<GurobiModel>;

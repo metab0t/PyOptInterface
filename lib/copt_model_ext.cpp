@@ -25,10 +25,8 @@ NB_MODULE(copt_model_ext, m)
 	    .def(nb::init<COPTEnvConfig &>())
 	    .def("close", &COPTEnv::close);
 
-	nb::class_<COPTModel>(m, "_RawModelBase");
-
-#define BIND_F(f) .def(#f, &COPTModelMixin::f)
-	nb::class_<COPTModelMixin, COPTModel>(m, "RawModel")
+#define BIND_F(f) .def(#f, &COPTModel::f)
+	nb::class_<COPTModel>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const COPTEnv &>())
 	    // clang-format off
@@ -37,7 +35,7 @@ NB_MODULE(copt_model_ext, m)
 	    BIND_F(close)
 	    // clang-format on
 
-	    .def("add_variable", &COPTModelMixin::add_variable,
+	    .def("add_variable", &COPTModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -COPT_INFINITY,
 	         nb::arg("ub") = COPT_INFINITY, nb::arg("name") = "")
 	    // clang-format off
@@ -45,53 +43,48 @@ NB_MODULE(copt_model_ext, m)
 	    BIND_F(delete_variables)
 	    BIND_F(is_variable_active)
 	    // clang-format on
-	    .def("set_variable_bounds", &COPTModelMixin::set_variable_bounds, nb::arg("variable"),
+	    .def("set_variable_bounds", &COPTModel::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
+	    .def("get_value", nb::overload_cast<const VariableIndex &>(&COPTModel::get_variable_value))
 	    .def("get_value",
-	         nb::overload_cast<const VariableIndex &>(&COPTModelMixin::get_variable_value))
+	         nb::overload_cast<const ScalarAffineFunction &>(&COPTModel::get_expression_value))
 	    .def("get_value",
-	         nb::overload_cast<const ScalarAffineFunction &>(&COPTModelMixin::get_expression_value))
-	    .def("get_value", nb::overload_cast<const ScalarQuadraticFunction &>(
-	                          &COPTModelMixin::get_expression_value))
-	    .def("get_value",
-	         nb::overload_cast<const ExprBuilder &>(&COPTModelMixin::get_expression_value))
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&COPTModel::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ExprBuilder &>(&COPTModel::get_expression_value))
 
-	    .def("pprint", &COPTModelMixin::pprint_variable)
+	    .def("pprint", &COPTModel::pprint_variable)
 	    .def("pprint",
-	         nb::overload_cast<const ScalarAffineFunction &, int>(
-	             &COPTModelMixin::pprint_expression),
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&COPTModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
-	             &COPTModelMixin::pprint_expression),
+	         nb::overload_cast<const ScalarQuadraticFunction &, int>(&COPTModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint",
-	         nb::overload_cast<const ExprBuilder &, int>(&COPTModelMixin::pprint_expression),
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&COPTModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("_add_linear_constraint", &COPTModelMixin::add_linear_constraint, nb::arg("expr"),
+	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &COPTModelMixin::add_linear_constraint_from_var,
+	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint_from_var, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint_from_expr, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_quadratic_constraint", &COPTModel::add_quadratic_constraint, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_quadratic_constraint", &COPTModel::add_quadratic_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &COPTModelMixin::add_linear_constraint_from_expr,
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_quadratic_constraint", &COPTModelMixin::add_quadratic_constraint,
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_quadratic_constraint", &COPTModelMixin::add_quadratic_constraint_from_expr,
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("add_second_order_cone_constraint", &COPTModelMixin::add_second_order_cone_constraint,
+	    .def("add_second_order_cone_constraint", &COPTModel::add_second_order_cone_constraint,
 	         nb::arg("variables"), nb::arg("name") = "", nb::arg("rotated") = false)
-	    .def("add_exp_cone_constraint", &COPTModelMixin::add_exp_cone_constraint,
-	         nb::arg("variables"), nb::arg("name") = "", nb::arg("dual") = false)
+	    .def("add_exp_cone_constraint", &COPTModel::add_exp_cone_constraint, nb::arg("variables"),
+	         nb::arg("name") = "", nb::arg("dual") = false)
 	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
-	                                   &COPTModelMixin::add_sos_constraint))
+	                                   &COPTModel::add_sos_constraint))
 	    .def("add_sos_constraint",
 	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
-	             &COPTModelMixin::add_sos_constraint))
-	    .def("_add_single_nl_constraint", &COPTModelMixin::add_single_nl_constraint)
+	             &COPTModel::add_sos_constraint))
+	    .def("_add_single_nl_constraint", &COPTModel::add_single_nl_constraint)
 	    .def("_add_single_nl_constraint_from_comparison",
-	         &COPTModelMixin::add_single_nl_constraint_from_comparison)
+	         &COPTModel::add_single_nl_constraint_from_comparison)
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
@@ -99,41 +92,38 @@ NB_MODULE(copt_model_ext, m)
 
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
-	             &COPTModelMixin::set_objective),
+	             &COPTModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
-	             &COPTModelMixin::set_objective),
+	             &COPTModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
-	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModelMixin::set_objective),
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&COPTModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
-	    .def("set_objective",
-	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
-	             &COPTModelMixin::set_objective_as_variable),
-	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
-	    .def("set_objective",
-	         nb::overload_cast<CoeffT, ObjectiveSense>(&COPTModelMixin::set_objective_as_constant),
-	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective", &COPTModel::set_objective_as_variable, nb::arg("expr"),
+	         nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective", &COPTModel::set_objective_as_constant, nb::arg("expr"),
+	         nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::cb_add_lazy_constraint),
+	             &COPTModel::cb_add_lazy_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::cb_add_lazy_constraint),
+	             &COPTModel::cb_add_lazy_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_user_cut",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::cb_add_user_cut),
+	             &COPTModel::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_user_cut",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &COPTModelMixin::cb_add_user_cut),
+	             &COPTModel::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 
-	    .def("optimize", &COPTModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("optimize", &COPTModel::optimize, nb::call_guard<nb::gil_scoped_release>())
 
 	    // clang-format off
 	    BIND_F(version_string)

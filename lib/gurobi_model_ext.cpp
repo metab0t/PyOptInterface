@@ -31,11 +31,9 @@ NB_MODULE(gurobi_model_ext, m)
 	    // clang-format on
 	    ;
 
-	nb::class_<GurobiModel>(m, "_RawModelBase");
-
 #undef BIND_F
-#define BIND_F(f) .def(#f, &GurobiModelMixin::f)
-	nb::class_<GurobiModelMixin, GurobiModel>(m, "RawModel")
+#define BIND_F(f) .def(#f, &GurobiModel::f)
+	nb::class_<GurobiModel>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
 	    // clang-format off
@@ -44,7 +42,7 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(write)
 	    // clang-format on
 
-	    .def("add_variable", &GurobiModelMixin::add_variable,
+	    .def("add_variable", &GurobiModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
 	         nb::arg("ub") = GRB_INFINITY, nb::arg("name") = "")
 	    // clang-format off
@@ -52,28 +50,26 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(delete_variables)
 		BIND_F(is_variable_active)
 	    // clang-format on
-	    .def("set_variable_bounds", &GurobiModelMixin::set_variable_bounds, nb::arg("variable"),
+	    .def("set_variable_bounds", &GurobiModel::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
-	    .def("get_value", &GurobiModelMixin::get_variable_value)
-	    .def("get_value", nb::overload_cast<const ScalarAffineFunction &>(
-	                          &GurobiModelMixin::get_expression_value))
-	    .def("get_value", nb::overload_cast<const ScalarQuadraticFunction &>(
-	                          &GurobiModelMixin::get_expression_value))
+	    .def("get_value", &GurobiModel::get_variable_value)
 	    .def("get_value",
-	         nb::overload_cast<const ExprBuilder &>(&GurobiModelMixin::get_expression_value))
+	         nb::overload_cast<const ScalarAffineFunction &>(&GurobiModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&GurobiModel::get_expression_value))
+	    .def("get_value",
+	         nb::overload_cast<const ExprBuilder &>(&GurobiModel::get_expression_value))
 
-	    .def("pprint", &GurobiModelMixin::pprint_variable)
+	    .def("pprint", &GurobiModel::pprint_variable)
 	    .def("pprint",
-	         nb::overload_cast<const ScalarAffineFunction &, int>(
-	             &GurobiModelMixin::pprint_expression),
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&GurobiModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 	    .def("pprint",
 	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
-	             &GurobiModelMixin::pprint_expression),
+	             &GurobiModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint",
-	         nb::overload_cast<const ExprBuilder &, int>(&GurobiModelMixin::pprint_expression),
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&GurobiModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    // clang-format off
@@ -81,24 +77,24 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(set_constraint_name)
 	    // clang-format on
 
-	    .def("_add_linear_constraint", &GurobiModelMixin::add_linear_constraint, nb::arg("expr"),
+	    .def("_add_linear_constraint", &GurobiModel::add_linear_constraint, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &GurobiModelMixin::add_linear_constraint_from_var,
+	    .def("_add_linear_constraint", &GurobiModel::add_linear_constraint_from_var,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &GurobiModelMixin::add_linear_constraint_from_expr,
+	    .def("_add_linear_constraint", &GurobiModel::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_quadratic_constraint", &GurobiModelMixin::add_quadratic_constraint,
-	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_quadratic_constraint", &GurobiModelMixin::add_quadratic_constraint_from_expr,
+	    .def("_add_quadratic_constraint", &GurobiModel::add_quadratic_constraint, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_quadratic_constraint", &GurobiModel::add_quadratic_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("add_sos_constraint", nb::overload_cast<const Vector<VariableIndex> &, SOSType>(
-	                                   &GurobiModelMixin::add_sos_constraint))
+	                                   &GurobiModel::add_sos_constraint))
 	    .def("add_sos_constraint",
 	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
-	             &GurobiModelMixin::add_sos_constraint))
-	    .def("_add_single_nl_constraint", &GurobiModelMixin::add_single_nl_constraint)
+	             &GurobiModel::add_sos_constraint))
+	    .def("_add_single_nl_constraint", &GurobiModel::add_single_nl_constraint)
 	    .def("_add_single_nl_constraint_from_comparison",
-	         &GurobiModelMixin::add_single_nl_constraint_from_comparison)
+	         &GurobiModel::add_single_nl_constraint_from_comparison)
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
@@ -106,43 +102,41 @@ NB_MODULE(gurobi_model_ext, m)
 
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
-	             &GurobiModelMixin::set_objective),
+	             &GurobiModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
-	             &GurobiModelMixin::set_objective),
+	             &GurobiModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
-	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(
-	             &GurobiModelMixin::set_objective),
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&GurobiModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
-	             &GurobiModelMixin::set_objective_as_variable),
+	             &GurobiModel::set_objective_as_variable),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
-	    .def(
-	        "set_objective",
-	        nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModelMixin::set_objective_as_constant),
-	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModel::set_objective_as_constant),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::cb_add_lazy_constraint),
+	             &GurobiModel::cb_add_lazy_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::cb_add_lazy_constraint),
+	             &GurobiModel::cb_add_lazy_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_user_cut",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::cb_add_user_cut),
+	             &GurobiModel::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 	    .def("cb_add_user_cut",
 	         nb::overload_cast<const ExprBuilder &, ConstraintSense, CoeffT>(
-	             &GurobiModelMixin::cb_add_user_cut),
+	             &GurobiModel::cb_add_user_cut),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"))
 
-	    .def("optimize", &GurobiModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
+	    .def("optimize", &GurobiModel::optimize, nb::call_guard<nb::gil_scoped_release>())
 
 	    // clang-format off
 		BIND_F(update)

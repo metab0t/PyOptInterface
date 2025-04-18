@@ -3,338 +3,389 @@
 #include <algorithm>
 #include <string>
 #include <concepts>
+#include <tuple>
 #include <numeric>
-#include <span>
 #include "fmt/format.h"
 #include "fmt/ranges.h"
 #include "pyoptinterface/core.hpp"
 
-template <typename CommercialSolverT>
-concept CommercialSolverConstraint = requires(CommercialSolverT *model, const char *name) {
+template <typename T>
+concept OnesideLinearConstraintMixinConcept = requires(T &model) {
 	{
-		model->add_linear_constraint(std::declval<const ScalarAffineFunction &>(),
-		                             ConstraintSense{}, CoeffT{}, name)
+		model.add_linear_constraint(ScalarAffineFunction(), ConstraintSense::Equal, 0.0, "")
 	} -> std::same_as<ConstraintIndex>;
-	{
-		model->add_quadratic_constraint(std::declval<const ScalarQuadraticFunction &>(),
-		                                ConstraintSense{}, CoeffT{}, name)
-	} -> std::same_as<ConstraintIndex>;
-	{
-		model->get_variable_value(std::declval<const VariableIndex &>())
-	} -> std::convertible_to<double>;
-	{
-		model->pprint_variable(std::declval<const VariableIndex &>())
-	} -> std::convertible_to<std::string>;
-	{
-		model->set_objective(std::declval<const ScalarAffineFunction &>(), ObjectiveSense())
-	} -> std::same_as<void>;
 };
 
-template <CommercialSolverConstraint T>
-class CommercialSolverMixin : public T
+template <typename T>
+class OnesideLinearConstraintMixin
 {
   private:
-	T *get_base();
+	T *get_base()
+	{
+		static_assert(OnesideLinearConstraintMixinConcept<T>);
+		return static_cast<T *>(this);
+	}
 
   public:
 	ConstraintIndex add_linear_constraint_from_var(const VariableIndex &variable,
 	                                               ConstraintSense sense, CoeffT rhs,
-	                                               const char *name = nullptr);
+	                                               const char *name = nullptr)
+	{
+		ScalarAffineFunction f(variable);
+		return get_base()->add_linear_constraint(f, sense, rhs, name);
+	}
 	ConstraintIndex add_linear_constraint_from_expr(const ExprBuilder &function,
 	                                                ConstraintSense sense, CoeffT rhs,
-	                                                const char *name = nullptr);
-	ConstraintIndex add_quadratic_constraint_from_expr(const ExprBuilder &function,
-	                                                   ConstraintSense sense, CoeffT rhs,
-	                                                   const char *name = nullptr);
-
-	double get_expression_value(const ScalarAffineFunction &function);
-	double get_expression_value(const ScalarQuadraticFunction &function);
-	double get_expression_value(const ExprBuilder &function);
-
-	std::string pprint_expression(const ScalarAffineFunction &function, int precision = 4);
-	std::string pprint_expression(const ScalarQuadraticFunction &function, int precision = 4);
-	std::string pprint_expression(const ExprBuilder &function, int precision = 4);
-
-	void set_objective_as_constant(CoeffT c, ObjectiveSense sense);
-	void set_objective_as_variable(const VariableIndex &variable, ObjectiveSense sense);
+	                                                const char *name = nullptr)
+	{
+		ScalarAffineFunction f(function);
+		return get_base()->add_linear_constraint(f, sense, rhs, name);
+	}
 };
 
-template <CommercialSolverConstraint T>
-T *CommercialSolverMixin<T>::get_base()
-{
-	return static_cast<T *>(this);
-}
-
-template <CommercialSolverConstraint T>
-ConstraintIndex CommercialSolverMixin<T>::add_linear_constraint_from_var(
-    const VariableIndex &variable, ConstraintSense sense, CoeffT rhs, const char *name)
-{
-	ScalarAffineFunction f(variable);
-	return get_base()->add_linear_constraint(f, sense, rhs, name);
-}
-
-template <CommercialSolverConstraint T>
-ConstraintIndex CommercialSolverMixin<T>::add_linear_constraint_from_expr(
-    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs, const char *name)
-{
-	ScalarAffineFunction f(function);
-	return get_base()->add_linear_constraint(f, sense, rhs, name);
-}
-
-template <CommercialSolverConstraint T>
-ConstraintIndex CommercialSolverMixin<T>::add_quadratic_constraint_from_expr(
-    const ExprBuilder &function, ConstraintSense sense, CoeffT rhs, const char *name)
-{
-	ScalarQuadraticFunction f(function);
-	return get_base()->add_quadratic_constraint(f, sense, rhs, name);
-}
+template <typename T>
+concept TwosideLinearConstraintMixinConcept = requires(T &model) {
+	{
+		model.add_linear_constraint(ScalarAffineFunction(), std::make_tuple(0.0, 1.0), "")
+	} -> std::same_as<ConstraintIndex>;
+};
 
 template <typename T>
-double get_affine_expression_value(T *model, const ScalarAffineFunction &function)
+class TwosideLinearConstraintMixin
 {
-	auto N = function.size();
-	double value = 0.0;
-	for (auto i = 0; i < N; ++i)
+  private:
+	T *get_base()
 	{
-		value += function.coefficients[i] * model->get_variable_value(function.variables[i]);
+		static_assert(TwosideLinearConstraintMixinConcept<T>);
+		return static_cast<T *>(this);
 	}
-	value += function.constant.value_or(0.0);
-	return value;
-}
 
-template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ScalarAffineFunction &function)
-{
-	T *model = get_base();
-	return ::get_affine_expression_value<T>(model, function);
-}
+  public:
+	ConstraintIndex add_linear_interval_constraint_from_var(
+	    const VariableIndex &variable, const std::tuple<double, double> &interval,
+	    const char *name = nullptr)
+	{
+		ScalarAffineFunction f(variable);
+		return get_base()->add_linear_constraint(f, interval, name);
+	}
+	ConstraintIndex add_linear_interval_constraint_from_expr(
+	    const ExprBuilder &function, const std::tuple<double, double> &interval,
+	    const char *name = nullptr)
+	{
+		ScalarAffineFunction f(function);
+		return get_base()->add_linear_constraint(f, interval, name);
+	}
+};
 
 template <typename T>
-double get_quadratic_expression_value(T *model, const ScalarQuadraticFunction &function)
-{
-	auto N = function.size();
-	double value = 0.0;
-	for (auto i = 0; i < N; ++i)
+concept OnesideQuadraticConstraintMixinConcept = requires(T &model) {
 	{
-		auto var1 = function.variable_1s[i];
-		auto var2 = function.variable_2s[i];
-		auto coef = function.coefficients[i];
-		auto v1 = model->get_variable_value(var1);
-		if (var1 == var2)
-		{
-			value += coef * v1 * v1;
-		}
-		else
-		{
-			auto v2 = model->get_variable_value(var2);
-			value += coef * v1 * v2;
-		}
-	}
-	if (function.affine_part)
-	{
-		auto affine_value = ::get_affine_expression_value(model, function.affine_part.value());
-		value += affine_value;
-	}
-	return value;
-}
-
-template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ScalarQuadraticFunction &function)
-{
-	T *model = get_base();
-	return ::get_quadratic_expression_value<T>(model, function);
-}
+		model.add_quadratic_constraint(ScalarQuadraticFunction(), ConstraintSense::Equal, 0.0, "")
+	} -> std::same_as<ConstraintIndex>;
+};
 
 template <typename T>
-double get_expression_builder_value(T *model, const ExprBuilder &function)
+class OnesideQuadraticConstraintMixin
 {
-	double value = 0.0;
-	for (const auto &[varpair, coef] : function.quadratic_terms)
+  private:
+	T *get_base()
 	{
-		auto var1 = varpair.var_1;
-		auto var2 = varpair.var_2;
-
-		auto v1 = model->get_variable_value(var1);
-		if (var1 == var2)
-		{
-			value += coef * v1 * v1;
-		}
-		else
-		{
-			auto v2 = model->get_variable_value(var2);
-			value += coef * v1 * v2;
-		}
+		static_assert(OnesideQuadraticConstraintMixinConcept<T>);
+		return static_cast<T *>(this);
 	}
-	for (const auto &[var, coef] : function.affine_terms)
+
+  public:
+	ConstraintIndex add_quadratic_constraint_from_var(const VariableIndex &variable,
+	                                                  ConstraintSense sense, CoeffT rhs,
+	                                                  const char *name = nullptr)
 	{
-		value += coef * model->get_variable_value(var);
+		ScalarQuadraticFunction f(variable);
+		return get_base()->add_quadratic_constraint(f, sense, rhs, name);
 	}
-	value += function.constant_term.value_or(0.0);
-	return value;
-}
-
-template <CommercialSolverConstraint T>
-double CommercialSolverMixin<T>::get_expression_value(const ExprBuilder &function)
-{
-	T *model = get_base();
-	return ::get_expression_builder_value<T>(model, function);
-}
+	ConstraintIndex add_quadratic_constraint_from_saf(const ScalarAffineFunction &function,
+	                                                  ConstraintSense sense, CoeffT rhs,
+	                                                  const char *name = nullptr)
+	{
+		ScalarQuadraticFunction f(function);
+		return get_base()->add_quadratic_constraint(f, sense, rhs, name);
+	}
+	ConstraintIndex add_quadratic_constraint_from_expr(const ExprBuilder &function,
+	                                                   ConstraintSense sense, CoeffT rhs,
+	                                                   const char *name = nullptr)
+	{
+		ScalarQuadraticFunction f(function);
+		return get_base()->add_quadratic_constraint(f, sense, rhs, name);
+	}
+};
 
 template <typename T>
-std::string pprint_affine_expression(T *model, const ScalarAffineFunction &function, int precision)
-{
-	auto N = function.size();
-	std::vector<std::string> terms;
-	terms.reserve(N + 1);
-
-	for (auto i = 0; i < N; ++i)
+concept TwosideQuadraticConstraintMixinConcept = requires(T &model) {
 	{
-		auto &coef = function.coefficients[i];
-		std::string var_str = model->pprint_variable(function.variables[i]);
-		std::string term;
-		if (coef > 0)
-		{
-			term = fmt::format("{:.{}g}*{}", coef, precision, var_str);
-		}
-		else if (coef < 0)
-		{
-			term = fmt::format("({:.{}g})*{}", coef, precision, var_str);
-		}
-		terms.push_back(term);
-	}
-	if (function.constant)
-	{
-		terms.push_back(fmt::format("{:.{}g}", function.constant.value(), precision));
-	}
-	return fmt::format("{}", fmt::join(terms, "+"));
-}
-
-template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ScalarAffineFunction &function,
-                                                        int precision)
-{
-	T *model = get_base();
-	return ::pprint_affine_expression<T>(model, function, precision);
-}
+		model.add_quadratic_constraint(ScalarQuadraticFunction(), std::make_tuple(0.0, 1.0), "")
+	} -> std::same_as<ConstraintIndex>;
+};
 
 template <typename T>
-std::string pprint_quadratic_expression(T *model, const ScalarQuadraticFunction &function,
-                                        int precision)
+class TwosideQuadraticConstraintMixin
 {
-	auto N = function.size();
-	std::vector<std::string> terms;
-	terms.reserve(N + 1);
-
-	for (auto i = 0; i < N; ++i)
+  private:
+	T *get_base()
 	{
-		auto &coef = function.coefficients[i];
-		std::string var1_str = model->pprint_variable(function.variable_1s[i]);
-		std::string var2_str;
-		if (function.variable_1s[i] == function.variable_2s[i])
-		{
-			var2_str = var1_str;
-		}
-		else
-		{
-			var2_str = model->pprint_variable(function.variable_2s[i]);
-		}
-		std::string term;
-		if (coef > 0)
-		{
-			term = fmt::format("{:.{}g}*{}*{}", coef, precision, var1_str, var2_str);
-		}
-		else if (coef < 0)
-		{
-			term = fmt::format("({:.{}g})*{}*{}", coef, precision, var1_str, var2_str);
-		}
-		terms.push_back(term);
+		static_assert(TwosideQuadraticConstraintMixinConcept<T>);
+		return static_cast<T *>(this);
 	}
-	if (function.affine_part)
-	{
-		terms.push_back(::pprint_affine_expression(model, function.affine_part.value(), precision));
-	}
-	return fmt::format("{}", fmt::join(terms, "+"));
-}
 
-template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ScalarQuadraticFunction &function,
-                                                        int precision)
-{
-	T *model = get_base();
-	return ::pprint_quadratic_expression<T>(model, function, precision);
-}
+  public:
+	ConstraintIndex add_quadratic_interval_constraint_from_var(
+	    const VariableIndex &variable, const std::tuple<double, double> &interval,
+	    const char *name = nullptr)
+	{
+		ScalarQuadraticFunction f(variable);
+		return get_base()->add_quadratic_constraint(f, interval, name);
+	}
+	ConstraintIndex add_quadratic_interval_constraint_from_expr(
+	    const ExprBuilder &function, const std::tuple<double, double> &interval,
+	    const char *name = nullptr)
+	{
+		ScalarQuadraticFunction f(function);
+		return get_base()->add_quadratic_constraint(f, interval, name);
+	}
+};
 
 template <typename T>
-std::string pprint_expression_builder(T *model, const ExprBuilder &function, int precision)
-{
-	std::vector<std::string> terms;
-	terms.reserve(function.quadratic_terms.size() + function.affine_terms.size() + 1);
+concept GetValueMxinConcept = requires(T &model) {
+	{ model.get_variable_value(VariableIndex()) } -> std::convertible_to<double>;
+};
 
-	for (const auto &[varpair, coef] : function.quadratic_terms)
+template <typename T>
+class GetValueMixin
+{
+  private:
+	T *get_base()
 	{
-		std::string var1_str = model->pprint_variable(varpair.var_1);
-		std::string var2_str;
-		if (varpair.var_1 == varpair.var_2)
-		{
-			var2_str = var1_str;
-		}
-		else
-		{
-			var2_str = model->pprint_variable(varpair.var_2);
-		}
-		std::string term;
-		if (coef > 0)
-		{
-			term = fmt::format("{:.{}g}*{}*{}", coef, precision, var1_str, var2_str);
-		}
-		else if (coef < 0)
-		{
-			term = fmt::format("({:.{}g})*{}*{}", coef, precision, var1_str, var2_str);
-		}
-		terms.push_back(term);
+		static_assert(GetValueMxinConcept<T>);
+		return static_cast<T *>(this);
 	}
-	for (const auto &[var, coef] : function.affine_terms)
+
+  public:
+	double get_expression_value(const ScalarAffineFunction &function)
 	{
-		std::string var_str = model->pprint_variable(var);
-		std::string term;
-		if (coef > 0)
+		T *model = get_base();
+		auto N = function.size();
+		double value = 0.0;
+		for (auto i = 0; i < N; ++i)
 		{
-			term = fmt::format("{:.{}g}*{}", coef, precision, var_str);
+			value += function.coefficients[i] * model->get_variable_value(function.variables[i]);
 		}
-		else if (coef < 0)
-		{
-			term = fmt::format("({:.{}g})*{}", coef, precision, var_str);
-		}
-		terms.push_back(term);
+		value += function.constant.value_or(0.0);
+		return value;
 	}
-	if (function.constant_term)
+	double get_expression_value(const ScalarQuadraticFunction &function)
 	{
-		terms.push_back(fmt::format("{:.{}g}", function.constant_term.value(), precision));
+		T *model = get_base();
+		auto N = function.size();
+		double value = 0.0;
+		for (auto i = 0; i < N; ++i)
+		{
+			auto var1 = function.variable_1s[i];
+			auto var2 = function.variable_2s[i];
+			auto coef = function.coefficients[i];
+			auto v1 = model->get_variable_value(var1);
+			if (var1 == var2)
+			{
+				value += coef * v1 * v1;
+			}
+			else
+			{
+				auto v2 = model->get_variable_value(var2);
+				value += coef * v1 * v2;
+			}
+		}
+		if (function.affine_part)
+		{
+			auto affine_value = model->get_expression_value(function.affine_part.value());
+			value += affine_value;
+		}
+		return value;
 	}
-	return fmt::format("{}", fmt::join(terms, "+"));
-}
+	double get_expression_value(const ExprBuilder &function)
+	{
+		T *model = get_base();
+		double value = 0.0;
+		for (const auto &[varpair, coef] : function.quadratic_terms)
+		{
+			auto var1 = varpair.var_1;
+			auto var2 = varpair.var_2;
 
-template <CommercialSolverConstraint T>
-std::string CommercialSolverMixin<T>::pprint_expression(const ExprBuilder &function, int precision)
-{
-	T *model = get_base();
-	return ::pprint_expression_builder<T>(model, function, precision);
-}
+			auto v1 = model->get_variable_value(var1);
+			if (var1 == var2)
+			{
+				value += coef * v1 * v1;
+			}
+			else
+			{
+				auto v2 = model->get_variable_value(var2);
+				value += coef * v1 * v2;
+			}
+		}
+		for (const auto &[var, coef] : function.affine_terms)
+		{
+			value += coef * model->get_variable_value(var);
+		}
+		value += function.constant_term.value_or(0.0);
+		return value;
+	}
+};
 
-template <CommercialSolverConstraint T>
-void CommercialSolverMixin<T>::set_objective_as_constant(CoeffT c, ObjectiveSense sense)
-{
-	ScalarAffineFunction f(c);
-	get_base()->set_objective(f, sense);
-}
+template <typename T>
+concept PPrintMixinConcept = requires(T &model) {
+	{ model.pprint_variable(VariableIndex()) } -> std::convertible_to<std::string>;
+};
 
-template <CommercialSolverConstraint T>
-void CommercialSolverMixin<T>::set_objective_as_variable(const VariableIndex &variable,
-                                                         ObjectiveSense sense)
+template <typename T>
+class PPrintMixin
 {
-	ScalarAffineFunction f(variable);
-	get_base()->set_objective(f, sense);
-}
+  private:
+	T *get_base()
+	{
+		static_assert(PPrintMixinConcept<T>);
+		return static_cast<T *>(this);
+	}
+
+  public:
+	std::string pprint_expression(const ScalarAffineFunction &function, int precision = 4)
+	{
+		T *model = get_base();
+		auto N = function.size();
+		std::vector<std::string> terms;
+		terms.reserve(N + 1);
+		for (auto i = 0; i < N; ++i)
+		{
+			auto &coef = function.coefficients[i];
+			std::string var_str = model->pprint_variable(function.variables[i]);
+			std::string term;
+			if (coef > 0)
+			{
+				term = fmt::format("{:.{}g}*{}", coef, precision, var_str);
+			}
+			else if (coef < 0)
+			{
+				term = fmt::format("({:.{}g})*{}", coef, precision, var_str);
+			}
+			terms.push_back(term);
+		}
+		if (function.constant)
+		{
+			terms.push_back(fmt::format("{:.{}g}", function.constant.value(), precision));
+		}
+		return fmt::format("{}", fmt::join(terms, "+"));
+	}
+	std::string pprint_expression(const ScalarQuadraticFunction &function, int precision = 4)
+	{
+		T *model = get_base();
+		auto N = function.size();
+		std::vector<std::string> terms;
+		terms.reserve(N + 1);
+		for (auto i = 0; i < N; ++i)
+		{
+			auto &coef = function.coefficients[i];
+			std::string var1_str = model->pprint_variable(function.variable_1s[i]);
+			std::string var2_str;
+			if (function.variable_1s[i] == function.variable_2s[i])
+			{
+				var2_str = var1_str;
+			}
+			else
+			{
+				var2_str = model->pprint_variable(function.variable_2s[i]);
+			}
+			std::string term;
+			if (coef > 0)
+			{
+				term = fmt::format("{:.{}g}*{}*{}", coef, precision, var1_str, var2_str);
+			}
+			else if (coef < 0)
+			{
+				term = fmt::format("({:.{}g})*{}*{}", coef, precision, var1_str, var2_str);
+			}
+			terms.push_back(term);
+		}
+		if (function.affine_part)
+		{
+			auto affine_value = model->pprint_expression(function.affine_part.value(), precision);
+			terms.push_back(affine_value);
+		}
+		return fmt::format("{}", fmt::join(terms, "+"));
+	}
+	std::string pprint_expression(const ExprBuilder &function, int precision = 4)
+	{
+		T *model = get_base();
+		std::vector<std::string> terms;
+		terms.reserve(function.quadratic_terms.size() + function.affine_terms.size() + 1);
+		for (const auto &[varpair, coef] : function.quadratic_terms)
+		{
+			std::string var1_str = model->pprint_variable(varpair.var_1);
+			std::string var2_str;
+			if (varpair.var_1 == varpair.var_2)
+			{
+				var2_str = var1_str;
+			}
+			else
+			{
+				var2_str = model->pprint_variable(varpair.var_2);
+			}
+			std::string term;
+			if (coef > 0)
+			{
+				term = fmt::format("{:.{}g}*{}*{}", coef, precision, var1_str, var2_str);
+			}
+			else if (coef < 0)
+			{
+				term = fmt::format("({:.{}g})*{}*{}", coef, precision, var1_str, var2_str);
+			}
+			terms.push_back(term);
+		}
+		for (const auto &[var, coef] : function.affine_terms)
+		{
+			auto term = fmt::format("{:.{}g}*{}", coef, precision, model->pprint_variable(var));
+			terms.push_back(term);
+		}
+		if (function.constant_term)
+		{
+			auto term = fmt::format("{:.{}g}", function.constant_term.value(), precision);
+			terms.push_back(term);
+		}
+		return fmt::format("{}", fmt::join(terms, "+"));
+	}
+};
+
+template <typename T>
+concept LinearObjectiveMxinConcept = requires(T &model) {
+	{ model.set_objective(ScalarAffineFunction(), ObjectiveSense()) } -> std::same_as<void>;
+};
+
+template <typename T>
+class LinearObjectiveMixin
+{
+  private:
+	T *get_base()
+	{
+		static_assert(LinearObjectiveMxinConcept<T>);
+		return static_cast<T *>(this);
+	}
+
+  public:
+	void set_objective_as_constant(CoeffT c, ObjectiveSense sense)
+	{
+		T *model = get_base();
+		model->set_objective(ScalarAffineFunction(c), sense);
+	}
+	void set_objective_as_variable(const VariableIndex &variable, ObjectiveSense sense)
+	{
+		T *model = get_base();
+		model->set_objective(ScalarAffineFunction(variable), sense);
+	}
+};
 
 /* This concept combined with partial specialization causes ICE on gcc 10 */
 // template <typename T>

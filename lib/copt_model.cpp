@@ -300,6 +300,41 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 	return constraint_index;
 }
 
+ConstraintIndex COPTModel::add_linear_constraint_interval(
+    const ScalarAffineFunction &function, const std::tuple<double, double> &interval,
+    const char *name)
+{
+	auto lb = std::get<0>(interval);
+	auto ub = std::get<1>(interval);
+
+	if (function.constant.has_value())
+	{
+		lb -= function.constant.value_or(0.0);
+		ub -= function.constant.value_or(0.0);
+	}
+
+	IndexT index = m_linear_constraint_index.add_index();
+	ConstraintIndex constraint_index(ConstraintType::Linear, index);
+
+	AffineFunctionPtrForm<int, int, double> ptr_form;
+	ptr_form.make(this, function);
+
+	int numnz = ptr_form.numnz;
+	int *cind = ptr_form.index;
+	double *cval = ptr_form.value;
+
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+
+	int error = copt::COPT_AddRow(m_model.get(), numnz, cind, cval, 0, lb, ub, name);
+	check_error(error);
+	return constraint_index;
+
+	return ConstraintIndex();
+}
+
 ConstraintIndex COPTModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
                                                     ConstraintSense sense, CoeffT rhs,
                                                     const char *name)
@@ -1290,7 +1325,7 @@ void COPTEnvConfig::set(const char *param_name, const char *value)
 int RealCOPTCallbackFunction(copt_prob *prob, void *cbdata, int cbctx, void *userdata)
 {
 	auto real_userdata = static_cast<COPTCallbackUserdata *>(userdata);
-	auto model = static_cast<COPTModelMixin *>(real_userdata->model);
+	auto model = static_cast<COPTModel *>(real_userdata->model);
 	auto &callback = real_userdata->callback;
 
 	model->m_cbdata = cbdata;

@@ -164,7 +164,11 @@ struct COPTCallbackUserdata
 	bool cb_requires_submit_solution = false;
 };
 
-class COPTModel
+class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
+                  public OnesideQuadraticConstraintMixin<COPTModel>,
+                  public LinearObjectiveMixin<COPTModel>,
+                  public PPrintMixin<COPTModel>,
+                  public GetValueMixin<COPTModel>
 {
   public:
 	COPTModel() = default;
@@ -187,6 +191,9 @@ class COPTModel
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs,
 	                                      const char *name = nullptr);
+	ConstraintIndex add_linear_constraint_interval(const ScalarAffineFunction &function,
+	                                               const std::tuple<double, double> &interval,
+	                                               const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
 	                                         ConstraintSense sense, CoeffT rhs,
 	                                         const char *name = nullptr);
@@ -332,5 +339,3 @@ class COPTModel
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;
 };
-
-using COPTModelMixin = CommercialSolverMixin<COPTModel>;

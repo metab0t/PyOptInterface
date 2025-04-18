@@ -20,10 +20,10 @@ def rocket_model(model: ipopt.Model, nh: int):
     D_c = 0.5 * v_c * (m_0 / g_0)
     T_max = T_c * m_0 * g_0
 
-    h = [model.add_variable(lb=1.0) for _ in range(nh)]
-    v = [model.add_variable(lb=0.0) for i in range(nh)]
-    m = [model.add_variable(lb=m_f, ub=m_0) for i in range(nh)]
-    T = [model.add_variable(lb=0.0, ub=T_max) for i in range(nh)]
+    h = model.add_m_variables(nh, lb=1.0)
+    v = model.add_m_variables(nh, lb=0.0)
+    m = model.add_m_variables(nh, lb=m_f, ub=m_0)
+    T = model.add_m_variables(nh, lb=0.0, ub=T_max)
     step = model.add_variable(lb=0.0)
 
     model.set_objective(-1.0 * h[-1])
