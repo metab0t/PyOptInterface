@@ -2,6 +2,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/function.h>
+#include <nanobind/stl/tuple.h>
 
 #include "pyoptinterface/copt_model.hpp"
 
@@ -63,12 +64,23 @@ NB_MODULE(copt_model_ext, m)
 	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&COPTModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint, nb::arg("expr"),
-	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &COPTModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, const std::tuple<double, double> &,
+	                           const char *>(&COPTModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint_from_var, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &COPTModel::add_linear_interval_constraint_from_var,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &COPTModel::add_linear_constraint_from_expr, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &COPTModel::add_linear_interval_constraint_from_expr,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
+
 	    .def("_add_quadratic_constraint", &COPTModel::add_quadratic_constraint, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("_add_quadratic_constraint", &COPTModel::add_quadratic_constraint_from_expr,

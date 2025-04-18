@@ -20,8 +20,8 @@ if ipopt.is_library_loaded():
         # The reason is still unclear
         nlp_model_dict["ipopt_c"] = c
 
-# if copt.is_library_loaded():
-#     nlp_model_dict["copt"] = copt.Model
+if copt.is_library_loaded():
+    nlp_model_dict["copt"] = copt.Model
 
 
 @pytest.fixture(params=nlp_model_dict.keys())

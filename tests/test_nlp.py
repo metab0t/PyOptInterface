@@ -5,11 +5,11 @@ import pyoptinterface as poi
 from pyoptinterface import ipopt, nlfunc
 
 
-def test_ipopt(nlp_model_ctor):
+def test_easy_nlp(nlp_model_ctor):
     model = nlp_model_ctor()
 
-    x = model.add_variable(lb=0.1, ub=10.0, start=0.65)
-    y = model.add_variable(lb=0.1, ub=10.0, start=0.35)
+    x = model.add_variable(lb=0.1, ub=10.0)
+    y = model.add_variable(lb=0.1, ub=10.0)
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
@@ -79,10 +79,13 @@ def test_ipopt(nlp_model_ctor):
 
 
 def test_nlfunc_ifelse(nlp_model_ctor):
+    if nlp_model_ctor is not ipopt.Model:
+        pytest.skip("ifelse is only supported in IPOPT")
+
     for x_, fx in zip([0.2, 0.5, 1.0, 2.0, 3.0], [0.2, 0.5, 1.0, 4.0, 9.0]):
         model = nlp_model_ctor()
 
-        x = model.add_variable(lb=0.0, ub=10.0, start=1.0)
+        x = model.add_variable(lb=0.0, ub=10.0)
 
         with nlfunc.graph():
             y = nlfunc.ifelse(x > 1.0, x**2, x)
@@ -101,11 +104,11 @@ if __name__ == "__main__":
     def c():
         return ipopt.Model(jit="C")
 
-    test_ipopt(c)
+    test_easy_nlp(c)
     test_nlfunc_ifelse(c)
 
     def llvm():
         return ipopt.Model(jit="LLVM")
 
-    test_ipopt(llvm)
+    test_easy_nlp(llvm)
     test_nlfunc_ifelse(llvm)

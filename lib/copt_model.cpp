@@ -300,9 +300,9 @@ ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &fun
 	return constraint_index;
 }
 
-ConstraintIndex COPTModel::add_linear_constraint_interval(
-    const ScalarAffineFunction &function, const std::tuple<double, double> &interval,
-    const char *name)
+ConstraintIndex COPTModel::add_linear_constraint(const ScalarAffineFunction &function,
+                                                 const std::tuple<double, double> &interval,
+                                                 const char *name)
 {
 	auto lb = std::get<0>(interval);
 	auto ub = std::get<1>(interval);
@@ -584,7 +584,7 @@ void COPTModel::decode_expr(const ExpressionGraph &graph, const ExpressionHandle
 		break;
 	}
 	case ArrayType::Ternary: {
-		throw std::runtime_error("Ternary operator is not supported in Gurobi");
+		throw std::runtime_error("Ternary operator is not supported in COPT");
 		break;
 	}
 	case ArrayType::Nary: {

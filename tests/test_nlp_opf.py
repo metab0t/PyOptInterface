@@ -173,9 +173,11 @@ def test_acopf(nlp_model_ctor):
 
     model.optimize()
 
-    assert (
-        model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-        == poi.TerminationStatusCode.LOCALLY_SOLVED
+    terminattion_status = model.get_model_attribute(
+        poi.ModelAttribute.TerminationStatus
+    )
+    assert (terminattion_status == poi.TerminationStatusCode.LOCALLY_SOLVED) or (
+        terminattion_status == poi.TerminationStatusCode.OPTIMAL
     )
 
     P_value = P.map(model.get_value)
