@@ -3,48 +3,40 @@ import pytest
 import math
 
 
-def test_nlp_reopt(ipopt_model_ctor):
-    model = ipopt_model_ctor()
+def test_nlp_reopt(nlp_model_ctor):
+    model = nlp_model_ctor()
 
     x = model.add_variable(lb=0.1)
     y = model.add_variable(lb=0.1)
 
-    def obj(vars):
-        return nlfunc.exp(vars.x) + nlfunc.exp(vars.y)
+    with nlfunc.graph():
+        model.add_nl_objective(x**2 + y**2)
 
-    obj_f = model.register_function(obj)
-    model.add_fn_objective(obj_f, vars=nlfunc.Vars(x=x, y=y))
-
-    def con(vars):
-        x = vars.x
-        return x**4
-
-    con_f = model.register_function(con)
-    model.add_fn_constraint(con_f, vars=nlfunc.Vars(x=x), lb=1.0)
-    model.add_fn_constraint(con_f, vars=nlfunc.Vars(x=y), lb=1.0)
+    with nlfunc.graph():
+        model.add_nl_constraint(x**2 <= 1.0)
+        model.add_nl_constraint(y**2 <= 1.0)
 
     model.optimize()
 
-    assert model.get_value(x) == pytest.approx(1.0)
-    assert model.get_value(y) == pytest.approx(1.0)
+    assert model.get_value(x) == pytest.approx(0.1)
+    assert model.get_value(y) == pytest.approx(0.1)
 
     z = model.add_variable(lb=0.2)
-    model.add_fn_objective(con_f, vars=nlfunc.Vars(x=z))
+    with nlfunc.graph():
+        model.add_nl_objective(z**4)
 
     model.optimize()
 
     assert model.get_value(z) == pytest.approx(0.2)
 
-    def con2(vars):
-        x = vars.x
-        return nlfunc.log(x)
-
-    con2_f = model.register_function(con2)
-    model.add_fn_constraint(con2_f, vars=nlfunc.Vars(x=z), lb=math.log(4.0))
+    with nlfunc.graph():
+        model.add_nl_constraint(nlfunc.log(z) >= math.log(4.0))
 
     model.optimize()
 
-    assert model.get_value(z) == pytest.approx(4.0)
+    print(model.get_value(z))
+
+    assert model.get_value(z) == pytest.approx(4.0, rel=1e-5)
 
 
 if __name__ == "__main__":

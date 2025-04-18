@@ -225,7 +225,7 @@ target_sources(ipopt_model PRIVATE
   include/pyoptinterface/ipopt_model.hpp
   lib/ipopt_model.cpp
 )
-target_link_libraries(ipopt_model PUBLIC nleval)
+target_link_libraries(ipopt_model PUBLIC nlexpr nleval)
 
 nanobind_add_module(
   ipopt_model_ext
@@ -308,8 +308,8 @@ nanobind_add_stub(
   OUTPUT ${POI_INSTALL_DIR}/ipopt_model_ext.pyi
 )
 
-set(ENABLE_TEST_MAIN OFF CACHE BOOL "Enable test c++ function with a main.cpp")
+set(ENABLE_TEST_MAIN ON BOOL "Enable test c++ function with a main.cpp")
 if(ENABLE_TEST_MAIN)
-  add_executable(test_main lib/main.cpp)
-  target_link_libraries(test_main PUBLIC core gurobi_model copt_model mosek_model highs_model)
+    add_executable(test_main lib/main.cpp)
+    target_link_libraries(test_main PUBLIC core nleval cppad_interface)
 endif()

@@ -1,387 +1,109 @@
-#include "pyoptinterface/container.hpp"
-#include "fmt/core.h"
-#include "pyoptinterface/gurobi_model.hpp"
-#include "pyoptinterface/copt_model.hpp"
-#include "pyoptinterface/mosek_model.hpp"
-#include "pyoptinterface/highs_model.hpp"
+#include "pyoptinterface/nleval.hpp"
+#include "pyoptinterface/cppad_interface.hpp"
 
-#include <chrono>
-
-struct MapIndexer
+void test_linear_eval()
 {
-	Hashmap<IndexT, int> map;
-
-	IndexT add_index()
+	LinearEvaluator evaluator;
 	{
-		auto y = map.size();
-		map.emplace(y, y);
-		return y;
-	}
+		ScalarAffineFunction f;
+		f.add_constant(1.0);
+		f.add_term(0, 2.0);
 
-	int get_index(const IndexT &x)
-	{
-		auto it = map.find(x);
-		if (it == map.end())
-		{
-			return -1;
-		}
-		return it->second;
-	}
-};
-
-struct VecIndexer
-{
-	Vector<int> vec;
-
-	IndexT add_index()
-	{
-		auto y = vec.size();
-		vec.emplace_back(y);
-		return y;
+		evaluator.add_row(f);
 	}
 
-	int get_index(const IndexT &x)
 	{
-		if (x >= vec.size())
-		{
-			return -1;
-		}
-		return vec[x];
-	}
-};
-
-template <typename T>
-void some_operations(T &t)
-{
-	auto N = 5e8;
-	for (auto i = 0; i < N; i++)
-	{
-		t.add_index();
+		ScalarAffineFunction f;
+		f.add_term(1, 3.0);
+		f.add_term(0, 4.0);
+		evaluator.add_row(f);
 	}
 
-	for (int i = 0.25 * N; i < 0.25 * N * 7 / 6; i++)
-	{
-		t.delete_index(i);
-	}
-	for (auto i = 0; i < N; i++)
-	{
-		t.get_index(i);
-	}
+	std::vector<double> x = {1.0, 2.0};
+	std::vector<double> f(2);
+	evaluator.eval_function(x.data(), f.data());
 
-	for (int i = 0.65 * N; i < 0.75 * N; i++)
-	{
-		t.delete_index(i);
-	}
-	for (auto i = 0; i < N; i++)
-	{
-		t.get_index(i);
-	}
+	size_t global_jabobian_nnz = 0;
+	std::vector<int> global_jacobian_rows, global_jacobian_cols;
+	evaluator.analyze_jacobian_structure(global_jabobian_nnz, global_jacobian_rows,
+	                                     global_jacobian_cols);
+
+	std::vector<double> jacobian(global_jabobian_nnz);
+	evaluator.eval_jacobian(x.data(), jacobian.data());
 }
 
-template <typename T>
-void some_easy_operations(T &t)
+void test_quadratic_eval()
 {
-	auto N = 1e8;
-	for (auto i = 0; i < N; i++)
+	QuadraticEvaluator evaluator;
 	{
-		t.add_index();
+		ScalarQuadraticFunction f;
+		f.add_constant(1.0);
+		f.add_quadratic_term(0, 1, 4.0);
+		f.add_quadratic_term(0, 0, 1.0);
+		f.add_affine_term(0, 4.0);
+		evaluator.add_row(f);
 	}
-
-	for (auto i = 0; i < N; i++)
-	{
-		t.get_index(i);
-	}
+	std::vector<double> x = {1.0, 2.0};
+	std::vector<double> f(1);
+	evaluator.eval_function(x.data(), f.data());
+	size_t global_jabobian_nnz = 0;
+	std::vector<int> global_jacobian_rows, global_jacobian_cols;
+	evaluator.analyze_jacobian_structure(0, global_jabobian_nnz, global_jacobian_rows,
+	                                     global_jacobian_cols);
+	std::vector<double> jacobian(global_jabobian_nnz);
+	evaluator.eval_jacobian(x.data(), jacobian.data());
+	size_t global_hessian_nnz = 0;
+	std::vector<int> global_hessian_rows, global_hessian_cols;
+	Hashmap<std::tuple<int, int>, int> global_hessian_index_map;
+	HessianSparsityType global_hessian_type = HessianSparsityType::Upper;
+	evaluator.analyze_hessian_structure(global_hessian_nnz, global_hessian_rows,
+	                                    global_hessian_cols, global_hessian_index_map,
+	                                    global_hessian_type);
+	std::vector<double> hessian(global_hessian_nnz);
+	std::vector<double> lambda = {1.0};
+	evaluator.eval_lagrangian_hessian(lambda.data(), hessian.data());
 }
 
-void bench_container()
+void test_cppad_pow_var_par()
 {
-	{
-		MonotoneVector<int> mv;
-		some_easy_operations(mv);
-	}
-	{
-		ChunkedBitVector<std::uint64_t, int> cbv;
-		some_easy_operations(cbv);
-	}
-	{
-		MapIndexer mi;
-		some_easy_operations(mi);
-	}
-	{
-		VecIndexer vi;
-		some_easy_operations(vi);
-	}
-}
+	std::vector<CppAD::AD<double>> x(2);
 
-auto test_monotone() -> void
-{
-	MonotoneVector<int> mv;
-	for (auto i = 0; i < 10; i++)
+	auto N_parameters = 2;
+	std::vector<CppAD::AD<double>> p(N_parameters);
+	for (size_t i = 0; i < N_parameters; i++)
 	{
-		mv.add_index();
+		p[i] = CppAD::AD<double>(i + 1);
 	}
-	mv.delete_index(5);
-	mv.delete_index(8);
-	mv.delete_index(2);
-
-	for (auto i = 0; i < 10; i++)
+	if (N_parameters > 0)
 	{
-		mv.add_index();
+		CppAD::Independent(x, p);
 	}
-	mv.delete_index(1);
-	mv.delete_index(0);
-
-	for (auto i = 0; i < 5; i++)
+	else
 	{
-		mv.add_index();
-	}
-	mv.delete_index(15);
-	mv.delete_index(20);
-	mv.delete_index(21);
-	mv.delete_index(22);
-
-	int x = mv.get_index(24);
-}
-
-auto test_chunkedbv() -> void
-{
-	ChunkedBitVector<std::uint64_t, int> cbv;
-
-	auto N = 127;
-	for (int i = 0; i < N; i++)
-	{
-		auto x = cbv.add_index();
-		fmt::print("added={}\n", x);
+		CppAD::Independent(x);
 	}
 
-	// auto M = 2;
-	// auto x = cbv.add_indices(M);
-	// fmt::print("added={}\n", x);
+	auto N_outputs = 1;
+	std::vector<CppAD::AD<double>> y(N_outputs);
 
-	for (int i = 0; i < N - 1; i++)
+	// Trace the outputs
+	for (size_t i = 0; i < N_outputs; i++)
 	{
-		cbv.delete_index(i);
-		auto x = cbv.get_index(i + 1);
-		if (x != 0)
-		{
-			fmt::print("wrong get_index: {}->{}\n", i + 1, x);
-		}
-	}
-}
-
-auto test_gurobi() -> void
-{
-	GurobiEnv env;
-	GurobiModelMixin model;
-	model.init(env);
-
-	VariableIndex x = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
-	VariableIndex y = model.add_variable(VariableDomain::Continuous, 0.0, 1.0);
-
-	ExprBuilder expr;
-	// expr.add(x);
-	// expr.add(y);
-	// ConstraintIndex con1 = model.add_linear_constraint(expr, ConstraintSense::LessEqual, 10.0);
-
-	expr.clear();
-	expr += (x);
-	expr += (y);
-	model.set_objective(expr, ObjectiveSense::Minimize);
-
-	model.optimize();
-}
-
-void bench()
-{
-	auto N = 50000;
-	std::vector<VariableIndex> x(N);
-	for (auto i = 0; i < N; i++)
-	{
-		x[i].index = i;
+		y[i] = CppAD::pow(x[i], p[i]);
 	}
 
-	ExprBuilder expr;
-	for (const auto &v : x)
-	{
-		expr += (v);
-	}
-	ScalarAffineFunction saf(expr);
+	ADFunDouble f;
+	f.Dependent(x, y);
 
-	int k = 0;
-}
+	CppAD::cpp_graph f_graph;
+	f.to_graph(f_graph);
 
-auto test_copt() -> void
-{
-	COPTEnv env;
-	COPTModelMixin model(env);
-
-	auto N = 100;
-	std::vector<VariableIndex> x;
-	for (auto i = 0; i < N; i++)
-	{
-		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
-	}
-
-	ExprBuilder expr;
-	for (const auto &v : x)
-	{
-		expr += (v);
-	}
-	auto con = model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N);
-
-	ExprBuilder obj;
-	for (const auto &v : x)
-	{
-		obj += (v * v);
-	}
-	model.set_objective(obj, ObjectiveSense::Minimize);
-	model.set_raw_parameter_int("Logging", 0);
-	model.set_raw_parameter_int("Presolve", 0);
-	model.set_raw_parameter_double("TimeLimit", 1.0);
-
-	model.optimize();
-
-	double lb = model.get_constraint_info(con, COPT_DBLINFO_LB);
-	double ub = model.get_constraint_info(con, COPT_DBLINFO_UB);
-
-	/*obj = ExprBuilder();
-	model.set_objective(obj, ObjectiveSense::Minimize);
-	for (int i = 0; i < N - 1; i++)
-	{
-	    model.delete_variable(x[i]);
-	    model.optimize();
-	    fmt::print("deleted {}\n", i);
-	}*/
-}
-
-auto test_mosek() -> void
-{
-	MOSEKEnv env;
-	MOSEKModelMixin model(env);
-
-	auto N = 1000;
-	std::vector<VariableIndex> x;
-	for (auto i = 0; i < N; i++)
-	{
-		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
-	}
-
-	ExprBuilder obj;
-	for (const auto &v : x)
-	{
-		obj += (v * v);
-	}
-	model.set_objective(obj, ObjectiveSense::Minimize);
-	model.enable_log();
-
-	model.optimize();
-
-	obj = ExprBuilder();
-	model.set_objective(obj, ObjectiveSense::Minimize);
-	for (int i = 0; i < N - 1; i++)
-	{
-		model.delete_variable(x[i]);
-		model.optimize();
-		fmt::print("deleted {}\n", i);
-	}
-}
-
-auto test_highs() -> void
-{
-	HighsModelMixin model;
-
-	auto N = 3;
-	std::vector<VariableIndex> x;
-	for (auto i = 0; i < N; i++)
-	{
-		x.push_back(model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr));
-	}
-
-	ExprBuilder obj;
-	for (const auto &v : x)
-	{
-		obj += (v * v);
-	}
-	model.set_objective(obj, ObjectiveSense::Minimize);
-
-	ExprBuilder expr;
-	for (const auto &v : x)
-	{
-		expr += (v);
-	}
-	auto con =
-	    model.add_linear_constraint_from_expr(expr, ConstraintSense::GreaterEqual, N / 2.0, "con1");
-
-	model.optimize();
-
-	model.set_objective(x[1] + 2 * x[2], ObjectiveSense::Minimize);
-	model.optimize();
-}
-
-auto debug_highs_passname(int N) -> void
-{
-	void *highs = highs::Highs_create();
-	
-	auto start = std::chrono::high_resolution_clock::now();
-
-	HighsModelMixin model;
-	for (auto i = 0; i < N; i++)
-	{
-		highs::Highs_addCol(highs, 0.0, 0.0, 0.0, 0, nullptr, nullptr);
-
-		auto col = highs::Highs_getNumCol(highs);
-
-		assert(col == i + 1);
-
-		auto name = fmt::format("x{}", i);
-		// highs::Highs_passColName(highs, i, name.c_str());
-	}
-
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-	fmt::print("N={}, time={} milliseconds\n", N, duration.count());
-}
-
-void debug_highs(int N)
-{
-	auto start = std::chrono::high_resolution_clock::now();
-
-	HighsModelMixin model;
-	for (auto i = 0; i < N; i++)
-	{
-		model.add_variable(VariableDomain::Continuous, 0.0, 1.0, nullptr);
-	}
-
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-	fmt::print("N={}, time={} milliseconds\n", N, duration.count());
-}
-
-void test_highs_add_variable()
-{
-	std::vector<int> Ns{1000, 10000, 100000, 1000000};
-
-	for (const auto& N : Ns)
-	{
-		debug_highs_passname(N);
-	}
-}
-
-void test_highs_qp()
-{
-	HighsModelMixin model;
-
-	auto x = model.add_variable();
-	auto y = model.add_variable();
-
-	model.set_objective(x * y, ObjectiveSense::Minimize);
-	model.optimize();
+	// Print the graph
+	f_graph.print(std::cout);
 }
 
 auto main() -> int
 {
-	highs::load_library("E:\\HiGHS\\build\\bin\\Release\\highs.dll");
-
-	test_highs_qp();
+	test_cppad_pow_var_par();
 	return 0;
 }

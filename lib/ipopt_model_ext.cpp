@@ -82,9 +82,6 @@ NB_MODULE(ipopt_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, int>(&IpoptModelMixin::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("add_parameter", &IpoptModelMixin::add_parameter, nb::arg("value") = 0.0)
-	    .def("set_parameter", &IpoptModelMixin::set_parameter)
-
 	    .def("get_obj_value", &IpoptModelMixin::get_obj_value)
 	    .def("get_constraint_primal", &IpoptModelMixin::get_constraint_primal)
 	    .def("get_constraint_dual", &IpoptModelMixin::get_constraint_dual)
@@ -136,35 +133,44 @@ NB_MODULE(ipopt_model_ext, m)
 	             &IpoptModelMixin::add_quadratic_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("interval"), nb::arg("name") = "")
 
-	    .def("add_objective", &IpoptModelMixin::add_objective<ExprBuilder>)
-	    .def("add_objective", &IpoptModelMixin::add_objective<ScalarQuadraticFunction>)
-	    .def("add_objective", &IpoptModelMixin::add_objective<ScalarAffineFunction>)
-	    .def("add_objective", &IpoptModelMixin::add_objective<VariableIndex>)
-	    .def("add_objective", &IpoptModelMixin::add_objective<double>)
+	    .def("set_objective",
+	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
+	             &IpoptModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
+	             &IpoptModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ScalarQuadraticFunction &, ObjectiveSense>(
+	             &IpoptModelMixin::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def(
+	        "set_objective",
+	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&IpoptModelMixin::set_objective),
+	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 
-	    .def("set_objective", &IpoptModelMixin::set_objective<ExprBuilder>, nb::arg("expr"),
-	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
-	    .def("set_objective", &IpoptModelMixin::set_objective<ScalarQuadraticFunction>,
-	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize,
-	         nb::arg("clear_nl") = false)
-	    .def("set_objective", &IpoptModelMixin::set_objective<ScalarAffineFunction>,
-	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize,
-	         nb::arg("clear_nl") = false)
-	    .def("set_objective", &IpoptModelMixin::set_objective<VariableIndex>, nb::arg("expr"),
-	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
-	    .def("set_objective", &IpoptModelMixin::set_objective<double>, nb::arg("expr"),
-	         nb::arg("sense") = ObjectiveSense::Minimize, nb::arg("clear_nl") = false)
+	    // New API
+	    .def("_add_graph_index", &IpoptModelMixin::add_graph_index)
+	    .def("_record_graph_hash", &IpoptModelMixin::record_graph_hash)
+	    .def("_aggregate_graph_constraint_groups",
+	         &IpoptModelMixin::aggregate_graph_constraint_groups)
+	    .def("_get_graph_constraint_group_representative",
+	         &IpoptModelMixin::get_graph_constraint_group_representative)
+	    .def("_aggregate_graph_objective_groups",
+	         &IpoptModelMixin::aggregate_graph_objective_groups)
+	    .def("_get_graph_objective_group_representative",
+	         &IpoptModelMixin::get_graph_objective_group_representative)
+	    .def("_assign_constraint_group_autodiff_structure",
+	         &IpoptModelMixin::assign_constraint_group_autodiff_structure)
+	    .def("_assign_constraint_group_autodiff_evaluator",
+	         &IpoptModelMixin::assign_constraint_group_autodiff_evaluator)
+	    .def("_assign_objective_group_autodiff_structure",
+	         &IpoptModelMixin::assign_objective_group_autodiff_structure)
+	    .def("_assign_objective_group_autodiff_evaluator",
+	         &IpoptModelMixin::assign_objective_group_autodiff_evaluator)
 
-	    .def("_add_fn_objective", &IpoptModelMixin::_add_fn_objective)
-
-	    .def("clear_nl_objective", &IpoptModelMixin::clear_nl_objective)
-
-	    .def("_register_function", &IpoptModelMixin::_register_function)
-	    .def("_set_function_evaluator", &IpoptModelMixin::_set_function_evaluator)
-	    .def("_has_function_evaluator", &IpoptModelMixin::_has_function_evaluator)
-
-	    .def("_add_fn_constraint_bounds", &IpoptModelMixin::_add_fn_constraint_bounds)
-	    .def("_add_fn_constraint_eq", &IpoptModelMixin::_add_fn_constraint_eq)
+	    .def("_add_single_nl_constraint", &IpoptModelMixin::add_single_nl_constraint)
 
 	    .def("_optimize", &IpoptModelMixin::optimize, nb::call_guard<nb::gil_scoped_release>())
 

@@ -34,18 +34,45 @@ def patch_core_compararison_operator(cls):
         return constraint
 
     def __eq__(self, other):
-        return self._compare(other, ConstraintSense.Equal)
+        return _compare(self, other, ConstraintSense.Equal)
 
     def __le__(self, other):
-        return self._compare(other, ConstraintSense.LessEqual)
+        return _compare(self, other, ConstraintSense.LessEqual)
 
     def __ge__(self, other):
-        return self._compare(other, ConstraintSense.GreaterEqual)
+        return _compare(self, other, ConstraintSense.GreaterEqual)
 
-    cls._compare = _compare
     cls.__eq__ = __eq__
     cls.__le__ = __le__
     cls.__ge__ = __ge__
+
+
+def patch_more_compararison_operator(cls):
+    def _compare(self, other, op: BinaryOperator):
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        converted_other = convert_to_expressionhandle(graph, other)
+        if isinstance(converted_other, ExpressionHandle):
+            converted_self = convert_to_expressionhandle(graph, self)
+            fallback_result = graph.add_binary(op, converted_self, converted_other)
+            return fallback_result
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        return _compare(self, other, BinaryOperator.LessThan)
+
+    def __gt__(self, other):
+        return _compare(self, other, BinaryOperator.GreaterThan)
+
+    def __ne__(self, other):
+        return _compare(self, other, BinaryOperator.NotEqual)
+
+    cls.__lt__ = __lt__
+    cls.__gt__ = __gt__
+    cls.__ne__ = __ne__
 
 
 def patch_quadratic_mul(cls):
@@ -101,6 +128,55 @@ def patch_quadratic_mul(cls):
 
     cls.__mul__ = __mul__
     cls.__rmul__ = __rmul__
+
+
+def patch_div(cls):
+    old_truediv = getattr(cls, "__truediv__", None)
+
+    assert old_truediv is not None, f"{cls} does not have __truediv__ method"
+
+    def __truediv__(self, other):
+        original_result = NotImplemented
+
+        try:
+            original_result = old_truediv(self, other)
+        except TypeError:
+            original_result = NotImplemented
+
+        if original_result is not NotImplemented:
+            return original_result
+
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        converted_other = convert_to_expressionhandle(graph, other)
+        if isinstance(converted_other, ExpressionHandle):
+            converted_self = convert_to_expressionhandle(graph, self)
+            fallback_result = graph.add_binary(
+                BinaryOperator.Div, converted_self, converted_other
+            )
+            return fallback_result
+        else:
+            return NotImplemented
+
+    def __rtruediv__(self, other):
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        converted_other = convert_to_expressionhandle(graph, other)
+        if isinstance(converted_other, ExpressionHandle):
+            converted_self = convert_to_expressionhandle(graph, self)
+            fallback_result = graph.add_binary(
+                BinaryOperator.Div, converted_other, converted_self
+            )
+            return fallback_result
+        else:
+            return NotImplemented
+
+    cls.__truediv__ = __truediv__
+    cls.__rtruediv__ = __rtruediv__
 
 
 def pow_int(graph, expr, N):
@@ -229,13 +305,76 @@ def patch_expressionhandle(cls):
     cls.__ge__ = __ge__
 
 
+def patch_pow(cls):
+    def __pow__(self, other):
+        if other == 0:
+            return 1
+        elif other == 1:
+            return self
+        elif other == 2:
+            return self * self
+
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        self = convert_to_expressionhandle(graph, self)
+
+        if isinstance(other, int):
+            new_expression = pow_int(graph, self, other)
+            return new_expression
+
+        other = convert_to_expressionhandle(graph, other)
+        if isinstance(other, ExpressionHandle):
+            result = graph.add_binary(BinaryOperator.Pow, self, other)
+            return result
+        else:
+            return NotImplemented
+
+    def __rpow__(self, other):
+        if other == 0:
+            return 0
+        elif other == 1:
+            return 1
+
+        graph = ExpressionGraphContext.current_graph_no_exception()
+        if graph is None:
+            return NotImplemented
+
+        self = convert_to_expressionhandle(graph, self)
+        other = convert_to_expressionhandle(graph, other)
+        if isinstance(other, ExpressionHandle):
+            result = graph.add_binary(BinaryOperator.Pow, other, self)
+            return result
+        else:
+            return NotImplemented
+
+    cls.__pow__ = __pow__
+    cls.__rpow__ = __rpow__
+
+
 def _monkeypatch_all():
     patch_core_compararison_operator(VariableIndex)
     patch_core_compararison_operator(ScalarAffineFunction)
     patch_core_compararison_operator(ScalarQuadraticFunction)
     patch_core_compararison_operator(ExprBuilder)
 
+    patch_more_compararison_operator(VariableIndex)
+    patch_more_compararison_operator(ScalarAffineFunction)
+    patch_more_compararison_operator(ScalarQuadraticFunction)
+    patch_more_compararison_operator(ExprBuilder)
+
     patch_quadratic_mul(ScalarQuadraticFunction)
     patch_quadratic_mul(ExprBuilder)
+
+    patch_div(VariableIndex)
+    patch_div(ScalarAffineFunction)
+    patch_div(ScalarQuadraticFunction)
+    patch_div(ExprBuilder)
+
+    patch_pow(VariableIndex)
+    patch_pow(ScalarAffineFunction)
+    patch_pow(ScalarQuadraticFunction)
+    patch_pow(ExprBuilder)
 
     patch_expressionhandle(ExpressionHandle)

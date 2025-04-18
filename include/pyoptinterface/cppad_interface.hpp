@@ -32,8 +32,9 @@ ADFunDouble sparse_hessian(const ADFunDouble &f, const sparsity_pattern_t &patte
                            const std::vector<double> &p_values);
 
 // Transform ExpressionGraph to CppAD function
-ADFunDouble cppad_trace_function(const ExpressionGraph &graph,
-                                 const std::vector<ExpressionHandle> &outputs);
+ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph);
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph);
+
 
 struct CppADAutodiffGraph
 {

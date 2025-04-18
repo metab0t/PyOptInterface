@@ -524,11 +524,11 @@ void COPTModel::decode_expr(const ExpressionGraph &graph, const ExpressionHandle
 	{
 	case ArrayType::Constant: {
 		opcodes.push_back(COPT_NL_GET);
-		constants.push_back(graph.m_constants[index].value);
+		constants.push_back(graph.m_constants[index]);
 		break;
 	}
 	case ArrayType::Variable: {
-		auto column = _checked_variable_index(graph.m_variables[index].id);
+		auto column = _checked_variable_index(graph.m_variables[index]);
 		opcodes.push_back(column);
 		break;
 	}

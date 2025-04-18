@@ -10,7 +10,9 @@ from .core_ext import (
     ScalarAffineFunction,
     ScalarQuadraticFunction,
     ExprBuilder,
+    ConstraintSense,
 )
+from .comparison_constraint import ComparisonConstraint
 import inspect
 import functools
 import math
@@ -47,7 +49,7 @@ class ExpressionGraphContext:
         if not stack:
             return None
         return stack[-1]
-    
+
     @classmethod
     def current_graph(cls):
         _thread_local = cls._thread_local
@@ -57,6 +59,13 @@ class ExpressionGraphContext:
         if not stack:
             raise RuntimeError("No active expression graph context")
         return stack[-1]
+
+
+compare_op_map = {
+    ConstraintSense.LessEqual: BinaryOperator.LessEqual,
+    ConstraintSense.GreaterEqual: BinaryOperator.GreaterEqual,
+    ConstraintSense.Equal: BinaryOperator.Equal,
+}
 
 
 def convert_to_expressionhandle(graph, expr):
@@ -72,6 +81,15 @@ def convert_to_expressionhandle(graph, expr):
         return graph.merge_scalarquadraticfunction(expr)
     elif isinstance(expr, ExprBuilder):
         return graph.merge_exprbuilder(expr)
+    elif isinstance(expr, ComparisonConstraint):
+        lhs = convert_to_expressionhandle(graph, expr.lhs)
+        rhs = convert_to_expressionhandle(graph, expr.rhs)
+        if isinstance(lhs, ExpressionHandle) and isinstance(rhs, ExpressionHandle):
+            compare_op = compare_op_map[expr.sense]
+            expr = graph.add_binary(compare_op, lhs, rhs)
+            return expr
+        else:
+            raise TypeError(f"Unsupported expression type in comparison constraint")
     else:
         return expr
 
@@ -158,10 +176,9 @@ def ifelse(condition, true_expr, false_expr):
         else:
             return false_expr
 
-    if isinstance(true_expr, (int, float)):
-        true_expr = graph.add_constant(true_expr)
-    if isinstance(false_expr, (int, float)):
-        false_expr = graph.add_constant(false_expr)
+    condition = convert_to_expressionhandle(graph, condition)
+    true_expr = convert_to_expressionhandle(graph, true_expr)
+    false_expr = convert_to_expressionhandle(graph, false_expr)
 
     new_expression = graph.add_ternary(
         TernaryOperator.IfThenElse, condition, true_expr, false_expr

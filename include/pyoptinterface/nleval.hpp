@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <vector>
 
@@ -5,7 +7,6 @@
 
 enum class HessianSparsityType
 {
-	Full,
 	Upper,
 	Lower
 };
@@ -25,24 +26,23 @@ struct AutodiffSymbolicStructure
 };
 
 // define the jit-compiled function pointer
-using f_funcptr = void (*)(const double *x, const double *p, double *y, const size_t *xi,
-                           const size_t *pi);
+using f_funcptr = void (*)(const double *x, const double *p, double *y, const int *xi);
 using jacobian_funcptr = void (*)(const double *x, const double *p, double *jacobian,
-                                  const size_t *xi, const size_t *pi);
+                                  const int *xi);
 using additive_grad_funcptr = void (*)(const double *x, const double *p, double *grad,
-                                       const size_t *xi, const size_t *pi, const size_t *gradi);
+                                       const int *xi, const int *gradi);
 using hessian_funcptr = void (*)(const double *x, const double *p, const double *w, double *hessian,
-                                 const size_t *xi, const size_t *pi, const size_t *hessiani);
+                                 const int *xi, const int *hessiani);
 
 // no parameter version
-using f_funcptr_noparam = void (*)(const double *x, double *y, const size_t *xi);
-using jacobian_funcptr_noparam = void (*)(const double *x, double *jacobian, const size_t *xi);
-using additive_grad_funcptr_noparam = void (*)(const double *x, double *grad, const size_t *xi,
-                                               const size_t *gradi);
+using f_funcptr_noparam = void (*)(const double *x, double *y, const int *xi);
+using jacobian_funcptr_noparam = void (*)(const double *x, double *jacobian, const int *xi);
+using additive_grad_funcptr_noparam = void (*)(const double *x, double *grad, const int *xi,
+                                               const int *gradi);
 using hessian_funcptr_noparam = void (*)(const double *x, const double *w, double *hessian,
-                                         const size_t *xi, const size_t *hessiani);
+                                         const int *xi, const int *hessiani);
 
-struct AutodiffEvaluator
+struct ConstraintAutodiffEvaluator
 {
 	union {
 		f_funcptr p = nullptr;
@@ -53,6 +53,22 @@ struct AutodiffEvaluator
 		jacobian_funcptr_noparam nop;
 	} jacobian_eval;
 	union {
+		hessian_funcptr p = nullptr;
+		hessian_funcptr_noparam nop;
+	} hessian_eval;
+
+	ConstraintAutodiffEvaluator() = default;
+
+	ConstraintAutodiffEvaluator(bool has_parameter, uintptr_t fp, uintptr_t jp, uintptr_t hp);
+};
+
+struct ObjectiveAutodiffEvaluator
+{
+	union {
+		f_funcptr p = nullptr;
+		f_funcptr_noparam nop;
+	} f_eval;
+	union {
 		additive_grad_funcptr p = nullptr;
 		additive_grad_funcptr_noparam nop;
 	} grad_eval;
@@ -61,201 +77,84 @@ struct AutodiffEvaluator
 		hessian_funcptr_noparam nop;
 	} hessian_eval;
 
-	AutodiffEvaluator() = default;
+	ObjectiveAutodiffEvaluator() = default;
 
-	AutodiffEvaluator(const AutodiffSymbolicStructure &structure, uintptr_t fp, uintptr_t jp,
-	                  uintptr_t ajp, uintptr_t hp);
+	ObjectiveAutodiffEvaluator(bool has_parameter, uintptr_t fp, uintptr_t ajp, uintptr_t hp);
 };
-
-struct FunctionInstance
-{
-	std::vector<size_t> xs, ps;
-	// The output in all outputs
-	size_t y_start;
-	// defaults to y_start, some optimizers only need the nonlinear parts
-	size_t eval_y_start;
-	size_t jacobian_start;
-	std::vector<size_t> hessian_indices;
-	std::vector<size_t> grad_indices;
-};
-
-using FunctionInstances = std::vector<FunctionInstance>;
-
-struct ParameterIndex
-{
-	IndexT index;
-
-	ParameterIndex() = default;
-	ParameterIndex(IndexT v) : index(v)
-	{
-	}
-};
-
-struct FunctionIndex
-{
-	IndexT index;
-
-	FunctionIndex() = default;
-	FunctionIndex(IndexT v) : index(v)
-	{
-	}
-};
-
-struct NLConstraintIndex
-{
-	// the index in all constraints
-	IndexT index;
-	IndexT dim;
-
-	NLConstraintIndex() = default;
-	NLConstraintIndex(IndexT v, IndexT d) : index(v), dim(d)
-	{
-	}
-};
-
-struct ConstantDelta
-{
-	double c;
-	size_t yi;
-	ConstantDelta() = default;
-	ConstantDelta(double c_, size_t yi_) : c(c_), yi(yi_)
-	{
-	}
-};
-
-struct AffineDelta
-{
-	double c;
-	size_t xi;
-	size_t yi;
-	AffineDelta() = default;
-	AffineDelta(double c_, size_t xi_, size_t yi_) : c(c_), xi(xi_), yi(yi_)
-	{
-	}
-};
-
-size_t add_gradient_column(size_t column, size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-                           Hashmap<size_t, size_t> &grad_index_map);
-size_t add_hessian_index(size_t x1, size_t x2, size_t &m_hessian_nnz,
-                         std::vector<size_t> &m_hessian_rows, std::vector<size_t> &m_hessian_cols,
-                         Hashmap<VariablePair, size_t> &m_hessian_index_map,
-                         HessianSparsityType hessian_sparsity_type);
-
-struct LinearQuadraticEvaluator
-{
-	std::vector<ScalarAffineFunction> linear_constraints;
-	std::vector<size_t> linear_constraint_indices;
-
-	std::vector<ScalarQuadraticFunction> quadratic_constraints;
-	std::vector<size_t> quadratic_constraint_indices;
-
-	ExprBuilder lq_objective;
-	std::vector<size_t> lq_objective_hessian_indices;
-
-	// jacobian[yi] += c
-	std::vector<ConstantDelta> jacobian_constants;
-	// jacobian[yi] += c * x[xi]
-	std::vector<AffineDelta> jacobian_linear_terms;
-
-	// grad[yi] += c
-	std::vector<ConstantDelta> gradient_constants;
-	// grad[yi] += c * x[xi]
-	std::vector<AffineDelta> gradient_linear_terms;
-
-	// hessian[yi] += lambda[xi] * c
-	std::vector<AffineDelta> constraint_hessian_linear_terms;
-	// hessian[yi] += sigma * c
-	std::vector<ConstantDelta> objective_hessian_linear_terms;
-
-	void add_linear_constraint(const ScalarAffineFunction &f, size_t y);
-	void add_quadratic_constraint(const ScalarQuadraticFunction &f, size_t y);
-
-	template <typename T>
-	void add_objective(const T &expr)
-	{
-		lq_objective += expr;
-	}
-
-	template <typename T>
-	void set_objective(const T &expr)
-	{
-		lq_objective = expr;
-	}
-
-	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
-	                                std::vector<size_t> &m_jacobian_cols);
-	void analyze_dense_gradient_structure();
-	void analyze_sparse_gradient_structure(size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-	                                       Hashmap<size_t, size_t> &gradient_index_map);
-	void analyze_hessian_structure(size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows,
-	                               std::vector<size_t> &m_hessian_cols,
-	                               Hashmap<VariablePair, size_t> &m_hessian_index_map,
-	                               HessianSparsityType hessian_sparsity_type);
 
 #define restrict __restrict
 
-	void eval_objective(const double *restrict x, double *restrict y);
+struct LinearEvaluator
+{
+	int n_constraints = 0;
 
-	void eval_objective_gradient(const double *restrict x, double *restrict grad);
+	std::vector<double> coefs;
+	std::vector<int> indices;
 
-	void eval_constraint(const double *restrict x, double *restrict con);
+	std::vector<double> constant_values;
+	std::vector<int> constant_indices;
 
-	void eval_constraint_jacobian(const double *restrict x, double *restrict jacobian);
+	std::vector<int> constraint_intervals = {0};
 
-	void eval_lagrangian_hessian(const double *restrict x, const double *restrict sigma,
-	                             const double *restrict lambda, double *restrict hessian);
+	void add_row(const ScalarAffineFunction &f);
+
+	void eval_function(const double *restrict x, double *restrict f);
+	void analyze_jacobian_structure(size_t &global_jacobian_nnz,
+	                                std::vector<int> &global_jacobian_rows,
+	                                std::vector<int> &global_jacobian_cols) const;
+	void eval_jacobian(const double *restrict x, double *restrict jacobian) const;
 };
 
-struct NonlinearFunctionEvaluator
+struct QuadraticEvaluator
 {
-	std::vector<AutodiffSymbolicStructure> nl_function_structures;
-	std::vector<std::optional<AutodiffEvaluator>> nl_function_evaluators;
-	std::vector<FunctionInstances> constraint_function_instances;
-	std::vector<size_t> active_constraint_function_indices;
-	std::vector<FunctionInstances> objective_function_instances;
-	std::vector<size_t> active_objective_function_indices;
+	int n_constraints = 0;
 
-	std::vector<double> p;
+	std::vector<double> diag_coefs;
+	std::vector<int> diag_indices;
+	std::vector<int> diag_intervals = {0};
 
-	ParameterIndex add_parameter(double value = 0.0);
-	void set_parameter(const ParameterIndex &parameter, double value);
+	std::vector<double> offdiag_coefs;
+	std::vector<int> offdiag_rows;
+	std::vector<int> offdiag_cols;
+	std::vector<int> offdiag_intervals = {0};
 
-	FunctionIndex register_function(const AutodiffSymbolicStructure &structure);
-	void set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
-	bool has_function_evaluator(const FunctionIndex &k);
+	std::vector<double> linear_coefs;
+	std::vector<int> linear_indices;
+	std::vector<int> linear_intervals = {0};
 
-	NLConstraintIndex add_nl_constraint(const FunctionIndex &k,
-	                                    const std::vector<VariableIndex> &xs,
-	                                    const std::vector<ParameterIndex> &ps, size_t y);
+	std::vector<double> linear_constant_values;
+	std::vector<int> linear_constant_indices;
 
-	void add_nl_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-	                      const std::vector<ParameterIndex> &ps);
+	int jacobian_nnz = 0;
 
-	void clear_nl_objective();
+	// This is the constant part
+	// jacobian_constant.size() = jacobian_nnz
+	std::vector<double> jacobian_constant;
+	std::vector<int> jacobian_variable_indices;
+	std::vector<int> jacobian_constraint_intervals = {0};
+	// jacobian_diag_indices.size() = diag_indices.size()
+	std::vector<int> jacobian_diag_indices;
+	// jacobian_offdiag_row_indices.size() = offdiag_rows.size()
+	std::vector<int> jacobian_offdiag_row_indices;
+	std::vector<int> jacobian_offdiag_col_indices;
 
-	void analyze_active_functions();
+	// Hessian
+	// = diag_coefs.size()
+	std::vector<int> hessian_diag_indices;
+	// = offdiag_coefs.size()
+	std::vector<int> hessian_offdiag_indices;
 
-	// renumber all nonlinear constraints from 0 and collect their indices
-	void analyze_compact_constraint_index(size_t &n_nlcon, std::vector<size_t> &ys);
+	void add_row(const ScalarQuadraticFunction &f);
 
-	void analyze_jacobian_structure(size_t &m_jacobian_nnz, std::vector<size_t> &m_jacobian_rows,
-	                                std::vector<size_t> &m_jacobian_cols);
-	void analyze_dense_gradient_structure();
-	void analyze_sparse_gradient_structure(size_t &gradient_nnz, std::vector<size_t> &gradient_cols,
-	                                       Hashmap<size_t, size_t> &gradient_index_map);
-	void analyze_hessian_structure(size_t &m_hessian_nnz, std::vector<size_t> &m_hessian_rows,
-	                               std::vector<size_t> &m_hessian_cols,
-	                               Hashmap<VariablePair, size_t> &m_hessian_index_map,
-	                               HessianSparsityType hessian_sparsity_type);
-
-	void eval_objective(const double *x, double *y);
-
-	void eval_objective_gradient(const double *x, double *grad);
-
-	void eval_constraint(const double *x, double *con);
-
-	void eval_constraint_jacobian(const double *x, double *jacobian);
-
-	void eval_lagrangian_hessian(const double *x, const double *sigma, const double *lambda,
-	                             double *hessian);
+	void eval_function(const double *restrict x, double *restrict f) const;
+	void analyze_jacobian_structure(size_t row_base, size_t &global_jacobian_nnz,
+	                                std::vector<int> &global_jacobian_rows,
+	                                std::vector<int> &global_jacobian_cols) const;
+	void eval_jacobian(const double *restrict x, double *restrict jacobian) const;
+	void analyze_hessian_structure(size_t &global_hessian_nnz,
+	                               std::vector<int> &global_hessian_rows,
+	                               std::vector<int> &global_hessian_cols,
+	                               Hashmap<std::tuple<int, int>, int> &hessian_index_map,
+	                               HessianSparsityType hessian_type);
+	void eval_lagrangian_hessian(const double *restrict lambda, double *restrict hessian) const;
 };

@@ -273,6 +273,7 @@ enum class ConstraintType
 	Gurobi_General,
 	COPT_ExpCone,
 	COPT_NL,
+	IPOPT_NL
 };
 
 enum class SOSType

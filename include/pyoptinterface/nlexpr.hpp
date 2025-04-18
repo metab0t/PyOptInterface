@@ -7,34 +7,11 @@
 #include "core.hpp"
 
 using NodeId = uint32_t;
-using EntityId = uint32_t;
+using EntityId = int;
 
-struct VariableNode
-{
-	EntityId id;
-
-	VariableNode(EntityId id) : id(id)
-	{
-	}
-};
-
-struct ConstantNode
-{
-	double value;
-
-	ConstantNode(double value) : value(value)
-	{
-	}
-};
-
-struct ParameterNode
-{
-	EntityId id;
-
-	ParameterNode(EntityId id) : id(id)
-	{
-	}
-};
+using VariableNode = EntityId;
+using ConstantNode = double;
+using ParameterNode = EntityId;
 
 enum class ArrayType
 {
@@ -110,6 +87,8 @@ struct ExpressionHandle
 	ExpressionHandle(ArrayType array, NodeId id) : array(array), id(id)
 	{
 	}
+
+	std::string to_string() const;
 };
 
 template <>
@@ -173,6 +152,7 @@ struct NaryNode
 
 struct ExpressionGraph
 {
+	Hashmap<EntityId, size_t> m_variable_index_map;
 	std::vector<VariableNode> m_variables;
 	std::vector<ConstantNode> m_constants;
 	std::vector<ParameterNode> m_parameters;
@@ -181,9 +161,15 @@ struct ExpressionGraph
 	std::vector<TernaryNode> m_ternaries;
 	std::vector<NaryNode> m_naries;
 
+	std::vector<ExpressionHandle> m_constraint_outputs;
+	std::vector<ExpressionHandle> m_objective_outputs;
+
 	ExpressionGraph() = default;
 
+	std::string to_string() const;
+
 	size_t n_variables() const;
+	size_t n_constants() const;
 	size_t n_parameters() const;
 
 	ExpressionHandle add_variable(EntityId id);
@@ -206,6 +192,11 @@ struct ExpressionGraph
 
 	NaryOperator get_nary_operator(const ExpressionHandle &expression) const;
 
+	void add_constraint_output(const ExpressionHandle &expression);
+	void add_objective_output(const ExpressionHandle &expression);
+	bool has_constraint_output() const;
+	bool has_objective_output() const;
+
 	// Merge VariableIndex/ScalarAffineFunction/ScalarQuadraticFunction/ExprBuilder into
 	// ExpressionGraph
 	ExpressionHandle merge_variableindex(const VariableIndex &v);
@@ -215,6 +206,11 @@ struct ExpressionGraph
 
 	// recognize compare expression
 	bool is_compare_expression(const ExpressionHandle &expr) const;
+
+	// tag the structure
+	uint64_t main_structure_hash() const;
+	uint64_t constraint_structure_hash(uint64_t hash) const;
+	uint64_t objective_structure_hash(uint64_t hash) const;
 };
 
 void unpack_comparison_expression(ExpressionGraph &graph, const ExpressionHandle &expr,

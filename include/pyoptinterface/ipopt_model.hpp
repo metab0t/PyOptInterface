@@ -1,6 +1,7 @@
 #pragma once
 
 #include "solvers/ipopt/IpStdCInterface.h"
+#include "pyoptinterface/nlexpr.hpp"
 #include "pyoptinterface/nleval.hpp"
 #include "pyoptinterface/dylib.hpp"
 #include "pyoptinterface/solver_common.hpp"
@@ -66,12 +67,10 @@ struct IpoptModel
 
 	std::string pprint_variable(const VariableIndex &variable);
 
-	ParameterIndex add_parameter(double value = 0.0);
-	void set_parameter(const ParameterIndex &parameter, double value);
-
 	double get_obj_value();
-	double get_constraint_primal(IndexT index);
-	double get_constraint_dual(IndexT index);
+	int _constraint_internal_index(const ConstraintIndex &constraint);
+	double get_constraint_primal(const ConstraintIndex &constraint);
+	double get_constraint_dual(const ConstraintIndex &constraint);
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
 	                                      double rhs, const char *name = nullptr);
@@ -102,49 +101,87 @@ struct IpoptModel
 	                                         const std::tuple<double, double> &interval,
 	                                         const char *name = nullptr);
 
-	template <typename T>
-	void add_objective(const T &expr)
+	void set_objective(const VariableIndex &expr, ObjectiveSense sense);
+	void set_objective(const ScalarAffineFunction &expr, ObjectiveSense sense);
+	void set_objective(const ScalarQuadraticFunction &expr, ObjectiveSense sense);
+	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
+
+	void _set_linear_objective(const ScalarAffineFunction &expr);
+	void _set_quadratic_objective(const ScalarQuadraticFunction &expr);
+
+	// new implementation
+	size_t n_graph_instances = 0;
+	std::vector<std::vector<int>> m_graph_instance_variables;
+	std::vector<std::vector<double>> m_graph_instance_constants;
+	// record graph instances with constraint output and objective output
+	struct GraphInstancesInfo
 	{
-		m_lq_model.add_objective(expr);
-	}
+		// hash of this graph instance
+		std::vector<uint64_t> hashes;
+		// index of this graph instance
+		std::vector<int> instance_indices;
 
-	template <typename T>
-	void set_objective(const T &expr, ObjectiveSense sense = ObjectiveSense::Minimize,
-	                   bool clear_nl = false)
+		size_t n_instances_since_last_aggregation;
+	} nl_constraint_info, nl_objective_info;
+
+	// length = n_graph_instances
+	struct GraphInstancesGroupInfo
 	{
-		if (sense != ObjectiveSense::Minimize)
-		{
-			throw std::runtime_error(
-			    "Currently Ipopt only supports ObjectiveSense::Minimize, please negate the "
-			    "objective manually if you intend to maximize the objective");
-		}
+		// which group it belongs to
+		std::vector<int> group_indices;
+		// the number in that group
+		std::vector<int> group_orders;
+	} nl_constraint_group_info, nl_objective_group_info;
 
-		m_lq_model.set_objective(expr);
-		if (clear_nl)
-		{
-			clear_nl_objective();
-		}
-	}
+	// graph groups
+	struct
+	{
+		Hashmap<uint64_t, int> hash_to_group;
+		size_t n_group = 0;
+		std::vector<int> representative_graph_indices;
+		std::vector<std::vector<int>> instance_indices;
+		std::vector<AutodiffSymbolicStructure> autodiff_structures;
+		std::vector<ConstraintAutodiffEvaluator> autodiff_evaluators;
 
-	FunctionIndex _register_function(const AutodiffSymbolicStructure &structure);
-	void _set_function_evaluator(const FunctionIndex &k, const AutodiffEvaluator &evaluator);
-	bool _has_function_evaluator(const FunctionIndex &k);
+		// where to store the hessian matrix, each group length = n_instance * local_hessian_nnz
+		std::vector<std::vector<int>> hessian_indices;
+	} nl_constraint_groups;
 
-	NLConstraintIndex _add_fn_constraint_bounds(const FunctionIndex &k,
-	                                            const std::vector<VariableIndex> &xs,
-	                                            const std::vector<ParameterIndex> &ps,
-	                                            const std::vector<double> &lbs,
-	                                            const std::vector<double> &ubs);
+	struct
+	{
+		Hashmap<uint64_t, int> hash_to_group;
+		size_t n_group = 0;
+		std::vector<int> representative_graph_indices;
+		std::vector<std::vector<int>> instance_indices;
+		std::vector<AutodiffSymbolicStructure> autodiff_structures;
+		std::vector<ObjectiveAutodiffEvaluator> autodiff_evaluators;
 
-	NLConstraintIndex _add_fn_constraint_eq(const FunctionIndex &k,
-	                                        const std::vector<VariableIndex> &xs,
-	                                        const std::vector<ParameterIndex> &ps,
-	                                        const std::vector<double> &eqs);
+		// where to store the gradient vector, each group length = n_instance * local_jacobian_nnz
+		std::vector<std::vector<int>> gradient_indices;
+		// where to store the hessian matrix, each group length = n_instance * local_hessian_nnz
+		std::vector<std::vector<int>> hessian_indices;
+	} nl_objective_groups;
 
-	void _add_fn_objective(const FunctionIndex &k, const std::vector<VariableIndex> &xs,
-	                       const std::vector<ParameterIndex> &ps);
+	int add_graph_index();
+	void record_graph_hash(size_t graph_index, const ExpressionGraph &graph);
+	int aggregate_graph_constraint_groups();
+	int get_graph_constraint_group_representative(int group_index) const;
+	int aggregate_graph_objective_groups();
+	int get_graph_objective_group_representative(int group_index) const;
 
-	void clear_nl_objective();
+	void assign_constraint_group_autodiff_structure(int group_index,
+	                                                const AutodiffSymbolicStructure &structure);
+	void assign_constraint_group_autodiff_evaluator(int group_index,
+	                                                const ConstraintAutodiffEvaluator &evaluator);
+	void assign_objective_group_autodiff_structure(int group_index,
+	                                               const AutodiffSymbolicStructure &structure);
+	void assign_objective_group_autodiff_evaluator(int group_index,
+	                                               const ObjectiveAutodiffEvaluator &evaluator);
+
+	ConstraintIndex add_single_nl_constraint(size_t graph_index, const ExpressionGraph &graph,
+	                                         double lb, double ub);
+
+	// void clear_nl_objective();
 
 	void analyze_structure();
 	void optimize();
@@ -160,22 +197,46 @@ struct IpoptModel
 	/* Members */
 
 	size_t n_variables = 0;
-	size_t n_constraints = 0;
+
+	size_t n_nl_constraints = 0;
+	/*
+	 * record the constraint indices maapping from the monotonic one (the order of adding
+	 * constraint) to the reordered one (linear, quadratic, NL group 0 -> con0, con1 ,..., conN0, NL
+	 * group1 -> con0, con1,..., conN1)
+	 */
+	// these two vectors are maintained when adding NL constraint
+	// which graph instance this constraint belongs to
+	std::vector<int> nl_constraint_graph_instance_indices;
+	// the order of this constraint in the graph instance
+	std::vector<int> nl_constraint_graph_instance_orders;
+
+	// these two vectors are constructed before optimization
+	// ext means the external monotonic order
+	// int means the internal order that passes to Ipopt
+	std::vector<int> nl_constraint_map_ext2int;
+
+	// we need a sparse vector to store the gradient
+	std::vector<double> sparse_gradient_values;
+	std::vector<int> sparse_gradient_indices;
 
 	std::vector<double> m_var_lb, m_var_ub, m_var_init;
-	std::vector<double> m_con_lb, m_con_ub;
+	std::vector<double> m_linear_con_lb, m_linear_con_ub, m_quadratic_con_lb, m_quadratic_con_ub,
+	    m_nl_con_lb, m_nl_con_ub, m_con_lb, m_con_ub;
 
-	Hashmap<IndexT, std::string> m_var_names, m_con_names;
+	Hashmap<IndexT, std::string> m_var_names;
 
 	size_t m_jacobian_nnz = 0;
-	std::vector<size_t> m_jacobian_rows, m_jacobian_cols;
+	std::vector<int> m_jacobian_rows, m_jacobian_cols;
 
 	size_t m_hessian_nnz = 0;
-	std::vector<size_t> m_hessian_rows, m_hessian_cols;
-	Hashmap<VariablePair, size_t> m_hessian_index_map;
+	std::vector<int> m_hessian_rows, m_hessian_cols;
+	Hashmap<std::tuple<int, int>, int> m_hessian_index_map;
 
-	NonlinearFunctionEvaluator m_function_model;
-	LinearQuadraticEvaluator m_lq_model;
+	LinearEvaluator m_linear_con_evaluator;
+	QuadraticEvaluator m_quadratic_con_evaluator;
+
+	std::optional<LinearEvaluator> m_linear_obj_evaluator;
+	std::optional<QuadraticEvaluator> m_quadratic_obj_evaluator;
 
 	// The options of the Ipopt solver, we cache them before constructing the m_problem
 	Hashmap<std::string, int> m_options_int;

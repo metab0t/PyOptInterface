@@ -1,7 +1,7 @@
 from io import StringIO
 import logging
 import platform
-from typing import Optional, Dict, Set, Union, Tuple, overload
+from typing import Optional, List, Dict, Set, Union, Tuple, overload
 
 from llvmlite import ir
 
@@ -10,7 +10,15 @@ from .codegen_c import generate_csrc_prelude, generate_csrc_from_graph
 from .jit_c import TCCJITCompiler
 from .codegen_llvm import create_llvmir_basic_functions, generate_llvmir_from_graph
 from .jit_llvm import LLJITCompiler
-from .nlfunc import trace_function, FunctionTracingResult, Vars, Params
+from .nlexpr_ext import ExpressionHandle, ExpressionGraph, unpack_comparison_expression
+from .nlfunc import (
+    ExpressionGraphContext,
+    convert_to_expressionhandle,
+    trace_function,
+    FunctionTracingResult,
+    Vars,
+    Params,
+)
 
 from .core_ext import (
     VariableIndex,
@@ -18,18 +26,17 @@ from .core_ext import (
     ScalarQuadraticFunction,
     ExprBuilder,
     ConstraintSense,
-    ConstraintIndex,
 )
 from .comparison_constraint import ComparisonConstraint
 from .nleval_ext import (
-    NLConstraintIndex,
-    FunctionIndex,
     AutodiffSymbolicStructure,
-    AutodiffEvaluator,
+    ConstraintAutodiffEvaluator,
+    ObjectiveAutodiffEvaluator,
 )
 from .cppad_interface_ext import (
-    cppad_trace_function,
     CppADAutodiffGraph,
+    cppad_trace_graph_constraints,
+    cppad_trace_graph_objective,
     cppad_autodiff,
 )
 
@@ -76,198 +83,6 @@ def autoload_library():
 
 
 autoload_library()
-
-
-def compile_functions_c(model: "Model", jit_compiler: TCCJITCompiler):
-    needs_compile_function_indices = []
-    for function_index in model.function_indices:
-        if not model._has_function_evaluator(function_index):
-            needs_compile_function_indices.append(function_index)
-
-    if len(needs_compile_function_indices) == 0:
-        return
-
-    io = StringIO()
-
-    generate_csrc_prelude(io)
-
-    for function_index in needs_compile_function_indices:
-        name = model.function_names[function_index]
-        autodiff_structure = model.function_autodiff_structures[function_index]
-        cppad_autodiff_graph = model.function_cppad_autodiff_graphs[function_index]
-
-        np = autodiff_structure.np
-        ny = autodiff_structure.ny
-
-        f_name = name
-        generate_csrc_from_graph(
-            io,
-            cppad_autodiff_graph.f,
-            f_name,
-            np=np,
-            indirect_x=True,
-            indirect_p=True,
-            add_y=True,
-        )
-        if autodiff_structure.has_jacobian:
-            jacobian_name = name + "_jacobian"
-            generate_csrc_from_graph(
-                io,
-                cppad_autodiff_graph.jacobian,
-                jacobian_name,
-                np=np,
-                indirect_x=True,
-                indirect_p=True,
-            )
-            gradient_name = name + "_gradient"
-            generate_csrc_from_graph(
-                io,
-                cppad_autodiff_graph.jacobian,
-                gradient_name,
-                np=np,
-                indirect_x=True,
-                indirect_p=True,
-                indirect_y=True,
-                add_y=True,
-            )
-        if autodiff_structure.has_hessian:
-            hessian_name = name + "_hessian"
-            generate_csrc_from_graph(
-                io,
-                cppad_autodiff_graph.hessian,
-                hessian_name,
-                np=np,
-                hessian_lagrange=True,
-                nw=ny,
-                indirect_x=True,
-                indirect_p=True,
-                indirect_y=True,
-                add_y=True,
-            )
-
-    csrc = io.getvalue()
-
-    inst = jit_compiler.create_instance()
-    jit_compiler.compile_string(inst, csrc)
-
-    for function_index in needs_compile_function_indices:
-        name = model.function_names[function_index]
-        autodiff_structure = model.function_autodiff_structures[function_index]
-
-        f_name = name
-        jacobian_name = name + "_jacobian"
-        gradient_name = name + "_gradient"
-        hessian_name = name + "_hessian"
-
-        f_ptr = inst.get_symbol(f_name)
-        jacobian_ptr = gradient_ptr = hessian_ptr = 0
-        if autodiff_structure.has_jacobian:
-            jacobian_ptr = inst.get_symbol(jacobian_name)
-            gradient_ptr = inst.get_symbol(gradient_name)
-        if autodiff_structure.has_hessian:
-            hessian_ptr = inst.get_symbol(hessian_name)
-
-        evaluator = AutodiffEvaluator(
-            autodiff_structure, f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr
-        )
-        model._set_function_evaluator(function_index, evaluator)
-
-
-def compile_functions_llvm(model: "Model", jit_compiler: LLJITCompiler):
-    needs_compile_function_indices = []
-    for function_index in model.function_indices:
-        if not model._has_function_evaluator(function_index):
-            needs_compile_function_indices.append(function_index)
-
-    if len(needs_compile_function_indices) == 0:
-        return
-
-    module = ir.Module(name="my_module")
-    create_llvmir_basic_functions(module)
-
-    export_functions = []
-
-    for function_index in needs_compile_function_indices:
-        name = model.function_names[function_index]
-        autodiff_structure = model.function_autodiff_structures[function_index]
-        cppad_autodiff_graph = model.function_cppad_autodiff_graphs[function_index]
-
-        np = autodiff_structure.np
-        ny = autodiff_structure.ny
-
-        f_name = name
-        generate_llvmir_from_graph(
-            module,
-            cppad_autodiff_graph.f,
-            f_name,
-            np=np,
-            indirect_x=True,
-            indirect_p=True,
-            add_y=True,
-        )
-        export_functions.append(f_name)
-        if autodiff_structure.has_jacobian:
-            jacobian_name = name + "_jacobian"
-            generate_llvmir_from_graph(
-                module,
-                cppad_autodiff_graph.jacobian,
-                jacobian_name,
-                np=np,
-                indirect_x=True,
-                indirect_p=True,
-            )
-            gradient_name = name + "_gradient"
-            generate_llvmir_from_graph(
-                module,
-                cppad_autodiff_graph.jacobian,
-                gradient_name,
-                np=np,
-                indirect_x=True,
-                indirect_p=True,
-                indirect_y=True,
-                add_y=True,
-            )
-            export_functions.extend([jacobian_name, gradient_name])
-        if autodiff_structure.has_hessian:
-            hessian_name = name + "_hessian"
-            generate_llvmir_from_graph(
-                module,
-                cppad_autodiff_graph.hessian,
-                hessian_name,
-                np=np,
-                hessian_lagrange=True,
-                nw=ny,
-                indirect_x=True,
-                indirect_p=True,
-                indirect_y=True,
-                add_y=True,
-            )
-            export_functions.append(hessian_name)
-
-    rt = jit_compiler.compile_module(module, export_functions)
-
-    for function_index in needs_compile_function_indices:
-        name = model.function_names[function_index]
-        autodiff_structure = model.function_autodiff_structures[function_index]
-
-        f_name = name
-        jacobian_name = name + "_jacobian"
-        gradient_name = name + "_gradient"
-        hessian_name = name + "_hessian"
-
-        f_ptr = rt[f_name]
-        jacobian_ptr = gradient_ptr = hessian_ptr = 0
-        if autodiff_structure.has_jacobian:
-            jacobian_ptr = rt[jacobian_name]
-            gradient_ptr = rt[gradient_name]
-        if autodiff_structure.has_hessian:
-            hessian_ptr = rt[hessian_name]
-
-        evaluator = AutodiffEvaluator(
-            autodiff_structure, f_ptr, jacobian_ptr, gradient_ptr, hessian_ptr
-        )
-        model._set_function_evaluator(function_index, evaluator)
-
 
 variable_attribute_get_func_map = {
     VariableAttribute.Value: lambda model, v: model.get_value(v),
@@ -382,27 +197,11 @@ model_attribute_set_func_map = {
 
 
 def get_constraint_primal(model, constraint):
-    if isinstance(constraint, ConstraintIndex):
-        return model.get_constraint_primal(constraint.index)
-    elif isinstance(constraint, NLConstraintIndex):
-        index = constraint.index
-        dim = constraint.dim
-        values = [model.get_constraint_primal(index + i) for i in range(dim)]
-        return values
-
-    raise ValueError(f"Unknown constraint type: {type(constraint)}")
+    return model.get_constraint_primal(constraint)
 
 
 def get_constraint_dual(model, constraint):
-    if isinstance(constraint, ConstraintIndex):
-        return model.get_constraint_dual(constraint.index)
-    elif isinstance(constraint, NLConstraintIndex):
-        index = constraint.index
-        dim = constraint.dim
-        values = [model.get_constraint_dual(index + i) for i in range(dim)]
-        return values
-
-    raise ValueError(f"Unknown constraint type: {type(constraint)}")
+    return model.get_constraint_dual(constraint)
 
 
 constraint_attribute_get_func_map = {
@@ -461,16 +260,26 @@ class Model(RawModel):
             raise ValueError(f"JIT engine can only be 'C' or 'LLVM', got {jit}")
         self.jit = jit
 
-        self.function_indices: Set[FunctionIndex] = set()
-        self.function_cppad_autodiff_graphs: Dict[FunctionIndex, CppADAutodiffGraph] = (
-            {}
-        )
-        self.function_autodiff_structures: Dict[
-            FunctionIndex, AutodiffSymbolicStructure
-        ] = {}
-        self.function_evaluators: Dict[FunctionIndex, AutodiffEvaluator] = {}
-        self.function_names: Dict[FunctionIndex, str] = {}
-        self.function_tracing_results: Dict[FunctionIndex, FunctionTracingResult] = {}
+        # store graph_instance to graph_index
+        self.graph_instance_to_index: Dict[ExpressionGraph, int] = {}
+        self.graph_instances: List[ExpressionGraph] = []
+
+        self.nl_constraint_group_num = 0
+        self.nl_constraint_group_representatives: List[int] = []
+        self.nl_constraint_cppad_autodiff_graphs: List[CppADAutodiffGraph] = []
+        self.nl_constraint_autodiff_structures: List[AutodiffSymbolicStructure] = []
+        self.nl_constraint_evaluators: List[ConstraintAutodiffEvaluator] = []
+
+        self.nl_objective_group_num = 0
+        self.nl_objective_group_representatives: List[int] = []
+        self.nl_objective_cppad_autodiff_graphs: List[CppADAutodiffGraph] = []
+        self.nl_objective_autodiff_structures: List[AutodiffSymbolicStructure] = []
+        self.nl_objective_evaluators: List[ObjectiveAutodiffEvaluator] = []
+
+        # record the analyzed part of the problem
+        self.n_graph_instances_since_last_optimize = 0
+        self.nl_constraint_group_num_since_last_optimize = 0
+        self.nl_objective_group_num_since_last_optimize = 0
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):
@@ -492,160 +301,6 @@ class Model(RawModel):
             return attribute in constraint_attribute_set_func_map
         else:
             return attribute in constraint_attribute_get_func_map
-
-    def optimize(self):
-        if self.jit == "C":
-            compile_functions_c(self, self.jit_compiler)
-        elif self.jit == "LLVM":
-            compile_functions_llvm(self, self.jit_compiler)
-        super()._optimize()
-
-    def register_function(
-        self,
-        f,
-        vars: Optional[Vars] = None,
-        params: Optional[Params] = None,
-        name: str = None,
-    ):
-        tracing_result = trace_function(f)
-        cppad_function = cppad_trace_function(
-            tracing_result.graph, tracing_result.results
-        )
-
-        autodiff_structure = AutodiffSymbolicStructure()
-        cppad_graph = CppADAutodiffGraph()
-
-        nx = cppad_function.nx
-        if vars is not None:
-            var_values = match_variable_values(tracing_result, vars.__dict__)
-        else:
-            var_values = [(i + 1) / (nx + 1) for i in range(nx)]
-        np = cppad_function.np
-        if params is not None:
-            param_values = match_parameter_values(tracing_result, params.__dict__)
-        else:
-            param_values = [(i + 1) / (np + 1) for i in range(np)]
-
-        cppad_autodiff(
-            cppad_function, autodiff_structure, cppad_graph, var_values, param_values
-        )
-
-        function_index = super()._register_function(autodiff_structure)
-        self.function_indices.add(function_index)
-        self.function_cppad_autodiff_graphs[function_index] = cppad_graph
-        self.function_autodiff_structures[function_index] = autodiff_structure
-        self.function_tracing_results[function_index] = tracing_result
-
-        if name is None:
-            name = f.__name__
-
-        # if it is not a valid identifier, we generate our own name based on numbering
-        if not name.isidentifier():
-            name = f"nlfunc_{function_index.index}"
-        else:
-            name = f"nlfunc_{name}_{function_index.index}"
-
-        self.function_names[function_index] = name
-
-        return function_index
-
-    def add_fn_constraint(
-        self,
-        function_index,
-        vars: Vars,
-        params: Optional[Params] = None,
-        eq=None,
-        lb=None,
-        ub=None,
-        name=None,
-    ):
-        tracing_result = self.function_tracing_results.get(function_index, None)
-        if tracing_result is None:
-            raise ValueError("Unregistered nonlinear function!")
-
-        var_values = match_variable_values(tracing_result, vars.__dict__)
-        if params is not None:
-            param_values = match_parameter_values(tracing_result, params.__dict__)
-            # if param is a double, we need to convert it to a ParameterIndex
-            for i, param in enumerate(param_values):
-                if isinstance(param, (int, float)):
-                    param_values[i] = self.add_parameter(param)
-        else:
-            param_values = []
-            np = tracing_result.n_parameters()
-            if np > 0:
-                raise ValueError(
-                    "Missing parameters for parameterized nonlinear function"
-                )
-
-        ny = tracing_result.n_outputs()
-        bounds_constraint = False
-        eq_constraint = False
-        if eq is not None:
-            if lb is not None or ub is not None:
-                raise ValueError("Cannot specify both equality and inequality bounds")
-            eq_constraint = True
-
-            if isinstance(eq, float):
-                eq = [eq] * ny
-
-            if len(eq) != ny:
-                raise ValueError(
-                    "Equality bounds must have the same length as the number of outputs, expects {ny}"
-                )
-        else:
-            bounds_constraint = True
-            if lb is None and ub is None:
-                raise ValueError("Must specify either equality or inequality bounds")
-            elif lb is None:
-                lb = float("-inf")
-            elif ub is None:
-                ub = float("inf")
-
-            if isinstance(lb, float):
-                lb = [lb] * ny
-            if isinstance(ub, float):
-                ub = [ub] * ny
-
-            if len(lb) != ny or len(ub) != ny:
-                raise ValueError(
-                    "Bounds must have the same length as the number of outputs, expects {ny}"
-                )
-
-        if bounds_constraint:
-            constraint_index = super()._add_fn_constraint_bounds(
-                function_index, var_values, param_values, lb, ub
-            )
-        else:
-            constraint_index = super()._add_fn_constraint_eq(
-                function_index, var_values, param_values, eq
-            )
-
-        return constraint_index
-
-    def add_fn_objective(
-        self, function_index, vars: Vars, params: Optional[Params] = None
-    ):
-        tracing_result = self.function_tracing_results.get(function_index, None)
-        if tracing_result is None:
-            raise ValueError("Unregistered nonlinear function!")
-
-        var_values = match_variable_values(tracing_result, vars.__dict__)
-        if params is not None:
-            param_values = match_parameter_values(tracing_result, params.__dict__)
-            # if param is a double, we need to convert it to a ParameterIndex
-            for i, param in enumerate(param_values):
-                if isinstance(param, (int, float)):
-                    param_values[i] = self.add_parameter(param)
-        else:
-            param_values = []
-            np = tracing_result.n_parameters()
-            if np > 0:
-                raise ValueError(
-                    "Missing parameters for parameterized nonlinear function"
-                )
-
-        super()._add_fn_objective(function_index, var_values, param_values)
 
     def get_variable_attribute(self, variable, attribute: VariableAttribute):
         def e(attribute):
@@ -783,6 +438,478 @@ class Model(RawModel):
             )
         else:
             return self._add_quadratic_constraint(arg, *args, **kwargs)
+
+    def add_nl_constraint(self, expr, eq=None, lb=None, ub=None, name=""):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError(
+                "Expression should be able to be converted to ExpressionHandle"
+            )
+        if eq is not None:
+            if lb is not None or ub is not None:
+                raise ValueError("Cannot specify both equality and inequality bounds")
+            lb = ub = eq
+        else:
+            if lb is None and ub is None:
+                is_comparison = graph.is_compare_expression(expr)
+                if is_comparison:
+                    expr, lb, ub = unpack_comparison_expression(
+                        graph, expr, float("inf")
+                    )
+                else:
+                    raise ValueError(
+                        "Must specify either equality or inequality bounds"
+                    )
+            elif lb is None:
+                lb = -float("inf")
+            elif ub is None:
+                ub = float("inf")
+
+        graph.add_constraint_output(expr)
+
+        graph_index = self.graph_instance_to_index.get(graph, None)
+        if graph_index is None:
+            graph_index = self._add_graph_index()
+            self.graph_instance_to_index[graph] = graph_index
+            self.graph_instances.append(graph)
+
+        con = self._add_single_nl_constraint(graph_index, graph, lb, ub)
+
+        return con
+
+    def add_nl_objective(self, expr):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError(
+                "Expression should be able to be converted to ExpressionHandle"
+            )
+
+        graph.add_objective_output(expr)
+
+        graph_index = self.graph_instance_to_index.get(graph, None)
+        if graph_index is None:
+            graph_index = self._add_graph_index()
+            self.graph_instance_to_index[graph] = graph_index
+            self.graph_instances.append(graph)
+
+    def optimize(self):
+        self._find_similar_graphs()
+        self._compile_evaluators()
+        # print("Compiling evaluators successfully")
+        # print(self.jit_compiler.source_codes[0])
+
+        self.n_graph_instances_since_last_optimize = len(self.graph_instances)
+        self.nl_constraint_group_num_since_last_optimize = self.nl_constraint_group_num
+        self.nl_objective_group_num_since_last_optimize = self.nl_objective_group_num
+
+        super()._optimize()
+
+    def _find_similar_graphs(self):
+        for i in range(
+            self.n_graph_instances_since_last_optimize, len(self.graph_instances)
+        ):
+            graph = self.graph_instances[i]
+            self._record_graph_hash(i, graph)
+
+        # constraint part
+
+        n_groups = self._aggregate_graph_constraint_groups()
+        # print(f"Found {n_groups} nonlinear constraint groups of similar graphs")
+        self.nl_constraint_group_num = n_groups
+
+        rep_instances = self.nl_constraint_group_representatives
+
+        for i in range(self.nl_constraint_group_num_since_last_optimize, n_groups):
+            graph_index = self._get_graph_constraint_group_representative(i)
+            rep_instances.append(graph_index)
+
+        # objective part
+        n_groups = self._aggregate_graph_objective_groups()
+        # print(f"Found {n_groups} nonlinear objective groups of similar graphs")
+        self.nl_objective_group_num = n_groups
+
+        rep_instances = self.nl_objective_group_representatives
+
+        for i in range(self.nl_objective_group_num_since_last_optimize, n_groups):
+            graph_index = self._get_graph_objective_group_representative(i)
+            rep_instances.append(graph_index)
+
+    def _compile_evaluators(self):
+        # for each group of nonlinear constraint and objective, we construct a cppad_autodiff graph
+        # and then compile them to get the function pointers
+
+        # constraint
+        # self.nl_constraint_cppad_autodiff_graphs.clear()
+        # self.nl_constraint_autodiff_structures.clear()
+        for i in range(
+            self.nl_constraint_group_num_since_last_optimize,
+            self.nl_constraint_group_num,
+        ):
+            graph_index = self.nl_constraint_group_representatives[i]
+            graph = self.graph_instances[graph_index]
+
+            # print(graph)
+
+            cppad_function = cppad_trace_graph_constraints(graph)
+
+            nx = cppad_function.nx
+            var_values = [(i + 1) / (nx + 1) for i in range(nx)]
+            np = cppad_function.np
+            param_values = [(i + 1) / (np + 1) for i in range(np)]
+
+            # print(f"nx = {nx}, np = {np}")
+            # print(f"var_values = {var_values}")
+            # print(f"param_values = {param_values}")
+
+            autodiff_structure = AutodiffSymbolicStructure()
+            cppad_graph = CppADAutodiffGraph()
+
+            cppad_autodiff(
+                cppad_function,
+                autodiff_structure,
+                cppad_graph,
+                var_values,
+                param_values,
+            )
+
+            # print(cppad_graph.f)
+
+            self._assign_constraint_group_autodiff_structure(i, autodiff_structure)
+
+            self.nl_constraint_cppad_autodiff_graphs.append(cppad_graph)
+            self.nl_constraint_autodiff_structures.append(autodiff_structure)
+
+        # objective
+        # self.nl_objective_cppad_autodiff_graphs.clear()
+        # self.nl_objective_autodiff_structures.clear()
+        for i in range(
+            self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
+        ):
+            graph_index = self.nl_objective_group_representatives[i]
+            graph = self.graph_instances[graph_index]
+
+            cppad_function = cppad_trace_graph_objective(graph)
+
+            nx = cppad_function.nx
+            var_values = [(i + 1) / (nx + 1) for i in range(nx)]
+            np = cppad_function.np
+            param_values = [(i + 1) / (np + 1) for i in range(np)]
+
+            autodiff_structure = AutodiffSymbolicStructure()
+            cppad_graph = CppADAutodiffGraph()
+
+            cppad_autodiff(
+                cppad_function,
+                autodiff_structure,
+                cppad_graph,
+                var_values,
+                param_values,
+            )
+
+            self._assign_objective_group_autodiff_structure(i, autodiff_structure)
+
+            self.nl_objective_cppad_autodiff_graphs.append(cppad_graph)
+            self.nl_objective_autodiff_structures.append(autodiff_structure)
+
+        # compile the evaluators
+        jit_compiler = self.jit_compiler
+        if isinstance(jit_compiler, TCCJITCompiler):
+            self._codegen_c()
+        elif isinstance(jit_compiler, LLJITCompiler):
+            self._codegen_llvm()
+
+    def _codegen_c(self):
+        jit_compiler: TCCJITCompiler = self.jit_compiler
+        io = StringIO()
+
+        generate_csrc_prelude(io)
+
+        for group_index in range(
+            self.nl_constraint_group_num_since_last_optimize,
+            self.nl_constraint_group_num,
+        ):
+            cppad_autodiff_graph = self.nl_constraint_cppad_autodiff_graphs[group_index]
+            autodiff_structure = self.nl_constraint_autodiff_structures[group_index]
+
+            np = autodiff_structure.np
+            ny = autodiff_structure.ny
+
+            name = f"nlconstraint_{group_index}"
+
+            f_name = name
+            generate_csrc_from_graph(
+                io,
+                cppad_autodiff_graph.f,
+                f_name,
+                np=np,
+                indirect_x=True,
+            )
+            if autodiff_structure.has_jacobian:
+                jacobian_name = name + "_jacobian"
+                generate_csrc_from_graph(
+                    io,
+                    cppad_autodiff_graph.jacobian,
+                    jacobian_name,
+                    np=np,
+                    indirect_x=True,
+                )
+            if autodiff_structure.has_hessian:
+                hessian_name = name + "_hessian"
+                generate_csrc_from_graph(
+                    io,
+                    cppad_autodiff_graph.hessian,
+                    hessian_name,
+                    np=np,
+                    hessian_lagrange=True,
+                    nw=ny,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+
+        for group_index in range(
+            self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
+        ):
+            cppad_autodiff_graph = self.nl_objective_cppad_autodiff_graphs[group_index]
+            autodiff_structure = self.nl_objective_autodiff_structures[group_index]
+
+            np = autodiff_structure.np
+            ny = autodiff_structure.ny
+
+            name = f"nlobjective_{group_index}"
+
+            f_name = name
+            generate_csrc_from_graph(
+                io, cppad_autodiff_graph.f, f_name, np=np, indirect_x=True, add_y=True
+            )
+            if autodiff_structure.has_jacobian:
+                jacobian_name = name + "_jacobian"
+                generate_csrc_from_graph(
+                    io,
+                    cppad_autodiff_graph.jacobian,
+                    jacobian_name,
+                    np=np,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+            if autodiff_structure.has_hessian:
+                hessian_name = name + "_hessian"
+                generate_csrc_from_graph(
+                    io,
+                    cppad_autodiff_graph.hessian,
+                    hessian_name,
+                    np=np,
+                    hessian_lagrange=True,
+                    nw=ny,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+
+        csrc = io.getvalue()
+
+        inst = jit_compiler.create_instance()
+        jit_compiler.compile_string(inst, csrc)
+
+        for group_index in range(
+            self.nl_constraint_group_num_since_last_optimize,
+            self.nl_constraint_group_num,
+        ):
+            name = f"nlconstraint_{group_index}"
+            autodiff_structure = self.nl_constraint_autodiff_structures[group_index]
+            has_parameter = autodiff_structure.has_parameter
+
+            f_name = name
+            jacobian_name = name + "_jacobian"
+            hessian_name = name + "_hessian"
+
+            f_ptr = inst.get_symbol(f_name)
+            jacobian_ptr = hessian_ptr = 0
+            if autodiff_structure.has_jacobian:
+                jacobian_ptr = inst.get_symbol(jacobian_name)
+            if autodiff_structure.has_hessian:
+                hessian_ptr = inst.get_symbol(hessian_name)
+
+            evaluator = ConstraintAutodiffEvaluator(
+                has_parameter, f_ptr, jacobian_ptr, hessian_ptr
+            )
+            self._assign_constraint_group_autodiff_evaluator(group_index, evaluator)
+
+        for group_index in range(
+            self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
+        ):
+            name = f"nlobjective_{group_index}"
+            autodiff_structure = self.nl_objective_autodiff_structures[group_index]
+            has_parameter = autodiff_structure.has_parameter
+
+            f_name = name
+            jacobian_name = name + "_jacobian"
+            hessian_name = name + "_hessian"
+
+            f_ptr = inst.get_symbol(f_name)
+            jacobian_ptr = hessian_ptr = 0
+            if autodiff_structure.has_jacobian:
+                jacobian_ptr = inst.get_symbol(jacobian_name)
+            if autodiff_structure.has_hessian:
+                hessian_ptr = inst.get_symbol(hessian_name)
+
+            evaluator = ObjectiveAutodiffEvaluator(
+                has_parameter, f_ptr, jacobian_ptr, hessian_ptr
+            )
+            self._assign_objective_group_autodiff_evaluator(group_index, evaluator)
+
+    def _codegen_llvm(self):
+        jit_compiler: LLJITCompiler = self.jit_compiler
+        module = ir.Module(name="my_module")
+        create_llvmir_basic_functions(module)
+
+        export_functions = []
+
+        for group_index in range(
+            self.nl_constraint_group_num_since_last_optimize,
+            self.nl_constraint_group_num,
+        ):
+            cppad_autodiff_graph = self.nl_constraint_cppad_autodiff_graphs[group_index]
+            autodiff_structure = self.nl_constraint_autodiff_structures[group_index]
+
+            np = autodiff_structure.np
+            ny = autodiff_structure.ny
+
+            name = f"nlconstraint_{group_index}"
+
+            f_name = name
+            generate_llvmir_from_graph(
+                module,
+                cppad_autodiff_graph.f,
+                f_name,
+                np=np,
+                indirect_x=True,
+            )
+            export_functions.append(f_name)
+            if autodiff_structure.has_jacobian:
+                jacobian_name = name + "_jacobian"
+                generate_llvmir_from_graph(
+                    module,
+                    cppad_autodiff_graph.jacobian,
+                    jacobian_name,
+                    np=np,
+                    indirect_x=True,
+                )
+                export_functions.append(jacobian_name)
+            if autodiff_structure.has_hessian:
+                hessian_name = name + "_hessian"
+                generate_llvmir_from_graph(
+                    module,
+                    cppad_autodiff_graph.hessian,
+                    hessian_name,
+                    np=np,
+                    hessian_lagrange=True,
+                    nw=ny,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+                export_functions.append(hessian_name)
+
+        for group_index in range(
+            self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
+        ):
+            cppad_autodiff_graph = self.nl_objective_cppad_autodiff_graphs[group_index]
+            autodiff_structure = self.nl_objective_autodiff_structures[group_index]
+
+            np = autodiff_structure.np
+            ny = autodiff_structure.ny
+
+            name = f"nlobjective_{group_index}"
+
+            f_name = name
+            generate_llvmir_from_graph(
+                module,
+                cppad_autodiff_graph.f,
+                f_name,
+                np=np,
+                indirect_x=True,
+                add_y=True,
+            )
+            export_functions.append(f_name)
+            if autodiff_structure.has_jacobian:
+                jacobian_name = name + "_jacobian"
+                generate_llvmir_from_graph(
+                    module,
+                    cppad_autodiff_graph.jacobian,
+                    jacobian_name,
+                    np=np,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+                export_functions.append(jacobian_name)
+            if autodiff_structure.has_hessian:
+                hessian_name = name + "_hessian"
+                generate_llvmir_from_graph(
+                    module,
+                    cppad_autodiff_graph.hessian,
+                    hessian_name,
+                    np=np,
+                    hessian_lagrange=True,
+                    nw=ny,
+                    indirect_x=True,
+                    indirect_y=True,
+                    add_y=True,
+                )
+                export_functions.append(hessian_name)
+
+        rt = jit_compiler.compile_module(module, export_functions)
+
+        for group_index in range(
+            self.nl_constraint_group_num_since_last_optimize,
+            self.nl_constraint_group_num,
+        ):
+            name = f"nlconstraint_{group_index}"
+            autodiff_structure = self.nl_constraint_autodiff_structures[group_index]
+            has_parameter = autodiff_structure.has_parameter
+
+            f_name = name
+            jacobian_name = name + "_jacobian"
+            hessian_name = name + "_hessian"
+
+            f_ptr = rt[f_name]
+            jacobian_ptr = hessian_ptr = 0
+            if autodiff_structure.has_jacobian:
+                jacobian_ptr = rt[jacobian_name]
+            if autodiff_structure.has_hessian:
+                hessian_ptr = rt[hessian_name]
+
+            evaluator = ConstraintAutodiffEvaluator(
+                has_parameter, f_ptr, jacobian_ptr, hessian_ptr
+            )
+            self._assign_constraint_group_autodiff_evaluator(group_index, evaluator)
+
+        for group_index in range(
+            self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
+        ):
+            name = f"nlobjective_{group_index}"
+            autodiff_structure = self.nl_objective_autodiff_structures[group_index]
+            has_parameter = autodiff_structure.has_parameter
+
+            f_name = name
+            jacobian_name = name + "_jacobian"
+            hessian_name = name + "_hessian"
+
+            f_ptr = rt[f_name]
+            jacobian_ptr = hessian_ptr = 0
+            if autodiff_structure.has_jacobian:
+                jacobian_ptr = rt[jacobian_name]
+            if autodiff_structure.has_hessian:
+                hessian_ptr = rt[hessian_name]
+
+            evaluator = ObjectiveAutodiffEvaluator(
+                has_parameter, f_ptr, jacobian_ptr, hessian_ptr
+            )
+            self._assign_objective_group_autodiff_evaluator(group_index, evaluator)
 
 
 Model.add_variables = make_variable_tupledict

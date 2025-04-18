@@ -22,20 +22,11 @@ NB_MODULE(nleval_ext, m)
 	    .def_ro("has_jacobian", &AutodiffSymbolicStructure::has_jacobian)
 	    .def_ro("has_hessian", &AutodiffSymbolicStructure::has_hessian);
 
-	nb::class_<AutodiffEvaluator>(m, "AutodiffEvaluator")
+	nb::class_<ConstraintAutodiffEvaluator>(m, "ConstraintAutodiffEvaluator")
 	    .def(nb::init<>())
-	    .def(nb::init<const AutodiffSymbolicStructure &, uintptr_t, uintptr_t, uintptr_t,
-	                  uintptr_t>());
+	    .def(nb::init<bool, uintptr_t, uintptr_t, uintptr_t>());
 
-	nb::class_<ParameterIndex>(m, "ParameterIndex")
-	    .def(nb::init<IndexT>())
-	    .def_ro("index", &ParameterIndex::index);
-
-	nb::class_<FunctionIndex>(m, "FunctionIndex")
-	    .def(nb::init<IndexT>())
-	    .def_ro("index", &FunctionIndex::index);
-
-	nb::class_<NLConstraintIndex>(m, "NLConstraintIndex")
-	    .def_ro("index", &NLConstraintIndex::index)
-	    .def_ro("dim", &NLConstraintIndex::dim);
+	nb::class_<ObjectiveAutodiffEvaluator>(m, "ObjectiveAutodiffEvaluator")
+	    .def(nb::init<>())
+	    .def(nb::init<bool, uintptr_t, uintptr_t, uintptr_t>());
 }

@@ -492,12 +492,12 @@ void GurobiModel::information_of_expr(const ExpressionGraph &graph, const Expres
 	{
 	case ArrayType::Constant: {
 		opcode = GRB_OPCODE_CONSTANT;
-		data = graph.m_constants[index].value;
+		data = graph.m_constants[index];
 		break;
 	}
 	case ArrayType::Variable: {
 		opcode = GRB_OPCODE_VARIABLE;
-		data = _checked_variable_index(graph.m_variables[index].id);
+		data = _checked_variable_index(graph.m_variables[index]);
 		break;
 	}
 	case ArrayType::Parameter: {

@@ -1,5 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/string.h>
 
 #include "pyoptinterface/nlexpr.hpp"
 
@@ -8,18 +10,6 @@ namespace nb = nanobind;
 NB_MODULE(nlexpr_ext, m)
 {
 	m.import_("pyoptinterface._src.core_ext");
-
-	nb::class_<VariableNode>(m, "VariableNode")
-	    .def(nb::init<EntityId>())
-	    .def_ro("id", &VariableNode::id);
-
-	nb::class_<ConstantNode>(m, "ConstantNode")
-	    .def(nb::init<double>())
-	    .def_ro("value", &ConstantNode::value);
-
-	nb::class_<ParameterNode>(m, "ParameterNode")
-	    .def(nb::init<EntityId>())
-	    .def_ro("id", &ParameterNode::id);
 
 	nb::enum_<ArrayType>(m, "ArrayType")
 	    .value("Constant", ArrayType::Constant)
@@ -86,6 +76,7 @@ NB_MODULE(nlexpr_ext, m)
 
 	nb::class_<ExpressionGraph>(m, "ExpressionGraph")
 	    .def(nb::init<>())
+	    .def("__str__", &ExpressionGraph::to_string)
 	    .def("n_variables", &ExpressionGraph::n_variables)
 	    .def("n_parameters", &ExpressionGraph::n_parameters)
 	    .def("add_variable", &ExpressionGraph::add_variable, nb::arg("id") = 0)
@@ -98,9 +89,19 @@ NB_MODULE(nlexpr_ext, m)
 	    .def("add_repeat_nary", &ExpressionGraph::add_repeat_nary)
 	    .def("append_nary", &ExpressionGraph::append_nary)
 	    .def("get_nary_operator", &ExpressionGraph::get_nary_operator)
+	    .def("add_constraint_output", &ExpressionGraph::add_constraint_output)
+	    .def("add_objective_output", &ExpressionGraph::add_objective_output)
 	    .def("merge_variableindex", &ExpressionGraph::merge_variableindex)
 	    .def("merge_scalaraffinefunction", &ExpressionGraph::merge_scalaraffinefunction)
 	    .def("merge_scalarquadraticfunction", &ExpressionGraph::merge_scalarquadraticfunction)
 	    .def("merge_exprbuilder", &ExpressionGraph::merge_exprbuilder)
 	    .def("is_compare_expression", &ExpressionGraph::is_compare_expression);
+
+	m.def("unpack_comparison_expression",
+	      [](ExpressionGraph &graph, const ExpressionHandle &expr, double INF) {
+		      ExpressionHandle real_expr;
+		      double lb = -INF, ub = INF;
+		      unpack_comparison_expression(graph, expr, real_expr, lb, ub);
+		      return std::make_tuple(real_expr, lb, ub);
+	      });
 }

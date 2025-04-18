@@ -127,13 +127,13 @@ def generate_csrc_from_graph(
         function_args_signature.append("const float_point_t* w")
     function_args_signature.append("float_point_t* y")
     if indirect_x:
-        function_args_signature.append("const size_t* xi")
+        function_args_signature.append("const int* xi")
     if has_parameter and indirect_p:
-        function_args_signature.append("const size_t* pi")
+        function_args_signature.append("const int* pi")
     if hessian_lagrange and indirect_w:
-        function_args_signature.append("const size_t* wi")
+        function_args_signature.append("const int* wi")
     if indirect_y:
-        function_args_signature.append("const size_t* yi")
+        function_args_signature.append("const int* yi")
 
     function_args = ", ".join(function_args_signature)
 
@@ -170,10 +170,11 @@ void {name}(
     )
 
     nc = n_constant
-    cs = (graph_obj.constant_vec_get(i) for i in range(nc))
-    cs_str = ", ".join(f"{c}" for c in cs)
-    io.write(
-        f"""
+    if nc > 0:
+        cs = (graph_obj.constant_vec_get(i) for i in range(nc))
+        cs_str = ", ".join(f"{c}" for c in cs)
+        io.write(
+            f"""
     // constants
     // set c[i] for i = 0, ..., nc-1
     // nc = {nc}
@@ -181,7 +182,7 @@ void {name}(
         {cs_str}
     }};
 """
-    )
+        )
 
     n_result_node = n_node
     io.write(

@@ -5,33 +5,8 @@ from pyoptinterface import nlfunc
 import pytest
 
 
-def test_acopf(ipopt_model_ctor):
-    model = ipopt_model_ctor()
-
-    def branch_flow(vars, params):
-        G, B, Bc = params.G, params.B, params.Bc
-        Vi, Vj, theta_i, theta_j, Pij, Qij, Pji, Qji = (
-            vars.Vi,
-            vars.Vj,
-            vars.theta_i,
-            vars.theta_j,
-            vars.Pij,
-            vars.Qij,
-            vars.Pji,
-            vars.Qji,
-        )
-
-        sin_ij = nlfunc.sin(theta_i - theta_j)
-        cos_ij = nlfunc.cos(theta_i - theta_j)
-
-        Pij_eq = G * Vi**2 - Vi * Vj * (G * cos_ij + B * sin_ij) - Pij
-        Qij_eq = -(B + Bc) * Vi**2 - Vi * Vj * (G * sin_ij - B * cos_ij) - Qij
-        Pji_eq = G * Vj**2 - Vi * Vj * (G * cos_ij - B * sin_ij) - Pji
-        Qji_eq = -(B + Bc) * Vj**2 - Vi * Vj * (-G * sin_ij - B * cos_ij) - Qji
-
-        return [Pij_eq, Qij_eq, Pji_eq, Qji_eq]
-
-    bf = model.register_function(branch_flow)
+def test_acopf(nlp_model_ctor):
+    model = nlp_model_ctor()
 
     branches = [
         # (from, to, R, X, B, angmin, angmax, Smax)
@@ -90,41 +65,47 @@ def test_acopf(ipopt_model_ctor):
 
     # nonlinear constraints
     for k in range(N_branch):
-        branch = branches[k]
-        R, X, Bc2 = branch[2], branch[3], branch[4]
+        with nlfunc.graph():
+            branch = branches[k]
+            R, X, Bc2 = branch[2], branch[3], branch[4]
 
-        G = R / (R**2 + X**2)
-        B = -X / (R**2 + X**2)
-        Bc = Bc2 / 2
+            G = R / (R**2 + X**2)
+            B = -X / (R**2 + X**2)
+            Bc = Bc2 / 2
 
-        i = branch[0]
-        j = branch[1]
+            i = branch[0]
+            j = branch[1]
 
-        Vi = V[i]
-        Vj = V[j]
-        theta_i = theta[i]
-        theta_j = theta[j]
+            Vi = V[i]
+            Vj = V[j]
+            theta_i = theta[i]
+            theta_j = theta[j]
 
-        Pij = Pbr_from[k]
-        Qij = Qbr_from[k]
-        Pji = Pbr_to[k]
-        Qji = Qbr_to[k]
+            Pij = Pbr_from[k]
+            Qij = Qbr_from[k]
+            Pji = Pbr_to[k]
+            Qji = Qbr_to[k]
 
-        model.add_fn_constraint(
-            bf,
-            vars=nlfunc.Vars(
-                Vi=Vi,
-                Vj=Vj,
-                theta_i=theta_i,
-                theta_j=theta_j,
-                Pij=Pij,
-                Qij=Qij,
-                Pji=Pji,
-                Qji=Qji,
-            ),
-            params=nlfunc.Params(G=G, B=B, Bc=Bc),
-            eq=0.0,
-        )
+            sin_ij = nlfunc.sin(theta_i - theta_j)
+            cos_ij = nlfunc.cos(theta_i - theta_j)
+
+            Pij_eq = G * Vi**2 - Vi * Vj * (G * cos_ij + B * sin_ij) - Pij
+            Qij_eq = -(B + Bc) * Vi**2 - Vi * Vj * (G * sin_ij - B * cos_ij) - Qij
+            Pji_eq = G * Vj**2 - Vi * Vj * (G * cos_ij - B * sin_ij) - Pji
+            Qji_eq = -(B + Bc) * Vj**2 - Vi * Vj * (-G * sin_ij - B * cos_ij) - Qji
+
+            model.add_nl_constraint(
+                Pij_eq == 0.0,
+            )
+            model.add_nl_constraint(
+                Qij_eq == 0.0,
+            )
+            model.add_nl_constraint(
+                Pji_eq == 0.0,
+            )
+            model.add_nl_constraint(
+                Qji_eq == 0.0,
+            )
 
     # power balance constraints
     P_balance_eq = [poi.ExprBuilder() for i in range(N_bus)]

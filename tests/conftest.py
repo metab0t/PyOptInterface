@@ -1,9 +1,9 @@
 import pytest
 import platform
 
-ipopt_model_dict = {}
+from pyoptinterface import gurobi, copt, mosek, highs, ipopt
 
-import pyoptinterface.ipopt as ipopt
+nlp_model_dict = {}
 
 if ipopt.is_library_loaded():
 
@@ -13,24 +13,25 @@ if ipopt.is_library_loaded():
     def c():
         return ipopt.Model(jit="C")
 
-    ipopt_model_dict["ipopt_llvm"] = llvm
+    nlp_model_dict["ipopt_llvm"] = llvm
     system = platform.system()
     if system != "Darwin":
         # On macOS, loading dynamic library of Gurobi/COPT/Mosek before loading libtcc will cause memory error
         # The reason is still unclear
-        ipopt_model_dict["ipopt_c"] = c
+        nlp_model_dict["ipopt_c"] = c
+
+# if copt.is_library_loaded():
+#     nlp_model_dict["copt"] = copt.Model
 
 
-@pytest.fixture(params=ipopt_model_dict.keys())
-def ipopt_model_ctor(request):
+@pytest.fixture(params=nlp_model_dict.keys())
+def nlp_model_ctor(request):
     name = request.param
-    ctor = ipopt_model_dict[name]
+    ctor = nlp_model_dict[name]
     return ctor
 
 
 model_interface_dict = {}
-
-from pyoptinterface import gurobi, copt, mosek, highs
 
 if gurobi.is_library_loaded():
     model_interface_dict["gurobi"] = gurobi.Model

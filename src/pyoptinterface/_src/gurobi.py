@@ -815,7 +815,9 @@ class Model(RawModel):
             if lb is None and ub is None:
                 is_comparison = graph.is_compare_expression(expr)
                 if is_comparison:
-                    return self._add_single_nl_constraint_from_comparison(graph, expr, name)
+                    return self._add_single_nl_constraint_from_comparison(
+                        graph, expr, name
+                    )
                 else:
                     raise ValueError(
                         "Must specify either equality or inequality bounds"

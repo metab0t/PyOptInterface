@@ -1,5 +1,7 @@
 #include "pyoptinterface/cppad_interface.hpp"
 
+#include "fmt/core.h"
+
 static const std::string opt_options = "no_compare_op no_conditional_skip no_cumulative_sum_op";
 
 ADFunDouble dense_jacobian(const ADFunDouble &f)
@@ -71,11 +73,6 @@ JacobianHessianSparsityPattern jacobian_hessian_sparsity(ADFunDouble &f,
 	f.rev_hes_sparsity(select_range, transpose, internal_bool, pattern_hes);
 
 	jachess.hessian = pattern_hes;
-	if (hessian_sparsity == HessianSparsityType::Full)
-	{
-		jachess.reduced_hessian = pattern_hes;
-		return jachess;
-	}
 
 	// Filter the sparsity pattern
 	sparsity_pattern_t pattern_hes_partial;
@@ -246,7 +243,8 @@ CppAD::AD<double> cppad_build_unary_expression(UnaryOperator op, const CppAD::AD
 		return CppAD::log10(operand);
 	}
 	default: {
-		throw std::runtime_error("Invalid unary operator");
+		auto msg = "Invalid unary operator " + unary_operator_to_string(op);
+		throw std::runtime_error(msg);
 	}
 	}
 }
@@ -263,6 +261,7 @@ CppAD::AD<double> cppad_build_binary_expression(BinaryOperator op, const CppAD::
 		return left / right;
 	}
 	case BinaryOperator::Pow: {
+		fmt::print("cppad_build_binary_expression encounters Pow\n");
 		return CppAD::pow(left, right);
 	}
 	case BinaryOperator::LessThan:
@@ -275,7 +274,8 @@ CppAD::AD<double> cppad_build_binary_expression(BinaryOperator op, const CppAD::
 		                         "function and cannot be evaluated as value");
 	}
 	default: {
-		throw std::runtime_error("Invalid binary operator");
+		auto msg = "Invalid binary operator " + binary_operator_to_string(op);
+		throw std::runtime_error(msg);
 	}
 	}
 }
@@ -307,7 +307,8 @@ CppAD::AD<double> cppad_build_ternary_expression(BinaryOperator compare_op,
 		return CppAD::CondExpGt(compare_left, compare_right, then_result, else_result);
 	}
 	default: {
-		throw std::runtime_error("Invalid compare operator");
+		auto msg = "Invalid compare operator " + binary_operator_to_string(compare_op);
+		throw std::runtime_error(msg);
 	}
 	}
 }
@@ -335,6 +336,10 @@ CppAD::AD<double> cppad_build_nary_expression(NaryOperator op,
 		}
 		break;
 	}
+	default: {
+		auto msg = "Invalid nary operator " + nary_operator_to_string(op);
+		throw std::runtime_error(msg);
+	}
 	}
 	return result;
 }
@@ -358,12 +363,11 @@ CppAD::AD<double> cppad_trace_expression(
 		break;
 	}
 	case ArrayType::Constant: {
-		auto &constant = graph.m_constants[id];
-		result = constant.value;
+		result = p[id];
 		break;
 	}
 	case ArrayType::Parameter: {
-		result = p[id];
+		throw std::runtime_error("Parameter is not supported in cppad_trace_expression");
 		break;
 	}
 	case ArrayType::Unary: {
@@ -424,16 +428,22 @@ CppAD::AD<double> cppad_trace_expression(
 	return result;
 }
 
-ADFunDouble cppad_trace_function(const ExpressionGraph &graph,
-                                 const std::vector<ExpressionHandle> &outputs)
+ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
 	auto N_inputs = graph.n_variables();
 	std::vector<CppAD::AD<double>> x(N_inputs);
 
-	auto N_parameters = graph.n_parameters();
+	auto N_parameters = graph.n_constants();
 	std::vector<CppAD::AD<double>> p(N_parameters);
+	// Must assign value to parameter, otherwise p will be zero
+	// and CppAD::pow(x, p) will be 0
+	for (size_t i = 0; i < N_parameters; i++)
+	{
+		p[i] = graph.m_constants[i];
+	}
+
 	if (N_parameters > 0)
 	{
 		CppAD::Independent(x, p);
@@ -443,6 +453,7 @@ ADFunDouble cppad_trace_function(const ExpressionGraph &graph,
 		CppAD::Independent(x);
 	}
 
+	auto &outputs = graph.m_constraint_outputs;
 	auto N_outputs = outputs.size();
 	std::vector<CppAD::AD<double>> y(N_outputs);
 
@@ -455,6 +466,52 @@ ADFunDouble cppad_trace_function(const ExpressionGraph &graph,
 
 	ADFunDouble f;
 	f.Dependent(x, y);
+
+	return f;
+}
+
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph)
+{
+	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
+
+	auto N_inputs = graph.n_variables();
+	std::vector<CppAD::AD<double>> x(N_inputs);
+
+	auto N_parameters = graph.n_constants();
+	std::vector<CppAD::AD<double>> p(N_parameters);
+	for (size_t i = 0; i < N_parameters; i++)
+	{
+		p[i] = graph.m_constants[i];
+	}
+
+	if (N_parameters > 0)
+	{
+		CppAD::Independent(x, p);
+	}
+	else
+	{
+		CppAD::Independent(x);
+	}
+
+	auto &outputs = graph.m_objective_outputs;
+	auto N_outputs = outputs.size();
+	std::vector<CppAD::AD<double>> y(N_outputs);
+
+	// Trace the outputs
+	for (size_t i = 0; i < N_outputs; i++)
+	{
+		auto &output = outputs[i];
+		y[i] = cppad_trace_expression(graph, output, x, p, seen_expressions);
+	}
+
+	CppAD::AD<double> y_sum = 0.0;
+	for (size_t i = 0; i < N_outputs; i++)
+	{
+		y_sum += y[i];
+	}
+
+	ADFunDouble f;
+	f.Dependent(x, {y_sum});
 
 	return f;
 }

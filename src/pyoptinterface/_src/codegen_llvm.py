@@ -6,9 +6,8 @@ from llvmlite import ir
 
 D = ir.DoubleType()
 D_PTR = ir.PointerType(D)
-SZ = ir.IntType(64)
-SZ_PTR = ir.PointerType(SZ)
 I = ir.IntType(32)
+I_PTR = ir.PointerType(I)
 
 
 def create_azmul(module: ir.Module):
@@ -68,9 +67,9 @@ def create_sign(module: ir.Module):
 
 def create_direct_load_store(module: ir.Module):
     # Define and create the load_direct function
-    # D load_directly(D_PTR, SZ)
+    # D load_directly(D_PTR, I)
     # returns ptr[idx_ptr[idx]]
-    load_direct_func_type = ir.FunctionType(D, [D_PTR, SZ])
+    load_direct_func_type = ir.FunctionType(D, [D_PTR, I])
     load_direct_func = ir.Function(module, load_direct_func_type, name="load_direct")
     load_direct_func.attributes.add("alwaysinline")
     ptr, idx = load_direct_func.args
@@ -86,9 +85,9 @@ def create_direct_load_store(module: ir.Module):
     builder.ret(val)
 
     # Define and create the store_direct function
-    # void store_directly(D_PTR, SZ, D)
+    # void store_directly(D_PTR, I, D)
     # ptr[idx] = val
-    store_direct_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, SZ, D])
+    store_direct_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, I, D])
     store_direct_func = ir.Function(module, store_direct_func_type, name="store_direct")
     store_direct_func.attributes.add("alwaysinline")
     ptr, idx, val = store_direct_func.args
@@ -105,9 +104,9 @@ def create_direct_load_store(module: ir.Module):
     builder.ret_void()
 
     # Define and create the add_store_direct function
-    # void add_store_directly(D_PTR, SZ, D)
+    # void add_store_directly(D_PTR, I, D)
     # ptr[idx] += val
-    add_store_direct_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, SZ, D])
+    add_store_direct_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, I, D])
     add_store_direct_func = ir.Function(
         module, add_store_direct_func_type, name="add_store_direct"
     )
@@ -130,9 +129,9 @@ def create_direct_load_store(module: ir.Module):
 
 def create_indirect_load_store(module: ir.Module):
     # Define and create the load_indirect function
-    # D load_indirectly(D_PTR, SZ_PTR, SZ)
+    # D load_indirectly(D_PTR, I_PTR, I)
     # returns ptr[idx_ptr[idx]]
-    load_indirect_func_type = ir.FunctionType(D, [D_PTR, SZ_PTR, SZ])
+    load_indirect_func_type = ir.FunctionType(D, [D_PTR, I_PTR, I])
     load_indirect_func = ir.Function(
         module, load_indirect_func_type, name="load_indirect"
     )
@@ -153,9 +152,9 @@ def create_indirect_load_store(module: ir.Module):
     builder.ret(val)
 
     # Define and create the store_indirect function
-    # void store_indirectly(D_PTR, SZ_PTR, SZ, D)
+    # void store_indirectly(D_PTR, I_PTR, I, D)
     # ptr[idx_ptr[idx]] = val
-    store_indirect_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, SZ_PTR, SZ, D])
+    store_indirect_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, I_PTR, I, D])
     store_indirect_func = ir.Function(
         module, store_indirect_func_type, name="store_indirect"
     )
@@ -177,11 +176,9 @@ def create_indirect_load_store(module: ir.Module):
     builder.ret_void()
 
     # Define and create the add_store_indirect function
-    # void add_store_indirectly(D_PTR, SZ_PTR, SZ, D)
+    # void add_store_indirectly(D_PTR, I_PTR, I, D)
     # ptr[idx_ptr[idx]] += val
-    add_store_indirect_func_type = ir.FunctionType(
-        ir.VoidType(), [D_PTR, SZ_PTR, SZ, D]
-    )
+    add_store_indirect_func_type = ir.FunctionType(ir.VoidType(), [D_PTR, I_PTR, I, D])
     add_store_indirect_func = ir.Function(
         module, add_store_indirect_func_type, name="add_store_indirect"
     )
@@ -286,16 +283,16 @@ def generate_llvmir_from_graph(
     func_args.append(D_PTR)
     arg_names.append("y")
     if indirect_x:
-        func_args.append(SZ_PTR)
+        func_args.append(I_PTR)
         arg_names.append("xi")
     if has_parameter and indirect_p:
-        func_args.append(SZ_PTR)
+        func_args.append(I_PTR)
         arg_names.append("pi")
     if hessian_lagrange and indirect_w:
-        func_args.append(SZ_PTR)
+        func_args.append(I_PTR)
         arg_names.append("wi")
     if indirect_y:
-        func_args.append(SZ_PTR)
+        func_args.append(I_PTR)
         arg_names.append("yi")
 
     func_type = ir.FunctionType(ir.VoidType(), func_args)
@@ -379,9 +376,9 @@ def generate_llvmir_from_graph(
             val = p_dict.get(p_index, None)
             if val is None:
                 if indirect_p:
-                    val = builder.call(load_indirect, [p, pi, SZ(p_index)])
+                    val = builder.call(load_indirect, [p, pi, I(p_index)])
                 else:
-                    val = builder.call(load_direct, [p, SZ(p_index)])
+                    val = builder.call(load_direct, [p, I(p_index)])
                 val.name = f"p[{p_index}]"
                 p_dict[p_index] = val
         elif node < 1 + n_dynamic_ind + n_variable_ind:
@@ -391,9 +388,9 @@ def generate_llvmir_from_graph(
                     val = w_dict.get(w_index, None)
                     if val is None:
                         if indirect_w:
-                            val = builder.call(load_indirect, [w, wi, SZ(w_index)])
+                            val = builder.call(load_indirect, [w, wi, I(w_index)])
                         else:
-                            val = builder.call(load_direct, [w, SZ(w_index)])
+                            val = builder.call(load_direct, [w, I(w_index)])
                         val.name = f"w[{w_index}]"
                         w_dict[w_index] = val
                 else:
@@ -401,9 +398,9 @@ def generate_llvmir_from_graph(
                     val = x_dict.get(x_index, None)
                     if val is None:
                         if indirect_x:
-                            val = builder.call(load_indirect, [x, xi, SZ(x_index)])
+                            val = builder.call(load_indirect, [x, xi, I(x_index)])
                         else:
-                            val = builder.call(load_direct, [x, SZ(x_index)])
+                            val = builder.call(load_direct, [x, I(x_index)])
                         val.name = f"x[{x_index}]"
                         x_dict[x_index] = val
             else:
@@ -411,16 +408,16 @@ def generate_llvmir_from_graph(
                 val = x_dict.get(x_index, None)
                 if val is None:
                     if indirect_x:
-                        val = builder.call(load_indirect, [x, xi, SZ(x_index)])
+                        val = builder.call(load_indirect, [x, xi, I(x_index)])
                     else:
-                        val = builder.call(load_direct, [x, SZ(x_index)])
+                        val = builder.call(load_direct, [x, I(x_index)])
                     val.name = f"x[{x_index}]"
                     x_dict[x_index] = val
         elif node < 1 + n_dynamic_ind + n_variable_ind + n_constant:
             c_index = node - 1 - n_dynamic_ind - n_variable_ind
             val = c_dict.get(c_index, None)
             if val is None:
-                val = builder.call(load_direct, [c_global_ptr, SZ(c_index)])
+                val = builder.call(load_direct, [c_global_ptr, I(c_index)])
                 val.name = f"c[{c_index}]"
                 c_dict[c_index] = val
         else:
@@ -498,9 +495,9 @@ def generate_llvmir_from_graph(
         val = get_node_value(node)
         builder.comment(f"write y[{i}]")
         if indirect_y:
-            builder.call(store_f, [y, yi, SZ(i), val])
+            builder.call(store_f, [y, yi, I(i), val])
         else:
-            builder.call(store_f, [y, SZ(i), val])
+            builder.call(store_f, [y, I(i), val])
 
     # Return from the function
     builder.ret_void()

@@ -20,61 +20,36 @@ def rocket_model(model: ipopt.Model, nh: int):
     D_c = 0.5 * v_c * (m_0 / g_0)
     T_max = T_c * m_0 * g_0
 
-    h = [model.add_variable(lb=1.0, start=1.0) for _ in range(nh)]
-    v = [model.add_variable(lb=0.0, start=i / nh * (1.0 - i / nh)) for i in range(nh)]
-    m = [
-        model.add_variable(lb=m_f, ub=m_0, start=(m_f - m_0) * (i / nh) + m_0)
-        for i in range(nh)
-    ]
-    T = [model.add_variable(lb=0.0, ub=T_max, start=T_max / 2.0) for i in range(nh)]
-    step = model.add_variable(lb=0.0, start=1.0 / nh)
+    h = [model.add_variable(lb=1.0) for _ in range(nh)]
+    v = [model.add_variable(lb=0.0) for i in range(nh)]
+    m = [model.add_variable(lb=m_f, ub=m_0) for i in range(nh)]
+    T = [model.add_variable(lb=0.0, ub=T_max) for i in range(nh)]
+    step = model.add_variable(lb=0.0)
 
     model.set_objective(-1.0 * h[-1])
 
-    def dynamics_eq(vars):
-        h1 = vars.h1
-        h2 = vars.h2
-        v1 = vars.v1
-        v2 = vars.v2
-        m1 = vars.m1
-        m2 = vars.m2
-        T1 = vars.T1
-        T2 = vars.T2
-
-        step = vars.step
-
-        eq_h = h2 - h1 - 0.5 * step * (v1 + v2)
-
-        D1 = D_c * v1 * v1 * nlfunc.exp(-h_c * (h1 - h_0)) / h_0
-        D2 = D_c * v2 * v2 * nlfunc.exp(-h_c * (h2 - h_0)) / h_0
-        g1 = g_0 * h_0 * h_0 / (h1 * h1)
-        g2 = g_0 * h_0 * h_0 / (h2 * h2)
-        dv1 = (T1 - D1) / m1 - g1
-        dv2 = (T2 - D2) / m2 - g2
-
-        eq_v = v2 - v1 - 0.5 * step * (dv1 + dv2)
-
-        eq_m = m2 - m1 + 0.5 * step * (T1 + T2) / c
-
-        return [eq_h, eq_v, eq_m]
-
-    dynamic_eq_f = model.register_function(dynamics_eq)
     for i in range(nh - 1):
-        model.add_fn_constraint(
-            dynamic_eq_f,
-            vars=nlfunc.Vars(
-                h1=h[i],
-                h2=h[i + 1],
-                v1=v[i],
-                v2=v[i + 1],
-                m1=m[i],
-                m2=m[i + 1],
-                T1=T[i],
-                T2=T[i + 1],
-                step=step,
-            ),
-            eq=0.0,
-        )
+        with nlfunc.graph():
+            h1 = h[i]
+            h2 = h[i + 1]
+            v1 = v[i]
+            v2 = v[i + 1]
+            m1 = m[i]
+            m2 = m[i + 1]
+            T1 = T[i]
+            T2 = T[i + 1]
+
+            model.add_nl_constraint(h2 - h1 - 0.5 * step * (v1 + v2) == 0)
+
+            D1 = D_c * v1 * v1 * nlfunc.exp(-h_c * (h1 - h_0)) / h_0
+            D2 = D_c * v2 * v2 * nlfunc.exp(-h_c * (h2 - h_0)) / h_0
+            g1 = g_0 * h_0 * h_0 / (h1 * h1)
+            g2 = g_0 * h_0 * h_0 / (h2 * h2)
+            dv1 = (T1 - D1) / m1 - g1
+            dv2 = (T2 - D2) / m2 - g2
+
+            model.add_nl_constraint(v2 - v1 - 0.5 * step * (dv1 + dv2) == 0)
+            model.add_nl_constraint(m2 - m1 + 0.5 * step * (T1 + T2) / c == 0)
 
     # Boundary conditions
     model.set_variable_bounds(h[0], h_0, h_0)
@@ -85,9 +60,9 @@ def rocket_model(model: ipopt.Model, nh: int):
     model.h = h
 
 
-def test_rocket(ipopt_model_ctor):
+def test_rocket(nlp_model_ctor):
     nh = 400
-    model = ipopt_model_ctor()
+    model = nlp_model_ctor()
     rocket_model(model, nh)
     model.optimize()
 

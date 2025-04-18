@@ -3,8 +3,8 @@ import pyoptinterface as poi
 import pytest
 
 
-def test_in_constraint_sense(ipopt_model_ctor):
-    model = ipopt_model_ctor()
+def test_in_constraint_sense(nlp_model_ctor):
+    model = nlp_model_ctor()
 
     x = model.add_variable(lb=0.0)
     y = model.add_variable(lb=0.0)
