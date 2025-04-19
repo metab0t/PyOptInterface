@@ -2,7 +2,7 @@ import os
 import platform
 from pathlib import Path
 import logging
-from typing import Dict, Union, overload
+from typing import Dict, Tuple, Union, overload
 
 from .copt_model_ext import RawModel, Env, COPT, load_library
 from .attributes import (
@@ -559,6 +559,14 @@ class Model(RawModel):
     @overload
     def add_linear_constraint(
         self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        interval: Tuple[float, float],
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
         con: ComparisonConstraint,
         name: str = "",
     ): ...
@@ -625,6 +633,15 @@ class Model(RawModel):
         con = self._add_single_nl_constraint(graph, expr, lb, ub, name)
 
         return con
+
+    def add_nl_objective(self, expr):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError(
+                "Expression should be able to be converted to ExpressionHandle"
+            )
+        self._add_single_nl_objective(graph, expr)
 
 
 Model.add_variables = make_variable_tupledict

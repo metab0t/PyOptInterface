@@ -606,13 +606,9 @@ void COPTModel::decode_expr(const ExpressionGraph &graph, const ExpressionHandle
 	}
 }
 
-ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
-                                                    const ExpressionHandle &result, double lb,
-                                                    double ub, const char *name)
+void COPTModel::decode_graph_prefix_order(ExpressionGraph &graph, const ExpressionHandle &result,
+                                          std::vector<int> &opcodes, std::vector<double> &constants)
 {
-	std::vector<int> opcodes;
-	std::vector<double> constants;
-
 	std::stack<ExpressionHandle> expr_stack;
 
 	// init stack
@@ -646,6 +642,7 @@ ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
 			}
 		}
 
+		fmt::print("Decoding expression: {}\n", expr.to_string());
 		decode_expr(graph, expr, opcodes, constants);
 
 		auto array_type = expr.array;
@@ -675,6 +672,16 @@ ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
 			break;
 		}
 	}
+}
+
+ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
+                                                    const ExpressionHandle &result, double lb,
+                                                    double ub, const char *name)
+{
+	std::vector<int> opcodes;
+	std::vector<double> constants;
+
+	decode_graph_prefix_order(graph, result, opcodes, constants);
 
 	if (name != nullptr && name[0] == '\0')
 	{
@@ -862,6 +869,39 @@ void COPTModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
 	}
 }
 
+void COPTModel::add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result)
+{
+	decode_graph_prefix_order(graph, result, m_nl_objective_opcodes, m_nl_objective_constants);
+
+	m_nl_objective_num += 1;
+	m_nl_objective_opcodes[1] = m_nl_objective_num;
+}
+
+void COPTModel::set_nl_objective()
+{
+	int error = 0;
+	if (m_nl_objective_num > 0)
+	{
+		int nToken = m_nl_objective_opcodes.size();
+		int nTokenElem = m_nl_objective_constants.size();
+		int *token = m_nl_objective_opcodes.data();
+		double *tokenElem = m_nl_objective_constants.data();
+
+		if (m_nl_objective_num == 1)
+		{
+			nToken -= 2;
+			token += 2;
+		}
+
+		/*fmt::print("COPT_SetNLObj opcodes: {}\n", std::vector<int>(token, token + nToken));
+		fmt::print("COPT_SetNLObj constants: {}\n",
+		           std::vector<double>(tokenElem, tokenElem + nTokenElem));*/
+
+		error = copt::COPT_SetNLObj(m_model.get(), nToken, nTokenElem, token, tokenElem);
+		check_error(error);
+	}
+}
+
 void COPTModel::optimize()
 {
 	if (has_callback)
@@ -869,6 +909,7 @@ void COPTModel::optimize()
 		// Store the number of variables for the callback
 		m_callback_userdata.n_variables = get_raw_attribute_int("Cols");
 	}
+	set_nl_objective();
 	int error = copt::COPT_Solve(m_model.get());
 	check_error(error);
 }
@@ -1000,6 +1041,9 @@ double COPTModel::get_constraint_info(const ConstraintIndex &constraint, const c
 	case ConstraintType::Quadratic:
 		error = copt::COPT_GetQConstrInfo(m_model.get(), info_name, num, &row, &retval);
 		break;
+	case ConstraintType::COPT_NL:
+		error = copt::COPT_GetNLConstrInfo(m_model.get(), info_name, num, &row, &retval);
+		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}
@@ -1019,6 +1063,9 @@ std::string COPTModel::get_constraint_name(const ConstraintIndex &constraint)
 		break;
 	case ConstraintType::Quadratic:
 		error = copt::COPT_GetQConstrName(m_model.get(), row, NULL, 0, &reqsize);
+		break;
+	case ConstraintType::COPT_NL:
+		error = copt::COPT_GetNLConstrName(m_model.get(), row, NULL, 0, &reqsize);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1050,6 +1097,9 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 		break;
 	case ConstraintType::Quadratic:
 		error = copt::COPT_SetQConstrNames(m_model.get(), 1, &row, names);
+		break;
+	case ConstraintType::COPT_NL:
+		error = copt::COPT_SetNLConstrNames(m_model.get(), 1, &row, names);
 		break;
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1237,6 +1287,8 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_cone_constraint_index.get_index(constraint.index);
 	case ConstraintType::COPT_ExpCone:
 		return m_exp_cone_constraint_index.get_index(constraint.index);
+	case ConstraintType::COPT_NL:
+		return m_nl_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
 	}

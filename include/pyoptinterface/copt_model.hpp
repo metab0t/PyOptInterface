@@ -45,6 +45,7 @@ extern "C"
 	B(COPT_SetObjConst);           \
 	B(COPT_SetObjSense);           \
 	B(COPT_SetQuadObj);            \
+	B(COPT_SetNLObj);              \
 	B(COPT_Solve);                 \
 	B(COPT_SearchParamAttr);       \
 	B(COPT_SetIntParam);           \
@@ -62,10 +63,13 @@ extern "C"
 	B(COPT_SetColUpper);           \
 	B(COPT_GetRowInfo);            \
 	B(COPT_GetQConstrInfo);        \
+	B(COPT_GetNLConstrInfo);       \
 	B(COPT_GetRowName);            \
 	B(COPT_GetQConstrName);        \
+	B(COPT_GetNLConstrName);       \
 	B(COPT_SetRowNames);           \
 	B(COPT_SetQConstrNames);       \
+	B(COPT_SetNLConstrNames);      \
 	B(COPT_AddMipStart);           \
 	B(COPT_GetQConstrRhs);         \
 	B(COPT_SetRowLower);           \
@@ -212,6 +216,8 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	// Nonlinear constraint
 	void decode_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
 	                 std::vector<int> &opcodes, std::vector<double> &constants);
+	void decode_graph_prefix_order(ExpressionGraph &graph, const ExpressionHandle &result,
+	                               std::vector<int> &opcodes, std::vector<double> &constants);
 	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
 	                                         double lb, double ub, const char *name = nullptr);
 	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
@@ -226,6 +232,9 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &function, ObjectiveSense sense);
+
+	void add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result);
+	void set_nl_objective();
 
 	void optimize();
 	void *get_raw_model();
@@ -336,6 +345,11 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	MonotoneIndexer<int> m_exp_cone_constraint_index;
 
 	MonotoneIndexer<int> m_nl_constraint_index;
+
+	// Store the nonlinear objectives
+	int m_nl_objective_num = 0;
+	std::vector<int> m_nl_objective_opcodes = {COPT_NL_SUM, 0};
+	std::vector<double> m_nl_objective_constants;
 
 	/* COPT part */
 	std::unique_ptr<copt_prob, COPTfreemodelT> m_model;

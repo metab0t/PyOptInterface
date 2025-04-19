@@ -50,9 +50,10 @@ def test_easy_nlp(nlp_model_ctor):
 
     model.optimize()
 
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
     assert (
-        model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-        == poi.TerminationStatusCode.LOCALLY_SOLVED
+        termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
+        or termination_status == poi.TerminationStatusCode.OPTIMAL
     )
 
     x_value = model.get_value(x)

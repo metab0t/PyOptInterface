@@ -1,4 +1,4 @@
-from pyoptinterface import ipopt, nlfunc
+from pyoptinterface import copt, ipopt, nlfunc
 import pytest
 import math
 
@@ -50,3 +50,5 @@ if __name__ == "__main__":
         return ipopt.Model(jit="LLVM")
 
     test_nlp_reopt(llvm)
+
+    test_nlp_reopt(copt.Model)

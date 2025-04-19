@@ -118,6 +118,8 @@ NB_MODULE(copt_model_ext, m)
 	    .def("set_objective", &COPTModel::set_objective_as_constant, nb::arg("expr"),
 	         nb::arg("sense") = ObjectiveSense::Minimize)
 
+	    .def("_add_single_nl_objective", &COPTModel::add_single_nl_objective)
+
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(
 	             &COPTModel::cb_add_lazy_constraint),

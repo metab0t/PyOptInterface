@@ -1,5 +1,5 @@
 import pyoptinterface as poi
-from pyoptinterface import ipopt, nlfunc
+from pyoptinterface import copt, ipopt, nlfunc
 
 import math
 import pytest
@@ -82,3 +82,5 @@ if __name__ == "__main__":
         return ipopt.Model(jit="LLVM")
 
     test_rocket(llvm)
+
+    test_rocket(copt.Model)
