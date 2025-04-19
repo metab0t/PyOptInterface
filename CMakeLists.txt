@@ -308,7 +308,7 @@ nanobind_add_stub(
   OUTPUT ${POI_INSTALL_DIR}/ipopt_model_ext.pyi
 )
 
-set(ENABLE_TEST_MAIN ON BOOL "Enable test c++ function with a main.cpp")
+set(ENABLE_TEST_MAIN OFF BOOL "Enable test c++ function with a main.cpp")
 if(ENABLE_TEST_MAIN)
     add_executable(test_main lib/main.cpp)
     target_link_libraries(test_main PUBLIC core nleval cppad_interface)

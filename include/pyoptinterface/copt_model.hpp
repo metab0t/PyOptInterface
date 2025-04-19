@@ -7,6 +7,7 @@
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/nlexpr.hpp"
+#define USE_NLMIXIN
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
 
@@ -171,6 +172,7 @@ struct COPTCallbackUserdata
 class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
                   public TwosideLinearConstraintMixin<COPTModel>,
                   public OnesideQuadraticConstraintMixin<COPTModel>,
+                  public TwosideNLConstraintMixin<COPTModel>,
                   public LinearObjectiveMixin<COPTModel>,
                   public PPrintMixin<COPTModel>,
                   public GetValueMixin<COPTModel>
@@ -180,6 +182,8 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	COPTModel(const COPTEnv &env);
 	void init(const COPTEnv &env);
 	void close();
+
+	double get_infinity() const;
 
 	void write(const std::string &filename);
 
@@ -219,10 +223,7 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	void decode_graph_prefix_order(ExpressionGraph &graph, const ExpressionHandle &result,
 	                               std::vector<int> &opcodes, std::vector<double> &constants);
 	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
-	                                         double lb, double ub, const char *name = nullptr);
-	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
-	                                                         const ExpressionHandle &result,
-	                                                         const char *name = nullptr);
+	                                        const std::tuple<double, double> &interval, const char *name = nullptr);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

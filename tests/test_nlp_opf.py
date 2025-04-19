@@ -1,6 +1,6 @@
 import math
 import pyoptinterface as poi
-from pyoptinterface import nlfunc
+from pyoptinterface import nl
 
 import pytest
 
@@ -65,7 +65,7 @@ def test_acopf(nlp_model_ctor):
 
     # nonlinear constraints
     for k in range(N_branch):
-        with nlfunc.graph():
+        with nl.graph():
             branch = branches[k]
             R, X, Bc2 = branch[2], branch[3], branch[4]
 
@@ -86,8 +86,8 @@ def test_acopf(nlp_model_ctor):
             Pji = Pbr_to[k]
             Qji = Qbr_to[k]
 
-            sin_ij = nlfunc.sin(theta_i - theta_j)
-            cos_ij = nlfunc.cos(theta_i - theta_j)
+            sin_ij = nl.sin(theta_i - theta_j)
+            cos_ij = nl.cos(theta_i - theta_j)
 
             Pij_eq = G * Vi**2 - Vi * Vj * (G * cos_ij + B * sin_ij) - Pij
             Qij_eq = -(B + Bc) * Vi**2 - Vi * Vj * (G * sin_ij - B * cos_ij) - Qij

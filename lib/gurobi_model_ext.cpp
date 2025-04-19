@@ -92,9 +92,15 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("add_sos_constraint",
 	         nb::overload_cast<const Vector<VariableIndex> &, SOSType, const Vector<CoeffT> &>(
 	             &GurobiModel::add_sos_constraint))
-	    .def("_add_single_nl_constraint", &GurobiModel::add_single_nl_constraint)
-	    .def("_add_single_nl_constraint_from_comparison",
-	         &GurobiModel::add_single_nl_constraint_from_comparison)
+
+	    .def("_add_single_nl_constraint", &GurobiModel::add_single_nl_constraint, nb::arg("graph"),
+	         nb::arg("result"), nb::arg("interval"), nb::arg("name") = "")
+	    .def("_add_single_nl_constraint", &GurobiModel::add_single_nl_constraint_sense_rhs,
+	         nb::arg("graph"), nb::arg("result"), nb::arg("sense"), nb::arg("rhs"),
+	         nb::arg("name") = "")
+	    .def("_add_single_nl_constraint", &GurobiModel::add_single_nl_constraint_from_comparison,
+	         nb::arg("graph"), nb::arg("expr"), nb::arg("name") = "")
+
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)

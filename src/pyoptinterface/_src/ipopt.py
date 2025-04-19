@@ -455,32 +455,75 @@ class Model(RawModel):
         else:
             return self._add_quadratic_constraint(arg, *args, **kwargs)
 
-    def add_nl_constraint(self, expr, eq=None, lb=None, ub=None, name=""):
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        sense: ConstraintSense,
+        rhs: float,
+        /,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        interval: Tuple[float, float],
+        /,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_nl_constraint(
+        self,
+        con,
+        /,
+        name: str = "",
+    ): ...
+
+    def add_nl_constraint(self, expr, *args, **kwargs):
         graph = ExpressionGraphContext.current_graph()
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
             raise ValueError(
                 "Expression should be able to be converted to ExpressionHandle"
             )
-        if eq is not None:
-            if lb is not None or ub is not None:
-                raise ValueError("Cannot specify both equality and inequality bounds")
-            lb = ub = eq
-        else:
-            if lb is None and ub is None:
-                is_comparison = graph.is_compare_expression(expr)
-                if is_comparison:
-                    expr, lb, ub = unpack_comparison_expression(
-                        graph, expr, float("inf")
-                    )
+
+        n_args = len(args)
+
+        if n_args == 0:
+            is_comparison = graph.is_compare_expression(expr)
+            if is_comparison:
+                expr, lb, ub = unpack_comparison_expression(graph, expr, float("inf"))
+            else:
+                raise ValueError("Must specify either equality or inequality bounds")
+        elif n_args == 1:
+            arg = args[0]
+            if isinstance(arg, tuple):
+                lb, ub = arg
+            else:
+                raise ValueError(
+                    "Must specify either equality or inequality bounds"
+                )
+        elif n_args == 2:
+            sense = args[0]
+            rhs = args[1]
+            if isinstance(sense, ConstraintSense) and isinstance(rhs, float):
+                if sense == ConstraintSense.Equal:
+                    lb = ub = rhs
+                elif sense == ConstraintSense.LessEqual:
+                    lb = -float("inf")
+                    ub = rhs
+                elif sense == ConstraintSense.GreaterEqual:
+                    lb = rhs
+                    ub = float("inf")
                 else:
-                    raise ValueError(
-                        "Must specify either equality or inequality bounds"
-                    )
-            elif lb is None:
-                lb = -float("inf")
-            elif ub is None:
-                ub = float("inf")
+                    raise ValueError(f"Unknown constraint sense: {sense}")
+            else:
+                raise ValueError(
+                    "Must specify either equality or inequality bounds"
+                )
 
         graph.add_constraint_output(expr)
 

@@ -187,6 +187,11 @@ void GurobiModel::close()
 	m_model.reset();
 }
 
+double GurobiModel::get_infinity() const
+{
+	return GRB_INFINITY;
+}
+
 void GurobiModel::write(const std::string &filename)
 {
 	int error = gurobi::GRBwrite(m_model.get(), filename.c_str());
@@ -530,9 +535,13 @@ void GurobiModel::information_of_expr(const ExpressionGraph &graph, const Expres
 }
 
 ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &graph,
-                                                      const ExpressionHandle &result, double lb,
-                                                      double ub, const char *name)
+                                                      const ExpressionHandle &result,
+                                                      const std::tuple<double, double> &interval,
+                                                      const char *name)
 {
+	double lb = std::get<0>(interval);
+	double ub = std::get<1>(interval);
+
 	std::vector<int> opcodes, parents;
 	std::vector<double> datas;
 
@@ -612,19 +621,6 @@ ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &gra
 
 	m_update_flag |= m_general_constraint_creation;
 
-	return constraint;
-}
-
-ConstraintIndex GurobiModel::add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
-                                                                      const ExpressionHandle &expr,
-                                                                      const char *name)
-{
-	ExpressionHandle real_expr;
-	double lb = -GRB_INFINITY, ub = GRB_INFINITY;
-
-	unpack_comparison_expression(graph, expr, real_expr, lb, ub);
-
-	auto constraint = add_single_nl_constraint(graph, real_expr, lb, ub, name);
 	return constraint;
 }
 

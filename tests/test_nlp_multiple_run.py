@@ -1,4 +1,4 @@
-from pyoptinterface import copt, ipopt, nlfunc
+from pyoptinterface import copt, ipopt, nl
 import pytest
 import math
 
@@ -9,10 +9,10 @@ def test_nlp_reopt(nlp_model_ctor):
     x = model.add_variable(lb=0.1)
     y = model.add_variable(lb=0.1)
 
-    with nlfunc.graph():
+    with nl.graph():
         model.add_nl_objective(x**2 + y**2)
 
-    with nlfunc.graph():
+    with nl.graph():
         model.add_nl_constraint(x**2 <= 1.0)
         model.add_nl_constraint(y**2 <= 1.0)
 
@@ -22,15 +22,15 @@ def test_nlp_reopt(nlp_model_ctor):
     assert model.get_value(y) == pytest.approx(0.1)
 
     z = model.add_variable(lb=0.2)
-    with nlfunc.graph():
+    with nl.graph():
         model.add_nl_objective(z**4)
 
     model.optimize()
 
     assert model.get_value(z) == pytest.approx(0.2)
 
-    with nlfunc.graph():
-        model.add_nl_constraint(nlfunc.log(z) >= math.log(4.0))
+    with nl.graph():
+        model.add_nl_constraint(nl.log(z) >= math.log(4.0))
 
     model.optimize()
 

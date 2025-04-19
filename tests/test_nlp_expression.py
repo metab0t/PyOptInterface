@@ -1,5 +1,5 @@
 import pyoptinterface as poi
-from pyoptinterface import nlfunc
+from pyoptinterface import nl
 import math
 import pytest
 from pytest import approx
@@ -14,8 +14,8 @@ def test_nlp_expressiontree(model_interface):
     x = model.add_variable(lb=0.0, ub=2.0)
     y = model.add_variable(lb=0.0, ub=2.0)
 
-    with nlfunc.graph():
-        z = nlfunc.exp(x) + nlfunc.exp(2 * y)
+    with nl.graph():
+        z = nl.exp(x) + nl.exp(2 * y)
         model.add_nl_constraint(z <= 2 * math.exp(1.0))
 
         z = x * x * x

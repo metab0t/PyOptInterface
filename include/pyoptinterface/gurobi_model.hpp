@@ -7,6 +7,7 @@
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 #include "pyoptinterface/nlexpr.hpp"
+#define USE_NLMIXIN
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
 
@@ -137,6 +138,7 @@ struct GurobiCallbackUserdata
 
 class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
                     public OnesideQuadraticConstraintMixin<GurobiModel>,
+                    public TwosideNLConstraintMixin<GurobiModel>,
                     public LinearObjectiveMixin<GurobiModel>,
                     public PPrintMixin<GurobiModel>,
                     public GetValueMixin<GurobiModel>
@@ -146,6 +148,8 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
 	void close();
+
+	double get_infinity() const;
 
 	void write(const std::string &filename);
 
@@ -176,11 +180,9 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	void information_of_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
 	                         int &opcode, double &data);
 	ConstraintIndex add_single_nl_constraint(const ExpressionGraph &graph,
-	                                         const ExpressionHandle &result, double lb, double ub,
+	                                         const ExpressionHandle &result,
+	                                         const std::tuple<double, double> &interval,
 	                                         const char *name = nullptr);
-	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
-	                                                         const ExpressionHandle &result,
-	                                                         const char *name = nullptr);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);

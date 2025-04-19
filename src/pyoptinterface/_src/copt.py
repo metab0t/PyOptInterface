@@ -602,35 +602,43 @@ class Model(RawModel):
             )
         else:
             return self._add_quadratic_constraint(arg, *args, **kwargs)
+        
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        sense: ConstraintSense,
+        rhs: float,
+        /,
+        name: str = "",
+    ): ...
 
-    def add_nl_constraint(self, expr, eq=None, lb=None, ub=None, name=""):
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        interval: Tuple[float, float],
+        /,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_nl_constraint(
+        self,
+        con,
+        /,
+        name: str = "",
+    ): ...
+
+    def add_nl_constraint(self, expr, *args, **kwargs):
         graph = ExpressionGraphContext.current_graph()
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
             raise ValueError(
                 "Expression should be able to be converted to ExpressionHandle"
             )
-        if eq is not None:
-            if lb is not None or ub is not None:
-                raise ValueError("Cannot specify both equality and inequality bounds")
-            lb = ub = eq
-        else:
-            if lb is None and ub is None:
-                is_comparison = graph.is_compare_expression(expr)
-                if is_comparison:
-                    return self._add_single_nl_constraint_from_comparison(
-                        graph, expr, name
-                    )
-                else:
-                    raise ValueError(
-                        "Must specify either equality or inequality bounds"
-                    )
-            elif lb is None:
-                lb = -COPT.INFINITY
-            elif ub is None:
-                ub = COPT.INFINITY
 
-        con = self._add_single_nl_constraint(graph, expr, lb, ub, name)
+        con = self._add_single_nl_constraint(graph, expr, *args, **kwargs)
 
         return con
 

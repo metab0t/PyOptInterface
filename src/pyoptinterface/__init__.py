@@ -36,9 +36,6 @@ Leq = ConstraintSense.LessEqual
 Geq = ConstraintSense.GreaterEqual
 """Alias of `ConstraintSense.GreaterEqual` for greater-than-or-equal-to constraints.
 """
-In = ConstraintSense.Within
-"""Alias of `ConstraintSense.Within` for range constraints.
-"""
 
 from pyoptinterface._src.monkeypatch import _monkeypatch_all
 
@@ -67,5 +64,4 @@ __all__ = [
     "Eq",
     "Leq",
     "Geq",
-    "In",
 ]

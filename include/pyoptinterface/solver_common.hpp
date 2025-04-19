@@ -152,6 +152,70 @@ class TwosideQuadraticConstraintMixin
 	}
 };
 
+#ifdef USE_NLMIXIN
+#include "pyoptinterface/nlexpr.hpp"
+
+template <typename T>
+concept TwosideNLConstraintMixinConcept = requires(T &model) {
+	{
+		model.add_single_nl_constraint(std::declval<ExpressionGraph &>(), ExpressionHandle(),
+		                               std::make_tuple(0.0, 1.0), "")
+	} -> std::same_as<ConstraintIndex>;
+	{ model.get_infinity() } -> std::convertible_to<double>;
+};
+
+template <typename T>
+class TwosideNLConstraintMixin
+{
+  private:
+	T *get_base()
+	{
+		static_assert(TwosideNLConstraintMixinConcept<T>);
+		return static_cast<T *>(this);
+	}
+
+  public:
+	ConstraintIndex add_single_nl_constraint_sense_rhs(ExpressionGraph &graph,
+	                                                   const ExpressionHandle &result,
+	                                                   ConstraintSense sense, CoeffT rhs,
+	                                                   const char *name = nullptr)
+	{
+		double infinity = get_base()->get_infinity();
+
+		double lb, ub;
+
+		if (sense == ConstraintSense::Equal)
+		{
+			lb = rhs;
+			ub = rhs;
+		}
+		else if (sense == ConstraintSense::LessEqual)
+		{
+			lb = -infinity;
+			ub = rhs;
+		}
+		else if (sense == ConstraintSense::GreaterEqual)
+		{
+			lb = rhs;
+			ub = infinity;
+		}
+
+		return get_base()->add_single_nl_constraint(graph, result, {lb, ub}, name);
+	}
+
+	ConstraintIndex add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
+	                                                         const ExpressionHandle &expr,
+	                                                         const char *name)
+	{
+		ExpressionHandle real_expr;
+		double lb = -get_base()->get_infinity(), ub = get_base()->get_infinity();
+		unpack_comparison_expression(graph, expr, real_expr, lb, ub);
+		auto constraint = get_base()->add_single_nl_constraint(graph, real_expr, {lb, ub}, name);
+		return constraint;
+	}
+};
+#endif
+
 template <typename T>
 concept GetValueMxinConcept = requires(T &model) {
 	{ model.get_variable_value(VariableIndex()) } -> std::convertible_to<double>;

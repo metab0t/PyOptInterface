@@ -150,6 +150,11 @@ void COPTModel::close()
 	m_model.reset();
 }
 
+double COPTModel::get_infinity() const
+{
+	return COPT_INFINITY;
+}
+
 void COPTModel::write(const std::string &filename)
 {
 	int error;
@@ -674,9 +679,13 @@ void COPTModel::decode_graph_prefix_order(ExpressionGraph &graph, const Expressi
 }
 
 ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
-                                                    const ExpressionHandle &result, double lb,
-                                                    double ub, const char *name)
+                                                    const ExpressionHandle &result,
+                                                    const std::tuple<double, double> &interval,
+                                                    const char *name)
 {
+	double lb = std::get<0>(interval);
+	double ub = std::get<1>(interval);
+
 	std::vector<int> opcodes;
 	std::vector<double> constants;
 
@@ -697,19 +706,6 @@ ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
 
 	ConstraintIndex constraint(ConstraintType::COPT_NL, constraint_index);
 
-	return constraint;
-}
-
-ConstraintIndex COPTModel::add_single_nl_constraint_from_comparison(ExpressionGraph &graph,
-                                                                    const ExpressionHandle &expr,
-                                                                    const char *name)
-{
-	ExpressionHandle real_expr;
-	double lb = -COPT_INFINITY, ub = COPT_INFINITY;
-
-	unpack_comparison_expression(graph, expr, real_expr, lb, ub);
-
-	auto constraint = add_single_nl_constraint(graph, real_expr, lb, ub, name);
 	return constraint;
 }
 

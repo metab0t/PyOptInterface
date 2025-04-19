@@ -1,5 +1,5 @@
 import pyoptinterface as poi
-from pyoptinterface import nlfunc
+from pyoptinterface import nl
 
 import math
 import pytest
@@ -29,7 +29,7 @@ def rocket_model(model, nh: int):
     model.set_objective(-1.0 * h[-1])
 
     for i in range(nh - 1):
-        with nlfunc.graph():
+        with nl.graph():
             h1 = h[i]
             h2 = h[i + 1]
             v1 = v[i]
@@ -41,8 +41,8 @@ def rocket_model(model, nh: int):
 
             model.add_nl_constraint(h2 - h1 - 0.5 * step * (v1 + v2) == 0)
 
-            D1 = D_c * v1 * v1 * nlfunc.exp(-h_c * (h1 - h_0)) / h_0
-            D2 = D_c * v2 * v2 * nlfunc.exp(-h_c * (h2 - h_0)) / h_0
+            D1 = D_c * v1 * v1 * nl.exp(-h_c * (h1 - h_0)) / h_0
+            D2 = D_c * v2 * v2 * nl.exp(-h_c * (h2 - h_0)) / h_0
             g1 = g_0 * h_0 * h_0 / (h1 * h1)
             g2 = g_0 * h_0 * h_0 / (h2 * h2)
             dv1 = (T1 - D1) / m1 - g1

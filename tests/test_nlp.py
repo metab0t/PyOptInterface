@@ -2,7 +2,7 @@ import math
 import pytest
 
 import pyoptinterface as poi
-from pyoptinterface import ipopt, nlfunc
+from pyoptinterface import ipopt, nl
 
 
 def test_easy_nlp(nlp_model_ctor):
@@ -13,39 +13,39 @@ def test_easy_nlp(nlp_model_ctor):
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
-    with nlfunc.graph():
-        model.add_nl_objective(nlfunc.exp(x) + nlfunc.exp(y))
+    with nl.graph():
+        model.add_nl_objective(nl.exp(x) + nl.exp(y))
 
-    with nlfunc.graph():
+    with nl.graph():
         z = x * x
         s = y * y
-        model.add_nl_constraint(z, lb=0.36, ub=4.0)
-        model.add_nl_constraint(s, lb=0.04, ub=4.0)
+        model.add_nl_constraint(z, (0.36, 4.0))
+        model.add_nl_constraint(s, (0.04, 4.0))
 
     nl_funcs = [
-        nlfunc.abs,
-        nlfunc.acos,
-        nlfunc.asin,
-        nlfunc.atan,
-        nlfunc.cos,
-        nlfunc.exp,
-        nlfunc.log,
-        nlfunc.log10,
-        nlfunc.pow,
-        nlfunc.sin,
-        nlfunc.sqrt,
-        nlfunc.tan,
+        nl.abs,
+        nl.acos,
+        nl.asin,
+        nl.atan,
+        nl.cos,
+        nl.exp,
+        nl.log,
+        nl.log10,
+        nl.pow,
+        nl.sin,
+        nl.sqrt,
+        nl.tan,
     ]
 
     B = 1e10
     all_nlfuncs_con = []
-    with nlfunc.graph():
+    with nl.graph():
         for f in nl_funcs:
-            if f == nlfunc.pow:
+            if f == nl.pow:
                 v = f(x, 2)
             else:
                 v = f(x)
-            con = model.add_nl_constraint(v, lb=-B, ub=B)
+            con = model.add_nl_constraint(v, (-B, B))
             all_nlfuncs_con.append(con)
 
     model.optimize()
@@ -71,7 +71,7 @@ def test_easy_nlp(nlp_model_ctor):
 
     correct_con_values = []
     for f in nl_funcs:
-        if f == nlfunc.pow:
+        if f == nl.pow:
             correct_con_values.append(f(x_value, 2))
         else:
             correct_con_values.append(f(x_value))
@@ -88,9 +88,9 @@ def test_nlfunc_ifelse(nlp_model_ctor):
 
         x = model.add_variable(lb=0.0, ub=10.0)
 
-        with nlfunc.graph():
-            y = nlfunc.ifelse(x > 1.0, x**2, x)
-            model.add_nl_constraint(y, lb=fx)
+        with nl.graph():
+            y = nl.ifelse(x > 1.0, x**2, x)
+            model.add_nl_constraint(y, poi.Geq, fx)
 
         model.set_objective(x)
 

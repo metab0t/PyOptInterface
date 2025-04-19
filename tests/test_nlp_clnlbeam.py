@@ -1,5 +1,5 @@
 import pyoptinterface as poi
-from pyoptinterface import nlfunc
+from pyoptinterface import nl
 
 import pytest
 
@@ -16,13 +16,13 @@ def test_clnlbeam(nlp_model_ctor):
     u = model.add_m_variables(N + 1)
 
     for i in range(N):
-        with nlfunc.graph():
+        with nl.graph():
             model.add_nl_objective(
                 0.5 * h * (u[i] * u[i] + u[i + 1] * u[i + 1])
-                + 0.5 * alpha * h * (nlfunc.cos(t[i]) + nlfunc.cos(t[i + 1]))
+                + 0.5 * alpha * h * (nl.cos(t[i]) + nl.cos(t[i + 1]))
             )
             model.add_nl_constraint(
-                x[i + 1] - x[i] - 0.5 * h * (nlfunc.sin(t[i]) + nlfunc.sin(t[i + 1]))
+                x[i + 1] - x[i] - 0.5 * h * (nl.sin(t[i]) + nl.sin(t[i + 1]))
                 == 0.0
             )
             model.add_linear_constraint(
