@@ -1,11 +1,11 @@
 import pyoptinterface as poi
-from pyoptinterface import copt, ipopt, nlfunc
+from pyoptinterface import nlfunc
 
 import math
 import pytest
 
 
-def rocket_model(model: ipopt.Model, nh: int):
+def rocket_model(model, nh: int):
     h_0 = 1.0
     v_0 = 0.0
     m_0 = 1.0
@@ -72,6 +72,7 @@ def test_rocket(nlp_model_ctor):
 
 
 if __name__ == "__main__":
+    from pyoptinterface import copt, ipopt
 
     def c():
         return ipopt.Model(jit="C")

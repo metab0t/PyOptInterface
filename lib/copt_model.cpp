@@ -642,7 +642,6 @@ void COPTModel::decode_graph_prefix_order(ExpressionGraph &graph, const Expressi
 			}
 		}
 
-		fmt::print("Decoding expression: {}\n", expr.to_string());
 		decode_expr(graph, expr, opcodes, constants);
 
 		auto array_type = expr.array;

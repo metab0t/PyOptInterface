@@ -192,6 +192,7 @@ def test_acopf(nlp_model_ctor):
 
 
 if __name__ == "__main__":
-    from pyoptinterface import ipopt
+    from pyoptinterface import ipopt, copt
 
     test_acopf(ipopt.Model)
+    test_acopf(copt.Model)
