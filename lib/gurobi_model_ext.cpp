@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/tuple.h>
 #include <nanobind/stl/function.h>
 
 #include "pyoptinterface/gurobi_model.hpp"
@@ -124,6 +125,8 @@ NB_MODULE(gurobi_model_ext, m)
 	    .def("set_objective",
 	         nb::overload_cast<CoeffT, ObjectiveSense>(&GurobiModel::set_objective_as_constant),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+
+	    .def("_add_single_nl_objective", &GurobiModel::add_single_nl_objective)
 
 	    .def("cb_add_lazy_constraint",
 	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT>(

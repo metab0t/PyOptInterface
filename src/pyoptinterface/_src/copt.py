@@ -602,7 +602,7 @@ class Model(RawModel):
             )
         else:
             return self._add_quadratic_constraint(arg, *args, **kwargs)
-        
+
     @overload
     def add_nl_constraint(
         self,

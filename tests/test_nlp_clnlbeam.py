@@ -22,8 +22,7 @@ def test_clnlbeam(nlp_model_ctor):
                 + 0.5 * alpha * h * (nl.cos(t[i]) + nl.cos(t[i + 1]))
             )
             model.add_nl_constraint(
-                x[i + 1] - x[i] - 0.5 * h * (nl.sin(t[i]) + nl.sin(t[i + 1]))
-                == 0.0
+                x[i + 1] - x[i] - 0.5 * h * (nl.sin(t[i]) + nl.sin(t[i + 1])) == 0.0
             )
             model.add_linear_constraint(
                 t[i + 1] - t[i] - 0.5 * h * u[i + 1] - 0.5 * h * u[i] == 0.0

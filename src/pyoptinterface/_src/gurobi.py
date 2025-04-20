@@ -839,6 +839,15 @@ class Model(RawModel):
 
         return con
 
+    def add_nl_objective(self, expr):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError(
+                "Expression should be able to be converted to ExpressionHandle"
+            )
+        self._add_single_nl_objective(graph, expr)
+
 
 Model.add_variables = make_variable_tupledict
 Model.add_m_variables = make_variable_ndarray

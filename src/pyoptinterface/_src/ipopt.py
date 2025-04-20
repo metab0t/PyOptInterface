@@ -503,9 +503,7 @@ class Model(RawModel):
             if isinstance(arg, tuple):
                 lb, ub = arg
             else:
-                raise ValueError(
-                    "Must specify either equality or inequality bounds"
-                )
+                raise ValueError("Must specify either equality or inequality bounds")
         elif n_args == 2:
             sense = args[0]
             rhs = args[1]
@@ -521,9 +519,7 @@ class Model(RawModel):
                 else:
                     raise ValueError(f"Unknown constraint sense: {sense}")
             else:
-                raise ValueError(
-                    "Must specify either equality or inequality bounds"
-                )
+                raise ValueError("Must specify either equality or inequality bounds")
 
         graph.add_constraint_output(expr)
 

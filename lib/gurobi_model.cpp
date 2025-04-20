@@ -534,17 +534,10 @@ void GurobiModel::information_of_expr(const ExpressionGraph &graph, const Expres
 	}
 }
 
-ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &graph,
-                                                      const ExpressionHandle &result,
-                                                      const std::tuple<double, double> &interval,
-                                                      const char *name)
+void GurobiModel::decode_graph(const ExpressionGraph &graph, const ExpressionHandle &result,
+                               std::vector<int> &opcodes, std::vector<int> &parents,
+                               std::vector<double> &datas)
 {
-	double lb = std::get<0>(interval);
-	double ub = std::get<1>(interval);
-
-	std::vector<int> opcodes, parents;
-	std::vector<double> datas;
-
 	std::stack<ExpressionHandle> expr_stack;
 	std::stack<int> parent_stack;
 
@@ -599,6 +592,20 @@ ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &gra
 			break;
 		}
 	}
+}
+
+ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &graph,
+                                                      const ExpressionHandle &result,
+                                                      const std::tuple<double, double> &interval,
+                                                      const char *name)
+{
+	double lb = std::get<0>(interval);
+	double ub = std::get<1>(interval);
+
+	std::vector<int> opcodes, parents;
+	std::vector<double> datas;
+
+	decode_graph(graph, result, opcodes, parents, datas);
 
 	if (name != nullptr && name[0] == '\0')
 	{
@@ -778,6 +785,51 @@ void GurobiModel::set_objective(const ExprBuilder &function, ObjectiveSense sens
 	}
 }
 
+void GurobiModel::add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result)
+{
+	std::vector<int> opcodes, parents;
+	std::vector<double> datas;
+
+	decode_graph(graph, result, opcodes, parents, datas);
+
+	// add a slack variable
+	VariableIndex resvar = add_variable(VariableDomain::Continuous);
+	auto resvar_column = _variable_index(resvar);
+
+	// add NL constraint
+	int error = gurobi::GRBaddgenconstrNL(m_model.get(), nullptr, resvar_column, opcodes.size(),
+	                                      opcodes.data(), datas.data(), parents.data());
+	check_error(error);
+
+	IndexT constraint_index = m_general_constraint_index.add_index();
+
+	m_nlobj_num += 1;
+	m_nlobj_con_indices.push_back(constraint_index);
+	m_nlobj_resvar_indices.push_back(resvar.index);
+
+	m_update_flag |= m_general_constraint_creation;
+}
+
+void GurobiModel::set_nl_objective()
+{
+	if (m_nlobj_num > 0)
+	{
+		std::vector<int> resvar_columns(m_nlobj_num);
+		std::vector<double> resvar_objcoefs(m_nlobj_num);
+		std::fill(resvar_objcoefs.begin(), resvar_objcoefs.end(), 1.0);
+
+		for (int i = 0; i < m_nlobj_num; i++)
+		{
+			auto resvar = m_nlobj_resvar_indices[i];
+			resvar_columns[i] = _variable_index(resvar);
+		}
+
+		int error = gurobi::GRBsetdblattrlist(m_model.get(), GRB_DBL_ATTR_OBJ, m_nlobj_num,
+		                                      resvar_columns.data(), resvar_objcoefs.data());
+		check_error(error);
+	}
+}
+
 void GurobiModel::optimize()
 {
 	if (has_callback)
@@ -785,6 +837,7 @@ void GurobiModel::optimize()
 		// Store the number of variables for the callback
 		m_callback_userdata.n_variables = get_model_raw_attribute_int(GRB_INT_ATTR_NUMVARS);
 	}
+	set_nl_objective();
 	m_update_flag = 0;
 	int error = gurobi::GRBoptimize(m_model.get());
 	check_error(error);

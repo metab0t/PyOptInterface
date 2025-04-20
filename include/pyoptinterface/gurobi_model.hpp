@@ -48,6 +48,7 @@
 	B(GRBgetstrattr);         \
 	B(GRBgetdblattrarray);    \
 	B(GRBgetdblattrlist);     \
+	B(GRBsetdblattrlist);     \
 	B(GRBsetintattrelement);  \
 	B(GRBsetcharattrelement); \
 	B(GRBsetdblattrelement);  \
@@ -179,6 +180,9 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	// Nonlinear constraint
 	void information_of_expr(const ExpressionGraph &graph, const ExpressionHandle &expr,
 	                         int &opcode, double &data);
+	void decode_graph(const ExpressionGraph &graph, const ExpressionHandle &result,
+	                  std::vector<int> &opcodes, std::vector<int> &parents,
+	                  std::vector<double> &datas);
 	ConstraintIndex add_single_nl_constraint(const ExpressionGraph &graph,
 	                                         const ExpressionHandle &result,
 	                                         const std::tuple<double, double> &interval,
@@ -192,6 +196,9 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	void set_objective(const ScalarAffineFunction &function, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &function, ObjectiveSense sense);
+
+	void add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result);
+	void set_nl_objective();
 
 	void optimize();
 	void update();
@@ -323,6 +330,14 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	// lb <= y <= ub, and add y = f(x) as a nonlinear constraint
 	// y is called the result variable (resvar)
 	Hashmap<IndexT, IndexT> m_nlcon_resvar_map;
+	// for each nonlinear term in objective function, we need to record the resvar to set their
+	// coefficient in objective as 1.0
+	// add f(x) to the objective is divided into two steps:
+	// 1. add a new nonlinear constraint y = f(x)
+	// 2. set the coefficient of y in objective to 1.0
+	int m_nlobj_num = 0;
+	std::vector<int> m_nlobj_con_indices;
+	std::vector<int> m_nlobj_resvar_indices;
 
 	/* flag to indicate whether the model needs update */
 	enum : std::uint64_t
