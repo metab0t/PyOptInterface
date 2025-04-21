@@ -121,11 +121,12 @@ struct MOSEKfreemodelT
 	};
 };
 
-class MOSEKModel:public OnesideLinearConstraintMixin<MOSEKModel>,
-                  public OnesideQuadraticConstraintMixin<MOSEKModel>,
-                  public LinearObjectiveMixin<MOSEKModel>,
-                  public PPrintMixin<MOSEKModel>,
-                  public GetValueMixin<MOSEKModel>
+class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
+                   public TwosideLinearConstraintMixin<MOSEKModel>,
+                   public OnesideQuadraticConstraintMixin<MOSEKModel>,
+                   public LinearObjectiveMixin<MOSEKModel>,
+                   public PPrintMixin<MOSEKModel>,
+                   public GetValueMixin<MOSEKModel>
 {
   public:
 	MOSEKModel() = default;
@@ -149,6 +150,9 @@ class MOSEKModel:public OnesideLinearConstraintMixin<MOSEKModel>,
 
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
 	                                      ConstraintSense sense, CoeffT rhs,
+	                                      const char *name = nullptr);
+	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &function,
+	                                      const std::tuple<double, double> &interval,
 	                                      const char *name = nullptr);
 	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &function,
 	                                         ConstraintSense sense, CoeffT rhs,

@@ -435,6 +435,54 @@ ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &fu
 	return constraint_index;
 }
 
+ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &function,
+                                                  const std::tuple<double, double> &interval,
+                                                  const char *name)
+{
+	IndexT index = m_linear_quadratic_constraint_index.add_index();
+	ConstraintIndex constraint_index(ConstraintType::Linear, index);
+
+	auto error = mosek::MSK_appendcons(m_model.get(), 1);
+	check_error(error);
+
+	MSKint32t row;
+	error = mosek::MSK_getnumcon(m_model.get(), &row);
+	check_error(error);
+	// 0-based indexing
+	row -= 1;
+
+	AffineFunctionPtrForm<MSKint32t, MSKint32t, MSKrealt> ptr_form;
+	ptr_form.make(this, function);
+
+	MSKint32t numnz = ptr_form.numnz;
+	MSKint32t *cind = ptr_form.index;
+	MSKrealt *cval = ptr_form.value;
+	double lb = std::get<0>(interval);
+	double ub = std::get<1>(interval);
+	if (function.constant.has_value())
+	{
+		lb -= function.constant.value();
+		ub -= function.constant.value();
+	}
+
+	error = mosek::MSK_putarow(m_model.get(), row, numnz, cind, cval);
+	check_error(error);
+	error = mosek::MSK_putconbound(m_model.get(), row, MSK_BK_RA, lb, ub);
+	check_error(error);
+
+	if (name != nullptr && name[0] == '\0')
+	{
+		name = nullptr;
+	}
+	if (name)
+	{
+		error = mosek::MSK_putconname(m_model.get(), row, name);
+		check_error(error);
+	}
+
+	return constraint_index;
+}
+
 ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
                                                      ConstraintSense sense, CoeffT rhs,
                                                      const char *name)

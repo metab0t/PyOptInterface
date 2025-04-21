@@ -1,4 +1,5 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/tuple.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
@@ -61,20 +62,33 @@ NB_MODULE(mosek_model_ext, m)
 	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&MOSEKModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("_add_linear_constraint", &MOSEKModel::add_linear_constraint, nb::arg("expr"),
-	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &MOSEKModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, const std::tuple<double, double> &,
+	                           const char *>(&MOSEKModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &MOSEKModel::add_linear_constraint_from_var, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &MOSEKModel::add_linear_interval_constraint_from_var,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &MOSEKModel::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &MOSEKModel::add_linear_interval_constraint_from_expr,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
+
 	    .def("_add_quadratic_constraint", &MOSEKModel::add_quadratic_constraint, nb::arg("expr"),
 	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
 	    .def("_add_quadratic_constraint", &MOSEKModel::add_quadratic_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+
 	    .def("add_second_order_cone_constraint", &MOSEKModel::add_second_order_cone_constraint,
 	         nb::arg("variables"), nb::arg("name") = "", nb::arg("rotated") = false)
 	    .def("add_exp_cone_constraint", &MOSEKModel::add_exp_cone_constraint, nb::arg("variables"),
 	         nb::arg("name") = "", nb::arg("dual") = false)
+
 	    // clang-format off
 		BIND_F(delete_constraint)
 		BIND_F(is_constraint_active)
