@@ -316,9 +316,9 @@
 <span class="sig-name descname"><span class="pre">add_exp_cone_constraint</span></span><a class="headerlink" href="#pyoptinterface.copt.Model.add_exp_cone_constraint" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.copt.Model.add_linear_constraint">
-<span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><a class="headerlink" href="#pyoptinterface.copt.Model.add_linear_constraint" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_linear_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.copt.Model.add_linear_constraint" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -341,9 +341,19 @@ b is an iterable of values or a single scalar</p>
 <span class="sig-name descname"><span class="pre">add_mip_start</span></span><a class="headerlink" href="#pyoptinterface.copt.Model.add_mip_start" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.copt.Model.add_nl_constraint">
+<span class="sig-name descname"><span class="pre">add_nl_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.copt.Model.add_nl_constraint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.copt.Model.add_nl_objective">
+<span class="sig-name descname"><span class="pre">add_nl_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.copt.Model.add_nl_objective" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.copt.Model.add_quadratic_constraint">
-<span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><a class="headerlink" href="#pyoptinterface.copt.Model.add_quadratic_constraint" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_quadratic_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.copt.Model.add_quadratic_constraint" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -771,11 +781,13 @@ b is an iterable of values or a single scalar</p>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_exp_cone_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_exp_cone_constraint</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_linear_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_linear_constraint</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_linear_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_linear_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_m_linear_constraints"><code class="docutils literal notranslate"><span class="pre">Model.add_m_linear_constraints()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_m_variables"><code class="docutils literal notranslate"><span class="pre">Model.add_m_variables()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_mip_start"><code class="docutils literal notranslate"><span class="pre">Model.add_mip_start</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_quadratic_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_quadratic_constraint</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_nl_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_nl_constraint()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_nl_objective"><code class="docutils literal notranslate"><span class="pre">Model.add_nl_objective()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.copt.Model.add_quadratic_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_quadratic_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_second_order_cone_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_second_order_cone_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_sos_constraint"><code class="docutils literal notranslate"><span class="pre">Model.add_sos_constraint</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.copt.Model.add_variable"><code class="docutils literal notranslate"><span class="pre">Model.add_variable</span></code></a></li>
