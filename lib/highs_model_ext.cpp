@@ -1,5 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
 #include <nanobind/stl/vector.h>
 
 #include "pyoptinterface/highs_model.hpp"
@@ -78,12 +79,23 @@ NB_MODULE(highs_model_ext, m)
 	         nb::overload_cast<const ExprBuilder &, int>(&HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
-	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint, nb::arg("expr"),
-	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
-	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint_from_var,
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, ConstraintSense, CoeffT, const char *>(
+	             &HighsModel::add_linear_constraint),
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint",
+	         nb::overload_cast<const ScalarAffineFunction &, const std::tuple<double, double> &,
+	                           const char *>(&HighsModel::add_linear_constraint),
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint_from_var, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &HighsModel::add_linear_interval_constraint_from_var,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
 	    .def("_add_linear_constraint", &HighsModel::add_linear_constraint_from_expr,
 	         nb::arg("expr"), nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("_add_linear_constraint", &HighsModel::add_linear_interval_constraint_from_expr,
+	         nb::arg("expr"), nb::arg("interval"), nb::arg("name") = "")
+
 	    .def("delete_constraint", &HighsModel::delete_constraint)
 	    .def("is_constraint_active", &HighsModel::is_constraint_active)
 

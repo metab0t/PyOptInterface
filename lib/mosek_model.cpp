@@ -1484,7 +1484,8 @@ void MOSEKEnv::close()
 {
 	if (m_env != nullptr)
 	{
-		mosek::MSK_deleteenv(&m_env);
+		auto error = mosek::MSK_deleteenv(&m_env);
+		check_error(error);
 	}
 	m_env = nullptr;
 }

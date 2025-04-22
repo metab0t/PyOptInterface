@@ -258,6 +258,30 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
                                                      ConstraintSense sense, CoeffT rhs,
                                                      const char *name)
 {
+	double lb = -kHighsInf;
+	double ub = kHighsInf;
+	switch (sense)
+	{
+	case ConstraintSense::LessEqual:
+		ub = rhs;
+		break;
+	case ConstraintSense::GreaterEqual:
+		lb = rhs;
+		break;
+	case ConstraintSense::Equal:
+		lb = rhs;
+		ub = rhs;
+		break;
+	}
+
+	auto con = add_linear_constraint(function, std::make_tuple(lb, ub), name);
+	return con;
+}
+
+ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction &function,
+                                                     const std::tuple<double, double> &interval,
+                                                     const char *name)
+{
 	IndexT index = m_linear_constraint_index.add_index();
 	ConstraintIndex constraint(ConstraintType::Linear, index);
 
@@ -268,21 +292,12 @@ ConstraintIndex POIHighsModel::add_linear_constraint(const ScalarAffineFunction 
 	HighsInt *cind = ptr_form.index;
 	double *cval = ptr_form.value;
 
-	double lb = -kHighsInf;
-	double ub = kHighsInf;
-	double g_rhs = rhs - function.constant.value_or(0.0);
-	switch (sense)
+	double lb = std::get<0>(interval);
+	double ub = std::get<1>(interval);
+	if (function.constant.has_value())
 	{
-	case ConstraintSense::LessEqual:
-		ub = g_rhs;
-		break;
-	case ConstraintSense::GreaterEqual:
-		lb = g_rhs;
-		break;
-	case ConstraintSense::Equal:
-		lb = g_rhs;
-		ub = g_rhs;
-		break;
+		lb -= function.constant.value();
+		ub -= function.constant.value();
 	}
 
 	auto error = highs::Highs_addRow(m_model.get(), lb, ub, numnz, cind, cval);
