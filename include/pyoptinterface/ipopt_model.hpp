@@ -189,7 +189,7 @@ struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
 
 	size_t n_nl_constraints = 0;
 	/*
-	 * record the constraint indices maapping from the monotonic one (the order of adding
+	 * record the constraint indices mapping from the monotonic one (the order of adding
 	 * constraint) to the reordered one (linear, quadratic, NL group 0 -> con0, con1 ,..., conN0, NL
 	 * group1 -> con0, con1,..., conN1)
 	 */

@@ -217,7 +217,7 @@ class TwosideNLConstraintMixin
 #endif
 
 template <typename T>
-concept GetValueMxinConcept = requires(T &model) {
+concept GetValueMixinConcept = requires(T &model) {
 	{ model.get_variable_value(VariableIndex()) } -> std::convertible_to<double>;
 };
 
@@ -227,7 +227,7 @@ class GetValueMixin
   private:
 	T *get_base()
 	{
-		static_assert(GetValueMxinConcept<T>);
+		static_assert(GetValueMixinConcept<T>);
 		return static_cast<T *>(this);
 	}
 
@@ -424,7 +424,7 @@ class PPrintMixin
 };
 
 template <typename T>
-concept LinearObjectiveMxinConcept = requires(T &model) {
+concept LinearObjectiveMixinConcept = requires(T &model) {
 	{ model.set_objective(ScalarAffineFunction(), ObjectiveSense()) } -> std::same_as<void>;
 };
 
@@ -434,7 +434,7 @@ class LinearObjectiveMixin
   private:
 	T *get_base()
 	{
-		static_assert(LinearObjectiveMxinConcept<T>);
+		static_assert(LinearObjectiveMixinConcept<T>);
 		return static_cast<T *>(this);
 	}
 
