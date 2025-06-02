@@ -25,7 +25,7 @@ extern "C" {
 
 #define COPT_VERSION_MAJOR                      7
 #define COPT_VERSION_MINOR                      2
-#define COPT_VERSION_TECHNICAL                  5
+#define COPT_VERSION_TECHNICAL                  8
 
 
 /*
@@ -147,6 +147,7 @@ extern "C" {
 #define COPT_DBLPARAM_TUNETIMELIMIT             "TuneTimeLimit"
 #define COPT_DBLPARAM_TUNETARGETTIME            "TuneTargetTime"
 #define COPT_DBLPARAM_TUNETARGETRELGAP          "TuneTargetRelGap"
+#define COPT_DBLPARAM_MULTIOBJTIMELIMIT         "MultiObjTimeLimit"
 
 /* Integer parameters */
 #define COPT_INTPARAM_LOGGING                   "Logging"
@@ -197,6 +198,7 @@ extern "C" {
 #define COPT_INTPARAM_TUNEMEASURE               "TuneMeasure"
 #define COPT_INTPARAM_TUNEPERMUTES              "TunePermutes"
 #define COPT_INTPARAM_TUNEOUTPUTLEVEL           "TuneOutputLevel"
+#define COPT_INTPARAM_MULTIOBJPARAMMODE         "MultiObjParamMode"
 #define COPT_INTPARAM_LAZYCONSTRAINTS           "LazyConstraints"
 
 /* Double attributes */
@@ -209,6 +211,7 @@ extern "C" {
 #define COPT_DBLATTR_FEASRELAXOBJ               "FeasRelaxObj"
 
 /* Integer attributes */
+#define COPT_INTATTR_MULTIOBJS                  "MultiObjs"
 #define COPT_INTATTR_COLS                       "Cols"
 #define COPT_INTATTR_PSDCOLS                    "PSDCols"
 #define COPT_INTATTR_ROWS                       "Rows"
@@ -297,6 +300,13 @@ extern "C" {
 #define COPT_NL_ATAN2                           -47
 #define COPT_NL_SUM                             -50
 #define COPT_NL_GET                             -60
+#define COPT_NL_POSTFIX                         -99
+
+/* Multi-objective parameters */
+#define COPT_MULTIOBJ_PRIORITY                  "MultiObjPriority"
+#define COPT_MULTIOBJ_WEIGHT                    "MultiObjWeight"
+#define COPT_MULTIOBJ_ABSTOL                    "MultiObjAbsTol"
+#define COPT_MULTIOBJ_RELTOL                    "MultiObjRelTol"
 
 /* COPT client config keywords */
 #define COPT_CLIENT_CAFILE                      "CaFile"
@@ -799,6 +809,28 @@ int COPT_CALL COPT_SetIndicatorNames(copt_prob *prob, int num, const int *list, 
 int COPT_CALL COPT_ReplaceColObj(copt_prob *prob, int num, const int *list, const double *obj);
 int COPT_CALL COPT_ReplacePSDObj(copt_prob *prob, int num, const int *list, const int *idx);
 
+int COPT_CALL COPT_MultiObjSetColObj(copt_prob *prob, int iObj, int num, const int *list, const double *colObj);
+int COPT_CALL COPT_MultiObjGetColObj(copt_prob *prob, int iObj, int num, const int *list, double *colObj);
+int COPT_CALL COPT_MultiObjDelColObj(copt_prob *prob, int iObj);
+
+int COPT_CALL COPT_MultiObjSetObjSense(copt_prob *prob, int iObj, int iObjSense);
+int COPT_CALL COPT_MultiObjSetObjConst(copt_prob *prob, int iObj, double dObjConst);
+
+int COPT_CALL COPT_MultiObjSetObjParam(copt_prob *prob, int iObj, const char *paramName, double dblParam);
+int COPT_CALL COPT_MultiObjGetObjParam(copt_prob *prob, int iObj, const char *paramName, double *p_dblParam);
+int COPT_CALL COPT_MultiObjResetObjParam(copt_prob *prob, int iObj);
+
+int COPT_CALL COPT_MultiObjSetIntParam(copt_prob *prob, int iObj, const char *paramName, int intParam);
+int COPT_CALL COPT_MultiObjGetIntParam(copt_prob *prob, int iObj, const char *paramName, int *p_intParam);
+int COPT_CALL COPT_MultiObjSetDblParam(copt_prob *prob, int iObj, const char *paramName, double dblParam);
+int COPT_CALL COPT_MultiObjGetDblParam(copt_prob *prob, int iObj, const char *paramName, double *p_dblParam);
+int COPT_CALL COPT_MultiObjResetParam(copt_prob *prob, int iObj);
+
+int COPT_CALL COPT_MultiObjGetIntAttr(copt_prob *prob, int iObj, const char *attrName, int *p_intAttr);
+int COPT_CALL COPT_MultiObjGetDblAttr(copt_prob *prob, int iObj, const char *attrName, double *p_dblAttr);
+
+int COPT_CALL COPT_MultiObjGetPoolObjVal(copt_prob *prob, int iObj, int iSol, double *p_objVal);
+
 int COPT_CALL COPT_ReadMps(copt_prob *prob, const char *mpsfilename);
 int COPT_CALL COPT_ReadLp(copt_prob *prob, const char *lpfilename);
 int COPT_CALL COPT_ReadSDPA(copt_prob *prob, const char *sdpafilename);
@@ -830,6 +862,7 @@ int COPT_CALL COPT_WriteParamStr(copt_prob *prob, char *str, int nStrSize, int *
 int COPT_CALL COPT_WriteBlob(copt_prob *prob, int tryCompress, void **p_blob, COPT_INT64 *pLen);
 
 int COPT_CALL COPT_AddMipStart(copt_prob *prob, int num, const int *list, const double *colVal);
+int COPT_CALL COPT_SetNLPrimalStart(copt_prob *prob, int num, const int *list, const double *colVal);
 
 int COPT_CALL COPT_SolveLp(copt_prob *prob);
 int COPT_CALL COPT_Solve(copt_prob *prob);

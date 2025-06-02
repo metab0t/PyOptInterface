@@ -51,8 +51,8 @@ runs:
       shell: pwsh
       name: Download Installers
       run: |
-        curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/11.0/Gurobi-11.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.4/win64/CardinalOptimizer-7.2.4-win64.zip
+        curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/12.0/Gurobi-12.0.2-win64.msi
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.8/win64/CardinalOptimizer-7.2.8-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
         curl -L -o D:\installers\idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-windows-x86_64.tar.gz
 
@@ -62,12 +62,12 @@ runs:
         GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
       run: |
         lessmsi x D:\installers\gurobi.msi "D:\" gurobi_cl.exe
-        lessmsi x D:\installers\gurobi.msi "D:\" gurobi110.dll gurobi110.lib
+        lessmsi x D:\installers\gurobi.msi "D:\" gurobi120.dll gurobi120.lib
         lessmsi x D:\installers\gurobi.msi "D:\" gurobi_c.h
-        ls D:\SourceDir\gurobi1100\win64
+        ls D:\SourceDir\gurobi1202\win64
         # set environment variables
-        echo "GUROBI_HOME=D:\SourceDir\gurobi1100\win64" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\SourceDir\gurobi1100\win64\bin" >> $env:GITHUB_ENV
+        echo "GUROBI_HOME=D:\SourceDir\gurobi1202\win64" >> $env:GITHUB_ENV
+        echo "PATH=$env:PATH;D:\SourceDir\gurobi1202\win64\bin" >> $env:GITHUB_ENV
         echo $env:GUROBI_HOME
         
         # setup license using secrets

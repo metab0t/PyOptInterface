@@ -48,8 +48,8 @@ runs:
       shell: bash
       name: Download Universal Installers
       run: |
-        curl -L -o ~/installers/gurobi.pkg https://packages.gurobi.com/11.0/gurobi11.0.0_macos_universal2.pkg
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.4/osx64/CardinalOptimizer-7.2.4-universal_mac.tar.gz
+        curl -L -o ~/installers/gurobi.pkg https://packages.gurobi.com/12.0/gurobi12.0.2_macos_universal2.pkg
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/osx64/CardinalOptimizer-7.2.8-universal_mac.tar.gz
 
     - if: ${{ (steps.cache-installers-macos.outputs.cache-hit != 'true') && (inputs.ARCH == 'X64') }}
       shell: bash
@@ -73,7 +73,7 @@ runs:
         pkgutil --expand-full ~/installers/gurobi.pkg ~/gurobi
         ls ~/gurobi
         # set environment variables
-        export GUROBI_HOME="${HOME}/gurobi/gurobi11.0.0_macos_universal2.component.pkg/Payload/Library/gurobi1100/macos_universal2"
+        export GUROBI_HOME="${HOME}/gurobi/gurobi12.0.2_macos_universal2.component.pkg/Payload/Library/gurobi1202/macos_universal2"
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${GUROBI_HOME}/bin" >> $GITHUB_ENV
         echo "DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${GUROBI_HOME}/lib" >> $GITHUB_ENV

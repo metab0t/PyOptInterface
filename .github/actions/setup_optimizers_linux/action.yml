@@ -48,8 +48,8 @@ runs:
       shell: bash
       name: Download X64 Installers
       run: |
-        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_linux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.4/linux64/CardinalOptimizer-7.2.4-lnx64.tar.gz
+        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/12.0/gurobi12.0.2_linux64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/linux64/CardinalOptimizer-7.2.8-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-x86_64.tar.gz
 
@@ -57,8 +57,8 @@ runs:
       shell: bash
       name: Download ARM64 Installers
       run: |
-        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/11.0/gurobi11.0.0_armlinux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.4/aarch64/CardinalOptimizer-7.2.4-aarch64_lnx.tar.gz
+        curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/12.0/gurobi12.0.2_armlinux64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/aarch64/CardinalOptimizer-7.2.8-aarch64_lnx.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinuxaarch64.tar.bz2
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-aarch64.tar.gz
 
@@ -67,18 +67,18 @@ runs:
       shell: bash
       run: |
         tar xfz ~/installers/gurobi.tar.gz -C ~/
-        ls ~/gurobi1100/linux64
+        ls ~/gurobi1202/linux64
         # set environment variables
-        export GUROBI_HOME="${HOME}/gurobi1100/linux64"
+        export GUROBI_HOME="${HOME}/gurobi1202/linux64"
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
     - name: Setup Gurobi Installation Home
       if: ${{ inputs.ARCH == 'ARM64' }}
       shell: bash
       run: |
         tar xfz ~/installers/gurobi.tar.gz -C ~/
-        ls ~/gurobi1100/armlinux64
+        ls ~/gurobi1202/armlinux64
         # set environment variables
-        export GUROBI_HOME="${HOME}/gurobi1100/armlinux64"
+        export GUROBI_HOME="${HOME}/gurobi1202/armlinux64"
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
     - name: Setup Gurobi Installation
       shell: bash
