@@ -317,6 +317,24 @@
 <p>In YALMIP, you can use the matrix form <span class="math notranslate nohighlight">\(Ax \leq b\)</span> to add linear constraints, which is quite convenient.</p>
 <p>In PyOptInterface, you can use <a class="reference internal" href="common_model_interface.html#model.add_m_linear_constraints" title="model.add_m_linear_constraints"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">model.add_m_linear_constraints</span></code></span></a> to add linear constraints in matrix form.</p>
 </section>
+<section id="will-pyoptinterface-support-new-optimizers-in-the-future">
+<h2>Will PyOptInterface support new optimizers in the future?<a class="headerlink" href="#will-pyoptinterface-support-new-optimizers-in-the-future" title="Link to this heading">¶</a></h2>
+<p>In short, no, there are no plans to support new optimizers. Supporting a new optimizer is not a trivial task, as it requires a lot of work to implement, test and maintain the interface.</p>
+<p>Basically, a new optimizer should satisfy the following criteria to be considered for support:</p>
+<ul class="simple">
+<li><p>Actively maintained</p></li>
+<li><p>Good performance (open source or commercial)</p></li>
+<li><p>Not difficult to acquire an academic license</p></li>
+<li><p>Have well-defined C/C++ API</p></li>
+</ul>
+<p>Support for a new optimizer will only happen if one or more of the following conditions are met:</p>
+<ul class="simple">
+<li><p>I am personally interested in the optimizer and plan to use it in my research, so I am willing to invest time in implementing it.</p></li>
+<li><p>Someone steps up to implement and maintain the interface for the optimizer in PyOptInterface.</p></li>
+<li><p>External funding or sponsorship become available to support the development and maintenance of the optimizer interface.</p></li>
+</ul>
+<p>Finally, we are always open to external contributions. If you have a specific optimizer in mind and plan to implement it, feel free to open an issue on our GitHub repository to discuss it.</p>
+</section>
 </section>
 
         </article>
@@ -377,6 +395,7 @@
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
 <li><a class="reference internal" href="#how-to-suppress-the-output-of-the-optimizer">How to suppress the output of the optimizer?</a></li>
 <li><a class="reference internal" href="#how-to-add-linear-constraints-in-matrix-form-like-ax-leq-b">How to add linear constraints in matrix form like <span class="math notranslate nohighlight">\(Ax \leq b\)</span>?</a></li>
+<li><a class="reference internal" href="#will-pyoptinterface-support-new-optimizers-in-the-future">Will PyOptInterface support new optimizers in the future?</a></li>
 </ul>
 </li>
 </ul>
