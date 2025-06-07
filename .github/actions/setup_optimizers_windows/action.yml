@@ -56,6 +56,11 @@ runs:
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
         curl -L -o D:\installers\idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-windows-x86_64.tar.gz
 
+    - name: List Installers
+      shell: pwsh
+      run: |
+        Get-ChildItem -Path D:\installers
+
     - name: Setup Gurobi Installation
       shell: pwsh
       env:
