@@ -74,7 +74,7 @@ model = highs.Model()
 x = model.add_variable(lb=0, ub=1, domain=poi.VariableDomain.Continuous, name="x")
 y = model.add_variable(lb=0, ub=1, domain=poi.VariableDomain.Integer, name="y")
 
-con = model.add_linear_constraint(x+y, poi.Geq, 1.2, name="con")
+con = model.add_linear_constraint(x + y >= 1.2, name="con")
 
 obj = 2*x
 model.set_objective(obj, poi.ObjectiveSense.Minimize)
