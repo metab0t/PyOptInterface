@@ -65,7 +65,7 @@ def bench(N, solver_name):
 
     t0 = time.time()
     model = create_linopy_model(N)
-    model.solve(solver_name=solver_name, io_api="lp")
+    model.solve(solver_name=solver_name, io_api="direct")
     t1 = time.time()
     results["linopy"] = t1 - t0
 
@@ -94,4 +94,4 @@ def main(solver_name="gurobi"):
 
 if __name__ == "__main__":
     # solver_name can be "copt", "gurobi", "highs"
-    main("highs")
+    main("gurobi")
