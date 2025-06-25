@@ -38,6 +38,10 @@ class OnesideLinearConstraintMixin
 	                                                ConstraintSense sense, CoeffT rhs,
 	                                                const char *name = nullptr)
 	{
+		if (function.degree() >= 2)
+		{
+			throw std::runtime_error("add_linear_constraint expects linear expression but receives a quadratic expression.");
+		}
 		ScalarAffineFunction f(function);
 		return get_base()->add_linear_constraint(f, sense, rhs, name);
 	}

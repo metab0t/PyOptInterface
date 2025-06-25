@@ -1,5 +1,6 @@
 import pyoptinterface as poi
 from pytest import approx
+import pytest
 
 
 def test_simple_opt(model_interface):
@@ -134,3 +135,13 @@ def test_constraint_primal_dual(model_interface):
 
     dual_val = model.get_constraint_attribute(con1, poi.ConstraintAttribute.Dual)
     assert dual_val == approx(0.5)
+
+
+def test_add_quadratic_expr_as_linear_throws_error(model_interface):
+    model = model_interface
+
+    xs = model.add_m_variables(10)
+    x2_sum = poi.quicksum(x * x for x in xs.flat)
+
+    with pytest.raises(RuntimeError, match="add_linear_constraint"):
+        model.add_linear_constraint(x2_sum <= 1.0)
