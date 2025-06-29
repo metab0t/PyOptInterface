@@ -15,6 +15,7 @@
 #define APILIST               \
 	B(GRBnewmodel);           \
 	B(GRBfreemodel);          \
+	B(GRBreset);              \
 	B(GRBgetenv);             \
 	B(GRBwrite);              \
 	B(GRBaddvar);             \
@@ -149,6 +150,8 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 	GurobiModel(const GurobiEnv &env);
 	void init(const GurobiEnv &env);
 	void close();
+
+	void _reset(int clearall);
 
 	double get_infinity() const;
 

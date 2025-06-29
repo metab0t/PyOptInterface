@@ -187,6 +187,12 @@ void GurobiModel::close()
 	m_model.reset();
 }
 
+void GurobiModel::_reset(int clearall)
+{
+	int error = gurobi::GRBreset(m_model.get(), clearall);
+	check_error(error);
+}
+
 double GurobiModel::get_infinity() const
 {
 	return GRB_INFINITY;

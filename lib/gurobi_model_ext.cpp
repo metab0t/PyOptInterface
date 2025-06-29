@@ -42,6 +42,7 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(close)
 		BIND_F(write)
 	    // clang-format on
+	    .def("_reset", &GurobiModel::_reset, nb::arg("clearall") = 0)
 
 	    .def("add_variable", &GurobiModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -GRB_INFINITY,
