@@ -1,4 +1,5 @@
 from llvmlite import ir, binding
+import atexit
 
 from typing import List
 
@@ -6,6 +7,9 @@ from typing import List
 binding.initialize()
 binding.initialize_native_target()
 binding.initialize_native_asmprinter()
+
+# Register shutdown function to clean up LLVM resources
+atexit.register(binding.shutdown)
 
 
 class LLJITCompiler:
