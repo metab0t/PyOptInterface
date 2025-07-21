@@ -305,139 +305,56 @@ void IpoptModel::_set_quadratic_objective(const ScalarQuadraticFunction &expr)
 
 int IpoptModel::add_graph_index()
 {
-	auto current_graph_index = n_graph_instances;
-	n_graph_instances += 1;
-	m_graph_instance_variables.emplace_back();
-	m_graph_instance_constants.emplace_back();
-	return current_graph_index;
+	return m_nl_evaluator.add_graph_instance();
 }
 
-void IpoptModel::record_graph_hash(size_t graph_index, const ExpressionGraph &graph)
+void IpoptModel::finalize_graph_instance(size_t graph_index, const ExpressionGraph &graph)
 {
-	auto bodyhash = graph.main_structure_hash();
-
-	m_graph_instance_variables[graph_index] = graph.m_variables;
-	m_graph_instance_constants[graph_index] = graph.m_constants;
-
-	if (graph.has_constraint_output())
-	{
-		auto hash = graph.constraint_structure_hash(bodyhash);
-		nl_constraint_info.hashes.push_back(hash);
-		nl_constraint_info.instance_indices.push_back(graph_index);
-	}
-
-	if (graph.has_objective_output())
-	{
-		auto hash = graph.objective_structure_hash(bodyhash);
-		nl_objective_info.hashes.push_back(hash);
-		nl_objective_info.instance_indices.push_back(graph_index);
-	}
+	m_nl_evaluator.finalize_graph_instance(graph_index, graph);
 }
 
-int IpoptModel::aggregate_graph_constraint_groups()
+int IpoptModel::aggregate_nl_constraint_groups()
 {
-	auto &instances = nl_constraint_info;
-	auto &groups = nl_constraint_groups;
-	auto &group_info = nl_constraint_group_info;
-
-	group_info.group_indices.resize(n_graph_instances, -1);
-	group_info.group_orders.resize(n_graph_instances, -1);
-
-	for (int i = instances.n_instances_since_last_aggregation; i < instances.hashes.size(); i++)
-	{
-		auto index = instances.instance_indices[i];
-		auto hash = instances.hashes[i];
-		auto [iter, inserted] = groups.hash_to_group.try_emplace(hash, groups.n_group);
-		auto group_index = iter->second;
-		if (inserted)
-		{
-			groups.representative_graph_indices.push_back(index);
-			groups.instance_indices.emplace_back();
-			groups.n_group += 1;
-		}
-		group_info.group_indices[index] = group_index;
-		group_info.group_orders[index] = groups.instance_indices[group_index].size();
-		groups.instance_indices[group_index].push_back(index);
-	}
-
-	groups.autodiff_structures.resize(groups.n_group);
-	groups.autodiff_evaluators.resize(groups.n_group);
-
-	instances.n_instances_since_last_aggregation = instances.hashes.size();
-
-	return groups.n_group;
+	return m_nl_evaluator.aggregate_constraint_groups();
 }
 
-int IpoptModel::get_graph_constraint_group_representative(int group_index) const
+int IpoptModel::get_nl_constraint_group_representative(int group_index) const
 {
-	return nl_constraint_groups.representative_graph_indices[group_index];
+	return m_nl_evaluator.get_constraint_group_representative(group_index);
 }
 
-int IpoptModel::aggregate_graph_objective_groups()
+int IpoptModel::aggregate_nl_objective_groups()
 {
-	auto &instances = nl_objective_info;
-	auto &groups = nl_objective_groups;
-	auto &group_info = nl_objective_group_info;
-
-	group_info.group_indices.resize(n_graph_instances, -1);
-	group_info.group_orders.resize(n_graph_instances, -1);
-
-	for (int i = instances.n_instances_since_last_aggregation; i < instances.hashes.size(); i++)
-	{
-		auto index = instances.instance_indices[i];
-		auto hash = instances.hashes[i];
-		auto [iter, inserted] = groups.hash_to_group.try_emplace(hash, groups.n_group);
-		auto group_index = iter->second;
-		if (inserted)
-		{
-			groups.representative_graph_indices.push_back(index);
-			groups.instance_indices.emplace_back();
-			groups.n_group += 1;
-		}
-		group_info.group_indices[index] = group_index;
-		group_info.group_orders[index] = groups.instance_indices[group_index].size();
-		groups.instance_indices[group_index].push_back(index);
-	}
-
-	groups.autodiff_structures.resize(groups.n_group);
-	groups.autodiff_evaluators.resize(groups.n_group);
-
-	instances.n_instances_since_last_aggregation = instances.hashes.size();
-
-	return groups.n_group;
+	return m_nl_evaluator.aggregate_objective_groups();
 }
 
-int IpoptModel::get_graph_objective_group_representative(int group_index) const
+int IpoptModel::get_nl_objective_group_representative(int group_index) const
 {
-	return nl_objective_groups.representative_graph_indices[group_index];
+	return m_nl_evaluator.get_objective_group_representative(group_index);
 }
 
-void IpoptModel::assign_constraint_group_autodiff_structure(
+void IpoptModel::assign_nl_constraint_group_autodiff_structure(
     int group_index, const AutodiffSymbolicStructure &structure)
 {
-	auto &groups = nl_constraint_groups;
-	groups.autodiff_structures[group_index] = structure;
+	m_nl_evaluator.assign_constraint_group_autodiff_structure(group_index, structure);
 }
 
-void IpoptModel::assign_constraint_group_autodiff_evaluator(
+void IpoptModel::assign_nl_constraint_group_autodiff_evaluator(
     int group_index, const ConstraintAutodiffEvaluator &evaluator)
 {
-	auto &groups = nl_constraint_groups;
-	groups.autodiff_evaluators[group_index] = evaluator;
+	m_nl_evaluator.assign_constraint_group_autodiff_evaluator(group_index, evaluator);
 }
 
-void IpoptModel::assign_objective_group_autodiff_structure(
+void IpoptModel::assign_nl_objective_group_autodiff_structure(
     int group_index, const AutodiffSymbolicStructure &structure)
 {
-	auto &groups = nl_objective_groups;
-	groups.autodiff_structures[group_index] = structure;
+	m_nl_evaluator.assign_objective_group_autodiff_structure(group_index, structure);
 }
 
-void IpoptModel::assign_objective_group_autodiff_evaluator(
+void IpoptModel::assign_nl_objective_group_autodiff_evaluator(
     int group_index, const ObjectiveAutodiffEvaluator &evaluator)
 {
-	auto &groups = nl_objective_groups;
-	groups.autodiff_evaluators[group_index] = evaluator;
+	m_nl_evaluator.assign_objective_group_autodiff_evaluator(group_index, evaluator);
 }
 
 ConstraintIndex IpoptModel::add_single_nl_constraint(size_t graph_index,
@@ -449,8 +366,8 @@ ConstraintIndex IpoptModel::add_single_nl_constraint(size_t graph_index,
 	auto constraint_index = n_nl_constraints;
 	n_nl_constraints += 1;
 
-	nl_constraint_graph_instance_indices.push_back(graph_index);
-	nl_constraint_graph_instance_orders.push_back(graph.m_constraint_outputs.size() - 1);
+	nl_constraint_graph_memberships.push_back(ConstraintGraphMembership{
+	    .graph = (int)graph_index, .rank = (int)graph.m_constraint_outputs.size() - 1});
 
 	return ConstraintIndex(ConstraintType::IPOPT_NL, constraint_index);
 }
@@ -458,7 +375,7 @@ ConstraintIndex IpoptModel::add_single_nl_constraint(size_t graph_index,
 static bool eval_f(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data)
 {
 	IpoptModel &model = *static_cast<IpoptModel *>(user_data);
-	obj_value[0] = 0.0;
+	*obj_value = 0.0;
 	// fmt::print("Before linear and quad objective, obj_value: {}\n", *obj_value);
 	if (model.m_linear_obj_evaluator)
 	{
@@ -471,35 +388,9 @@ static bool eval_f(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, User
 	// fmt::print("After linear and quad objective, obj_value: {}\n", *obj_value);
 
 	// nonlinear part
-	auto &groups = model.nl_objective_groups;
-	auto n_group = groups.n_group;
-	for (int i = 0; i < n_group; i++)
-	{
-		auto &instance_indices = groups.instance_indices[i];
-		auto n_instances = instance_indices.size();
-		auto &structure = groups.autodiff_structures[i];
-		auto &evaluator = groups.autodiff_evaluators[i];
+	double nl_obj = model.m_nl_evaluator.eval_objective(x);
 
-		if (!structure.has_parameter)
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				evaluator.f_eval.nop(x, obj_value, variables.data());
-			}
-		}
-		else
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				auto &constant = model.m_graph_instance_constants[instance_index];
-				evaluator.f_eval.p(x, constant.data(), obj_value, variables.data());
-			}
-		}
-	}
+	*obj_value += nl_obj;
 
 	return true;
 }
@@ -526,48 +417,7 @@ static bool eval_grad_f(ipindex n, ipnumber *x, bool new_x, ipnumber *grad_f, Us
 	}
 
 	// nonlinear part
-	auto &groups = model.nl_objective_groups;
-	auto n_group = groups.n_group;
-
-	for (int i = 0; i < n_group; i++)
-	{
-		auto &instance_indices = groups.instance_indices[i];
-		auto n_instances = instance_indices.size();
-		auto &structure = groups.autodiff_structures[i];
-		auto &evaluator = groups.autodiff_evaluators[i];
-
-		if (!structure.has_jacobian)
-		{
-			continue;
-		}
-
-		auto local_jacobian_nnz = structure.m_jacobian_nnz;
-		int *grad_index = groups.gradient_indices[i].data();
-
-		if (!structure.has_parameter)
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				evaluator.grad_eval.nop(x, sparse_gradient_values.data(), variables.data(),
-				                        grad_index);
-				grad_index += local_jacobian_nnz;
-			}
-		}
-		else
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				auto &constant = model.m_graph_instance_constants[instance_index];
-				evaluator.grad_eval.p(x, constant.data(), sparse_gradient_values.data(),
-				                      variables.data(), grad_index);
-				grad_index += local_jacobian_nnz;
-			}
-		}
-	}
+	model.m_nl_evaluator.eval_objective_gradient(x, sparse_gradient_values.data());
 
 	// copy to grad_f
 	for (size_t i = 0; i < model.sparse_gradient_indices.size(); i++)
@@ -602,39 +452,7 @@ static bool eval_g(ipindex n, ipnumber *x, bool new_x, ipindex m, ipnumber *g,
 
 	// nonlinear part
 	g += model.m_quadratic_con_evaluator.n_constraints;
-	auto &groups = model.nl_constraint_groups;
-	auto n_group = groups.n_group;
-	for (int i = 0; i < n_group; i++)
-	{
-		auto &instance_indices = groups.instance_indices[i];
-		auto n_instances = instance_indices.size();
-		auto &structure = groups.autodiff_structures[i];
-		auto &evaluator = groups.autodiff_evaluators[i];
-
-		auto ny = structure.ny;
-
-		if (!structure.has_parameter)
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				evaluator.f_eval.nop(x, g, variables.data());
-				g += ny;
-			}
-		}
-		else
-		{
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = model.m_graph_instance_variables[instance_index];
-				auto &constant = model.m_graph_instance_constants[instance_index];
-				evaluator.f_eval.p(x, constant.data(), g, variables.data());
-				g += ny;
-			}
-		}
-	}
+	model.m_nl_evaluator.eval_constraints(x, g);
 
 	// debug
 	/*fmt::print("Current x: {}\n", std::vector<double>(x, x + n));
@@ -677,45 +495,7 @@ static bool eval_jac_g(ipindex n, ipnumber *x, bool new_x, ipindex m, ipindex ne
 		/*fmt::print("jacobian forwards {} for quadratic part\n",
 		           model.m_quadratic_con_evaluator.jacobian_nnz);*/
 		values += model.m_quadratic_con_evaluator.jacobian_nnz;
-		auto &groups = model.nl_constraint_groups;
-		auto n_group = groups.n_group;
-
-		for (int i = 0; i < n_group; i++)
-		{
-			auto &instance_indices = groups.instance_indices[i];
-			auto n_instances = instance_indices.size();
-			auto &structure = groups.autodiff_structures[i];
-			auto &evaluator = groups.autodiff_evaluators[i];
-
-			if (!structure.has_jacobian)
-			{
-				continue;
-			}
-
-			auto local_jacobian_nnz = structure.m_jacobian_nnz;
-
-			if (!structure.has_parameter)
-			{
-				for (int j = 0; j < n_instances; j++)
-				{
-					auto instance_index = instance_indices[j];
-					auto &variables = model.m_graph_instance_variables[instance_index];
-					evaluator.jacobian_eval.nop(x, values, variables.data());
-					values += local_jacobian_nnz;
-				}
-			}
-			else
-			{
-				for (int j = 0; j < n_instances; j++)
-				{
-					auto instance_index = instance_indices[j];
-					auto &variables = model.m_graph_instance_variables[instance_index];
-					auto &constant = model.m_graph_instance_constants[instance_index];
-					evaluator.jacobian_eval.p(x, constant.data(), values, variables.data());
-					values += local_jacobian_nnz;
-				}
-			}
-		}
+		model.m_nl_evaluator.eval_constraints_jacobian(x, values);
 
 		// debug
 		/*fmt::print("Current x: {}\n", std::vector<double>(x, x + n));
@@ -752,51 +532,6 @@ static bool eval_h(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipin
 			model.m_quadratic_obj_evaluator->eval_lagrangian_hessian(&obj_factor, values);
 		}
 
-		// nonlinear part
-		{
-			auto &groups = model.nl_objective_groups;
-			auto n_group = groups.n_group;
-			for (int i = 0; i < n_group; i++)
-			{
-				auto &instance_indices = groups.instance_indices[i];
-				auto n_instances = instance_indices.size();
-				auto &structure = groups.autodiff_structures[i];
-				auto &evaluator = groups.autodiff_evaluators[i];
-
-				if (!structure.has_hessian)
-				{
-					continue;
-				}
-
-				auto local_hessian_nnz = structure.m_hessian_nnz;
-				int *hessian_index = groups.hessian_indices[i].data();
-
-				if (!structure.has_parameter)
-				{
-					for (int j = 0; j < n_instances; j++)
-					{
-						auto instance_index = instance_indices[j];
-						auto &variables = model.m_graph_instance_variables[instance_index];
-						evaluator.hessian_eval.nop(x, &obj_factor, values, variables.data(),
-						                           hessian_index);
-						hessian_index += local_hessian_nnz;
-					}
-				}
-				else
-				{
-					for (int j = 0; j < n_instances; j++)
-					{
-						auto instance_index = instance_indices[j];
-						auto &variables = model.m_graph_instance_variables[instance_index];
-						auto &constant = model.m_graph_instance_constants[instance_index];
-						evaluator.hessian_eval.p(x, constant.data(), &obj_factor, values,
-						                         variables.data(), hessian_index);
-						hessian_index += local_hessian_nnz;
-					}
-				}
-			}
-		}
-
 		// constraint
 
 		// quadratic part
@@ -805,49 +540,7 @@ static bool eval_h(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipin
 
 		// nonlinear part
 		lambda += model.m_quadratic_con_evaluator.n_constraints;
-		{
-			auto &groups = model.nl_constraint_groups;
-			auto n_group = groups.n_group;
-			for (int i = 0; i < n_group; i++)
-			{
-				auto &instance_indices = groups.instance_indices[i];
-				auto n_instances = instance_indices.size();
-				auto &structure = groups.autodiff_structures[i];
-				auto &evaluator = groups.autodiff_evaluators[i];
-				if (!structure.has_hessian)
-				{
-					continue;
-				}
-				auto local_hessian_nnz = structure.m_hessian_nnz;
-				auto ny = structure.ny;
-				int *hessian_index = groups.hessian_indices[i].data();
-				if (!structure.has_parameter)
-				{
-					for (int j = 0; j < n_instances; j++)
-					{
-						auto instance_index = instance_indices[j];
-						auto &variables = model.m_graph_instance_variables[instance_index];
-						evaluator.hessian_eval.nop(x, lambda, values, variables.data(),
-						                           hessian_index);
-						hessian_index += local_hessian_nnz;
-						lambda += ny;
-					}
-				}
-				else
-				{
-					for (int j = 0; j < n_instances; j++)
-					{
-						auto instance_index = instance_indices[j];
-						auto &variables = model.m_graph_instance_variables[instance_index];
-						auto &constant = model.m_graph_instance_constants[instance_index];
-						evaluator.hessian_eval.p(x, constant.data(), lambda, values,
-						                         variables.data(), hessian_index);
-						hessian_index += local_hessian_nnz;
-						lambda += ny;
-					}
-				}
-			}
-		}
+		model.m_nl_evaluator.eval_lagrangian_hessian(x, lambda, obj_factor, values);
 
 		// debug
 		/*fmt::print("Current x: {}\n", std::vector<double>(x, x + n));
@@ -910,235 +603,42 @@ void IpoptModel::analyze_structure()
 		sparse_gradient_map.emplace(index, i);
 	}
 
-	// analyze nonlinear constraints
+	fmt::print("before m_nl_evaluator\n");
+
+	// analyze nonlinear constraints and objectives
 	{
+		auto &evaluator = m_nl_evaluator;
+
 		auto constraint_counter =
 		    m_linear_con_evaluator.n_constraints + m_quadratic_con_evaluator.n_constraints;
-		auto &groups = nl_constraint_groups;
-
-		auto n_group = groups.n_group;
-		for (int i = 0; i < n_group; i++)
-		{
-			auto &instance_indices = groups.instance_indices[i];
-			auto &structure = groups.autodiff_structures[i];
-
-			if (!structure.has_jacobian)
-			{
-				continue;
-			}
-
-			auto n_instances = instance_indices.size();
-
-			auto local_jacobian_nnz = structure.m_jacobian_nnz;
-			auto &local_jacobian_rows = structure.m_jacobian_rows;
-			auto &local_jacobian_cols = structure.m_jacobian_cols;
-
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = m_graph_instance_variables[instance_index];
-
-				for (int k = 0; k < local_jacobian_nnz; k++)
-				{
-					auto row = local_jacobian_rows[k] + constraint_counter;
-					auto col = variables[local_jacobian_cols[k]];
-					m_jacobian_rows.push_back(row);
-					m_jacobian_cols.push_back(col);
-				}
-
-				constraint_counter += structure.ny;
-			}
-
-			m_jacobian_nnz += local_jacobian_nnz * n_instances;
-		}
-	}
-	{
-		auto &groups = nl_constraint_groups;
-
-		auto n_group = groups.n_group;
-		groups.hessian_indices.resize(n_group);
-		for (int i = 0; i < n_group; i++)
-		{
-			auto &instance_indices = groups.instance_indices[i];
-			auto &structure = groups.autodiff_structures[i];
-
-			if (!structure.has_hessian)
-			{
-				continue;
-			}
-
-			auto n_instances = instance_indices.size();
-
-			auto local_hessian_nnz = structure.m_hessian_nnz;
-			auto &local_hessian_rows = structure.m_hessian_rows;
-			auto &local_hessian_cols = structure.m_hessian_cols;
-
-			std::vector<int> hessian_index_buffer(local_hessian_nnz);
-
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = m_graph_instance_variables[instance_index];
-
-				for (int k = 0; k < local_hessian_nnz; k++)
-				{
-					auto row = variables[local_hessian_rows[k]];
-					auto col = variables[local_hessian_cols[k]];
-
-					// Lower part of hessian
-					if (row < col)
-					{
-						std::swap(row, col);
-					}
-
-					auto [iter, inserted] =
-					    m_hessian_index_map.try_emplace({row, col}, m_hessian_nnz);
-					if (inserted)
-					{
-						m_hessian_rows.push_back(row);
-						m_hessian_cols.push_back(col);
-						m_hessian_nnz += 1;
-					}
-					auto hessian_index = iter->second;
-					hessian_index_buffer[k] = hessian_index;
-				}
-				groups.hessian_indices[i].insert(groups.hessian_indices[i].end(),
-				                                 hessian_index_buffer.begin(),
-				                                 hessian_index_buffer.end());
-			}
-		}
+		evaluator.analyze_constraints_jacobian_structure(constraint_counter, m_jacobian_nnz,
+		                                                 m_jacobian_rows, m_jacobian_cols);
+		evaluator.analyze_objective_gradient_structure(sparse_gradient_indices,
+		                                               sparse_gradient_map);
+		evaluator.analyze_constraints_hessian_structure(m_hessian_nnz, m_hessian_rows,
+		                                                m_hessian_cols, m_hessian_index_map,
+		                                                HessianSparsityType::Lower);
+		evaluator.analyze_objective_hessian_structure(m_hessian_nnz, m_hessian_rows, m_hessian_cols,
+		                                              m_hessian_index_map,
+		                                              HessianSparsityType::Lower);
 	}
 
-	// nonlinear objective
-	{
-		auto &groups = nl_objective_groups;
-
-		auto n_group = groups.n_group;
-		groups.gradient_indices.resize(n_group, {});
-		for (int i = 0; i < n_group; i++)
-		{
-			auto &instance_indices = groups.instance_indices[i];
-			auto &structure = groups.autodiff_structures[i];
-
-			if (!structure.has_jacobian)
-			{
-				continue;
-			}
-
-			auto n_instances = instance_indices.size();
-
-			auto local_jacobian_nnz = structure.m_jacobian_nnz;
-			auto &local_jacobian_cols = structure.m_jacobian_cols;
-
-			std::vector<int> jacobian_index_buffer(local_jacobian_nnz);
-
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = m_graph_instance_variables[instance_index];
-
-				for (int k = 0; k < local_jacobian_nnz; k++)
-				{
-					auto col = variables[local_jacobian_cols[k]];
-
-					auto [iter, inserted] =
-					    sparse_gradient_map.try_emplace(col, sparse_gradient_indices.size());
-					if (inserted)
-					{
-						sparse_gradient_indices.push_back(col);
-					}
-					jacobian_index_buffer[k] = iter->second;
-				}
-				groups.gradient_indices[i].insert(groups.gradient_indices[i].end(),
-				                                  jacobian_index_buffer.begin(),
-				                                  jacobian_index_buffer.end());
-			}
-		}
-	}
-	{
-		auto &groups = nl_objective_groups;
-
-		auto n_group = groups.n_group;
-		groups.hessian_indices.resize(n_group, {});
-		for (int i = 0; i < n_group; i++)
-		{
-			auto &instance_indices = groups.instance_indices[i];
-			auto &structure = groups.autodiff_structures[i];
-
-			if (!structure.has_hessian)
-			{
-				continue;
-			}
-
-			auto n_instances = instance_indices.size();
-
-			auto local_hessian_nnz = structure.m_hessian_nnz;
-			auto &local_hessian_rows = structure.m_hessian_rows;
-			auto &local_hessian_cols = structure.m_hessian_cols;
-
-			std::vector<int> hessian_index_buffer(local_hessian_nnz);
-
-			for (int j = 0; j < n_instances; j++)
-			{
-				auto instance_index = instance_indices[j];
-				auto &variables = m_graph_instance_variables[instance_index];
-
-				for (int k = 0; k < local_hessian_nnz; k++)
-				{
-					auto row = variables[local_hessian_rows[k]];
-					auto col = variables[local_hessian_cols[k]];
-
-					// Lower part of hessian
-					if (row < col)
-					{
-						std::swap(row, col);
-					}
-
-					auto [iter, inserted] =
-					    m_hessian_index_map.try_emplace({row, col}, m_hessian_nnz);
-					if (inserted)
-					{
-						m_hessian_rows.push_back(row);
-						m_hessian_cols.push_back(col);
-						m_hessian_nnz += 1;
-					}
-					auto hessian_index = iter->second;
-					hessian_index_buffer[k] = hessian_index;
-				}
-				groups.hessian_indices[i].insert(groups.hessian_indices[i].end(),
-				                                 hessian_index_buffer.begin(),
-				                                 hessian_index_buffer.end());
-			}
-		}
-	}
 	sparse_gradient_values.resize(sparse_gradient_indices.size());
 
 	// update the mapping of nl constraint
 	nl_constraint_map_ext2int.resize(n_nl_constraints);
-	// compute the prefix sum of each group of constraint group
-	std::vector<int> group_prefix_sum(nl_constraint_groups.n_group + 1, 0);
-	for (int i = 0; i < nl_constraint_groups.n_group; i++)
-	{
-		auto group_size = nl_constraint_groups.instance_indices[i].size();
-		auto ny = nl_constraint_groups.autodiff_structures[i].ny;
-		group_prefix_sum[i + 1] = group_prefix_sum[i] + group_size * ny;
-	}
-	for (int i = 0; i < nl_constraint_graph_instance_indices.size(); i++)
+	m_nl_evaluator.calculate_constraint_graph_instances_offset();
+	for (int i = 0; i < n_nl_constraints; i++)
 	{
 		auto i_nl_con = i;
-		auto i_graph_instance = nl_constraint_graph_instance_indices[i];
-		auto i_graph_order = nl_constraint_graph_instance_orders[i];
-		auto i_graph_group = nl_constraint_group_info.group_indices[i_graph_instance];
-		auto i_graph_group_order = nl_constraint_group_info.group_orders[i_graph_instance];
-		auto ny = nl_constraint_groups.autodiff_structures[i_graph_group].ny;
+		auto i_graph_instance = nl_constraint_graph_memberships[i].graph;
+		auto i_graph_rank = nl_constraint_graph_memberships[i].rank;
 
-		auto base = group_prefix_sum[i_graph_group];
-		auto internal_index = base + i_graph_group_order * ny + i_graph_order;
+		auto index_base = m_nl_evaluator.constraint_indices_offsets[i_graph_instance];
 
-		nl_constraint_map_ext2int[i_nl_con] = internal_index;
+		nl_constraint_map_ext2int[i_nl_con] = index_base + i_graph_rank;
 	}
-
-	/*fmt::print("group_prefix_sum {}\n", group_prefix_sum);
+	/*fmt::print("constraint_indices_offsets {}\n", m_nl_evaluator.constraint_indices_offsets);
 	fmt::print("nl_constraint_map_ext2int {}\n", nl_constraint_map_ext2int);*/
 
 	// construct the lower bound and upper bound of the constraints

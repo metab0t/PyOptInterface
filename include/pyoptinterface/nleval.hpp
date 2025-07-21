@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <vector>
 
-#include "core.hpp"
+#include "pyoptinterface/core.hpp"
+#include "pyoptinterface/nlexpr.hpp"
 
 enum class HessianSparsityType
 {
@@ -157,4 +158,120 @@ struct QuadraticEvaluator
 	                               Hashmap<std::tuple<int, int>, int> &hessian_index_map,
 	                               HessianSparsityType hessian_type);
 	void eval_lagrangian_hessian(const double *restrict lambda, double *restrict hessian) const;
+};
+
+struct NonlinearEvaluator
+{
+	// How many graph instances are there
+	size_t n_graph_instances = 0;
+	// record the inputs of graph instances
+	struct GraphInput
+	{
+		std::vector<int> variables;
+		std::vector<double> constants;
+	};
+	std::vector<GraphInput> graph_inputs;
+	// record graph instances with constraint output and objective output
+	struct GraphHash
+	{
+		// hash of this graph instance
+		uint64_t hash;
+		// index of this graph instance
+		int index;
+	};
+	struct GraphHashes
+	{
+		std::vector<GraphHash> hashes;
+		size_t n_hashes_since_last_aggregation;
+	} constraint_graph_hashes, objective_graph_hashes;
+
+	// length = n_graph_instances
+	// record which group this graph instance belongs to
+	struct GraphGroupMembership
+	{
+		// which group it belongs to
+		int group;
+		// the rank in that group
+		int rank;
+	};
+	std::vector<GraphGroupMembership> constraint_group_memberships, objective_group_memberships;
+	// record which index of constraint this graph starts
+	std::vector<int> constraint_indices_offsets;
+
+	// graph groups
+	struct ConstraintGraphGroup
+	{
+		std::vector<int> instance_indices;
+		AutodiffSymbolicStructure autodiff_structure;
+		ConstraintAutodiffEvaluator autodiff_evaluator;
+
+		// where to store the hessian matrix
+		// length = instance_indices.size() * hessian_nnz
+		std::vector<int> hessian_indices;
+	};
+	std::vector<ConstraintGraphGroup> constraint_groups;
+	Hashmap<uint64_t, int> hash_to_constraint_group;
+
+	struct ObjectiveGraphGroup
+	{
+		std::vector<int> instance_indices;
+		AutodiffSymbolicStructure autodiff_structure;
+		ObjectiveAutodiffEvaluator autodiff_evaluator;
+		// where to store the gradient vector
+		// length = instance_indices.size() * jacobian_nnz
+		std::vector<int> gradient_indices;
+		// where to store the hessian matrix
+		// length = instance_indices.size() * hessian_nnz
+		std::vector<int> hessian_indices;
+	};
+	std::vector<ObjectiveGraphGroup> objective_groups;
+	Hashmap<uint64_t, int> hash_to_objective_group;
+
+	int add_graph_instance();
+	void finalize_graph_instance(size_t graph_index, const ExpressionGraph &graph);
+	int aggregate_constraint_groups();
+	int get_constraint_group_representative(int group_index) const;
+	int aggregate_objective_groups();
+	int get_objective_group_representative(int group_index) const;
+
+	void assign_constraint_group_autodiff_structure(int group_index,
+	                                                const AutodiffSymbolicStructure &structure);
+	void assign_constraint_group_autodiff_evaluator(int group_index,
+	                                                const ConstraintAutodiffEvaluator &evaluator);
+	void assign_objective_group_autodiff_structure(int group_index,
+	                                               const AutodiffSymbolicStructure &structure);
+	void assign_objective_group_autodiff_evaluator(int group_index,
+	                                               const ObjectiveAutodiffEvaluator &evaluator);
+
+	void calculate_constraint_graph_instances_offset();
+
+	// functions to evaluate the nonlinear constraints and objectives
+
+	// f
+	void eval_constraints(const double *restrict x, double *restrict f) const;
+	double eval_objective(const double *restrict x) const;
+
+	// first order derivative
+	void analyze_constraints_jacobian_structure(size_t row_base, size_t &global_jacobian_nnz,
+	                                            std::vector<int> &global_jacobian_rows,
+	                                            std::vector<int> &global_jacobian_cols);
+	void analyze_objective_gradient_structure(std::vector<int> &global_gradient_cols,
+	                                          Hashmap<int, int> &sparse_gradient_map);
+
+	void eval_constraints_jacobian(const double *restrict x, double *restrict jacobian) const;
+	void eval_objective_gradient(const double *restrict x, double *restrict grad_f) const;
+
+	// second order derivative
+	void analyze_constraints_hessian_structure(
+	    size_t &global_hessian_nnz, std::vector<int> &global_hessian_rows,
+	    std::vector<int> &global_hessian_cols,
+	    Hashmap<std::tuple<int, int>, int> &hessian_index_map, HessianSparsityType hessian_type);
+	void analyze_objective_hessian_structure(size_t &global_hessian_nnz,
+	                                         std::vector<int> &global_hessian_rows,
+	                                         std::vector<int> &global_hessian_cols,
+	                                         Hashmap<std::tuple<int, int>, int> &hessian_index_map,
+	                                         HessianSparsityType hessian_type);
+
+	void eval_lagrangian_hessian(const double *restrict x, const double *restrict lambda,
+	                             const double sigma, double *restrict hessian) const;
 };

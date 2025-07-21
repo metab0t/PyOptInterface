@@ -128,21 +128,21 @@ NB_MODULE(ipopt_model_ext, m)
 
 	    // New API
 	    .def("_add_graph_index", &IpoptModel::add_graph_index)
-	    .def("_record_graph_hash", &IpoptModel::record_graph_hash)
-	    .def("_aggregate_graph_constraint_groups", &IpoptModel::aggregate_graph_constraint_groups)
-	    .def("_get_graph_constraint_group_representative",
-	         &IpoptModel::get_graph_constraint_group_representative)
-	    .def("_aggregate_graph_objective_groups", &IpoptModel::aggregate_graph_objective_groups)
-	    .def("_get_graph_objective_group_representative",
-	         &IpoptModel::get_graph_objective_group_representative)
-	    .def("_assign_constraint_group_autodiff_structure",
-	         &IpoptModel::assign_constraint_group_autodiff_structure)
-	    .def("_assign_constraint_group_autodiff_evaluator",
-	         &IpoptModel::assign_constraint_group_autodiff_evaluator)
-	    .def("_assign_objective_group_autodiff_structure",
-	         &IpoptModel::assign_objective_group_autodiff_structure)
-	    .def("_assign_objective_group_autodiff_evaluator",
-	         &IpoptModel::assign_objective_group_autodiff_evaluator)
+	    .def("_finalize_graph_instance", &IpoptModel::finalize_graph_instance)
+	    .def("_aggregate_nl_constraint_groups", &IpoptModel::aggregate_nl_constraint_groups)
+	    .def("_get_nl_constraint_group_representative",
+	         &IpoptModel::get_nl_constraint_group_representative)
+	    .def("_aggregate_nl_objective_groups", &IpoptModel::aggregate_nl_objective_groups)
+	    .def("_get_nl_objective_group_representative",
+	         &IpoptModel::get_nl_objective_group_representative)
+	    .def("_assign_nl_constraint_group_autodiff_structure",
+	         &IpoptModel::assign_nl_constraint_group_autodiff_structure)
+	    .def("_assign_nl_constraint_group_autodiff_evaluator",
+	         &IpoptModel::assign_nl_constraint_group_autodiff_evaluator)
+	    .def("_assign_nl_objective_group_autodiff_structure",
+	         &IpoptModel::assign_nl_objective_group_autodiff_structure)
+	    .def("_assign_nl_objective_group_autodiff_evaluator",
+	         &IpoptModel::assign_nl_objective_group_autodiff_evaluator)
 
 	    .def("_add_single_nl_constraint", &IpoptModel::add_single_nl_constraint)
 

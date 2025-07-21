@@ -520,6 +520,8 @@ class Model(RawModel):
                     raise ValueError(f"Unknown constraint sense: {sense}")
             else:
                 raise ValueError("Must specify either equality or inequality bounds")
+        else:
+            raise ValueError("Must specify either equality or inequality bounds")
 
         graph.add_constraint_output(expr)
 
@@ -566,29 +568,29 @@ class Model(RawModel):
             self.n_graph_instances_since_last_optimize, len(self.graph_instances)
         ):
             graph = self.graph_instances[i]
-            self._record_graph_hash(i, graph)
+            self._finalize_graph_instance(i, graph)
 
         # constraint part
 
-        n_groups = self._aggregate_graph_constraint_groups()
+        n_groups = self._aggregate_nl_constraint_groups()
         # print(f"Found {n_groups} nonlinear constraint groups of similar graphs")
         self.nl_constraint_group_num = n_groups
 
         rep_instances = self.nl_constraint_group_representatives
 
         for i in range(self.nl_constraint_group_num_since_last_optimize, n_groups):
-            graph_index = self._get_graph_constraint_group_representative(i)
+            graph_index = self._get_nl_constraint_group_representative(i)
             rep_instances.append(graph_index)
 
         # objective part
-        n_groups = self._aggregate_graph_objective_groups()
+        n_groups = self._aggregate_nl_objective_groups()
         # print(f"Found {n_groups} nonlinear objective groups of similar graphs")
         self.nl_objective_group_num = n_groups
 
         rep_instances = self.nl_objective_group_representatives
 
         for i in range(self.nl_objective_group_num_since_last_optimize, n_groups):
-            graph_index = self._get_graph_objective_group_representative(i)
+            graph_index = self._get_nl_objective_group_representative(i)
             rep_instances.append(graph_index)
 
     def _compile_evaluators(self):
@@ -631,7 +633,7 @@ class Model(RawModel):
 
             # print(cppad_graph.f)
 
-            self._assign_constraint_group_autodiff_structure(i, autodiff_structure)
+            self._assign_nl_constraint_group_autodiff_structure(i, autodiff_structure)
 
             self.nl_constraint_cppad_autodiff_graphs.append(cppad_graph)
             self.nl_constraint_autodiff_structures.append(autodiff_structure)
@@ -663,7 +665,7 @@ class Model(RawModel):
                 param_values,
             )
 
-            self._assign_objective_group_autodiff_structure(i, autodiff_structure)
+            self._assign_nl_objective_group_autodiff_structure(i, autodiff_structure)
 
             self.nl_objective_cppad_autodiff_graphs.append(cppad_graph)
             self.nl_objective_autodiff_structures.append(autodiff_structure)
@@ -791,7 +793,7 @@ class Model(RawModel):
             evaluator = ConstraintAutodiffEvaluator(
                 has_parameter, f_ptr, jacobian_ptr, hessian_ptr
             )
-            self._assign_constraint_group_autodiff_evaluator(group_index, evaluator)
+            self._assign_nl_constraint_group_autodiff_evaluator(group_index, evaluator)
 
         for group_index in range(
             self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
@@ -814,7 +816,7 @@ class Model(RawModel):
             evaluator = ObjectiveAutodiffEvaluator(
                 has_parameter, f_ptr, jacobian_ptr, hessian_ptr
             )
-            self._assign_objective_group_autodiff_evaluator(group_index, evaluator)
+            self._assign_nl_objective_group_autodiff_evaluator(group_index, evaluator)
 
     def _codegen_llvm(self):
         jit_compiler: LLJITCompiler = self.jit_compiler
@@ -941,7 +943,7 @@ class Model(RawModel):
             evaluator = ConstraintAutodiffEvaluator(
                 has_parameter, f_ptr, jacobian_ptr, hessian_ptr
             )
-            self._assign_constraint_group_autodiff_evaluator(group_index, evaluator)
+            self._assign_nl_constraint_group_autodiff_evaluator(group_index, evaluator)
 
         for group_index in range(
             self.nl_objective_group_num_since_last_optimize, self.nl_objective_group_num
@@ -964,7 +966,7 @@ class Model(RawModel):
             evaluator = ObjectiveAutodiffEvaluator(
                 has_parameter, f_ptr, jacobian_ptr, hessian_ptr
             )
-            self._assign_objective_group_autodiff_evaluator(group_index, evaluator)
+            self._assign_nl_objective_group_autodiff_evaluator(group_index, evaluator)
 
 
 Model.add_variables = make_variable_tupledict

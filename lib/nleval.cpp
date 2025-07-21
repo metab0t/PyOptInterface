@@ -1,5 +1,6 @@
 #include "pyoptinterface/nleval.hpp"
 #include <cassert>
+#include <span>
 
 ConstraintAutodiffEvaluator::ConstraintAutodiffEvaluator(bool has_parameter, uintptr_t fp,
                                                          uintptr_t jp, uintptr_t hp)
@@ -372,6 +373,613 @@ void QuadraticEvaluator::eval_lagrangian_hessian(const double *restrict lambda,
 			auto coef = offdiag_coefs[j];
 			auto hessian_index = hessian_offdiag_indices[j];
 			hessian[hessian_index] += coef * multiplier;
+		}
+	}
+}
+
+int NonlinearEvaluator::add_graph_instance()
+{
+	auto current_graph_index = n_graph_instances;
+	n_graph_instances += 1;
+	graph_inputs.emplace_back();
+	return current_graph_index;
+}
+
+void NonlinearEvaluator::finalize_graph_instance(size_t graph_index, const ExpressionGraph &graph)
+{
+	auto bodyhash = graph.main_structure_hash();
+
+	graph_inputs[graph_index].variables = graph.m_variables;
+	graph_inputs[graph_index].constants = graph.m_constants;
+
+	if (graph.has_constraint_output())
+	{
+		auto hash = graph.constraint_structure_hash(bodyhash);
+		constraint_graph_hashes.hashes.emplace_back(hash, (int)graph_index);
+	}
+
+	if (graph.has_objective_output())
+	{
+		auto hash = graph.objective_structure_hash(bodyhash);
+		objective_graph_hashes.hashes.emplace_back(hash, (int)graph_index);
+	}
+}
+
+int NonlinearEvaluator::aggregate_constraint_groups()
+{
+	auto &graph_hashes = constraint_graph_hashes;
+	auto &group_memberships = constraint_group_memberships;
+
+	// ensure we have enough space for every graph instance
+	group_memberships.resize(n_graph_instances, GraphGroupMembership{.group = -1, .rank = -1});
+
+	// graph hashes that has not been aggregated
+	std::span<const GraphHash> hashes_to_analyze(graph_hashes.hashes.begin() +
+	                                                 graph_hashes.n_hashes_since_last_aggregation,
+	                                             graph_hashes.hashes.end());
+
+	for (const auto &graph_hash : hashes_to_analyze)
+	{
+		auto index = graph_hash.index;
+		auto hash = graph_hash.hash;
+		auto [iter, inserted] =
+		    hash_to_constraint_group.try_emplace(hash, constraint_groups.size());
+		auto group_index = iter->second;
+		if (inserted)
+		{
+			constraint_groups.emplace_back();
+		}
+		group_memberships[index].group = group_index;
+		group_memberships[index].rank = (int)constraint_groups[group_index].instance_indices.size();
+		constraint_groups[group_index].instance_indices.push_back(index);
+	}
+
+	graph_hashes.n_hashes_since_last_aggregation = graph_hashes.hashes.size();
+
+	return constraint_groups.size();
+}
+
+int NonlinearEvaluator::get_constraint_group_representative(int group_index) const
+{
+	auto index = constraint_groups.at(group_index).instance_indices.at(0);
+	return index;
+}
+
+int NonlinearEvaluator::aggregate_objective_groups()
+{
+	auto &graph_hashes = objective_graph_hashes;
+	auto &group_memberships = objective_group_memberships;
+
+	// ensure we have enough space for every graph instance
+	group_memberships.resize(n_graph_instances, GraphGroupMembership{.group = -1, .rank = -1});
+
+	// graph hashes that has not been aggregated
+	std::span<const GraphHash> hashes_to_analyze(graph_hashes.hashes.begin() +
+	                                                 graph_hashes.n_hashes_since_last_aggregation,
+	                                             graph_hashes.hashes.end());
+
+	for (const auto &graph_hash : hashes_to_analyze)
+	{
+		auto index = graph_hash.index;
+		auto hash = graph_hash.hash;
+		auto [iter, inserted] = hash_to_objective_group.try_emplace(hash, objective_groups.size());
+		auto group_index = iter->second;
+		if (inserted)
+		{
+			objective_groups.emplace_back();
+		}
+		group_memberships[index].group = group_index;
+		group_memberships[index].rank = (int)objective_groups[group_index].instance_indices.size();
+		objective_groups[group_index].instance_indices.push_back(index);
+	}
+
+	graph_hashes.n_hashes_since_last_aggregation = graph_hashes.hashes.size();
+
+	return objective_groups.size();
+}
+
+int NonlinearEvaluator::get_objective_group_representative(int group_index) const
+{
+	auto index = objective_groups.at(group_index).instance_indices.at(0);
+	return index;
+}
+
+void NonlinearEvaluator::assign_constraint_group_autodiff_structure(
+    int group_index, const AutodiffSymbolicStructure &structure)
+{
+	constraint_groups[group_index].autodiff_structure = structure;
+}
+
+void NonlinearEvaluator::assign_constraint_group_autodiff_evaluator(
+    int group_index, const ConstraintAutodiffEvaluator &evaluator)
+{
+	constraint_groups[group_index].autodiff_evaluator = evaluator;
+}
+
+void NonlinearEvaluator::assign_objective_group_autodiff_structure(
+    int group_index, const AutodiffSymbolicStructure &structure)
+{
+	objective_groups[group_index].autodiff_structure = structure;
+}
+
+void NonlinearEvaluator::assign_objective_group_autodiff_evaluator(
+    int group_index, const ObjectiveAutodiffEvaluator &evaluator)
+{
+	objective_groups[group_index].autodiff_evaluator = evaluator;
+}
+
+void NonlinearEvaluator::calculate_constraint_graph_instances_offset()
+{
+	// now all graphs are aggregated we need to figure out which index each graph starts
+	constraint_indices_offsets.resize(n_graph_instances, -1);
+	int counter = 0;
+	for (const auto &group : constraint_groups)
+	{
+		const auto &instance_indices = group.instance_indices;
+		auto ny = group.autodiff_structure.ny;
+		for (auto instance_index : instance_indices)
+		{
+			constraint_indices_offsets[instance_index] = counter;
+			counter += ny;
+		}
+	}
+}
+
+void NonlinearEvaluator::eval_constraints(const double *restrict x, double *restrict f) const
+{
+	auto &groups = constraint_groups;
+	for (const auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+		auto &evaluator = group.autodiff_evaluator;
+
+		auto ny = structure.ny;
+
+		if (!structure.has_parameter)
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				evaluator.f_eval.nop(x, f, variables.data());
+				f += ny;
+			}
+		}
+		else
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				auto &constant = graph_inputs[instance_index].constants;
+				evaluator.f_eval.p(x, constant.data(), f, variables.data());
+				f += ny;
+			}
+		}
+	}
+}
+
+double NonlinearEvaluator::eval_objective(const double *restrict x) const
+{
+	auto &groups = objective_groups;
+	double obj_value = 0.0;
+	for (const auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+		auto &evaluator = group.autodiff_evaluator;
+
+		if (!structure.has_parameter)
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				evaluator.f_eval.nop(x, &obj_value, variables.data());
+			}
+		}
+		else
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				auto &constant = graph_inputs[instance_index].constants;
+				evaluator.f_eval.p(x, constant.data(), &obj_value, variables.data());
+			}
+		}
+	}
+	return obj_value;
+}
+
+void NonlinearEvaluator::analyze_constraints_jacobian_structure(
+    size_t row_base, size_t &global_jacobian_nnz, std::vector<int> &global_jacobian_rows,
+    std::vector<int> &global_jacobian_cols)
+{
+	auto &groups = constraint_groups;
+
+	for (const auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+
+		if (!structure.has_jacobian)
+		{
+			continue;
+		}
+
+		auto local_jacobian_nnz = structure.m_jacobian_nnz;
+		auto &local_jacobian_rows = structure.m_jacobian_rows;
+		auto &local_jacobian_cols = structure.m_jacobian_cols;
+
+		for (int j = 0; j < n_instances; j++)
+		{
+			auto instance_index = instance_indices[j];
+			auto &variables = graph_inputs[instance_index].variables;
+
+			for (int k = 0; k < local_jacobian_nnz; k++)
+			{
+				auto row = local_jacobian_rows[k] + row_base;
+				auto col = variables[local_jacobian_cols[k]];
+				global_jacobian_rows.push_back(row);
+				global_jacobian_cols.push_back(col);
+			}
+
+			row_base += structure.ny;
+		}
+
+		global_jacobian_nnz += local_jacobian_nnz * n_instances;
+	}
+}
+
+void NonlinearEvaluator::analyze_objective_gradient_structure(
+    std::vector<int> &global_gradient_cols, Hashmap<int, int> &sparse_gradient_map)
+{
+	auto &groups = objective_groups;
+
+	for (auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+
+		if (!structure.has_jacobian)
+		{
+			continue;
+		}
+
+		auto local_jacobian_nnz = structure.m_jacobian_nnz;
+		auto &local_jacobian_cols = structure.m_jacobian_cols;
+
+		std::vector<int> jacobian_index_buffer(local_jacobian_nnz);
+		group.gradient_indices.resize(n_instances * local_jacobian_nnz);
+
+		for (int j = 0; j < n_instances; j++)
+		{
+			auto instance_index = instance_indices[j];
+			auto &variables = graph_inputs[instance_index].variables;
+
+			for (int k = 0; k < local_jacobian_nnz; k++)
+			{
+				auto col = variables[local_jacobian_cols[k]];
+
+				auto [iter, inserted] =
+				    sparse_gradient_map.try_emplace(col, global_gradient_cols.size());
+				if (inserted)
+				{
+					global_gradient_cols.push_back(col);
+				}
+				jacobian_index_buffer[k] = iter->second;
+			}
+			std::copy(jacobian_index_buffer.begin(), jacobian_index_buffer.end(),
+			          group.gradient_indices.begin() + j * local_jacobian_nnz);
+		}
+	}
+}
+
+void NonlinearEvaluator::eval_constraints_jacobian(const double *restrict x,
+                                                   double *restrict jacobian) const
+{
+	auto &groups = constraint_groups;
+
+	for (const auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+		auto &evaluator = group.autodiff_evaluator;
+		if (!structure.has_jacobian)
+		{
+			continue;
+		}
+		auto local_jacobian_nnz = structure.m_jacobian_nnz;
+		if (!structure.has_parameter)
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				evaluator.jacobian_eval.nop(x, jacobian, variables.data());
+				jacobian += local_jacobian_nnz;
+			}
+		}
+		else
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				auto &constant = graph_inputs[instance_index].constants;
+				evaluator.jacobian_eval.p(x, constant.data(), jacobian, variables.data());
+				jacobian += local_jacobian_nnz;
+			}
+		}
+	}
+}
+
+void NonlinearEvaluator::eval_objective_gradient(const double *restrict x,
+                                                 double *restrict grad_f) const
+{
+	auto &groups = objective_groups;
+
+	for (const auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+		auto &evaluator = group.autodiff_evaluator;
+		if (!structure.has_jacobian)
+		{
+			continue;
+		}
+		auto local_jacobian_nnz = structure.m_jacobian_nnz;
+		const int *grad_index = group.gradient_indices.data();
+		if (!structure.has_parameter)
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				evaluator.grad_eval.nop(x, grad_f, variables.data(), grad_index);
+				grad_index += local_jacobian_nnz;
+			}
+		}
+		else
+		{
+			for (int j = 0; j < n_instances; j++)
+			{
+				auto instance_index = instance_indices[j];
+				auto &variables = graph_inputs[instance_index].variables;
+				auto &constant = graph_inputs[instance_index].constants;
+				evaluator.grad_eval.p(x, constant.data(), grad_f, variables.data(), grad_index);
+				grad_index += local_jacobian_nnz;
+			}
+		}
+	}
+}
+
+void NonlinearEvaluator::analyze_constraints_hessian_structure(
+    size_t &global_hessian_nnz, std::vector<int> &global_hessian_rows,
+    std::vector<int> &global_hessian_cols, Hashmap<std::tuple<int, int>, int> &hessian_index_map,
+    HessianSparsityType hessian_type)
+{
+	auto &groups = constraint_groups;
+
+	for (auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+
+		if (!structure.has_hessian)
+		{
+			continue;
+		}
+
+		auto local_hessian_nnz = structure.m_hessian_nnz;
+		auto &local_hessian_rows = structure.m_hessian_rows;
+		auto &local_hessian_cols = structure.m_hessian_cols;
+
+		std::vector<int> hessian_index_buffer(local_hessian_nnz);
+		group.hessian_indices.resize(n_instances * local_hessian_nnz);
+
+		for (int j = 0; j < n_instances; j++)
+		{
+			auto instance_index = instance_indices[j];
+			auto &variables = graph_inputs[instance_index].variables;
+
+			for (int k = 0; k < local_hessian_nnz; k++)
+			{
+				auto row = variables[local_hessian_rows[k]];
+				auto col = variables[local_hessian_cols[k]];
+
+				if (hessian_type == HessianSparsityType::Upper)
+				{
+					if (row > col)
+						std::swap(row, col);
+				}
+				else
+				{
+					if (row < col)
+						std::swap(row, col);
+				}
+
+				auto [iter, inserted] =
+				    hessian_index_map.try_emplace({row, col}, global_hessian_nnz);
+				if (inserted)
+				{
+					global_hessian_rows.push_back(row);
+					global_hessian_cols.push_back(col);
+					global_hessian_nnz += 1;
+				}
+				auto hessian_index = iter->second;
+				hessian_index_buffer[k] = hessian_index;
+			}
+			std::copy(hessian_index_buffer.begin(), hessian_index_buffer.end(),
+			          group.hessian_indices.begin() + j * local_hessian_nnz);
+		}
+	}
+}
+
+void NonlinearEvaluator::analyze_objective_hessian_structure(
+    size_t &global_hessian_nnz, std::vector<int> &global_hessian_rows,
+    std::vector<int> &global_hessian_cols, Hashmap<std::tuple<int, int>, int> &hessian_index_map,
+    HessianSparsityType hessian_type)
+{
+	auto &groups = objective_groups;
+
+	for (auto &group : groups)
+	{
+		auto &instance_indices = group.instance_indices;
+		auto n_instances = instance_indices.size();
+		auto &structure = group.autodiff_structure;
+
+		if (!structure.has_hessian)
+		{
+			continue;
+		}
+
+		auto local_hessian_nnz = structure.m_hessian_nnz;
+		auto &local_hessian_rows = structure.m_hessian_rows;
+		auto &local_hessian_cols = structure.m_hessian_cols;
+
+		std::vector<int> hessian_index_buffer(local_hessian_nnz);
+		group.hessian_indices.resize(n_instances * local_hessian_nnz);
+
+		for (int j = 0; j < n_instances; j++)
+		{
+			auto instance_index = instance_indices[j];
+			auto &variables = graph_inputs[instance_index].variables;
+
+			for (int k = 0; k < local_hessian_nnz; k++)
+			{
+				auto row = variables[local_hessian_rows[k]];
+				auto col = variables[local_hessian_cols[k]];
+
+				if (hessian_type == HessianSparsityType::Upper)
+				{
+					if (row > col)
+						std::swap(row, col);
+				}
+				else
+				{
+					if (row < col)
+						std::swap(row, col);
+				}
+
+				auto [iter, inserted] =
+				    hessian_index_map.try_emplace({row, col}, global_hessian_nnz);
+				if (inserted)
+				{
+					global_hessian_rows.push_back(row);
+					global_hessian_cols.push_back(col);
+					global_hessian_nnz += 1;
+				}
+				auto hessian_index = iter->second;
+				hessian_index_buffer[k] = hessian_index;
+			}
+			std::copy(hessian_index_buffer.begin(), hessian_index_buffer.end(),
+			          group.hessian_indices.begin() + j * local_hessian_nnz);
+		}
+	}
+}
+
+void NonlinearEvaluator::eval_lagrangian_hessian(const double *restrict x,
+                                                 const double *restrict lambda,
+                                                 const double obj_factor,
+                                                 double *restrict hessian) const
+{
+	// lambda are the multipliers of constraints
+	// obj_factor is the multiplier of objective function
+
+	// objective
+	{
+		auto &groups = objective_groups;
+		for (const auto &group : groups)
+		{
+			auto &instance_indices = group.instance_indices;
+			auto n_instances = instance_indices.size();
+			auto &structure = group.autodiff_structure;
+			auto &evaluator = group.autodiff_evaluator;
+
+			if (!structure.has_hessian)
+			{
+				continue;
+			}
+
+			auto local_hessian_nnz = structure.m_hessian_nnz;
+			const int *hessian_index = group.hessian_indices.data();
+
+			if (!structure.has_parameter)
+			{
+				for (int j = 0; j < n_instances; j++)
+				{
+					auto instance_index = instance_indices[j];
+					auto &variables = graph_inputs[instance_index].variables;
+					evaluator.hessian_eval.nop(x, &obj_factor, hessian, variables.data(),
+					                           hessian_index);
+					hessian_index += local_hessian_nnz;
+				}
+			}
+			else
+			{
+				for (int j = 0; j < n_instances; j++)
+				{
+					auto instance_index = instance_indices[j];
+					auto &variables = graph_inputs[instance_index].variables;
+					auto &constant = graph_inputs[instance_index].constants;
+					evaluator.hessian_eval.p(x, constant.data(), &obj_factor, hessian,
+					                         variables.data(), hessian_index);
+					hessian_index += local_hessian_nnz;
+				}
+			}
+		}
+	}
+
+	// constraints
+	{
+		auto &groups = constraint_groups;
+		for (const auto &group : groups)
+		{
+			auto &instance_indices = group.instance_indices;
+			auto n_instances = instance_indices.size();
+			auto &structure = group.autodiff_structure;
+			auto &evaluator = group.autodiff_evaluator;
+			if (!structure.has_hessian)
+			{
+				continue;
+			}
+			auto local_hessian_nnz = structure.m_hessian_nnz;
+			auto ny = structure.ny;
+			const int *hessian_index = group.hessian_indices.data();
+			if (!structure.has_parameter)
+			{
+				for (int j = 0; j < n_instances; j++)
+				{
+					auto instance_index = instance_indices[j];
+					auto &variables = graph_inputs[instance_index].variables;
+					evaluator.hessian_eval.nop(x, lambda, hessian, variables.data(), hessian_index);
+					hessian_index += local_hessian_nnz;
+					lambda += ny;
+				}
+			}
+			else
+			{
+				for (int j = 0; j < n_instances; j++)
+				{
+					auto instance_index = instance_indices[j];
+					auto &variables = graph_inputs[instance_index].variables;
+					auto &constant = graph_inputs[instance_index].constants;
+					evaluator.hessian_eval.p(x, constant.data(), lambda, hessian, variables.data(),
+					                         hessian_index);
+					hessian_index += local_hessian_nnz;
+					lambda += ny;
+				}
+			}
 		}
 	}
 }

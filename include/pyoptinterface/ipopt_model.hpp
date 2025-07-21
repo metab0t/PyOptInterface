@@ -152,20 +152,20 @@ struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
 	} nl_objective_groups;
 
 	int add_graph_index();
-	void record_graph_hash(size_t graph_index, const ExpressionGraph &graph);
-	int aggregate_graph_constraint_groups();
-	int get_graph_constraint_group_representative(int group_index) const;
-	int aggregate_graph_objective_groups();
-	int get_graph_objective_group_representative(int group_index) const;
+	void finalize_graph_instance(size_t graph_index, const ExpressionGraph &graph);
+	int aggregate_nl_constraint_groups();
+	int get_nl_constraint_group_representative(int group_index) const;
+	int aggregate_nl_objective_groups();
+	int get_nl_objective_group_representative(int group_index) const;
 
-	void assign_constraint_group_autodiff_structure(int group_index,
-	                                                const AutodiffSymbolicStructure &structure);
-	void assign_constraint_group_autodiff_evaluator(int group_index,
-	                                                const ConstraintAutodiffEvaluator &evaluator);
-	void assign_objective_group_autodiff_structure(int group_index,
-	                                               const AutodiffSymbolicStructure &structure);
-	void assign_objective_group_autodiff_evaluator(int group_index,
-	                                               const ObjectiveAutodiffEvaluator &evaluator);
+	void assign_nl_constraint_group_autodiff_structure(int group_index,
+	                                                   const AutodiffSymbolicStructure &structure);
+	void assign_nl_constraint_group_autodiff_evaluator(
+	    int group_index, const ConstraintAutodiffEvaluator &evaluator);
+	void assign_nl_objective_group_autodiff_structure(int group_index,
+	                                                  const AutodiffSymbolicStructure &structure);
+	void assign_nl_objective_group_autodiff_evaluator(int group_index,
+	                                                  const ObjectiveAutodiffEvaluator &evaluator);
 
 	ConstraintIndex add_single_nl_constraint(size_t graph_index, const ExpressionGraph &graph,
 	                                         double lb, double ub);
@@ -193,13 +193,18 @@ struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
 	 * constraint) to the reordered one (linear, quadratic, NL group 0 -> con0, con1 ,..., conN0, NL
 	 * group1 -> con0, con1,..., conN1)
 	 */
-	// these two vectors are maintained when adding NL constraint
-	// which graph instance this constraint belongs to
-	std::vector<int> nl_constraint_graph_instance_indices;
-	// the order of this constraint in the graph instance
-	std::vector<int> nl_constraint_graph_instance_orders;
+	// this is maintained when adding NL constraint
+	struct ConstraintGraphMembership
+	{
+		// which graph it belongs to
+		int graph;
+		// the rank in that graph
+		int rank;
+	};
+	// record the graph a nonlinear constraint belongs to
+	std::vector<ConstraintGraphMembership> nl_constraint_graph_memberships;
 
-	// these two vectors are constructed before optimization
+	// this vector is constructed before optimization
 	// ext means the external monotonic order
 	// int means the internal order that passes to Ipopt
 	std::vector<int> nl_constraint_map_ext2int;
@@ -226,6 +231,8 @@ struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
 
 	std::optional<LinearEvaluator> m_linear_obj_evaluator;
 	std::optional<QuadraticEvaluator> m_quadratic_obj_evaluator;
+
+	NonlinearEvaluator m_nl_evaluator;
 
 	// The options of the Ipopt solver, we cache them before constructing the m_problem
 	Hashmap<std::string, int> m_options_int;
