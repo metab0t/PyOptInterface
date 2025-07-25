@@ -42,13 +42,13 @@ def test_acopf(nlp_model_ctor):
     N_bus = len(buses)
     N_gen = len(generators)
 
-    Pbr_from = model.add_variables(range(N_branch))
-    Qbr_from = model.add_variables(range(N_branch))
-    Pbr_to = model.add_variables(range(N_branch))
-    Qbr_to = model.add_variables(range(N_branch))
+    Pbr_from = model.add_m_variables(N_branch)
+    Qbr_from = model.add_m_variables(N_branch)
+    Pbr_to = model.add_m_variables(N_branch)
+    Qbr_to = model.add_m_variables(N_branch)
 
-    V = model.add_variables(range(N_bus), name="V")
-    theta = model.add_variables(range(N_bus), name="theta")
+    V = model.add_m_variables(N_bus, name="V")
+    theta = model.add_m_variables(N_bus, name="theta")
 
     for i in range(N_bus):
         Vmin, Vmax = buses[i][4], buses[i][5]

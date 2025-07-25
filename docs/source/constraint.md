@@ -71,6 +71,31 @@ add a linear constraint to the model
 PyOptInterface provides <project:#pyoptinterface.Eq>, <project:#pyoptinterface.Leq>, and <project:#pyoptinterface.Geq> as alias of <project:#pyoptinterface.ConstraintSense> to represent the sense of the constraint with a shorter name.
 :::
 
+The linear constraint can also be created with a comparison operator, like `<=`, `==`, or `>=`:
+
+```{code-cell}
+model.add_linear_constraint(2.0*x + 3.0*y <= 1.0)
+model.add_linear_constraint(2.0*x + 3.0*y == 1.0)
+model.add_linear_constraint(2.0*x + 3.0*y >= 1.0)
+```
+
+If you want to express a two-sided linear constraint, you can use the `add_linear_constraint` method with a tuple to represent the left-hand side and right-hand side of the constraint like:
+
+```{code-cell}
+model.add_linear_constraint(2.0*x + 3.0*y, (1.0, 2.0))
+```
+
+which is equivalent to:
+```{code-cell}
+model.add_linear_constraint(2.0*x + 3.0*y, poi.Leq, 2.0)
+model.add_linear_constraint(2.0*x + 3.0*y, poi.Geq, 1.0)
+```
+
+:::{note}
+
+The two-sided linear constraint is not implemented for Gurobi because of its [special handling of range constraints](https://docs.gurobi.com/projects/optimizer/en/12.0/reference/c/model.html#c.GRBaddrangeconstr).
+:::
+
 ## Quadratic Constraint
 Like the linear constraint, it is defined as:
 
@@ -102,6 +127,29 @@ add a quadratic constraint to the model
 :param str name: the name of the constraint, optional
 :return: the handle of the constraint
 ```
+
+Similarly, the quadratic constraint can also be created with a comparison operator, like `<=`, `==`, or `>=`:
+
+```python
+model.add_quadratic_constraint(x*x + 2.0*x*y + 4.0*y*y <= 1.0)
+model.add_quadratic_constraint(x*x + 2.0*x*y + 4.0*y*y == 1.0)
+model.add_quadratic_constraint(x*x + 2.0*x*y + 4.0*y*y >= 1.0)
+```
+
+:::{note}
+
+Some solvers like COPT (as of 7.2.9) only supports convex quadratic constraints, which means the quadratic term must be positive semidefinite. If you try to add a non-convex quadratic constraint, an exception will be raised.
+:::
+
+The two-sided quadratic constraint can also be created with a tuple to represent the left-hand side and right-hand side of the constraint like:
+
+```python
+model.add_quadratic_constraint(x*x + 2.0*x*y + 4.0*y*y, (1.0, 2.0))
+```
+:::{note}
+
+Currently, two-sided quadratic constraint is only implemented for IPOPT.
+:::
 
 ## Second-Order Cone Constraint
 It is defined as:
@@ -245,26 +293,3 @@ model.set_normalized_rhs(con, 2.0)
 # modify the coefficient of the linear part of the constraint
 model.set_normalized_coefficient(con, x, 2.0)
 ```
-
-## Create constraint with comparison operator
-
-In other modeling languages, we can create a constraint with a comparison operator, like:
-
-```python
-model.addConsr(x + y <= 1)
-```
-
-This is quite convenient, so PyOptInterface now supports to create constraint with comparison operators `<=`, `==`, `>=` as a shortcut to create a linear or quadratic constraint.
-
-```{code-cell}
-model.add_linear_constraint(x + y <= 1)
-model.add_linear_constraint(x <= y)
-model.add_quadratic_constraint(x*x + y*y <= 1)
-```
-
-:::{note}
-
-Creating constraint with comparison operator may cause performance issue especially the left-hand side and right-hand side of the constraint are complex expressions. PyOptInterface needs to create a new expression by subtracting the right-hand side from the left-hand side, which may be time-consuming.
-
-If that becomes the bottleneck of performance, it is recommended to construct the left-hand side expression with `ExprBuilder` and call `add_linear_constraint` or `add_quadratic_constraint` method to create constraints explicitly.
-:::
