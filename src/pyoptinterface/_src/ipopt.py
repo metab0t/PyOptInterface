@@ -14,10 +14,6 @@ from .nlexpr_ext import ExpressionHandle, ExpressionGraph, unpack_comparison_exp
 from .nlfunc import (
     ExpressionGraphContext,
     convert_to_expressionhandle,
-    trace_function,
-    FunctionTracingResult,
-    Vars,
-    Params,
 )
 
 from .core_ext import (
@@ -210,42 +206,6 @@ constraint_attribute_get_func_map = {
 }
 
 constraint_attribute_set_func_map = {}
-
-
-def match_variable_values(
-    tracing_result: FunctionTracingResult, vars_dict: Dict[str, any]
-):
-    nx = tracing_result.n_variables()
-    variable_indices_map = tracing_result.variable_indices_map
-    var_values = [None for _ in range(nx)]
-    for v_name, value in vars_dict.items():
-        index = variable_indices_map.get(v_name, None)
-        if index is None:
-            raise ValueError(f"Unknown variable name: {v_name}")
-        var_values[index] = value
-    for i, value in enumerate(var_values):
-        if value is None:
-            missing_name = tracing_result.variable_names[i]
-            raise ValueError(f"Missing initial value for variable {missing_name}")
-    return var_values
-
-
-def match_parameter_values(
-    tracing_result: FunctionTracingResult, params_dict: Dict[str, any]
-):
-    np = tracing_result.n_parameters()
-    parameter_indices_map = tracing_result.parameter_indices_map
-    param_values = [None for _ in range(np)]
-    for p_name, value in params_dict.items():
-        index = parameter_indices_map.get(p_name, None)
-        if index is None:
-            raise ValueError(f"Unknown parameter name: {p_name}")
-        param_values[index] = value
-    for i, value in enumerate(param_values):
-        if value is None:
-            missing_name = tracing_result.parameter_names[i]
-            raise ValueError(f"Missing initial value for parameter {missing_name}")
-    return param_values
 
 
 class Model(RawModel):
