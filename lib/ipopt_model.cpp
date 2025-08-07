@@ -603,8 +603,6 @@ void IpoptModel::analyze_structure()
 		sparse_gradient_map.emplace(index, i);
 	}
 
-	fmt::print("before m_nl_evaluator\n");
-
 	// analyze nonlinear constraints and objectives
 	{
 		auto &evaluator = m_nl_evaluator;
