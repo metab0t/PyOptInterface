@@ -2,11 +2,18 @@
 #include <nanobind/operators.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/optional.h>
+#include <nanobind/ndarray.h>
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
 
+#include <span>
+#include <algorithm>
+
 namespace nb = nanobind;
+
+using CoeffNdarrayT = nb::ndarray<const double, nb::ndim<1>, nb::any_contig>;
+using IndexNdarrayT = nb::ndarray<int, nb::ndim<1>, nb::any_contig>;
 
 NB_MODULE(core_ext, m)
 {
@@ -74,6 +81,51 @@ NB_MODULE(core_ext, m)
 	         nb::arg("variables"))
 	    .def(nb::init<const Vector<CoeffT> &, const Vector<IndexT> &, CoeffT>(),
 	         nb::arg("coefficients"), nb::arg("variables"), nb::arg("constant"))
+
+	    // ndarray constructor
+	    .def_static(
+	        "from_numpy",
+	        [](CoeffNdarrayT coefficients, IndexNdarrayT variables) {
+		        auto *expr = new ScalarAffineFunction();
+
+		        auto n = coefficients.size();
+
+		        expr->coefficients.resize(n);
+		        std::span<const double> coeffs(coefficients.data(), n);
+		        std::ranges::copy(coeffs, expr->coefficients.begin());
+
+		        n = variables.size();
+		        expr->variables.resize(n);
+		        std::span<const int> vars(variables.data(), n);
+		        std::ranges::copy(vars, expr->variables.begin());
+
+		        expr->constant.reset();
+
+		        return expr;
+	        },
+	        nb::arg("coefficients"), nb::arg("variables"))
+	    .def_static(
+	        "from_numpy",
+	        [](CoeffNdarrayT coefficients, IndexNdarrayT variables, CoeffT constant) {
+		        auto *expr = new ScalarAffineFunction();
+
+		        auto n = coefficients.size();
+
+		        expr->coefficients.resize(n);
+		        std::span<const double> coeffs(coefficients.data(), n);
+		        std::ranges::copy(coeffs, expr->coefficients.begin());
+
+		        n = variables.size();
+		        expr->variables.resize(n);
+		        std::span<const int> vars(variables.data(), n);
+		        std::ranges::copy(vars, expr->variables.begin());
+
+		        expr->constant = constant;
+
+		        return expr;
+	        },
+	        nb::arg("coefficients"), nb::arg("variables"), nb::arg("constant"))
+
 	    .def(nb::init<const ExprBuilder &>())
 	    .def_ro("coefficients", &ScalarAffineFunction::coefficients)
 	    .def_ro("variables", &ScalarAffineFunction::variables)

@@ -69,6 +69,24 @@ def test_basic():
     assert sqf.affine_part.constant == approx(6.0)
 
 
+def test_affineexpr_from_numpy():
+    N = 25
+    coefs = np.arange(N, dtype=np.float64)
+    vars = np.arange(N, dtype=np.int_)
+
+    expr = poi.ScalarAffineFunction.from_numpy(coefs, vars)
+
+    assert list(expr.variables) == list(vars)
+    assert np.allclose(expr.coefficients, coefs)
+
+    constant = 3.0
+    expr = poi.ScalarAffineFunction.from_numpy(coefs, vars, constant)
+
+    assert list(expr.variables) == list(vars)
+    assert np.allclose(expr.coefficients, coefs)
+    assert expr.constant == approx(constant)
+
+
 def test_monotoneindexer():
     indexer = IntMonotoneIndexer()
 
