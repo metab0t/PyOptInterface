@@ -5,33 +5,33 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Objective" href="objective.html" /><link rel="prev" title="Expression" href="expression.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Constraint - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -191,7 +191,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  
   <span class="sidebar-brand-text">PyOptInterface  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
@@ -307,12 +306,12 @@ optimizer you are using to see which types of constraints are supported.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-06-30 13:55:10 [INFO] checks license for COPT v7.2.8 20250516
-2025-06-30 13:55:10 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
-2025-06-30 13:55:10 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.11/x64/bin
-2025-06-30 13:55:10 [WARN] no license files in HOME folder: /home/runner/copt
-2025-06-30 13:55:10 [INFO] empty environment variable: COPT_LICENSE_DIR
-2025-06-30 13:55:10 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-08-07 03:08:54 [INFO] checks license for COPT v7.2.8 20250516
+2025-08-07 03:08:54 [WARN] no license files in current working folder: /home/runner/work/PyOptInterface/PyOptInterface/docs/source
+2025-08-07 03:08:54 [WARN] no license files in binary folder: /opt/hostedtoolcache/Python/3.12.11/x64/bin
+2025-08-07 03:08:54 [WARN] no license files in HOME folder: /home/runner/copt
+2025-08-07 03:08:54 [INFO] empty environment variable: COPT_LICENSE_DIR
+2025-08-07 03:08:54 [WARN] no license files in EV &#39;COPT_LICENSE_DIR&#39;: 
 
 No license found. Starting COPT with size limitations for non-commercial use
 Please apply for a license from www.shanshu.ai/copt
@@ -377,6 +376,52 @@ Please apply for a license from www.shanshu.ai/copt
 <p class="admonition-title">Note</p>
 <p>PyOptInterface provides <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.Eq" title="pyoptinterface.Eq"><code class="xref myst py py-data docutils literal notranslate"><span class="pre">pyoptinterface.Eq</span></code></a>, <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.Leq" title="pyoptinterface.Leq"><code class="xref myst py py-data docutils literal notranslate"><span class="pre">pyoptinterface.Leq</span></code></a>, and <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.Geq" title="pyoptinterface.Geq"><code class="xref myst py py-data docutils literal notranslate"><span class="pre">pyoptinterface.Geq</span></code></a> as alias of <a class="reference internal" href="api/pyoptinterface.html#pyoptinterface.ConstraintSense" title="pyoptinterface.ConstraintSense"><code class="xref myst py py-class docutils literal notranslate"><span class="pre">pyoptinterface.ConstraintSense</span></code></a> to represent the sense of the constraint with a shorter name.</p>
 </div>
+<p>The linear constraint can also be created with a comparison operator, like <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code>, or <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pyoptinterface._src.core_ext.ConstraintIndex at 0x7f18c8482870&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you want to express a two-sided linear constraint, you can use the <code class="docutils literal notranslate"><span class="pre">add_linear_constraint</span></code> method with a tuple to represent the left-hand side and right-hand side of the constraint like:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pyoptinterface._src.core_ext.ConstraintIndex at 0x7f18c8482db0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>which is equivalent to:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pyoptinterface._src.core_ext.ConstraintIndex at 0x7f18c8482e10&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The two-sided linear constraint is not implemented for Gurobi because of its <a class="reference external" href="https://docs.gurobi.com/projects/optimizer/en/12.0/reference/c/model.html#c.GRBaddrangeconstr">special handling of range constraints</a>.</p>
+</div>
 </section>
 <section id="quadratic-constraint">
 <h2>Quadratic Constraint<a class="headerlink" href="#quadratic-constraint" title="Link to this heading">¶</a></h2>
@@ -422,6 +467,24 @@ Please apply for a license from www.shanshu.ai/copt
 </dl>
 </dd></dl>
 
+<p>Similarly, the quadratic constraint can also be created with a comparison operator, like <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code>, or <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some solvers like COPT (as of 7.2.9) only supports convex quadratic constraints, which means the quadratic term must be positive semidefinite. If you try to add a non-convex quadratic constraint, an exception will be raised.</p>
+</div>
+<p>The two-sided quadratic constraint can also be created with a tuple to represent the left-hand side and right-hand side of the constraint like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, two-sided quadratic constraint is only implemented for IPOPT.</p>
+</div>
 </section>
 <section id="second-order-cone-constraint">
 <h2>Second-Order Cone Constraint<a class="headerlink" href="#second-order-cone-constraint" title="Link to this heading">¶</a></h2>
@@ -608,33 +671,6 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 </pre></div>
 </div>
 </section>
-<section id="create-constraint-with-comparison-operator">
-<h2>Create constraint with comparison operator<a class="headerlink" href="#create-constraint-with-comparison-operator" title="Link to this heading">¶</a></h2>
-<p>In other modeling languages, we can create a constraint with a comparison operator, like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">addConsr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This is quite convenient, so PyOptInterface now supports to create constraint with comparison operators <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> as a shortcut to create a linear or quadratic constraint.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">add_quadratic_constraint</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pyoptinterface._src.core_ext.ConstraintIndex at 0x7f7de0f5af70&gt;
-</pre></div>
-</div>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Creating constraint with comparison operator may cause performance issue especially the left-hand side and right-hand side of the constraint are complex expressions. PyOptInterface needs to create a new expression by subtracting the right-hand side from the left-hand side, which may be time-consuming.</p>
-<p>If that becomes the bottleneck of performance, it is recommended to construct the left-hand side expression with <code class="docutils literal notranslate"><span class="pre">ExprBuilder</span></code> and call <code class="docutils literal notranslate"><span class="pre">add_linear_constraint</span></code> or <code class="docutils literal notranslate"><span class="pre">add_quadratic_constraint</span></code> method to create constraints explicitly.</p>
-</div>
-</section>
 </section>
 
         </article>
@@ -717,7 +753,6 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 <li><a class="reference internal" href="#constraint-attributes">Constraint Attributes</a></li>
 <li><a class="reference internal" href="#delete-constraint">Delete constraint</a></li>
 <li><a class="reference internal" href="#modify-constraint">Modify constraint</a></li>
-<li><a class="reference internal" href="#create-constraint-with-comparison-operator">Create constraint with comparison operator</a></li>
 </ul>
 </li>
 </ul>
@@ -732,7 +767,7 @@ calling the <code class="docutils literal notranslate"><span class="pre">set_nor
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

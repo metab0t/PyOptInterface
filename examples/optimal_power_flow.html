@@ -5,33 +5,33 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Optimal Control of a Rocket" href="optimal_control_rocket.html" /><link rel="prev" title="Economic Dispatch" href="economic_dispatch.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Optimal Power Flow - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -191,7 +191,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  
   <span class="sidebar-brand-text">PyOptInterface  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
@@ -312,59 +311,7 @@
 </section>
 <section id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">¶</a></h2>
-<p>We notice that the branch power flow equations with respect to <span class="math notranslate nohighlight">\(P_{ij}\)</span>, <span class="math notranslate nohighlight">\(Q_{ij}\)</span>, <span class="math notranslate nohighlight">\(P_{ji}\)</span> and <span class="math notranslate nohighlight">\(Q_{ji}\)</span> are nonlinear equations and have the same structure for each branch. We will use a single function to model the nonlinear power flow equations of one branch.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">branch_flow</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-    <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Bc</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">Bc</span>
-    <span class="n">Vi</span><span class="p">,</span> <span class="n">Vj</span><span class="p">,</span> <span class="n">theta_i</span><span class="p">,</span> <span class="n">theta_j</span><span class="p">,</span> <span class="n">Pij</span><span class="p">,</span> <span class="n">Qij</span><span class="p">,</span> <span class="n">Pji</span><span class="p">,</span> <span class="n">Qji</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Vi</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Vj</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">theta_i</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">theta_j</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Pij</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Qij</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Pji</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">.</span><span class="n">Qji</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">sin_ij</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">)</span>
-    <span class="n">cos_ij</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">)</span>
-
-    <span class="n">Pij_eq</span> <span class="o">=</span> <span class="n">G</span> <span class="o">*</span> <span class="n">Vi</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">cos_ij</span> <span class="o">+</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sin_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Pij</span>
-    <span class="n">Qij_eq</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">B</span> <span class="o">+</span> <span class="n">Bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">Vi</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">sin_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">cos_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Qij</span>
-    <span class="n">Pji_eq</span> <span class="o">=</span> <span class="n">G</span> <span class="o">*</span> <span class="n">Vj</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">cos_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sin_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Pji</span>
-    <span class="n">Qji_eq</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">B</span> <span class="o">+</span> <span class="n">Bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">Vj</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">G</span> <span class="o">*</span> <span class="n">sin_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">cos_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Qji</span>
-
-    <span class="k">return</span> <span class="p">[</span><span class="n">Pij_eq</span><span class="p">,</span> <span class="n">Qij_eq</span><span class="p">,</span> <span class="n">Pji_eq</span><span class="p">,</span> <span class="n">Qji_eq</span><span class="p">]</span>
-
-<span class="n">bf</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">branch_flow</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="k">def</span><span class="w"> </span><span class="nf">branch_flow</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-
-<span class="ne">ImportError</span>: cannot import name &#39;nlfunc&#39; from &#39;pyoptinterface&#39; (/opt/hostedtoolcache/Python/3.12.11/x64/lib/python3.12/site-packages/pyoptinterface/__init__.py)
-</pre></div>
-</div>
-</div>
-</div>
-<p>Here the nonlinear function takes two arguments: <code class="docutils literal notranslate"><span class="pre">vars</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code>. Although the power flow constraints take the same form for each branch, the parameters <code class="docutils literal notranslate"><span class="pre">G</span></code> <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">Bc</span></code>, namely the <span class="math notranslate nohighlight">\(\pi\)</span> circuit parameters of the branch, are different for each branch.</p>
-<p>Next, we will use PJM 5-bus system as an example to demonstrate the implementation of the optimal power flow problem. The PJM 5-bus system is a small power system with 5 buses and 6 branches. The system data is shown below.</p>
+<p>We will use PJM 5-bus system as an example to demonstrate the implementation of the optimal power flow problem. The PJM 5-bus system is a small power system with 5 buses and 6 branches. The system data is shown below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">branches</span> <span class="o">=</span> <span class="p">[</span>
@@ -403,17 +350,23 @@
 <p>Then we declare the variables:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N_branch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">branches</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nl</span><span class="p">,</span> <span class="n">ipopt</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+<span class="n">N_branch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">branches</span><span class="p">)</span>
 <span class="n">N_bus</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buses</span><span class="p">)</span>
 <span class="n">N_gen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">generators</span><span class="p">)</span>
 
-<span class="n">Pbr_from</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">))</span>
-<span class="n">Qbr_from</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">))</span>
-<span class="n">Pbr_to</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">))</span>
-<span class="n">Qbr_to</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">))</span>
+<span class="n">Pbr_from</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span>
+<span class="n">Qbr_from</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span>
+<span class="n">Pbr_to</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span>
+<span class="n">Qbr_to</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span>
 
-<span class="n">V</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_bus</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">)</span>
-<span class="n">theta</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_bus</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;theta&quot;</span><span class="p">)</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_bus</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">)</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N_bus</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;theta&quot;</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_bus</span><span class="p">):</span>
     <span class="n">Vmin</span><span class="p">,</span> <span class="n">Vmax</span> <span class="o">=</span> <span class="n">buses</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="n">buses</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
@@ -436,41 +389,47 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># nonlinear constraints</span>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">):</span>
-    <span class="n">branch</span> <span class="o">=</span> <span class="n">branches</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">R</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Bc2</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">branch</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">branch</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+        <span class="n">branch</span> <span class="o">=</span> <span class="n">branches</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">R</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Bc2</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">branch</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">branch</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
 
-    <span class="n">G</span> <span class="o">=</span> <span class="n">R</span> <span class="o">/</span> <span class="p">(</span><span class="n">R</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="o">-</span><span class="n">X</span> <span class="o">/</span> <span class="p">(</span><span class="n">R</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">Bc</span> <span class="o">=</span> <span class="n">Bc2</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">R</span> <span class="o">/</span> <span class="p">(</span><span class="n">R</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="o">-</span><span class="n">X</span> <span class="o">/</span> <span class="p">(</span><span class="n">R</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Bc</span> <span class="o">=</span> <span class="n">Bc2</span> <span class="o">/</span> <span class="mi">2</span>
 
-    <span class="n">i</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">j</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">Vi</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">Vj</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-    <span class="n">theta_i</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">theta_j</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">Vi</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">Vj</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">theta_i</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">theta_j</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
-    <span class="n">Pij</span> <span class="o">=</span> <span class="n">Pbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">Qij</span> <span class="o">=</span> <span class="n">Qbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">Pji</span> <span class="o">=</span> <span class="n">Pbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">Qji</span> <span class="o">=</span> <span class="n">Qbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">Pij</span> <span class="o">=</span> <span class="n">Pbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">Qij</span> <span class="o">=</span> <span class="n">Qbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">Pji</span> <span class="o">=</span> <span class="n">Pbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">Qji</span> <span class="o">=</span> <span class="n">Qbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
-    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
-        <span class="n">bf</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">=</span><span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span>
-            <span class="n">Vi</span><span class="o">=</span><span class="n">Vi</span><span class="p">,</span>
-            <span class="n">Vj</span><span class="o">=</span><span class="n">Vj</span><span class="p">,</span>
-            <span class="n">theta_i</span><span class="o">=</span><span class="n">theta_i</span><span class="p">,</span>
-            <span class="n">theta_j</span><span class="o">=</span><span class="n">theta_j</span><span class="p">,</span>
-            <span class="n">Pij</span><span class="o">=</span><span class="n">Pij</span><span class="p">,</span>
-            <span class="n">Qij</span><span class="o">=</span><span class="n">Qij</span><span class="p">,</span>
-            <span class="n">Pji</span><span class="o">=</span><span class="n">Pji</span><span class="p">,</span>
-            <span class="n">Qji</span><span class="o">=</span><span class="n">Qji</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="n">params</span><span class="o">=</span><span class="n">nlfunc</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">G</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">Bc</span><span class="o">=</span><span class="n">Bc</span><span class="p">),</span>
-        <span class="n">eq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-    <span class="p">)</span>
+        <span class="n">sin_ij</span> <span class="o">=</span> <span class="n">nl</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">)</span>
+        <span class="n">cos_ij</span> <span class="o">=</span> <span class="n">nl</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">)</span>
+
+        <span class="n">Pij_eq</span> <span class="o">=</span> <span class="n">G</span> <span class="o">*</span> <span class="n">Vi</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">cos_ij</span> <span class="o">+</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sin_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Pij</span>
+        <span class="n">Qij_eq</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">B</span> <span class="o">+</span> <span class="n">Bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">Vi</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">sin_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">cos_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Qij</span>
+        <span class="n">Pji_eq</span> <span class="o">=</span> <span class="n">G</span> <span class="o">*</span> <span class="n">Vj</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="n">G</span> <span class="o">*</span> <span class="n">cos_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sin_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Pji</span>
+        <span class="n">Qji_eq</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">B</span> <span class="o">+</span> <span class="n">Bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">Vj</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">Vi</span> <span class="o">*</span> <span class="n">Vj</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">G</span> <span class="o">*</span> <span class="n">sin_ij</span> <span class="o">-</span> <span class="n">B</span> <span class="o">*</span> <span class="n">cos_ij</span><span class="p">)</span> <span class="o">-</span> <span class="n">Qji</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
+            <span class="n">Pij_eq</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
+            <span class="n">Qij_eq</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
+            <span class="n">Pji_eq</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
+            <span class="n">Qji_eq</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <span class="c1"># power balance constraints</span>
 <span class="n">P_balance_eq</span> <span class="o">=</span> <span class="p">[</span><span class="n">poi</span><span class="o">.</span><span class="n">ExprBuilder</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_bus</span><span class="p">)]</span>
@@ -487,7 +446,9 @@
     <span class="n">P_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
         <span class="n">Pbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span> <span class="k">if</span> <span class="n">branches</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span>
     <span class="p">)</span>
-    <span class="n">P_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">)</span> <span class="k">if</span> <span class="n">generators</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">P_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">)</span> <span class="k">if</span> <span class="n">generators</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span>
+    <span class="p">)</span>
     <span class="n">P_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-=</span> <span class="n">Pd</span>
     <span class="n">P_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-=</span> <span class="n">Gs</span> <span class="o">*</span> <span class="n">Vb</span> <span class="o">*</span> <span class="n">Vb</span>
 
@@ -497,7 +458,9 @@
     <span class="n">Q_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
         <span class="n">Qbr_to</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_branch</span><span class="p">)</span> <span class="k">if</span> <span class="n">branches</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span>
     <span class="p">)</span>
-    <span class="n">Q_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">)</span> <span class="k">if</span> <span class="n">generators</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">Q_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="n">poi</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span>
+        <span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">)</span> <span class="k">if</span> <span class="n">generators</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span>
+    <span class="p">)</span>
     <span class="n">Q_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-=</span> <span class="n">Qd</span>
     <span class="n">Q_balance_eq</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Bs</span> <span class="o">*</span> <span class="n">Vb</span> <span class="o">*</span> <span class="n">Vb</span>
 
@@ -513,10 +476,10 @@
     <span class="n">theta_i</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="n">theta_j</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
-    <span class="n">angmin</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span>  <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">angmin</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">angmax</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
 
-    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">In</span><span class="p">,</span> <span class="n">angmin</span><span class="p">,</span> <span class="n">angmax</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">theta_i</span> <span class="o">-</span> <span class="n">theta_j</span><span class="p">,</span> <span class="p">(</span><span class="n">angmin</span><span class="p">,</span> <span class="n">angmax</span><span class="p">))</span>
 
     <span class="n">Smax</span> <span class="o">=</span> <span class="n">branch</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
     <span class="n">Pij</span> <span class="o">=</span> <span class="n">Pbr_from</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -548,6 +511,89 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>before m_nl_evaluator
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit http://projects.coin-or.org/Ipopt
+
+This version of Ipopt was compiled from source code available at
+    https://github.com/IDAES/Ipopt as part of the Institute for the Design of
+    Advanced Energy Systems Process Systems Engineering Framework (IDAES PSE
+    Framework) Copyright (c) 2018-2019. See https://github.com/IDAES/idaes-pse.
+
+This version of Ipopt was compiled using HSL, a collection of Fortran codes
+    for large-scale scientific computation.  All technical papers, sales and
+    publicity material resulting from use of the HSL codes within IPOPT must
+    contain the following acknowledgement:
+        HSL, a collection of Fortran codes for large-scale scientific
+        computation. See http://www.hsl.rl.ac.uk.
+******************************************************************************
+
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:      152
+Number of nonzeros in inequality constraint Jacobian.:       33
+Number of nonzeros in Lagrangian Hessian.............:       60
+
+Total number of variables............................:       43
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:       15
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:       34
+Total number of inequality constraints...............:       18
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        6
+        inequality constraints with only upper bounds:       12
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.0059989e+02 3.99e+00 2.88e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  8.2642475e+03 2.47e+00 1.01e+02  -1.0 2.79e+00    -  4.08e-03 3.81e-01h  1
+   2  7.3953828e+03 2.42e+00 9.90e+01  -1.0 1.89e+01    -  6.33e-02 1.87e-02f  2
+   3  6.5016499e+03 2.36e+00 9.57e+01  -1.0 1.58e+01    -  2.57e-01 2.73e-02f  1
+   4  6.3495650e+03 2.27e+00 9.10e+01  -1.0 1.48e+01    -  4.57e-01 3.80e-02f  3
+   5  6.2696718e+03 2.07e+00 8.07e+01  -1.0 1.38e+01    -  7.59e-01 8.54e-02f  2
+   6  7.1293922e+03 1.63e+00 6.07e+01  -1.0 1.07e+01    -  8.60e-01 2.13e-01h  2
+   7  9.2308978e+03 9.26e-01 3.44e+01  -1.0 8.92e+00    -  4.35e-01 4.33e-01h  1
+   8  1.1477927e+04 6.73e-01 2.82e+01  -1.0 2.96e+00    -  1.27e-01 2.73e-01h  1
+   9  1.5885484e+04 1.86e-01 1.12e+01  -1.0 2.20e+00    -  5.73e-01 7.24e-01h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  1.7582902e+04 7.44e-03 1.39e+00  -1.0 1.54e+00    -  8.05e-01 1.00e+00h  1
+  11  1.7581523e+04 5.37e-04 6.38e-02  -1.0 8.19e-01    -  1.00e+00 1.00e+00h  1
+  12  1.7556846e+04 4.26e-03 1.53e-01  -2.5 3.55e-01    -  8.73e-01 9.76e-01f  1
+  13  1.7552853e+04 3.50e-03 1.39e-01  -2.5 8.11e-02    -  1.00e+00 7.89e-01h  1
+  14  1.7552881e+04 1.84e-05 1.96e-03  -2.5 1.30e-02    -  1.00e+00 1.00e+00h  1
+  15  1.7551955e+04 1.39e-05 6.19e-03  -3.8 1.78e-02    -  1.00e+00 9.72e-01f  1
+  16  1.7551939e+04 1.54e-08 1.13e-06  -3.8 6.68e-04    -  1.00e+00 1.00e+00f  1
+  17  1.7551891e+04 1.33e-08 1.02e-06  -5.7 9.92e-04    -  1.00e+00 1.00e+00f  1
+  18  1.7551891e+04 1.14e-12 1.20e-10  -8.6 1.29e-05    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 18
+
+                                   (scaled)                 (unscaled)
+Objective...............:   4.3879727096482060e+02    1.7551890838592823e+04
+Dual infeasibility......:   1.1975398450658759e-10    4.7901593802635034e-09
+Constraint violation....:   1.1413092693146609e-12    1.1413092693146609e-12
+Complementarity.........:   2.5405436222389087e-09    1.0162174488955634e-07
+Overall NLP error.......:   2.5405436222389087e-09    1.0162174488955634e-07
+
+
+Number of objective function evaluations             = 33
+Number of objective gradient evaluations             = 19
+Number of equality constraint evaluations            = 33
+Number of inequality constraint evaluations          = 33
+Number of equality constraint Jacobian evaluations   = 19
+Number of inequality constraint Jacobian evaluations = 19
+Number of Lagrangian Hessian evaluations             = 18
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.003
+Total CPU secs in NLP function evaluations           =      0.000
+
+EXIT: Optimal Solution Found.
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -559,6 +605,17 @@
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_gen</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generator </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">P_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.LOCALLY_SOLVED
+Optimal active power output of the generators:
+Generator 0: 0.4
+Generator 1: 1.7
+Generator 2: 3.244984943109816
+Generator 3: 0.0
+Generator 4: 4.7069359970171085
 </pre></div>
 </div>
 </div>
@@ -638,7 +695,7 @@
 </div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

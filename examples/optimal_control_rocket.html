@@ -5,33 +5,33 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Developer Guide" href="../develop.html" /><link rel="prev" title="Optimal Power Flow" href="optimal_power_flow.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Optimal Control of a Rocket - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -191,7 +191,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  
   <span class="sidebar-brand-text">PyOptInterface  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
@@ -320,52 +319,27 @@
 <p>In the discretized optimal control problem, the variables at two adjacent time points share the same algebraic relationship.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nl</span><span class="p">,</span> <span class="n">ipopt</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
-<span class="n">h_0</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># Initial height</span>
-<span class="n">v_0</span> <span class="o">=</span> <span class="mi">0</span>                      <span class="c1"># Initial velocity</span>
-<span class="n">m_0</span> <span class="o">=</span> <span class="mf">1.0</span>                    <span class="c1"># Initial mass</span>
-<span class="n">m_T</span> <span class="o">=</span> <span class="mf">0.6</span>                    <span class="c1"># Final mass</span>
-<span class="n">g_0</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># Gravity at the surface</span>
-<span class="n">h_c</span> <span class="o">=</span> <span class="mi">500</span>                    <span class="c1"># Used for drag</span>
-<span class="n">c</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">g_0</span> <span class="o">*</span> <span class="n">h_0</span><span class="p">)</span>    <span class="c1"># Thrust-to-fuel mass</span>
-<span class="n">D_c</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mi">620</span> <span class="o">*</span> <span class="n">m_0</span> <span class="o">/</span> <span class="n">g_0</span>  <span class="c1"># Drag scaling</span>
-<span class="n">u_t_max</span> <span class="o">=</span> <span class="mf">3.5</span> <span class="o">*</span> <span class="n">g_0</span> <span class="o">*</span> <span class="n">m_0</span>    <span class="c1"># Maximum thrust</span>
-<span class="n">T_max</span> <span class="o">=</span> <span class="mf">0.2</span>                  <span class="c1"># Number of seconds</span>
-<span class="n">T</span> <span class="o">=</span> <span class="mi">1_000</span>                    <span class="c1"># Number of time steps</span>
-<span class="n">delta_t</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="o">/</span> <span class="n">T</span><span class="p">;</span>           <span class="c1"># Time per discretized step</span>
+<span class="n">h_0</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">v_0</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">m_0</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">g_0</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">T_c</span> <span class="o">=</span> <span class="mf">3.5</span>
+<span class="n">h_c</span> <span class="o">=</span> <span class="mf">500.0</span>
+<span class="n">v_c</span> <span class="o">=</span> <span class="mf">620.0</span>
+<span class="n">m_c</span> <span class="o">=</span> <span class="mf">0.6</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">rocket_dynamics</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-    <span class="n">m2</span><span class="p">,</span> <span class="n">m1</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">m2</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">m1</span>
-    <span class="n">h2</span><span class="p">,</span> <span class="n">h1</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">h2</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">h1</span>
-    <span class="n">v2</span><span class="p">,</span> <span class="n">v1</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">v2</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">v1</span>
-    <span class="n">u</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">u</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">g_0</span> <span class="o">*</span> <span class="n">h_0</span><span class="p">)</span>
+<span class="n">m_f</span> <span class="o">=</span> <span class="n">m_c</span> <span class="o">*</span> <span class="n">m_0</span>
+<span class="n">D_c</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v_c</span> <span class="o">*</span> <span class="p">(</span><span class="n">m_0</span> <span class="o">/</span> <span class="n">g_0</span><span class="p">)</span>
+<span class="n">T_max</span> <span class="o">=</span> <span class="n">T_c</span> <span class="o">*</span> <span class="n">m_0</span> <span class="o">*</span> <span class="n">g_0</span>
 
-    <span class="n">h_eq</span> <span class="o">=</span> <span class="p">(</span><span class="n">h2</span> <span class="o">-</span> <span class="n">h1</span><span class="p">)</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">*</span> <span class="n">v1</span>
-    <span class="n">v_eq</span> <span class="o">=</span> <span class="p">(</span><span class="n">v2</span> <span class="o">-</span> <span class="n">v1</span><span class="p">)</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">g_0</span> <span class="o">*</span> <span class="p">(</span><span class="n">h_0</span> <span class="o">/</span> <span class="n">h1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">D_c</span> <span class="o">*</span> <span class="n">v1</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">h_c</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">-</span> <span class="n">h_0</span><span class="p">)</span> <span class="o">/</span> <span class="n">h_0</span><span class="p">))</span> <span class="o">/</span> <span class="n">m1</span><span class="p">)</span>
-    <span class="n">m_eq</span> <span class="o">=</span> <span class="p">(</span><span class="n">m2</span> <span class="o">-</span> <span class="n">m1</span><span class="p">)</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">u</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">[</span><span class="n">h_eq</span><span class="p">,</span> <span class="n">v_eq</span><span class="p">,</span> <span class="n">m_eq</span><span class="p">]</span>
-
-<span class="n">rd</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">rocket_dynamics</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">h_0</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># Initial height</span>
-
-<span class="ne">ImportError</span>: cannot import name &#39;nlfunc&#39; from &#39;pyoptinterface&#39; (/opt/hostedtoolcache/Python/3.12.11/x64/lib/python3.12/site-packages/pyoptinterface/__init__.py)
+<span class="n">nh</span> <span class="o">=</span> <span class="mi">1000</span>
 </pre></div>
 </div>
 </div>
@@ -373,15 +347,17 @@
 <p>Then, we declare variables and set boundary conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">v_0</span><span class="p">)</span>
-<span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">h_0</span><span class="p">)</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="n">m_T</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="n">m_0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">m_0</span><span class="p">)</span>
-<span class="n">u</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="n">u_t_max</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">nh</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">nh</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">nh</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="n">m_f</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="n">m_0</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">nh</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="n">T_max</span><span class="p">)</span>
+<span class="n">step</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v_0</span><span class="p">,</span> <span class="n">v_0</span><span class="p">)</span>
+<span class="c1"># Boundary conditions</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h_0</span><span class="p">,</span> <span class="n">h_0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v_0</span><span class="p">,</span> <span class="n">v_0</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_0</span><span class="p">,</span> <span class="n">m_0</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">m_f</span><span class="p">,</span> <span class="n">m_f</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -389,12 +365,28 @@
 <p>Next, we add the dynamics constraints.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
-        <span class="n">rd</span><span class="p">,</span>
-        <span class="nb">vars</span><span class="o">=</span><span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">h2</span><span class="o">=</span><span class="n">h</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">h1</span><span class="o">=</span><span class="n">h</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">v2</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">v1</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">m2</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">m1</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">u</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">]),</span>
-        <span class="n">eq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-    <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nh</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">h</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">T1</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">T2</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">h2</span> <span class="o">-</span> <span class="n">h1</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">step</span> <span class="o">*</span> <span class="p">(</span><span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">D1</span> <span class="o">=</span> <span class="n">D_c</span> <span class="o">*</span> <span class="n">v1</span> <span class="o">*</span> <span class="n">v1</span> <span class="o">*</span> <span class="n">nl</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">h_c</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">-</span> <span class="n">h_0</span><span class="p">))</span> <span class="o">/</span> <span class="n">h_0</span>
+        <span class="n">D2</span> <span class="o">=</span> <span class="n">D_c</span> <span class="o">*</span> <span class="n">v2</span> <span class="o">*</span> <span class="n">v2</span> <span class="o">*</span> <span class="n">nl</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">h_c</span> <span class="o">*</span> <span class="p">(</span><span class="n">h2</span> <span class="o">-</span> <span class="n">h_0</span><span class="p">))</span> <span class="o">/</span> <span class="n">h_0</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">g_0</span> <span class="o">*</span> <span class="n">h_0</span> <span class="o">*</span> <span class="n">h_0</span> <span class="o">/</span> <span class="p">(</span><span class="n">h1</span> <span class="o">*</span> <span class="n">h1</span><span class="p">)</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">g_0</span> <span class="o">*</span> <span class="n">h_0</span> <span class="o">*</span> <span class="n">h_0</span> <span class="o">/</span> <span class="p">(</span><span class="n">h2</span> <span class="o">*</span> <span class="n">h2</span><span class="p">)</span>
+        <span class="n">dv1</span> <span class="o">=</span> <span class="p">(</span><span class="n">T1</span> <span class="o">-</span> <span class="n">D1</span><span class="p">)</span> <span class="o">/</span> <span class="n">m1</span> <span class="o">-</span> <span class="n">g1</span>
+        <span class="n">dv2</span> <span class="o">=</span> <span class="p">(</span><span class="n">T2</span> <span class="o">-</span> <span class="n">D2</span><span class="p">)</span> <span class="o">/</span> <span class="n">m2</span> <span class="o">-</span> <span class="n">g2</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">v2</span> <span class="o">-</span> <span class="n">v1</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">step</span> <span class="o">*</span> <span class="p">(</span><span class="n">dv1</span> <span class="o">+</span> <span class="n">dv2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">m2</span> <span class="o">-</span> <span class="n">m1</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">step</span> <span class="o">*</span> <span class="p">(</span><span class="n">T1</span> <span class="o">+</span> <span class="n">T2</span><span class="p">)</span> <span class="o">/</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -402,7 +394,7 @@
 <p>Finally, we add the objective function. We want to maximize the altitude at the final time, so we set the objective function to be the negative of the altitude at the final time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="p">[</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">set_objective</span><span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -414,14 +406,125 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>before m_nl_evaluator
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit http://projects.coin-or.org/Ipopt
+
+This version of Ipopt was compiled from source code available at
+    https://github.com/IDAES/Ipopt as part of the Institute for the Design of
+    Advanced Energy Systems Process Systems Engineering Framework (IDAES PSE
+    Framework) Copyright (c) 2018-2019. See https://github.com/IDAES/idaes-pse.
+
+This version of Ipopt was compiled using HSL, a collection of Fortran codes
+    for large-scale scientific computation.  All technical papers, sales and
+    publicity material resulting from use of the HSL codes within IPOPT must
+    contain the following acknowledgement:
+        HSL, a collection of Fortran codes for large-scale scientific
+        computation. See http://www.hsl.rl.ac.uk.
+******************************************************************************
+
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:    18973
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:    10985
+
+Total number of variables............................:     3997
+                     variables with only lower bounds:     1999
+                variables with lower and upper bounds:     1998
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:     2997
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0 -1.0100000e+00 3.96e-01 2.46e+00  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1 -1.2110112e+00 1.15e-02 5.17e+03  -1.0 5.00e-01    -  1.36e-02 9.86e-01f  1
+   2 -1.2099407e+00 9.59e-03 8.85e+03  -1.0 3.39e+00    -  1.37e-01 1.47e-01f  1
+   3 -1.2731866e+00 8.12e-03 1.71e+04  -1.0 1.34e+00    -  9.82e-02 1.50e-01f  1
+   4 -1.5262916e+00 7.82e-03 1.94e+03  -1.0 1.52e+01    -  1.21e-02 3.17e-02f  1
+   5 -1.1210731e+00 3.23e-03 2.18e+06  -1.0 6.73e-01   2.0 3.76e-02 6.02e-01h  1
+   6 -1.1286617e+00 2.98e-03 3.72e+06  -1.0 4.49e+01    -  2.89e-03 7.50e-02f  1
+   7 -1.0982535e+00 6.62e-04 4.62e+04  -1.0 6.80e-01   1.5 1.00e+00 7.71e-01h  1
+   8 -1.0905648e+00 5.68e-04 1.04e+05  -1.0 3.79e+00    -  9.68e-02 1.28e-01h  1
+   9 -1.0656057e+00 4.17e-04 1.59e+05  -1.0 4.32e+00    -  1.49e-01 2.78e-01h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10 -1.0403524e+00 3.41e-04 2.67e+05  -1.0 4.58e+00    -  4.11e-01 4.24e-01f  1
+  11 -1.0319980e+00 2.93e-04 2.53e+05  -1.0 1.25e+01    -  2.55e-01 2.49e-01h  1
+  12 -1.0207018e+00 1.51e-04 2.78e+05  -1.0 3.48e+00    -  7.14e-01 4.61e-01h  1
+  13 -1.0136574e+00 1.16e-04 2.46e+05  -1.0 2.52e+00    -  1.00e+00 5.74e-01h  1
+  14 -1.0097529e+00 1.22e-04 1.86e+05  -1.0 1.76e+00    -  1.00e+00 8.03e-01h  1
+  15 -1.0081978e+00 6.01e-05 8.20e+04  -1.0 1.03e+00    -  1.00e+00 1.00e+00h  1
+  16 -1.0078306e+00 3.23e-06 5.36e+03  -1.0 3.69e-01    -  1.00e+00 1.00e+00h  1
+  17 -1.0078153e+00 1.07e-08 1.04e+01  -1.0 6.32e-02    -  1.00e+00 1.00e+00h  1
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  18 -1.0078154e+00 1.07e-13 1.24e+01  -2.5 6.61e-05    -  1.00e+00 1.00e+00h  1
+  19 -1.0078183e+00 1.32e-10 9.14e-04  -2.5 2.22e-03    -  1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  20 -1.0078213e+00 1.42e-10 1.30e+01  -3.8 2.25e-03    -  1.00e+00 1.00e+00h  1
+  21 -1.0078734e+00 4.51e-08 3.50e-03  -3.8 4.02e-02    -  1.00e+00 1.00e+00h  1
+  22 -1.0078736e+00 5.25e-14 7.17e-07  -3.8 1.60e-04    -  1.00e+00 1.00e+00h  1
+  23 -1.0079313e+00 5.44e-08 5.95e+01  -5.7 4.41e-02    -  9.86e-01 1.00e+00f  1
+  24 -1.0095374e+00 7.11e-05 1.53e+00  -5.7 2.26e+00    -  1.00e+00 9.57e-01h  1
+  25 -1.0109038e+00 2.47e-05 2.18e+00  -5.7 1.19e+00    -  1.00e+00 1.00e+00f  1
+  26 -1.0108101e+00 5.42e-07 8.29e-03  -5.7 3.57e-01    -  1.00e+00 1.00e+00h  1
+  27 -1.0108150e+00 5.70e-10 2.68e-05  -5.7 4.01e-03    -  1.00e+00 1.00e+00h  1
+  28 -1.0108150e+00 2.19e-16 2.65e-11  -5.7 2.49e-06    -  1.00e+00 1.00e+00h  1
+  29 -1.0121478e+00 2.59e-05 1.26e+01  -8.6 1.21e+00    -  6.62e-01 9.40e-01f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  30 -1.0126688e+00 1.17e-05 3.47e+00  -8.6 1.06e+00    -  7.09e-01 8.01e-01h  1
+  31 -1.0127947e+00 8.36e-06 1.02e+00  -8.6 1.12e+00    -  6.88e-01 7.40e-01h  1
+  32 -1.0128257e+00 5.10e-06 3.05e-01  -8.6 1.29e+00    -  6.66e-01 7.60e-01h  1
+  33 -1.0128323e+00 2.55e-06 7.65e-02  -8.6 1.27e+00    -  7.13e-01 8.18e-01h  1
+  34 -1.0128334e+00 1.07e-06 2.69e-03  -8.6 1.14e+00    -  9.65e-01 9.65e-01f  1
+  35 -1.0128334e+00 5.34e-07 3.99e-04  -8.6 8.28e-01    -  1.00e+00 5.00e-01f  2
+  36 -1.0128334e+00 4.72e-08 1.58e-05  -8.6 3.52e-01    -  1.00e+00 1.00e+00h  1
+  37 -1.0128334e+00 8.97e-12 3.04e-09  -8.6 1.37e-02    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 37
+
+                                   (scaled)                 (unscaled)
+Objective...............:  -1.0128333977358319e+00   -1.0128333977358319e+00
+Dual infeasibility......:   3.0413424222730859e-09    3.0413424222730859e-09
+Constraint violation....:   8.9663898322159957e-12    8.9663898322159957e-12
+Complementarity.........:   2.5066170257954236e-09    2.5066170257954236e-09
+Overall NLP error.......:   3.0413424222730859e-09    3.0413424222730859e-09
+
+
+Number of objective function evaluations             = 39
+Number of objective gradient evaluations             = 38
+Number of equality constraint evaluations            = 39
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 38
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 37
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.344
+Total CPU secs in NLP function evaluations           =      0.010
+
+EXIT: Optimal Solution Found.
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h_value</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nh</span><span class="p">):</span>
     <span class="n">h_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal altitude: &quot;</span><span class="p">,</span> <span class="n">h_value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Optimal altitude:  1.012833397735832
 </pre></div>
 </div>
 </div>
@@ -437,6 +540,9 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/6137a2764017e264129bd54026f647d0a4347d0d002c24732a6764c1433e3962.png" src="../_images/6137a2764017e264129bd54026f647d0a4347d0d002c24732a6764c1433e3962.png" />
 </div>
 </div>
 </section>
@@ -514,7 +620,7 @@
 </div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

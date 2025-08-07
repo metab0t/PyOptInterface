@@ -42,69 +42,76 @@ where $h_t$, $v_t$, and $m_t$ are the altitude, velocity, and mass at time $t$, 
 In the discretized optimal control problem, the variables at two adjacent time points share the same algebraic relationship.
 
 ```{code-cell}
-from math import sqrt
+import math
 import pyoptinterface as poi
-from pyoptinterface import nlfunc, ipopt
+from pyoptinterface import nl, ipopt
 
 model = ipopt.Model()
 
-h_0 = 1                      # Initial height
-v_0 = 0                      # Initial velocity
-m_0 = 1.0                    # Initial mass
-m_T = 0.6                    # Final mass
-g_0 = 1                      # Gravity at the surface
-h_c = 500                    # Used for drag
-c = 0.5 * sqrt(g_0 * h_0)    # Thrust-to-fuel mass
-D_c = 0.5 * 620 * m_0 / g_0  # Drag scaling
-u_t_max = 3.5 * g_0 * m_0    # Maximum thrust
-T_max = 0.2                  # Number of seconds
-T = 1_000                    # Number of time steps
-delta_t = 0.2 / T;           # Time per discretized step
+h_0 = 1.0
+v_0 = 0.0
+m_0 = 1.0
+g_0 = 1.0
+T_c = 3.5
+h_c = 500.0
+v_c = 620.0
+m_c = 0.6
 
-def rocket_dynamics(vars, params):
-    m2, m1 = vars.m2, vars.m1
-    h2, h1 = vars.h2, vars.h1
-    v2, v1 = vars.v2, vars.v1
-    u = vars.u
+c = 0.5 * math.sqrt(g_0 * h_0)
+m_f = m_c * m_0
+D_c = 0.5 * v_c * (m_0 / g_0)
+T_max = T_c * m_0 * g_0
 
-    h_eq = (h2 - h1) - delta_t * v1
-    v_eq = (v2 - v1) - delta_t * (-g_0 * (h_0 / h1)**2 + (u - D_c * v1**2 * nlfunc.exp(-h_c * (h1 - h_0) / h_0)) / m1)
-    m_eq = (m2 - m1) - delta_t * (-u / c)
-
-    return [h_eq, v_eq, m_eq]
-
-rd = model.register_function(rocket_dynamics)
+nh = 1000
 ```
 
 Then, we declare variables and set boundary conditions.
 
 ```{code-cell}
-v = model.add_variables(range(T), name="v", lb=0.0, start=v_0)
-h = model.add_variables(range(T), name="h", lb=0.0, start=h_0)
-m = model.add_variables(range(T), name="m", lb=m_T, ub=m_0, start=m_0)
-u = model.add_variables(range(T), name="u", lb=0.0, ub=u_t_max, start=0.0)
+h = model.add_m_variables(nh, lb=1.0)
+v = model.add_m_variables(nh, lb=0.0)
+m = model.add_m_variables(nh, lb=m_f, ub=m_0)
+T = model.add_m_variables(nh, lb=0.0, ub=T_max)
+step = model.add_variable(lb=0.0)
 
-model.set_variable_bounds(v[0], v_0, v_0)
+# Boundary conditions
 model.set_variable_bounds(h[0], h_0, h_0)
+model.set_variable_bounds(v[0], v_0, v_0)
 model.set_variable_bounds(m[0], m_0, m_0)
-model.set_variable_bounds(u[T-1], 0.0, 0.0)
+model.set_variable_bounds(m[-1], m_f, m_f)
 ```
 
 Next, we add the dynamics constraints.
 
 ```{code-cell}
-for t in range(T-1):
-    model.add_nl_constraint(
-        rd,
-        vars=nlfunc.Vars(h2=h[t+1], h1=h[t], v2=v[t+1], v1=v[t], m2=m[t+1], m1=m[t], u=u[t]),
-        eq=0.0,
-    )
+for i in range(nh - 1):
+    with nl.graph():
+        h1 = h[i]
+        h2 = h[i + 1]
+        v1 = v[i]
+        v2 = v[i + 1]
+        m1 = m[i]
+        m2 = m[i + 1]
+        T1 = T[i]
+        T2 = T[i + 1]
+
+        model.add_nl_constraint(h2 - h1 - 0.5 * step * (v1 + v2) == 0)
+
+        D1 = D_c * v1 * v1 * nl.exp(-h_c * (h1 - h_0)) / h_0
+        D2 = D_c * v2 * v2 * nl.exp(-h_c * (h2 - h_0)) / h_0
+        g1 = g_0 * h_0 * h_0 / (h1 * h1)
+        g2 = g_0 * h_0 * h_0 / (h2 * h2)
+        dv1 = (T1 - D1) / m1 - g1
+        dv2 = (T2 - D2) / m2 - g2
+
+        model.add_nl_constraint(v2 - v1 - 0.5 * step * (dv1 + dv2) == 0)
+        model.add_nl_constraint(m2 - m1 + 0.5 * step * (T1 + T2) / c == 0)
 ```
 
 Finally, we add the objective function. We want to maximize the altitude at the final time, so we set the objective function to be the negative of the altitude at the final time.
 
 ```{code-cell}
-model.set_objective(-h[T-1])
+model.set_objective(-h[-1])
 ```
 
 After solving the problem, we can plot the results.
@@ -115,7 +122,7 @@ model.optimize()
 
 ```{code-cell}
 h_value = []
-for i in range(T):
+for i in range(nh):
     h_value.append(model.get_value(h[i]))
 
 print("Optimal altitude: ", h_value[-1])

@@ -33,44 +33,7 @@ The objective function is the total cost of the generators, which is the sum of 
 
 ## Implementation
 
-We notice that the branch power flow equations with respect to $P_{ij}$, $Q_{ij}$, $P_{ji}$ and $Q_{ji}$ are nonlinear equations and have the same structure for each branch. We will use a single function to model the nonlinear power flow equations of one branch.
-
-```{code-cell}
-import math
-import pyoptinterface as poi
-from pyoptinterface import nlfunc, ipopt
-
-model = ipopt.Model()
-
-def branch_flow(vars, params):
-    G, B, Bc = params.G, params.B, params.Bc
-    Vi, Vj, theta_i, theta_j, Pij, Qij, Pji, Qji = (
-        vars.Vi,
-        vars.Vj,
-        vars.theta_i,
-        vars.theta_j,
-        vars.Pij,
-        vars.Qij,
-        vars.Pji,
-        vars.Qji,
-    )
-
-    sin_ij = nlfunc.sin(theta_i - theta_j)
-    cos_ij = nlfunc.cos(theta_i - theta_j)
-
-    Pij_eq = G * Vi**2 - Vi * Vj * (G * cos_ij + B * sin_ij) - Pij
-    Qij_eq = -(B + Bc) * Vi**2 - Vi * Vj * (G * sin_ij - B * cos_ij) - Qij
-    Pji_eq = G * Vj**2 - Vi * Vj * (G * cos_ij - B * sin_ij) - Pji
-    Qji_eq = -(B + Bc) * Vj**2 - Vi * Vj * (-G * sin_ij - B * cos_ij) - Qji
-
-    return [Pij_eq, Qij_eq, Pji_eq, Qji_eq]
-
-bf = model.register_function(branch_flow)
-```
-
-Here the nonlinear function takes two arguments: `vars` and `params`. Although the power flow constraints take the same form for each branch, the parameters `G` `B` and `Bc`, namely the $\pi$ circuit parameters of the branch, are different for each branch.
-
-Next, we will use PJM 5-bus system as an example to demonstrate the implementation of the optimal power flow problem. The PJM 5-bus system is a small power system with 5 buses and 6 branches. The system data is shown below.
+We will use PJM 5-bus system as an example to demonstrate the implementation of the optimal power flow problem. The PJM 5-bus system is a small power system with 5 buses and 6 branches. The system data is shown below.
 
 ```{code-cell}
 
@@ -108,17 +71,23 @@ slack_bus = 3
 Then we declare the variables:
 
 ```{code-cell}
+import math
+import pyoptinterface as poi
+from pyoptinterface import nl, ipopt
+
+model = ipopt.Model()
+
 N_branch = len(branches)
 N_bus = len(buses)
 N_gen = len(generators)
 
-Pbr_from = model.add_variables(range(N_branch))
-Qbr_from = model.add_variables(range(N_branch))
-Pbr_to = model.add_variables(range(N_branch))
-Qbr_to = model.add_variables(range(N_branch))
+Pbr_from = model.add_m_variables(N_branch)
+Qbr_from = model.add_m_variables(N_branch)
+Pbr_to = model.add_m_variables(N_branch)
+Qbr_to = model.add_m_variables(N_branch)
 
-V = model.add_variables(range(N_bus), name="V")
-theta = model.add_variables(range(N_bus), name="theta")
+V = model.add_m_variables(N_bus, name="V")
+theta = model.add_m_variables(N_bus, name="theta")
 
 for i in range(N_bus):
     Vmin, Vmax = buses[i][4], buses[i][5]
@@ -139,41 +108,47 @@ Next, we add the constraints:
 ```{code-cell}
 # nonlinear constraints
 for k in range(N_branch):
-    branch = branches[k]
-    R, X, Bc2 = branch[2], branch[3], branch[4]
+    with nl.graph():
+        branch = branches[k]
+        R, X, Bc2 = branch[2], branch[3], branch[4]
 
-    G = R / (R**2 + X**2)
-    B = -X / (R**2 + X**2)
-    Bc = Bc2 / 2
+        G = R / (R**2 + X**2)
+        B = -X / (R**2 + X**2)
+        Bc = Bc2 / 2
 
-    i = branch[0]
-    j = branch[1]
+        i = branch[0]
+        j = branch[1]
 
-    Vi = V[i]
-    Vj = V[j]
-    theta_i = theta[i]
-    theta_j = theta[j]
+        Vi = V[i]
+        Vj = V[j]
+        theta_i = theta[i]
+        theta_j = theta[j]
 
-    Pij = Pbr_from[k]
-    Qij = Qbr_from[k]
-    Pji = Pbr_to[k]
-    Qji = Qbr_to[k]
+        Pij = Pbr_from[k]
+        Qij = Qbr_from[k]
+        Pji = Pbr_to[k]
+        Qji = Qbr_to[k]
 
-    model.add_nl_constraint(
-        bf,
-        vars=nlfunc.Vars(
-            Vi=Vi,
-            Vj=Vj,
-            theta_i=theta_i,
-            theta_j=theta_j,
-            Pij=Pij,
-            Qij=Qij,
-            Pji=Pji,
-            Qji=Qji,
-        ),
-        params=nlfunc.Params(G=G, B=B, Bc=Bc),
-        eq=0.0,
-    )
+        sin_ij = nl.sin(theta_i - theta_j)
+        cos_ij = nl.cos(theta_i - theta_j)
+
+        Pij_eq = G * Vi**2 - Vi * Vj * (G * cos_ij + B * sin_ij) - Pij
+        Qij_eq = -(B + Bc) * Vi**2 - Vi * Vj * (G * sin_ij - B * cos_ij) - Qij
+        Pji_eq = G * Vj**2 - Vi * Vj * (G * cos_ij - B * sin_ij) - Pji
+        Qji_eq = -(B + Bc) * Vj**2 - Vi * Vj * (-G * sin_ij - B * cos_ij) - Qji
+
+        model.add_nl_constraint(
+            Pij_eq == 0.0,
+        )
+        model.add_nl_constraint(
+            Qij_eq == 0.0,
+        )
+        model.add_nl_constraint(
+            Pji_eq == 0.0,
+        )
+        model.add_nl_constraint(
+            Qji_eq == 0.0,
+        )
 
 # power balance constraints
 P_balance_eq = [poi.ExprBuilder() for i in range(N_bus)]
@@ -190,7 +165,9 @@ for b in range(N_bus):
     P_balance_eq[b] -= poi.quicksum(
         Pbr_to[k] for k in range(N_branch) if branches[k][1] == b
     )
-    P_balance_eq[b] += poi.quicksum(P[i] for i in range(N_gen) if generators[i][0] == b)
+    P_balance_eq[b] += poi.quicksum(
+        P[i] for i in range(N_gen) if generators[i][0] == b
+    )
     P_balance_eq[b] -= Pd
     P_balance_eq[b] -= Gs * Vb * Vb
 
@@ -200,7 +177,9 @@ for b in range(N_bus):
     Q_balance_eq[b] -= poi.quicksum(
         Qbr_to[k] for k in range(N_branch) if branches[k][1] == b
     )
-    Q_balance_eq[b] += poi.quicksum(Q[i] for i in range(N_gen) if generators[i][0] == b)
+    Q_balance_eq[b] += poi.quicksum(
+        Q[i] for i in range(N_gen) if generators[i][0] == b
+    )
     Q_balance_eq[b] -= Qd
     Q_balance_eq[b] += Bs * Vb * Vb
 
@@ -216,10 +195,10 @@ for k in range(N_branch):
     theta_i = theta[i]
     theta_j = theta[j]
 
-    angmin = branch[5] / 180 *  math.pi
+    angmin = branch[5] / 180 * math.pi
     angmax = branch[6] / 180 * math.pi
 
-    model.add_linear_constraint(theta_i - theta_j, poi.In, angmin, angmax)
+    model.add_linear_constraint(theta_i - theta_j, (angmin, angmax))
 
     Smax = branch[7]
     Pij = Pbr_from[k]

@@ -5,33 +5,33 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Container" href="container.html" /><link rel="prev" title="Objective" href="objective.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Nonlinear Programming - PyOptInterface documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -191,7 +191,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  
   <span class="sidebar-brand-text">PyOptInterface  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
@@ -287,104 +286,35 @@
 <h1>Nonlinear Programming<a class="headerlink" href="#nonlinear-programming" title="Link to this heading">¶</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
-<p>Compared with the linear and quadratic expressions and objectives we have discussed in the previous sections, nonlinear programming is more general and can handle a wider range of problems. In this section, we will introduce how to use PyOptInterface to formulate and solve structured nonlinear programming problems.</p>
+<p>Compared with the linear and quadratic expressions and objectives we have discussed in the previous sections, nonlinear programming is more general and can handle a wider range of problems. In this section, we will introduce how to use PyOptInterface to formulate and solve general nonlinear programming problems.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyoptinterface[nlp]</span></code> and nonlinear solver (IPOPT) as described in the <a class="reference internal" href="getting_started.html#ipopt"><span class="std std-ref">Getting Started</span></a> section.</p>
+<p>Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyoptinterface[nlp]</span></code> and solvers that support nonlinear programming (IPOPT, COPT, Gurobi) as described in the <a class="reference internal" href="getting_started.html"><span class="std std-doc">Getting Started</span></a> section.</p>
 </div>
 </section>
-<section id="structures-in-nonlinear-programming">
-<h2>Structures in nonlinear programming<a class="headerlink" href="#structures-in-nonlinear-programming" title="Link to this heading">¶</a></h2>
-<p>Although nonlinear programming allows arbitrary nonlinear functions to appear in constraints and objective functions, most nonlinear terms in practical problems can be categorized into a few common structures.</p>
-<p>Generally, a nonlinear function mapping from <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span> can be represented as a parameterized function <span class="math notranslate nohighlight">\(f(x, p)\)</span>, where <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> is the input variable and <span class="math notranslate nohighlight">\(p \in \mathbb{R}^k\)</span> is a set of parameters. The same function can be applied to multiple groups of variables and parameters.</p>
-<p>In PyOptInterface, a nonlinear function can be declared as a normal Python function that accepts two variables: <code class="docutils literal notranslate"><span class="pre">vars</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code>. The <code class="docutils literal notranslate"><span class="pre">vars</span></code> variable is a “magic” object that maps variable names to their values, and the <code class="docutils literal notranslate"><span class="pre">params</span></code> variable is another “magic” object that maps parameter names to their values. The function should return a dictionary that maps output names to their values. Of course, you can omit the <code class="docutils literal notranslate"><span class="pre">params</span></code> variable if the function does not have any parameters.</p>
-<p>To make things easier, we start from a very simple bivariate function <span class="math notranslate nohighlight">\(f(x, y, p) = p * exp(x) * y^2\)</span>. The function has two variables <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, and one parameter <span class="math notranslate nohighlight">\(p\)</span>. The function can be implemented as follows:</p>
+<section id="construct-nonlinear-expressions">
+<h2>Construct nonlinear expressions<a class="headerlink" href="#construct-nonlinear-expressions" title="Link to this heading">¶</a></h2>
+<p>Nonlinear expressions are more complex than linear and quadratic expressions, and they can include various nonlinear functions such as trigonometric functions, exponential functions, logarithmic functions, etc. In PyOptInterface, we must declare a <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context to construct nonlinear expressions. The <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context is used to trace the computational graph of the nonlinear expression, which allows PyOptInterface to automatically differentiate the expression and calculate the gradients and Hessians.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nl</span><span class="p">,</span> <span class="n">ipopt</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">p</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">*=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="k">return</span> <span class="n">result</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
-<span class="n">reg_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-
-<span class="ne">ImportError</span>: cannot import name &#39;nlfunc&#39; from &#39;pyoptinterface&#39; (/opt/hostedtoolcache/Python/3.12.11/x64/lib/python3.12/site-packages/pyoptinterface/__init__.py)
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">nl</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">nl</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="mf">10.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>In the code snippet above, we first import the <code class="docutils literal notranslate"><span class="pre">nlfunc</span></code> module, which contains a set of nonlinear functions that can be used in PyOptInterface. Then, we create an <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code> object to represent the optimization problem.</p>
-<p>Next, we define the function <code class="docutils literal notranslate"><span class="pre">f</span></code> that accepts two arguments: <code class="docutils literal notranslate"><span class="pre">vars</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code>. In the function, we can extract the values of variables and parameters by accessing the corresponding attributes of the <code class="docutils literal notranslate"><span class="pre">vars</span></code> and <code class="docutils literal notranslate"><span class="pre">params</span></code> objects. The <code class="docutils literal notranslate"><span class="pre">nlfunc.exp</span></code> function is used to calculate the exponential function. Finally, we return the result.</p>
-<p>Finally, we register the function <code class="docutils literal notranslate"><span class="pre">f</span></code> by calling the <code class="docutils literal notranslate"><span class="pre">register_function</span></code> method of the <code class="docutils literal notranslate"><span class="pre">model</span></code> object. The <code class="docutils literal notranslate"><span class="pre">register_function</span></code> method returns an abstract <code class="docutils literal notranslate"><span class="pre">FunctionIndex</span></code> object that can be used in constraints and objectives.</p>
-<p>The magic happens in the <code class="docutils literal notranslate"><span class="pre">register_function</span></code> where we use function tracing to capture the variables and parameters used in the function and the whole computational graph of the function. This allows PyOptInterface to automatically differentiate the function and calculate the gradients and Hessians of the function.</p>
-<p>It is worth mentioning that <code class="docutils literal notranslate"><span class="pre">f</span></code> is also a simple Python function that can be called directly. For example, we can evaluate the function at a specific point by calling <code class="docutils literal notranslate"><span class="pre">f</span></code> with the corresponding values of variables and parameters:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">types</span><span class="o">,</span><span class="w"> </span><span class="nn">math</span>
-
-<span class="nb">vars</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
-
-<span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-
-<span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="mi">2</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We also provide <code class="docutils literal notranslate"><span class="pre">nlfunc.Vars</span></code> and <code class="docutils literal notranslate"><span class="pre">nlfunc.Params</span></code> as a convenient way to create a group of variables and parameters. In fact, they are wrappers of <code class="docutils literal notranslate"><span class="pre">types.SimpleNamespace</span></code>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">vars</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
-
-<span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-
-<span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="mi">2</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>If there is no parameter in the function, we can omit the <code class="docutils literal notranslate"><span class="pre">params</span></code> argument in the function definition. For example, the following code snippet defines a function <span class="math notranslate nohighlight">\(g(x, y) = x^4 + y^4\)</span>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span> <span class="o">**</span> <span class="mi">4</span>
-
-<span class="n">reg_g</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>In the code snippet above, we define a function <code class="docutils literal notranslate"><span class="pre">g</span></code> that accepts only one argument <code class="docutils literal notranslate"><span class="pre">vars</span></code>. The function calculates the sum of the fourth powers of the two variables <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. We register the function <code class="docutils literal notranslate"><span class="pre">g</span></code> in the same way as we did for the function <code class="docutils literal notranslate"><span class="pre">f</span></code>.</p>
-<p>The result of a nonlinear function is not restricted to a scalar value. It can be a scalar or a vector by returning a Python list containing the results. For example, the following code snippet defines a function <span class="math notranslate nohighlight">\(h(x, y) = [cos(x + y^2), sin(x^2 - y)]\)</span> mapping from <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="n">z1</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">z2</span> <span class="o">=</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">]</span>
-
-<span class="n">reg_h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
+<p>In the code snippet above, we first import the <code class="docutils literal notranslate"><span class="pre">nl</span></code> module, which contains the nonlinear programming utilities including a set of nonlinear functions that can be used in PyOptInterface. Then, we create an <code class="docutils literal notranslate"><span class="pre">ipopt.Model</span></code> object to represent the optimization problem.</p>
+<p>We then add two variables <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> to the model. After that, we enter the <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context, where we can construct nonlinear expressions using the functions provided by the <code class="docutils literal notranslate"><span class="pre">nl</span></code> module. In this case, we define a nonlinear expression <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">exp(x)</span> <span class="pre">*</span> <span class="pre">pow(y,</span> <span class="pre">2)</span></code> and add a nonlinear constraint <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">&lt;=</span> <span class="pre">10.0</span></code> to the model.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context, we can use various nonlinear functions provided by the <code class="docutils literal notranslate"><span class="pre">nl</span></code> module to construct nonlinear expressions. The functions are designed to be similar to the mathematical notation, making it easy to read and write nonlinear expressions.</p>
 <p>PyOptInterface currently supports the following nonlinear operators:</p>
 <div class="table-wrapper docutils container" id="id1">
 <table class="docutils align-default" id="id1">
@@ -399,37 +329,37 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">-x</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>sin</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.sin(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.sin(x)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>cos</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.cos(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.cos(x)</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>tan</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.tan(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.tan(x)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>asin</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.asin(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.asin(x)</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>acos</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.acos(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.acos(x)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>atan</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.atan(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.atan(x)</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>abs</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.abs(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.abs(x)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>sqrt</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.sqrt(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.sqrt(x)</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>exp</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.exp(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.exp(x)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>log</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.log(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.log(x)</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>log10</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nlfunc.log10(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">nl.log10(x)</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -459,45 +389,129 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">x</span> <span class="pre">**</span> <span class="pre">y</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>pow</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">nlfunc.pow(x,</span> <span class="pre">y)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">nl.pow(x,</span> <span class="pre">y)</span></code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>We can also use <code class="docutils literal notranslate"><span class="pre">nlfunc.ifelse</span></code> to implement the conditional operator. For example, the following code snippet defines a absolute value function <span class="math notranslate nohighlight">\(f(x) = |x|\)</span>:</p>
+<p>We can also use <code class="docutils literal notranslate"><span class="pre">nl.ifelse</span></code> to implement the conditional operator. For example, the following code snippet defines a absolute value function <span class="math notranslate nohighlight">\(f(x) = |x|\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">ifelse</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">nl</span><span class="o">.</span><span class="n">ifelse</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">nlfunc.ifelse</span></code> accepts three arguments: a condition, a value when the condition is true, and a value when the condition is false. The function returns the value of the second argument if the condition is true; otherwise, it returns the value of the third argument.</p>
-<p>The condition variable must be a boolean variable, which can be obtained by comparing two variables using the comparison operators <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nl.ifelse</span></code> accepts three arguments: a condition, a value when the condition is true, and a value when the condition is false. The function returns the value of the second argument if the condition is true; otherwise, it returns the value of the third argument. The condition variable must be a boolean variable, which can be obtained by comparing two variables using the comparison operators <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>.</p>
+<p>Another interesting fact is that you can construct nonlinear expressions in the context of <code class="docutils literal notranslate"><span class="pre">nl.graph</span></code> that are prohibited outside the context. For example, you can construct <span class="math notranslate nohighlight">\((x+2)^3\)</span> in the following way:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span>
+
+<span class="c1"># Illegal outside nl.graph context because it is a nonlinear expression</span>
+<span class="c1"># z = (x + 2) ** 3  # This will raise an error</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="nonlinear-constraints-and-objectives">
 <h2>Nonlinear constraints and objectives<a class="headerlink" href="#nonlinear-constraints-and-objectives" title="Link to this heading">¶</a></h2>
-<p>After defining and registering nonlinear functions, we can use them in constraints and objectives. For example, the following code snippet defines a nonlinear programming problem.</p>
+<p>After constructing nonlinear expressions, we can use them in constraints and objectives. For example, the following code snippet defines a nonlinear programming problem.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">obj</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">con</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">]</span>
-
-<span class="n">obj_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<span class="n">con_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">lb</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
 
-<span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">con_f</span><span class="p">,</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">),</span> <span class="n">ub</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">])</span>
-<span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span><span class="n">obj_f</span><span class="p">,</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span>
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">&lt;=</span> <span class="mf">4.0</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span><span class="n">nl</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">nl</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>before m_nl_evaluator
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit http://projects.coin-or.org/Ipopt
+
+This version of Ipopt was compiled from source code available at
+    https://github.com/IDAES/Ipopt as part of the Institute for the Design of
+    Advanced Energy Systems Process Systems Engineering Framework (IDAES PSE
+    Framework) Copyright (c) 2018-2019. See https://github.com/IDAES/idaes-pse.
+
+This version of Ipopt was compiled using HSL, a collection of Fortran codes
+    for large-scale scientific computation.  All technical papers, sales and
+    publicity material resulting from use of the HSL codes within IPOPT must
+    contain the following acknowledgement:
+        HSL, a collection of Fortran codes for large-scale scientific
+        computation. See http://www.hsl.rl.ac.uk.
+******************************************************************************
+
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:        0
+Number of nonzeros in inequality constraint Jacobian.:        4
+Number of nonzeros in Lagrangian Hessian.............:        3
+
+Total number of variables............................:        2
+                     variables with only lower bounds:        2
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:        0
+Total number of inequality constraints...............:        2
+        inequality constraints with only lower bounds:        1
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        1
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  2.0201003e+00 1.00e+00 5.42e-05  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  2.0221048e+00 1.00e+00 9.80e+01  -1.0 1.01e+00    -  9.03e-01 9.82e-03h  1
+   2  2.8874042e+00 8.65e-01 1.08e+02  -1.0 4.56e+01    -  3.06e-04 7.81e-03h  8
+   3  3.8770898e+00 5.62e-01 2.99e+02  -1.0 1.18e+00   2.0 1.00e+00 2.50e-01h  3
+   4  5.5678044e+00 0.00e+00 1.11e+01  -1.0 1.24e+00    -  9.72e-01 1.00e+00H  1
+   5  5.4931736e+00 0.00e+00 9.32e+00  -1.0 2.80e-01   1.5 1.00e+00 1.00e+00f  1
+   6  5.4953247e+00 0.00e+00 2.96e-02  -1.0 5.50e-03    -  1.00e+00 1.00e+00h  1
+   7  5.4427137e+00 0.00e+00 3.36e-03  -2.5 7.95e-02    -  9.84e-01 1.00e+00f  1
+   8  5.4366982e+00 0.00e+00 4.18e-06  -3.8 7.75e-03    -  1.00e+00 1.00e+00h  1
+   9  5.4365655e+00 0.00e+00 1.91e-08  -5.7 1.81e-04    -  1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  5.4365636e+00 0.00e+00 3.26e-12  -8.6 2.72e-06    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 10
+
+                                   (scaled)                 (unscaled)
+Objective...............:   5.4365636322427102e+00    5.4365636322427102e+00
+Dual infeasibility......:   3.2572901920675866e-12    3.2572901920675866e-12
+Constraint violation....:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   2.5071229771986031e-09    2.5071229771986031e-09
+Overall NLP error.......:   2.5071229771986031e-09    2.5071229771986031e-09
+
+
+Number of objective function evaluations             = 22
+Number of objective gradient evaluations             = 11
+Number of equality constraint evaluations            = 0
+Number of inequality constraint evaluations          = 26
+Number of equality constraint Jacobian evaluations   = 0
+Number of inequality constraint Jacobian evaluations = 11
+Number of Lagrangian Hessian evaluations             = 10
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.005
+Total CPU secs in NLP function evaluations           =      0.000
+
+EXIT: Optimal Solution Found.
 </pre></div>
 </div>
 </div>
@@ -511,71 +525,116 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x = 0.9999999954612174, y = 0.9999999954612174
+</pre></div>
 </div>
-<p>Nonlinear constraint can be declared by calling <code class="docutils literal notranslate"><span class="pre">add_nl_constraint</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> object. The method accepts the registered function, the variables/parameters of the constraint, and the bounds of the constraint.</p>
-<p>The variables of the constraint should be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Vars</span></code> and the parameters should be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Params</span></code>.</p>
-<p>The bounds can be specified as a scalar or a list with the same length as the number of outputs of the function. If it is a scalar, the same bound will be applied to all outputs. If it is a list, each output will have its own bound.</p>
-<p>You can declare <code class="docutils literal notranslate"><span class="pre">eq</span></code> for equality constraints, <code class="docutils literal notranslate"><span class="pre">lb</span></code> for lower bounds, and <code class="docutils literal notranslate"><span class="pre">ub</span></code> for upper bounds. <code class="docutils literal notranslate"><span class="pre">lb</span></code> and <code class="docutils literal notranslate"><span class="pre">ub</span></code> can be declared simultaneously to create a bounded constraint.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="model.add_nl_constraint">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_nl_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">registered_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lb=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_nl_constraint" title="Link to this definition">¶</a></dt>
-<dd><p>add a nonlinear constraint to the model</p>
-<dl class="myst field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>registered_function</strong> – the <code class="docutils literal notranslate"><span class="pre">FunctionIndex</span></code> returned by <code class="docutils literal notranslate"><span class="pre">register_function</span></code></p></li>
-<li><p><strong>vars</strong> – the variables of the constraint, must be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Vars</span></code></p></li>
-<li><p><strong>params</strong> – the parameters of the constraint, must be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Params</span></code>, optional</p></li>
-<li><p><strong>eq</strong> – the equality value of the constraint, optional</p></li>
-<li><p><strong>lb</strong> – the lower bound of the constraint, optional</p></li>
-<li><p><strong>ub</strong> – the upper bound of the constraint, optional</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – the name of the constraint, optional</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the handle of the constraint</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p>Nonlinear objective can be declared by calling <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> object. The method accepts the registered function, the variables/parameters of the objective, and the parameters of the objective.</p>
-<p>It is noteworthy that <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> only adds a nonlinear term to the objective and can be called multiple times to construct a sum of nonlinear terms as objective.</p>
-<p>The nonlinear function in <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> should return a scalar value and PyOptInterface will throw an error if the function returns multiple values.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="model.add_nl_objective">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">add_nl_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">registered_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=&quot;&quot;</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#model.add_nl_objective" title="Link to this definition">¶</a></dt>
-<dd><p>add a nonlinear objective term to the model</p>
-<dl class="myst field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>registered_function</strong> – the <code class="docutils literal notranslate"><span class="pre">FunctionIndex</span></code> returned by <code class="docutils literal notranslate"><span class="pre">register_function</span></code></p></li>
-<li><p><strong>vars</strong> – the variables of the objective, must be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Vars</span></code></p></li>
-<li><p><strong>params</strong> – the parameters of the objective, must be constructed by <code class="docutils literal notranslate"><span class="pre">nlfunc.Params</span></code>, optional</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – the name of the objective, optional</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<p>We will use the well-known <a class="reference external" href="https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/simple_examples/#The-Rosenbrock-function">Rosenbrock function</a> as another example:</p>
+</div>
+</div>
+<p>Nonlinear constraint can be declared by calling <code class="docutils literal notranslate"><span class="pre">add_nl_constraint</span></code> method. Like the linear and quadratic constraints, you can specify the sense/right-hand-side of constraint, use an interval of values to represent a two-sided constraint, or use a comparison operator like <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code>, or <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> to create the constraint.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># One-sided nonlinear constraint</span>
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="c1"># equivalent to</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Two-sided nonlinear constraint</span>
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+    <span class="c1"># equivalent to</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Leq</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Geq</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Similarly, the nonlinear objective can be declared by calling <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> method. It is noteworthy that <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> only adds a nonlinear term to the objective and can be called multiple times to construct a sum of nonlinear terms as objective.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Nonlinear objective</span>
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span><span class="n">nl</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">nl</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Because the nonlinear expressions are captured by the current <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context, both <code class="docutils literal notranslate"><span class="pre">add_nl_constraint</span></code> and <code class="docutils literal notranslate"><span class="pre">add_nl_objective</span></code> methods must be called within the same <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context. If you try to call them outside the context, it will raise an error.</p>
+<p>Finally, we will use the well-known <a class="reference external" href="https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/simple_examples/#The-Rosenbrock-function">Rosenbrock function</a> as another example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nl</span><span class="p">,</span> <span class="n">ipopt</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
 <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variable</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="nb">vars</span><span class="o">.</span><span class="n">y</span>
-    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-
-<span class="n">rosenbrock_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">)</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span><span class="n">rosenbrock_f</span><span class="p">,</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span>
+<span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>before m_nl_evaluator
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:        0
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:        3
+
+Total number of variables............................:        2
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:        0
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.0000000e+00 0.00e+00 2.00e+00  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  9.5312500e-01 0.00e+00 1.25e+01  -1.0 1.00e+00    -  1.00e+00 2.50e-01f  3
+   2  4.8320569e-01 0.00e+00 1.01e+00  -1.0 9.03e-02    -  1.00e+00 1.00e+00f  1
+   3  4.5708829e-01 0.00e+00 9.53e+00  -1.0 4.29e-01    -  1.00e+00 5.00e-01f  2
+   4  1.8894205e-01 0.00e+00 4.15e-01  -1.0 9.51e-02    -  1.00e+00 1.00e+00f  1
+   5  1.3918726e-01 0.00e+00 6.51e+00  -1.7 3.49e-01    -  1.00e+00 5.00e-01f  2
+   6  5.4940990e-02 0.00e+00 4.51e-01  -1.7 9.29e-02    -  1.00e+00 1.00e+00f  1
+   7  2.9144630e-02 0.00e+00 2.27e+00  -1.7 2.49e-01    -  1.00e+00 5.00e-01f  2
+   8  9.8586451e-03 0.00e+00 1.15e+00  -1.7 1.10e-01    -  1.00e+00 1.00e+00f  1
+   9  2.3237475e-03 0.00e+00 1.00e+00  -1.7 1.00e-01    -  1.00e+00 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  2.3797236e-04 0.00e+00 2.19e-01  -1.7 5.09e-02    -  1.00e+00 1.00e+00f  1
+  11  4.9267371e-06 0.00e+00 5.95e-02  -1.7 2.53e-02    -  1.00e+00 1.00e+00f  1
+  12  2.8189505e-09 0.00e+00 8.31e-04  -2.5 3.20e-03    -  1.00e+00 1.00e+00f  1
+  13  9.9920072e-16 0.00e+00 8.68e-07  -5.7 9.78e-05    -  1.00e+00 1.00e+00f  1
+  14  0.0000000e+00 0.00e+00 1.57e-13  -8.6 4.65e-08    -  1.00e+00 1.00e+00f  1
+
+Number of Iterations....: 14
+
+                                   (scaled)                 (unscaled)
+Objective...............:   0.0000000000000000e+00    0.0000000000000000e+00
+Dual infeasibility......:   1.5676349107707210e-13    1.5676349107707210e-13
+Constraint violation....:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   1.5676349107707210e-13    1.5676349107707210e-13
+
+
+Number of objective function evaluations             = 36
+Number of objective gradient evaluations             = 15
+Number of equality constraint evaluations            = 0
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 0
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 14
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.008
+Total CPU secs in NLP function evaluations           =      0.000
+
+EXIT: Optimal Solution Found.
 </pre></div>
 </div>
 </div>
@@ -586,6 +645,11 @@
 <span class="n">y_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x = </span><span class="si">{</span><span class="n">x_value</span><span class="si">}</span><span class="s2">, y = </span><span class="si">{</span><span class="n">y_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x = 0.9999999999999897, y = 0.9999999999999789
 </pre></div>
 </div>
 </div>
@@ -597,7 +661,7 @@
 <p>We will use the <a class="reference external" href="https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/simple_examples/#The-clnlbeam-problem">clnlbeam problem</a> as example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlfunc</span><span class="p">,</span> <span class="n">ipopt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">nl</span><span class="p">,</span> <span class="n">ipopt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipopt</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
@@ -606,28 +670,75 @@
 <span class="n">h</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">N</span>
 <span class="n">alpha</span> <span class="o">=</span> <span class="mi">350</span>
 
-<span class="n">t</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lb</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lb</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
-<span class="n">u</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">obj</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">u2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="nb">vars</span><span class="o">.</span><span class="n">u1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">nlfunc</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">t2</span><span class="p">)</span> <span class="o">+</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">t1</span><span class="p">))</span>
-
-<span class="n">obj_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span><span class="n">obj_f</span><span class="p">,</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">t2</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">u1</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">u2</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">con</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x2</span> <span class="o">-</span> <span class="nb">vars</span><span class="o">.</span><span class="n">x1</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">nlfunc</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">t2</span><span class="p">)</span> <span class="o">+</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="nb">vars</span><span class="o">.</span><span class="n">t1</span><span class="p">))</span>
-
-<span class="n">con_f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span><span class="n">con_f</span><span class="p">,</span> <span class="n">nlfunc</span><span class="o">.</span><span class="n">Vars</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">t2</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="n">eq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lb</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lb</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_m_variables</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">,</span> <span class="n">poi</span><span class="o">.</span><span class="n">Eq</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">nl</span><span class="o">.</span><span class="n">graph</span><span class="p">():</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_objective</span><span class="p">(</span>
+            <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">nl</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">nl</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_nl_constraint</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">nl</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">nl</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">==</span> <span class="mf">0.0</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_linear_constraint</span><span class="p">(</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span>
+        <span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>before m_nl_evaluator
+This is Ipopt version 3.13.2, running with linear solver ma27.
+
+Number of nonzeros in equality constraint Jacobian...:     8000
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:     3002
+
+Total number of variables............................:     3003
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:     2002
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:     2000
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  3.5000000e+02 0.00e+00 0.00e+00  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  3.5000000e+02 0.00e+00 0.00e+00  -1.7 0.00e+00    -  1.00e+00 1.00e+00   0
+   2  3.5000000e+02 0.00e+00 0.00e+00  -3.8 0.00e+00  -2.0 1.00e+00 1.00e+00T  0
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   3  3.5000000e+02 0.00e+00 0.00e+00  -5.7 0.00e+00   0.2 1.00e+00 1.00e+00T  0
+   4  3.5000000e+02 0.00e+00 0.00e+00  -8.6 0.00e+00  -0.2 1.00e+00 1.00e+00T  0
+
+Number of Iterations....: 4
+
+                                   (scaled)                 (unscaled)
+Objective...............:   3.5000000000000318e+02    3.5000000000000318e+02
+Dual infeasibility......:   0.0000000000000000e+00    0.0000000000000000e+00
+Constraint violation....:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   2.5059035596802450e-09    2.5059035596802450e-09
+Overall NLP error.......:   2.5059035596802450e-09    2.5059035596802450e-09
+
+
+Number of objective function evaluations             = 5
+Number of objective gradient evaluations             = 5
+Number of equality constraint evaluations            = 5
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 5
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 4
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.027
+Total CPU secs in NLP function evaluations           =      0.001
+
+EXIT: Optimal Solution Found.
 </pre></div>
 </div>
 </div>
@@ -640,7 +751,18 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Objective value: 350.0000000000032
+</pre></div>
 </div>
+</div>
+</div>
+</section>
+<section id="how-to-use-nl-graph-to-capture-the-similar-structure">
+<h2>How to use <code class="docutils literal notranslate"><span class="pre">nl.graph</span></code> to capture the similar structure<a class="headerlink" href="#how-to-use-nl-graph-to-capture-the-similar-structure" title="Link to this heading">¶</a></h2>
+<p>You might be wondering how to place the <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context manager correctly in your code. The key is to ensure that all nonlinear constraints and objectives that share the same structure are enclosed within the same <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context.</p>
+<p>As a rule of thumb, <code class="docutils literal notranslate"><span class="pre">nl.graph</span></code> should always be used inside the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop instead of outside, so that each graph will have the same pattern and PyOptInterface can recognize the similar structures to accelerate the automatic differentiation process. This is particularly important when you have a large number of nonlinear constraints or objectives that share the same structure, as it can significantly improve the performance of the optimization process as discussed in our research paper <a class="reference external" href="https://ieeexplore.ieee.org/document/10721402">Accelerating Optimal Power Flow with Structure-aware Automatic Differentiation and Code Generation</a>.</p>
+<p>In the clnlbeam example above, we have placed the <code class="docutils literal notranslate"><span class="pre">nl.graph()</span></code> context inside the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop, which allows us to capture the structure of the nonlinear constraints and objectives for each iteration.</p>
 </section>
 <section id="more-complex-examples">
 <h2>More complex examples<a class="headerlink" href="#more-complex-examples" title="Link to this heading">¶</a></h2>
@@ -705,13 +827,10 @@
             <ul>
 <li><a class="reference internal" href="#">Nonlinear Programming</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#structures-in-nonlinear-programming">Structures in nonlinear programming</a></li>
-<li><a class="reference internal" href="#nonlinear-constraints-and-objectives">Nonlinear constraints and objectives</a><ul>
-<li><a class="reference internal" href="#model.add_nl_constraint"><code class="docutils literal notranslate"><span class="pre">model.add_nl_constraint()</span></code></a></li>
-<li><a class="reference internal" href="#model.add_nl_objective"><code class="docutils literal notranslate"><span class="pre">model.add_nl_objective()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#construct-nonlinear-expressions">Construct nonlinear expressions</a></li>
+<li><a class="reference internal" href="#nonlinear-constraints-and-objectives">Nonlinear constraints and objectives</a></li>
 <li><a class="reference internal" href="#mixing-nonlinear-and-linear-quadratic-constraints-together">Mixing nonlinear and linear/quadratic constraints together</a></li>
+<li><a class="reference internal" href="#how-to-use-nl-graph-to-capture-the-similar-structure">How to use <code class="docutils literal notranslate"><span class="pre">nl.graph</span></code> to capture the similar structure</a></li>
 <li><a class="reference internal" href="#more-complex-examples">More complex examples</a></li>
 </ul>
 </li>
@@ -727,7 +846,7 @@
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
