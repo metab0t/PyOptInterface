@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0
+- Overhaul of the nonlinear programming interface and now PyOptInterface can solve nonlinear programming problems with COPT, Gurobi and IPOPT.
+- Use `model.add_linear_constraint(x+y, (1.0, 2.0))` to add two-sided linear constraints
+- Add `poi.ScalarAffineFunction.from_numpy` to create scalar affine functions from numpy arrays quickly
+
 ## 0.4.1
 - Support writing solution files in HiGHS
 - Pass the names of variables and constraints to HiGHS
