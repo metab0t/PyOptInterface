@@ -395,13 +395,14 @@ void NonlinearEvaluator::finalize_graph_instance(size_t graph_index, const Expre
 	if (graph.has_constraint_output())
 	{
 		auto hash = graph.constraint_structure_hash(bodyhash);
-		constraint_graph_hashes.hashes.emplace_back(hash, (int)graph_index);
+		constraint_graph_hashes.hashes.push_back(
+		    GraphHash{.hash = hash, .index = (int)graph_index});
 	}
 
 	if (graph.has_objective_output())
 	{
 		auto hash = graph.objective_structure_hash(bodyhash);
-		objective_graph_hashes.hashes.emplace_back(hash, (int)graph_index);
+		objective_graph_hashes.hashes.push_back(GraphHash{.hash = hash, .index = (int)graph_index});
 	}
 }
 
