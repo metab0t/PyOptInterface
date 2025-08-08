@@ -72,7 +72,9 @@ def test_basic():
 def test_affineexpr_from_numpy():
     N = 25
     coefs = np.arange(N, dtype=np.float64)
-    vars = np.arange(N, dtype=np.int_)
+    vars = np.arange(N, dtype=np.int_) * 2
+    coefs.flags.writeable = False
+    vars.flags.writeable = False
 
     expr = poi.ScalarAffineFunction.from_numpy(coefs, vars)
 

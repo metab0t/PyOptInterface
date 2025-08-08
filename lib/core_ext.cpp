@@ -13,7 +13,7 @@
 namespace nb = nanobind;
 
 using CoeffNdarrayT = nb::ndarray<const double, nb::ndim<1>, nb::any_contig>;
-using IndexNdarrayT = nb::ndarray<int, nb::ndim<1>, nb::any_contig>;
+using IndexNdarrayT = nb::ndarray<const int, nb::ndim<1>, nb::any_contig>;
 
 NB_MODULE(core_ext, m)
 {
