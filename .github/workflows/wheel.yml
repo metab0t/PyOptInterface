@@ -30,7 +30,7 @@ jobs:
         env:
           # Select wheels
           CIBW_BUILD: "*-manylinux_x86_64 *-manylinux_aarch64 *-win_amd64 *-macosx_x86_64 *-macosx_arm64"
-          CIBW_SKIP: "cp36-* cp37-* cp38-* pp*"
+          CIBW_SKIP: "cp38-* cp314*"
           CIBW_ARCHS: "native"
           # use manylinux2014
           CIBW_MANYLINUX_X86_64_IMAGE: "quay.io/pypa/manylinux2014_x86_64"
