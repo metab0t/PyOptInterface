@@ -50,9 +50,10 @@ enum SimplexScaleStrategy {
   kSimplexScaleStrategyChoose,                          // 1
   kSimplexScaleStrategyEquilibration,                   // 2
   kSimplexScaleStrategyForcedEquilibration,             // 3
-  kSimplexScaleStrategyMaxValue015,                     // 4
-  kSimplexScaleStrategyMaxValue0157,                    // 5
-  kSimplexScaleStrategyMax = kSimplexScaleStrategyMaxValue0157
+  kSimplexScaleStrategyMaxValue,                        // 4
+  kSimplexScaleStrategyMaxValue015 = kSimplexScaleStrategyMaxValue,
+  kSimplexScaleStrategyMaxValue0157 = kSimplexScaleStrategyMaxValue,
+  kSimplexScaleStrategyMax = kSimplexScaleStrategyMaxValue
 };
 
 enum HighsDebugLevel {
@@ -261,7 +262,8 @@ enum PresolveRuleType : int {
   kPresolveRuleDependentFreeCols,
   kPresolveRuleAggregator,
   kPresolveRuleParallelRowsAndCols,
-  kPresolveRuleMax = kPresolveRuleParallelRowsAndCols,
+  kPresolveRuleProbing,
+  kPresolveRuleMax = kPresolveRuleProbing,
   kPresolveRuleLastAllowOff = kPresolveRuleMax,
   kPresolveRuleCount,
 };
@@ -275,6 +277,12 @@ enum IisStrategy {
   kIisStrategyMax = kIisStrategyFromLpColPriority
 };
 
+// Default KKT tolerance
+const double kDefaultKktTolerance = 1e-7;
+
+// Default QP Hessian regularization value
+const double kHessianRegularizationValue = 1e-7;
+
 // Default and max allowed power-of-two matrix scale factor
 const HighsInt kDefaultAllowedMatrixPow2Scale = 20;
 const HighsInt kMaxAllowedMatrixPow2Scale = 30;
@@ -284,6 +292,11 @@ const HighsInt kMaxAllowedMatrixPow2Scale = 30;
 const double kHighsIllegalInfeasibilityMeasure = kHighsInf;
 const HighsInt kHighsIllegalInfeasibilityCount = -1;
 
+// Illegal values of num/max/sum residual - used to indicate that true
+// values aren't known
+const double kHighsIllegalResidualMeasure = kHighsInf;
+const HighsInt kHighsIllegalResidualCount = -1;
+
 // Illegal values for HighsError - used to indicate that true
 // values aren't known
 const double kHighsIllegalErrorValue = kHighsInf;
@@ -292,6 +305,7 @@ const HighsInt kHighsIllegalErrorIndex = -1;
 // Illegal values for complementarity violations used to indicate that true
 // values aren't known
 const double kHighsIllegalComplementarityViolation = kHighsInf;
+const HighsInt kHighsIllegalComplementarityCount = -1;
 
 // Maximum upper bound on semi-variables
 const double kMaxSemiVariableUpper = 1e5;

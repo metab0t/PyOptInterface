@@ -45,19 +45,22 @@ enum MipSolutionSource : int {
   kSolutionSourceBranching,
   kSolutionSourceCentralRounding,
   kSolutionSourceFeasibilityPump,
+  kSolutionSourceFeasibilityJump,
   kSolutionSourceHeuristic,
   //  kSolutionSourceInitial,
   kSolutionSourceSubMip,
   kSolutionSourceEmptyMip,
   kSolutionSourceRandomizedRounding,
+  kSolutionSourceZiRound,
+  kSolutionSourceShifting,
   kSolutionSourceSolveLp,
   kSolutionSourceEvaluateNode,
   kSolutionSourceUnbounded,
+  kSolutionSourceUserSolution,
   kSolutionSourceTrivialZ,
   kSolutionSourceTrivialL,
   kSolutionSourceTrivialU,
   kSolutionSourceTrivialP,
-  kSolutionSourceUserSolution,
   kSolutionSourceCleanup,
   kSolutionSourceCount
 };
@@ -213,6 +216,7 @@ struct HighsMipSolverData {
   }
 
   bool solutionRowFeasible(const std::vector<double>& solution) const;
+  HighsModelStatus feasibilityJump();
   HighsModelStatus trivialHeuristics();
 
   void startAnalyticCenterComputation(
@@ -257,6 +261,8 @@ struct HighsMipSolverData {
   double percentageInactiveIntegers() const;
   void performRestart();
   bool checkSolution(const std::vector<double>& solution) const;
+  std::vector<std::tuple<HighsInt, HighsInt, double>> getInfeasibleRows(
+      const std::vector<double>& solution) const;
   bool trySolution(const std::vector<double>& solution,
                    const int solution_source = kSolutionSourceNone);
   bool rootSeparationRound(HighsSeparation& sepa, HighsInt& ncuts,
@@ -290,8 +296,9 @@ struct HighsMipSolverData {
   bool interruptFromCallbackWithData(const int callback_type,
                                      const double mipsolver_objective_value,
                                      const std::string message = "") const;
-  void callbackUserSolution(const double mipsolver_objective_value,
-                            const HighsInt user_solution_callback_origin);
+  void callbackUserSolution(
+      const double mipsolver_objective_value,
+      const userMipSolutionCallbackOrigin user_solution_callback_origin);
 };
 
 #endif

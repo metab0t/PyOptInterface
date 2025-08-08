@@ -105,6 +105,7 @@ const HighsInt kHighsCallbackMipLogging = 5;
 const HighsInt kHighsCallbackMipInterrupt = 6;
 const HighsInt kHighsCallbackMipGetCutPool = 7;
 const HighsInt kHighsCallbackMipDefineLazyConstraints = 8;
+const HighsInt kHighsCallbackCallbackMipUserSolution = 9;
 
 const char* const kHighsCallbackDataOutLogTypeName = "log_type";
 const char* const kHighsCallbackDataOutRunningTimeName = "running_time";
@@ -770,7 +771,7 @@ HighsInt Highs_getStringOptionValue(const void* highs, const char* option,
  *
  * @param highs     A pointer to the Highs instance.
  * @param option    The name of the option.
- * @param type      An int in which the corresponding `kHighsOptionType`
+ * @param type      A HighsInt in which the corresponding `kHighsOptionType`
  *                  constant should be placed.
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
@@ -842,7 +843,7 @@ HighsInt Highs_getBoolOptionValues(const void* highs, const char* option,
                                    HighsInt* current_value,
                                    HighsInt* default_value);
 /**
- * Get the current and default values of an int option
+ * Get the current and default values of a HighsInt option
  *
  * @param highs         A pointer to the Highs instance.
  * @param current_value A pointer to the current value of the option.
@@ -924,7 +925,7 @@ HighsInt Highs_getInt64InfoValue(const void* highs, const char* info,
  *
  * @param highs     A pointer to the Highs instance.
  * @param info      The name of the info item.
- * @param type      An int in which the corresponding `kHighsOptionType`
+ * @param type      A HighsInt in which the corresponding `kHighsOptionType`
  *                  constant is stored.
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
@@ -983,7 +984,7 @@ HighsInt Highs_getModelStatus(const void* highs);
  * LP) gets it if it does not and dual_ray_value is not nullptr.
  *
  * @param highs             A pointer to the Highs instance.
- * @param has_dual_ray      A pointer to an int to store 1 if a dual ray
+ * @param has_dual_ray      A pointer to a HighsInt to store 1 if a dual ray
  *                          currently exists.
  * @param dual_ray_value    An array of length [num_row] filled with the
  *                          unbounded ray.
@@ -1001,9 +1002,10 @@ HighsInt Highs_getDualRay(const void* highs, HighsInt* has_dual_ray,
  *
  * @param highs                                   A pointer to the Highs
  *                                                instance.
- * @param has_dual_unboundedness_direction        A pointer to an int to store 1
- *                                                if the dual unboundedness
- *                                                direction exists.
+ * @param has_dual_unboundedness_direction        A pointer to a HighsInt to
+ *                                                store 1 if the dual
+ *                                                unboundedness direction
+ *                                                exists.
  * @param dual_unboundedness_direction_value      An array of length [num_col]
  *                                                filled with the unboundedness
  *                                                direction.
@@ -1018,7 +1020,7 @@ HighsInt Highs_getDualUnboundednessDirection(
  * LP) gets it if it does not and primal_ray_value is not nullptr.
  *
  * @param highs             A pointer to the Highs instance.
- * @param has_primal_ray    A pointer to an int to store 1 if the primal ray
+ * @param has_primal_ray    A pointer to a HighsInt to store 1 if the primal ray
  *                          exists.
  * @param primal_ray_value  An array of length [num_col] filled with the
  *                          unbounded ray.
@@ -1163,15 +1165,15 @@ HighsInt Highs_getBasisTransposeSolve(const void* highs, const double* rhs,
  * See `Highs_getBasicVariables` for a description of the ``B`` matrix.
  *
  * The arrays `row_vector` and `row_index` must have an allocated length of
- * [num_row]. However, check `row_num_nz` to see how many non-zero elements are
+ * [num_col]. However, check `row_num_nz` to see how many non-zero elements are
  * actually stored.
  *
  * @param highs         A pointer to the Highs instance.
  * @param row           The index of the row to compute.
- * @param row_vector    An array of length [num_row] in which to store the
+ * @param row_vector    An array of length [num_col] in which to store the
  *                      values of the non-zero elements.
  * @param row_num_nz    The number of non-zeros in the row.
- * @param row_index     An array of length [num_row] in which to store the
+ * @param row_index     An array of length [num_col] in which to store the
  *                      indices of the non-zero elements.
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
@@ -1279,7 +1281,7 @@ HighsInt Highs_setCallback(void* highs, HighsCCallbackType user_callback,
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
  */
-HighsInt Highs_startCallback(void* highs, const int callback_type);
+HighsInt Highs_startCallback(void* highs, const HighsInt callback_type);
 
 /**
  * Stop callback of given type
@@ -1289,7 +1291,7 @@ HighsInt Highs_startCallback(void* highs, const int callback_type);
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
  */
-HighsInt Highs_stopCallback(void* highs, const int callback_type);
+HighsInt Highs_stopCallback(void* highs, const HighsInt callback_type);
 
 /**
  * Return the cumulative wall-clock time spent in `Highs_run`.
@@ -1671,6 +1673,24 @@ HighsInt Highs_changeRowBounds(void* highs, const HighsInt row,
                                const double lower, const double upper);
 
 /**
+ * Change the variable bounds of multiple adjacent rows.
+ *
+ * @param highs     A pointer to the Highs instance.
+ * @param from_row  The index of the first row whose bound changes.
+ * @param to_row    The index of the last row whose bound changes.
+ * @param lower     An array of length [to_row - from_row + 1] with the new
+ *                  lower bounds.
+ * @param upper     An array of length [to_row - from_row + 1] with the new
+ *                  upper bounds.
+ *
+ * @returns A `kHighsStatus` constant indicating whether the call succeeded.
+ */
+HighsInt Highs_changeRowsBoundsByRange(void* highs, const HighsInt from_row,
+                                       const HighsInt to_row,
+                                       const double* lower,
+                                       const double* upper);
+
+/**
  * Change the bounds of multiple rows given by an array of indices.
  *
  * @param highs             A pointer to the Highs instance.
@@ -1754,7 +1774,7 @@ HighsInt Highs_getObjectiveOffset(const void* highs, double* offset);
  * @param highs         A pointer to the Highs instance.
  * @param from_col      The first column for which to query data for.
  * @param to_col        The last column (inclusive) for which to query data for.
- * @param num_col       An integer populated with the number of columns got from
+ * @param num_col       A HighsInt populated with the number of columns got from
  *                      the model (this should equal `to_col - from_col + 1`).
  * @param costs         An array of size [to_col - from_col + 1] for the column
  *                      cost coefficients.
@@ -1762,7 +1782,7 @@ HighsInt Highs_getObjectiveOffset(const void* highs, double* offset);
  *                      lower bounds.
  * @param upper         An array of size [to_col - from_col + 1] for the column
  *                      upper bounds.
- * @param num_nz        An integer to be populated with the number of non-zero
+ * @param num_nz        A HighsInt to be populated with the number of non-zero
  *                      elements in the constraint matrix.
  * @param matrix_start  An array of size [to_col - from_col + 1] with the start
  *                      indices of each column in `matrix_index` and
@@ -1831,13 +1851,13 @@ HighsInt Highs_getColsByMask(const void* highs, const HighsInt* mask,
  * @param highs         A pointer to the Highs instance.
  * @param from_row      The first row for which to query data for.
  * @param to_row        The last row (inclusive) for which to query data for.
- * @param num_row       An integer to be populated with the number of rows got
+ * @param num_row       A HighsInt to be populated with the number of rows got
  *                      from the model.
  * @param lower         An array of size [to_row - from_row + 1] for the row
  *                      lower bounds.
  * @param upper         An array of size [to_row - from_row + 1] for the row
  *                      upper bounds.
- * @param num_nz        An integer to be populated with the number of non-zero
+ * @param num_nz        A HighsInt to be populated with the number of non-zero
  *                      elements in the constraint matrix.
  * @param matrix_start  An array of size [to_row - from_row + 1] with the start
  *                      indices of each row in `matrix_index` and
@@ -1940,7 +1960,7 @@ HighsInt Highs_getColByName(const void* highs, const char* name, HighsInt* col);
  * Get the integrality of a column.
  *
  * @param col          The index of the column to query.
- * @param integrality  An integer in which the integrality of the column should
+ * @param integrality  A HighsInt in which the integrality of the column should
  *                     be placed. The integer is one of the `kHighsVarTypeXXX`
  *                     constants.
  *
@@ -1994,7 +2014,7 @@ HighsInt Highs_deleteColsByMask(void* highs, HighsInt* mask);
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
  */
-HighsInt Highs_deleteRowsByRange(void* highs, const int from_row,
+HighsInt Highs_deleteRowsByRange(void* highs, const HighsInt from_row,
                                  const HighsInt to_row);
 
 /**
@@ -2222,9 +2242,9 @@ HighsInt Highs_getPresolvedLp(const void* highs, const HighsInt a_format,
  *
  * @returns A `kHighsStatus` constant indicating whether the call succeeded.
  */
-HighsInt Highs_crossover(void* highs, const int num_col, const int num_row,
-                         const double* col_value, const double* col_dual,
-                         const double* row_dual);
+HighsInt Highs_crossover(void* highs, const HighsInt num_col,
+                         const HighsInt num_row, const double* col_value,
+                         const double* col_dual, const double* row_dual);
 
 /**
  * Compute the ranging information for all costs and bounds. For
@@ -2360,6 +2380,49 @@ void Highs_resetGlobalScheduler(const HighsInt blocking);
  */
 const void* Highs_getCallbackDataOutItem(const HighsCallbackDataOut* data_out,
                                          const char* item_name);
+
+/**
+ * Set a solution within a callback by passing a subset of the values.
+ *
+ * For any values that are unavailable/unknown, pass kHighsUndefined.
+ *
+ * @param data_in     A pointer to the callback input data instance.
+ * @param num_entries Number of variables in the set
+ * @param value       An array of length [num_entries <= num_col] with
+ *                    column solution values.
+ *
+ * @returns A `kHighsStatus` constant indicating whether the call succeeded.
+ */
+HighsInt Highs_setCallbackSolution(HighsCallbackDataIn* data_in,
+                                   const HighsInt num_entries,
+                                   const double* value);
+
+/**
+ * Set a partial primal solution by passing values for a set of variables,
+ * within a valid callback.
+ *
+ * @param data_in     A pointer to the callback input data instance.
+ * @param num_entries Number of variables in the set
+ * @param index       Indices of variables in the set
+ * @param value       Values of variables in the set
+ *
+ * @returns A `kHighsStatus` constant indicating whether the call succeeded.
+ */
+HighsInt Highs_setCallbackSparseSolution(HighsCallbackDataIn* data_in,
+                                         const HighsInt num_entries,
+                                         const HighsInt* index,
+                                         const double* value);
+
+/**
+ * Finds a feasible solution for a given (partial) primal user solution,
+ * within a valid callback.
+ *
+ * On success, the user solution is updated within the callback input data
+ * instance.
+ *
+ * @returns A `kHighsStatus` constant indicating whether the call succeeded.
+ */
+HighsInt Highs_repairCallbackSolution(HighsCallbackDataIn* data_in);
 
 // *********************
 // * Deprecated methods*

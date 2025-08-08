@@ -16,11 +16,14 @@
 
 #include "lp_data/HConst.h"
 
-struct HighsIterationCounts {
-  HighsInt simplex = 0;
-  HighsInt ipm = 0;
-  HighsInt crossover = 0;
-  HighsInt qp = 0;
+struct HighsFiles {
+  bool empty = true;
+  std::string read_solution_file = "";
+  std::string read_basis_file = "";
+  std::string write_model_file = "";
+  std::string write_solution_file = "";
+  std::string write_basis_file = "";
+  void clear();
 };
 
 struct HighsSolution {
@@ -156,12 +159,12 @@ struct HighsIllConditioning {
 };
 
 struct HighsLinearObjective {
-  double weight;
-  double offset;
+  double weight = 0;
+  double offset = 0;
   std::vector<double> coefficients;
-  double abs_tolerance;
-  double rel_tolerance;
-  HighsInt priority;
+  double abs_tolerance = -1;
+  double rel_tolerance = -1;
+  HighsInt priority = 0;
   void clear();
 };
 
