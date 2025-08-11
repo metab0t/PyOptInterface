@@ -69,7 +69,7 @@ env.close()
 
 ### Parameter
 
-For [solver-specific parameters](https://www.gurobi.com/documentation/current/refman/parameters.html#sec:Parameters), we provide `get_raw_parameter` and `set_raw_parameter` methods to get and set the parameters.
+For [solver-specific parameters](https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html), we provide `get_raw_parameter` and `set_raw_parameter` methods to get and set the parameters.
 
 ```python
 model = gurobi.Model()
@@ -83,7 +83,7 @@ model.set_raw_parameter("TimeLimit", 10.0)
 
 ### Attribute
 
-Gurobi supports a lot of [attributes](https://www.gurobi.com/documentation/current/refman/attributes.html#sec:Attributes) for the model, variable, and constraint. We provide methods to get or set the value of the attribute.
+Gurobi supports a lot of [attributes](https://docs.gurobi.com/projects/optimizer/en/current/reference/attributes.html) for the model, variable, and constraint. We provide methods to get or set the value of the attribute.
 
 - Model attribute: `model.get_model_raw_attribute(name: str)` and `model.set_model_raw_attribute(name: str, value: Any)`
 - Variable attribute: `model.get_variable_raw_attribute(variable, name: str)` and `model.set_variable_raw_attribute(variable, name: str, value: Any)`

@@ -520,7 +520,7 @@
 <h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">¶</a></h2>
 <section id="parameter">
 <h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">¶</a></h3>
-<p>For <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/parameters.html#sec:Parameters">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
+<p>For <a class="reference external" href="https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
 <span class="c1"># get the value of the parameter</span>
@@ -533,7 +533,7 @@
 </section>
 <section id="attribute">
 <h3>Attribute<a class="headerlink" href="#attribute" title="Link to this heading">¶</a></h3>
-<p>Gurobi supports a lot of <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/attributes.html#sec:Attributes">attributes</a> for the model, variable, and constraint. We provide methods to get or set the value of the attribute.</p>
+<p>Gurobi supports a lot of <a class="reference external" href="https://docs.gurobi.com/projects/optimizer/en/current/reference/attributes.html">attributes</a> for the model, variable, and constraint. We provide methods to get or set the value of the attribute.</p>
 <ul class="simple">
 <li><p>Model attribute: <code class="docutils literal notranslate"><span class="pre">model.get_model_raw_attribute(name:</span> <span class="pre">str)</span></code> and <code class="docutils literal notranslate"><span class="pre">model.set_model_raw_attribute(name:</span> <span class="pre">str,</span> <span class="pre">value:</span> <span class="pre">Any)</span></code></p></li>
 <li><p>Variable attribute: <code class="docutils literal notranslate"><span class="pre">model.get_variable_raw_attribute(variable,</span> <span class="pre">name:</span> <span class="pre">str)</span></code> and <code class="docutils literal notranslate"><span class="pre">model.set_variable_raw_attribute(variable,</span> <span class="pre">name:</span> <span class="pre">str,</span> <span class="pre">value:</span> <span class="pre">Any)</span></code></p></li>
