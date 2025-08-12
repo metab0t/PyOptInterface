@@ -130,6 +130,9 @@ def get_rawstatusstring(model):
 
 
 def get_terminationstatus(model):
+    is_dirty = model.m_is_dirty
+    if is_dirty:
+        return TerminationStatusCode.OPTIMIZE_NOT_CALLED
     status = model.m_status
     if (
         status == ApplicationReturnStatus.Solve_Succeeded
@@ -510,6 +513,8 @@ class Model(RawModel):
             graph_index = self._add_graph_index()
             self.graph_instance_to_index[graph] = graph_index
             self.graph_instances.append(graph)
+
+        self.m_is_dirty = True
 
     def optimize(self):
         self._find_similar_graphs()

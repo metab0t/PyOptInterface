@@ -80,7 +80,8 @@ def test_easy_nlp(nlp_model_ctor):
 
 
 def test_nlfunc_ifelse(nlp_model_ctor):
-    if nlp_model_ctor is not ipopt.Model:
+    model = nlp_model_ctor()
+    if not isinstance(model, ipopt.Model):
         pytest.skip("ifelse is only supported in IPOPT")
 
     for x_, fx in zip([0.2, 0.5, 1.0, 2.0, 3.0], [0.2, 0.5, 1.0, 4.0, 9.0]):
@@ -98,6 +99,53 @@ def test_nlfunc_ifelse(nlp_model_ctor):
 
         x_value = model.get_value(x)
         assert x_value == pytest.approx(x_)
+
+
+def test_ipopt_optimizer_not_called():
+    model = ipopt.Model()
+
+    x = model.add_variable(lb=0.0, ub=10.0)
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
+
+    model.set_objective(x**2)
+    model.optimize()
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
+
+    model.add_linear_constraint(x >= 0.5)
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
+
+    model.optimize()
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
+
+    model.add_quadratic_constraint(x**2 >= 0.36)
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
+
+    model.optimize()
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
+
+    with nl.graph():
+        model.add_nl_constraint(nl.exp(x) <= 100.0)
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
+
+    model.optimize()
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
+
+    with nl.graph():
+        model.add_nl_objective(nl.log(x))
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
+
+    model.optimize()
+    termination_status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
+    assert termination_status == poi.TerminationStatusCode.LOCALLY_SOLVED
 
 
 if __name__ == "__main__":

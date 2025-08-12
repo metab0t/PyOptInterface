@@ -80,6 +80,8 @@ VariableIndex IpoptModel::add_variable(double lb, double ub, double start, const
 		m_var_names.emplace(vi.index, name);
 	}
 
+	m_is_dirty = true;
+
 	return vi;
 }
 
@@ -216,6 +218,8 @@ ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,
 	m_linear_con_lb.push_back(lb);
 	m_linear_con_ub.push_back(ub);
 
+	m_is_dirty = true;
+
 	return con;
 }
 
@@ -257,6 +261,8 @@ ConstraintIndex IpoptModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 	m_quadratic_con_lb.push_back(lb);
 	m_quadratic_con_ub.push_back(ub);
 
+	m_is_dirty = true;
+
 	return con;
 }
 
@@ -285,6 +291,8 @@ void IpoptModel::set_objective(const ExprBuilder &expr, ObjectiveSense sense)
 	{
 		throw std::runtime_error("Only linear and quadratic objective is supported");
 	}
+
+	m_is_dirty = true;
 }
 
 void IpoptModel::_set_linear_objective(const ScalarAffineFunction &expr)
@@ -368,6 +376,8 @@ ConstraintIndex IpoptModel::add_single_nl_constraint(size_t graph_index,
 
 	nl_constraint_graph_memberships.push_back(ConstraintGraphMembership{
 	    .graph = (int)graph_index, .rank = (int)graph.m_constraint_outputs.size() - 1});
+
+	m_is_dirty = true;
 
 	return ConstraintIndex(ConstraintType::IPOPT_NL, constraint_index);
 }
@@ -636,8 +646,6 @@ void IpoptModel::analyze_structure()
 
 		nl_constraint_map_ext2int[i_nl_con] = index_base + i_graph_rank;
 	}
-	/*fmt::print("constraint_indices_offsets {}\n", m_nl_evaluator.constraint_indices_offsets);
-	fmt::print("nl_constraint_map_ext2int {}\n", nl_constraint_map_ext2int);*/
 
 	// construct the lower bound and upper bound of the constraints
 	auto n_constraints = m_linear_con_evaluator.n_constraints +
@@ -754,6 +762,7 @@ void IpoptModel::optimize()
 	                             &m_result.obj_val, m_result.mult_g.data(),
 	                             m_result.mult_x_L.data(), m_result.mult_x_U.data(), (void *)this);
 	m_result.is_valid = true;
+	m_is_dirty = false;
 }
 
 void IpoptModel::load_current_solution()

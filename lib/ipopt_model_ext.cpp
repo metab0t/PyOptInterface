@@ -43,6 +43,7 @@ NB_MODULE(ipopt_model_ext, m)
 	    .def(nb::init<>())
 	    .def("close", &IpoptModel::close)
 	    .def_ro("m_status", &IpoptModel::m_status)
+	    .def_rw("m_is_dirty", &IpoptModel::m_is_dirty)
 	    .def("add_variable", &IpoptModel::add_variable, nb::arg("lb") = -INFINITY,
 	         nb::arg("ub") = INFINITY, nb::arg("start") = 0.0, nb::arg("name") = "")
 	    .def("get_variable_lb", &IpoptModel::get_variable_lb)

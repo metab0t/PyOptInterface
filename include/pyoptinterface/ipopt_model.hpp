@@ -240,6 +240,7 @@ struct IpoptModel : public OnesideLinearConstraintMixin<IpoptModel>,
 	Hashmap<std::string, std::string> m_options_str;
 
 	IpoptResult m_result;
+	bool m_is_dirty = true;
 	enum ApplicationReturnStatus m_status;
 
 	std::unique_ptr<IpoptProblemInfo, IpoptfreeproblemT> m_problem = nullptr;
