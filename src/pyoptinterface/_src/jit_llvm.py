@@ -1,15 +1,16 @@
 from llvmlite import ir, binding
-import atexit
 
 from typing import List
 
 # Initialize LLVM
-binding.initialize()
+try:
+    # llvmlite older than 0.45.0 still requires this
+    binding.initialize()
+except Exception:
+    pass
+
 binding.initialize_native_target()
 binding.initialize_native_asmprinter()
-
-# Register shutdown function to clean up LLVM resources
-atexit.register(binding.shutdown)
 
 
 class LLJITCompiler:

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.1
+- Support llvmlite 0.45.0
+
 ## 0.5.0
 - Overhaul of the nonlinear programming interface and now PyOptInterface can solve nonlinear programming problems with COPT, Gurobi and IPOPT.
 - Use `model.add_linear_constraint(x+y, (1.0, 2.0))` to add two-sided linear constraints
