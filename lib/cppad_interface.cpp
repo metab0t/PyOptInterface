@@ -261,7 +261,6 @@ CppAD::AD<double> cppad_build_binary_expression(BinaryOperator op, const CppAD::
 		return left / right;
 	}
 	case BinaryOperator::Pow: {
-		fmt::print("cppad_build_binary_expression encounters Pow\n");
 		return CppAD::pow(left, right);
 	}
 	case BinaryOperator::LessThan:
