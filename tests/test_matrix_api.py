@@ -27,3 +27,15 @@ def test_matrix_api(model_interface):
     model.optimize()
     obj_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
     assert obj_value == approx(-N * ub)
+
+
+def test_quicksum_ndarray(model_interface):
+    model = model_interface
+
+    N = 10
+    x = model.add_m_variables((N, 2 * N), lb=1.0, ub=3.0)
+    obj = poi.quicksum(x)
+    model.set_objective(obj)
+    model.optimize()
+    obj_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+    assert obj_value == approx(2 * N**2)
