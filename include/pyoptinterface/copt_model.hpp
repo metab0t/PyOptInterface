@@ -72,6 +72,7 @@ extern "C"
 	B(COPT_SetQConstrNames);       \
 	B(COPT_SetNLConstrNames);      \
 	B(COPT_AddMipStart);           \
+	B(COPT_SetNLPrimalStart);      \
 	B(COPT_GetQConstrRhs);         \
 	B(COPT_SetRowLower);           \
 	B(COPT_SetRowUpper);           \
@@ -223,7 +224,8 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	void decode_graph_prefix_order(ExpressionGraph &graph, const ExpressionHandle &result,
 	                               std::vector<int> &opcodes, std::vector<double> &constants);
 	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
-	                                        const std::tuple<double, double> &interval, const char *name = nullptr);
+	                                         const std::tuple<double, double> &interval,
+	                                         const char *name = nullptr);
 
 	void delete_constraint(const ConstraintIndex &constraint);
 	bool is_constraint_active(const ConstraintIndex &constraint);
@@ -281,6 +283,8 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 
 	// MIPStart
 	void add_mip_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
+	// NLP start
+	void add_nl_start(const Vector<VariableIndex> &variables, const Vector<double> &values);
 
 	// Modifications of model
 	// 1. set/get RHS of a constraint

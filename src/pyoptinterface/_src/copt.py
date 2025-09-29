@@ -100,6 +100,12 @@ variable_attribute_get_func_map = {
     > 0,
 }
 
+
+def set_variable_start(model, v, val):
+    model.mip_start_values[v] = val
+    model.nl_start_values[v] = val
+
+
 variable_attribute_set_func_map = {
     VariableAttribute.LowerBound: lambda model, v, val: model.set_variable_lower_bound(
         v, val
@@ -107,9 +113,7 @@ variable_attribute_set_func_map = {
     VariableAttribute.UpperBound: lambda model, v, val: model.set_variable_upper_bound(
         v, val
     ),
-    VariableAttribute.PrimalStart: lambda model, v, val: model.mip_start_values.__setitem__(
-        v, val
-    ),
+    VariableAttribute.PrimalStart: set_variable_start,
     VariableAttribute.Domain: lambda model, v, val: model.set_variable_type(v, val),
     VariableAttribute.Name: lambda model, v, val: model.set_variable_name(v, val),
 }
@@ -377,6 +381,7 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
         self.mip_start_values: Dict[VariableIndex, float] = dict()
+        self.nl_start_values: Dict[VariableIndex, float] = dict()
 
     def add_variables(self, *args, **kwargs):
         return make_variable_tupledict(self, *args, **kwargs)
@@ -440,6 +445,11 @@ class Model(RawModel):
     def _is_mip(self):
         ismip = self.get_raw_attribute_int("IsMIP")
         return ismip > 0
+
+    def _has_nl(self):
+        nlconstrs = self.get_raw_attribute_int("NLConstrs")
+        hasnlobj = self.get_raw_attribute_int("HasNLObj")
+        return nlconstrs > 0 and hasnlobj > 0
 
     def get_model_attribute(self, attribute: ModelAttribute):
         def e(attribute):
@@ -534,6 +544,13 @@ class Model(RawModel):
                 values = list(mip_start.values())
                 self.add_mip_start(variables, values)
                 mip_start.clear()
+        if self._has_nl():
+            nl_start = self.nl_start_values
+            if len(nl_start) != 0:
+                variables = list(nl_start.keys())
+                values = list(nl_start.values())
+                self.add_nl_start(variables, values)
+                nl_start.clear()
         super().optimize()
 
     def cb_get_info(self, what):

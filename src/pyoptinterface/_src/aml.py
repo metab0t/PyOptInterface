@@ -4,8 +4,6 @@ from .tupledict import make_tupledict
 from collections.abc import Collection
 from typing import Tuple, Union
 
-import numpy as np
-
 
 def make_variable_ndarray(
     model,
@@ -105,6 +103,8 @@ def make_variable_tupledict(
 
 
 def quicksum_(expr: ExprBuilder, terms, f=None):
+    import numpy as np
+
     if isinstance(terms, dict):
         iter = terms.values()
     elif isinstance(terms, np.ndarray):

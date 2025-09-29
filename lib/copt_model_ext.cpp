@@ -184,6 +184,7 @@ NB_MODULE(copt_model_ext, m)
 	    BIND_F(set_obj_sense)
 
 	    BIND_F(add_mip_start)
+	    BIND_F(add_nl_start)
 
 		BIND_F(get_normalized_rhs)
 		BIND_F(set_normalized_rhs)
