@@ -66,3 +66,24 @@ def test_shuffle_qp_objective(model_interface):
     obj_values = np.array(obj_values)
     # test all values are the same
     assert np.all(np.abs(obj_values - obj_values[0]) < 1e-8)
+
+
+def test_duplicated_quadratic_terms(model_interface):
+    model = model_interface
+
+    x = model.add_m_variables(2, lb=1.0)
+
+    obj = (
+        x[0] * x[0]
+        + x[0] * x[0]
+        + x[1] * x[1]
+        + 2 * x[1] * x[1]
+        + 0.5 * x[0] * x[1]
+        + 0.1 * x[1] * x[0]
+    )
+
+    model.set_objective(obj)
+
+    model.optimize()
+    obj_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
+    assert obj_value == approx(5.6)
