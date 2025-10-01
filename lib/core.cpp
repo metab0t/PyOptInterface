@@ -427,17 +427,35 @@ ExprBuilder &ExprBuilder::operator+=(const ScalarQuadraticFunction &q)
 }
 ExprBuilder &ExprBuilder::operator+=(const ExprBuilder &t)
 {
-	for (const auto &[varpair, c] : t.quadratic_terms)
+	if (this == &t)
 	{
-		_add_quadratic_term(varpair.var_1, varpair.var_2, c);
+		for (auto &[varpair, c] : quadratic_terms)
+		{
+			c *= 2.0;
+		}
+		for (auto &[v, c] : affine_terms)
+		{
+			c *= 2.0;
+		}
+		if (constant_term)
+		{
+			constant_term = constant_term.value() * 2.0;
+		}
 	}
-	for (const auto &[v, c] : t.affine_terms)
+	else
 	{
-		_add_affine_term(v, c);
-	}
-	if (t.constant_term)
-	{
-		constant_term = constant_term.value_or(0.0) + t.constant_term.value();
+		for (const auto &[varpair, c] : t.quadratic_terms)
+		{
+			_add_quadratic_term(varpair.var_1, varpair.var_2, c);
+		}
+		for (const auto &[v, c] : t.affine_terms)
+		{
+			_add_affine_term(v, c);
+		}
+		if (t.constant_term)
+		{
+			constant_term = constant_term.value_or(0.0) + t.constant_term.value();
+		}
 	}
 	return *this;
 }
@@ -482,17 +500,26 @@ ExprBuilder &ExprBuilder::operator-=(const ScalarQuadraticFunction &q)
 }
 ExprBuilder &ExprBuilder::operator-=(const ExprBuilder &t)
 {
-	for (const auto &[varpair, c] : t.quadratic_terms)
+	if (this == &t)
 	{
-		_add_quadratic_term(varpair.var_1, varpair.var_2, -c);
+		quadratic_terms.clear();
+		affine_terms.clear();
+		constant_term.reset();
 	}
-	for (const auto &[v, c] : t.affine_terms)
+	else
 	{
-		_add_affine_term(v, -c);
-	}
-	if (t.constant_term)
-	{
-		constant_term = constant_term.value_or(0.0) - t.constant_term.value();
+		for (const auto &[varpair, c] : t.quadratic_terms)
+		{
+			_add_quadratic_term(varpair.var_1, varpair.var_2, -c);
+		}
+		for (const auto &[v, c] : t.affine_terms)
+		{
+			_add_affine_term(v, -c);
+		}
+		if (t.constant_term)
+		{
+			constant_term = constant_term.value_or(0.0) - t.constant_term.value();
+		}
 	}
 	return *this;
 }
@@ -653,107 +680,150 @@ ExprBuilder &ExprBuilder::operator*=(const ExprBuilder &t)
 		    deg2));
 	}
 
-	if (deg1 == 0)
+	if (this == &t)
 	{
-		if (constant_term)
-		{
-			auto c = constant_term.value();
+		auto deg = deg1;
 
-			auto N = t.quadratic_terms.size();
-			quadratic_terms.reserve(N);
-			for (const auto &[varpair, c2] : t.quadratic_terms)
+		if (deg == 0)
+		{
+			if (constant_term)
 			{
-				_add_quadratic_term(varpair.var_1, varpair.var_2, c * c2);
+				auto c = constant_term.value();
+				constant_term = c * c;
+			}
+		}
+		else
+		// deg = 1
+		{
+			auto N = affine_terms.size();
+			quadratic_terms.reserve(N * N / 2);
+			for (const auto &[xi, ci] : affine_terms)
+			{
+				for (const auto &[xj, cj] : affine_terms)
+				{
+					_add_quadratic_term(xi, xj, ci * cj);
+				}
 			}
 
-			N = t.affine_terms.size();
-			affine_terms.reserve(N);
-			for (const auto &[v, c1] : t.affine_terms)
+			if (constant_term)
 			{
-				_add_affine_term(v, c * c1);
+				auto d0 = constant_term.value();
+				for (auto &[_, ci] : affine_terms)
+				{
+					ci *= 2.0 * d0;
+				}
+				constant_term = d0 * d0;
+			}
+			else
+			{
+				affine_terms.clear();
+			}
+		}
+	}
+	else
+	{
+		if (deg1 == 0)
+		{
+			if (constant_term)
+			{
+				auto c = constant_term.value();
+
+				auto N = t.quadratic_terms.size();
+				quadratic_terms.reserve(N);
+				for (const auto &[varpair, c2] : t.quadratic_terms)
+				{
+					_add_quadratic_term(varpair.var_1, varpair.var_2, c * c2);
+				}
+
+				N = t.affine_terms.size();
+				affine_terms.reserve(N);
+				for (const auto &[v, c1] : t.affine_terms)
+				{
+					_add_affine_term(v, c * c1);
+				}
+
+				if (t.constant_term)
+				{
+					constant_term = c * t.constant_term.value();
+				}
+				else
+				{
+					constant_term.reset();
+				}
+			}
+		}
+		else if (deg1 == 1)
+		{
+			if (deg2 == 1)
+			{
+				auto N1 = affine_terms.size();
+				auto N2 = t.affine_terms.size();
+				quadratic_terms.reserve(N1 * N2 / 2);
+				for (const auto &[xi, ci] : affine_terms)
+				{
+					for (const auto &[xj, dj] : t.affine_terms)
+					{
+						_add_quadratic_term(xi, xj, ci * dj);
+					}
+				}
 			}
 
 			if (t.constant_term)
 			{
-				constant_term = c * t.constant_term.value();
+				auto d0 = t.constant_term.value();
+				for (auto &[_, ci] : affine_terms)
+				{
+					ci *= d0;
+				}
+			}
+			else
+			{
+				affine_terms.clear();
+			}
+
+			if (constant_term)
+			{
+				auto c0 = constant_term.value();
+				for (const auto &[xj, dj] : t.affine_terms)
+				{
+					_add_affine_term(xj, c0 * dj);
+				}
+			}
+
+			if (t.constant_term && constant_term)
+			{
+				constant_term = t.constant_term.value() * constant_term.value();
 			}
 			else
 			{
 				constant_term.reset();
 			}
 		}
-	}
-	else if (deg1 == 1)
-	{
-		if (deg2 == 1)
+		else if (deg1 == 2)
 		{
-			auto N1 = affine_terms.size();
-			auto N2 = t.affine_terms.size();
-			quadratic_terms.reserve(N1 * N2 / 2);
-			for (const auto &[xi, ci] : affine_terms)
+			if (t.constant_term)
 			{
-				for (const auto &[xj, dj] : t.affine_terms)
+				auto c = t.constant_term.value();
+
+				for (auto &[_, c2] : quadratic_terms)
 				{
-					_add_quadratic_term(xi, xj, ci * dj);
+					c2 *= c;
+				}
+
+				for (auto &[_, c1] : affine_terms)
+				{
+					c1 *= c;
+				}
+
+				if (constant_term)
+				{
+					constant_term = c * constant_term.value();
 				}
 			}
-		}
-
-		if (t.constant_term)
-		{
-			auto d0 = t.constant_term.value();
-			for (auto &[_, ci] : affine_terms)
+			else
 			{
-				ci *= d0;
+				clear();
 			}
-		}
-		else
-		{
-			affine_terms.clear();
-		}
-
-		if (constant_term)
-		{
-			auto c0 = constant_term.value();
-			for (const auto &[xj, dj] : t.affine_terms)
-			{
-				_add_affine_term(xj, c0 * dj);
-			}
-		}
-
-		if (t.constant_term && constant_term)
-		{
-			constant_term = t.constant_term.value() * constant_term.value();
-		}
-		else
-		{
-			constant_term.reset();
-		}
-	}
-	else if (deg1 == 2)
-	{
-		if (t.constant_term)
-		{
-			auto c = t.constant_term.value();
-
-			for (auto &[_, c2] : quadratic_terms)
-			{
-				c2 *= c;
-			}
-
-			for (auto &[_, c1] : affine_terms)
-			{
-				c1 *= c;
-			}
-
-			if (constant_term)
-			{
-				constant_term = c * constant_term.value();
-			}
-		}
-		else
-		{
-			clear();
 		}
 	}
 	return *this;
