@@ -182,7 +182,7 @@ struct NonlinearEvaluator
 	struct GraphHashes
 	{
 		std::vector<GraphHash> hashes;
-		size_t n_hashes_since_last_aggregation;
+		size_t n_hashes_since_last_aggregation = 0;
 	} constraint_graph_hashes, objective_graph_hashes;
 
 	// length = n_graph_instances
