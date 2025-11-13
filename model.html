@@ -405,16 +405,19 @@ The meanings of these standard attributes are the same as <a class="reference ex
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.11.0 (git hash: 364c83a): Copyright (c) 2025 HiGHS under MIT licence terms
-QP   has 1 rows; 2 cols; 2 matrix nonzeros; 2 Hessian nonzeros
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.12.0 (git hash: 755a8e0): Copyright (c) 2025 HiGHS under MIT licence terms
+QP has 1 row; 2 cols; 2 matrix nonzeros; 2 Hessian nonzeros
 Coefficient ranges:
-  Matrix [1e+00, 1e+00]
-  Cost   [0e+00, 0e+00]
-  Bound  [1e+00, 1e+00]
-  RHS    [1e+00, 1e+00]
+  Matrix  [1e+00, 1e+00]
+  Cost    [0e+00, 0e+00]
+  Hessian [2e+00, 2e+00]
+  Bound   [1e+00, 1e+00]
+  RHS     [1e+00, 1e+00]
   Iteration        Objective     NullspaceDim
 Objective value: 0.49999999999999994
-          0                1                0      0.00s
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>          0                1                0      0.00s
           2       0.50000002                1      0.00s
 Model status        : Optimal
 QP ASM    iterations: 2
@@ -483,6 +486,10 @@ x[0]^2 = 0.24999999999999994
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: Column names are blank or not present: using names with prefix &quot;c&quot;, beginning with suffix 0
+WARNING: Row    names are blank or not present: using names with prefix &quot;r&quot;, beginning with suffix 0
+</pre></div>
+</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Writing the model to model.lp
 </pre></div>
 </div>
