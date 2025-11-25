@@ -84,10 +84,15 @@ def detected_libraries():
         pass
 
     # default names
+    gurobi_names = [
+        "gurobi130",
+        "gurobi120",
+        "gurobi110",
+    ]
     default_libname = {
-        "Linux": ["libgurobi120.so", "libgurobi110.so"],
-        "Darwin": ["libgurobi120.dylib", "libgurobi110.dylib"],
-        "Windows": ["gurobi120.dll", "gurobi110.dll"],
+        "Linux": ["lib" + name + ".so" for name in gurobi_names],
+        "Darwin": ["lib" + name + ".dylib" for name in gurobi_names],
+        "Windows": [name + ".dll" for name in gurobi_names],
     }[platform.system()]
     libs.extend(default_libname)
 

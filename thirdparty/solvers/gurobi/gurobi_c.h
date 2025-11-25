@@ -40,9 +40,9 @@ typedef struct _GRBenv GRBenv;
 
 /* Version numbers */
 
-#define GRB_VERSION_MAJOR     12
+#define GRB_VERSION_MAJOR     13
 #define GRB_VERSION_MINOR     0
-#define GRB_VERSION_TECHNICAL 1
+#define GRB_VERSION_TECHNICAL 0
 
 /* Default and max priority for Compute Server jobs */
 
@@ -93,7 +93,8 @@ typedef struct _GRBenv GRBenv;
 #define GRB_ERROR_TUNE_MODEL_TYPES         10031
 #define GRB_ERROR_SECURITY                 10032
 #define GRB_ERROR_GPU                      10033
-#define GRB_C_MAX_ERROR                    10033
+#define GRB_ERROR_OVERFLOW                 10034
+#define GRB_C_MAX_ERROR                    10034
 
 /* Constraint senses */
 
@@ -233,12 +234,22 @@ int __stdcall
                      int (__stdcall *cb)(CB_ARGS),
                      void  *usrdata);
 int __stdcall
+  GRBsetcallbackfuncadv(GRBmodel *model,
+                        int (__stdcall *cb)(CB_ARGS),
+                        void  *usrdata,
+                        unsigned int wheres);
+int __stdcall
   GRBgetcallbackfuncenv(GRBenv *env,
                         int (__stdcall **cbP)(CB_ARGS));
 int __stdcall
   GRBsetcallbackfuncenv(GRBenv *env,
                         int (__stdcall *cb)(CB_ARGS),
                         void  *usrdata);
+int __stdcall
+  GRBsetcallbackfuncenvadv(GRBenv *env,
+                           int (__stdcall *cb)(CB_ARGS),
+                           void  *usrdata,
+                           unsigned int wheres);
 int __stdcall
   GRBgetcallbackfunc(GRBmodel *model,
                      int (__stdcall **cbP)(CB_ARGS));
@@ -386,11 +397,15 @@ int __stdcall
 #define GRB_DBL_ATTR_OBJBOUND      "ObjBound"    /* Best bound on solution */
 #define GRB_DBL_ATTR_OBJBOUNDC     "ObjBoundC"   /* Continuous bound */
 #define GRB_DBL_ATTR_POOLOBJBOUND  "PoolObjBound" /* Best bound on pool solution */
-#define GRB_DBL_ATTR_POOLOBJVAL    "PoolObjVal"  /* Solution objective, depends on solutionnumber */
+#define GRB_DBL_ATTR_POOLNOBJVAL   "PoolNObjVal" /* Solution objective, depends on solutionnumber */
+#define GRB_DBL_ATTR_POOLOBJVAL    "PoolObjVal"  /* Deprecated since v13 - use GRB_DBL_ATTR_POOLNOBJVAL instead */
 #define GRB_DBL_ATTR_MIPGAP        "MIPGap"      /* MIP optimality gap */
 #define GRB_INT_ATTR_SOLCOUNT      "SolCount"    /* # of solutions found */
 #define GRB_DBL_ATTR_ITERCOUNT     "IterCount"   /* Iters performed (simplex) */
+#define GRB_INT_ATTR_BARSTATUS     "BarStatus"   /* Status computed by barrier before crossover */
 #define GRB_INT_ATTR_BARITERCOUNT  "BarIterCount" /* Iters performed (barrier) */
+#define GRB_INT_ATTR_NLBARITERCOUNT "NLBarIterCount" /* Iters performed (NL barrier) */
+#define GRB_DBL_ATTR_PDHGITERCOUNT "PDHGIterCount" /* Iters performed (PDHG) */
 #define GRB_DBL_ATTR_NODECOUNT     "NodeCount"    /* Nodes explored (B&C) */
 #define GRB_DBL_ATTR_OPENNODECOUNT "OpenNodeCount" /* Unexplored nodes (B&C) */
 #define GRB_INT_ATTR_HASDUALNORM   "HasDualNorm"  /* 0, no basis,
@@ -401,7 +416,8 @@ int __stdcall
 /* Variable attributes related to the current solution */
 
 #define GRB_DBL_ATTR_X         "X"         /* Solution value */
-#define GRB_DBL_ATTR_XN        "Xn"        /* Alternate MIP solution, depends on solutionnumber */
+#define GRB_DBL_ATTR_POOLNX    "PoolNX"    /* Alternate MIP solution, depends on solutionnumber */
+#define GRB_DBL_ATTR_XN        "Xn"        /* Deprecated since v13 - use GRB_DBL_ATTR_POOLNX instead */
 #define GRB_DBL_ATTR_BARX      "BarX"      /* Best barrier primal iterate */
 #define GRB_DBL_ATTR_BARPI     "BarPi"     /* Best barrier dual iterate */
 #define GRB_DBL_ATTR_RC        "RC"        /* Reduced costs */
@@ -459,6 +475,19 @@ int __stdcall
 #define GRB_DBL_ATTR_KAPPA                  "Kappa"
 #define GRB_DBL_ATTR_KAPPA_EXACT            "KappaExact"
 #define GRB_DBL_ATTR_N2KAPPA                "N2Kappa"
+
+/* Solution pool quality attributes, controlled by parameter SolutionNumber (= i)
+ */
+#define GRB_DBL_ATTR_POOL_MAX_VIO           "PoolNMaxVio"
+#define GRB_DBL_ATTR_POOL_BOUND_VIO         "PoolNBoundVio"
+#define GRB_INT_ATTR_POOL_BOUND_VIO_INDEX   "PoolNBoundVioIndex"
+#define GRB_DBL_ATTR_POOL_BOUND_VIO_SUM     "PoolNBoundVioSum"
+#define GRB_DBL_ATTR_POOL_CONSTR_VIO        "PoolNConstrVio"
+#define GRB_INT_ATTR_POOL_CONSTR_VIO_INDEX  "PoolNConstrVioIndex"
+#define GRB_DBL_ATTR_POOL_CONSTR_VIO_SUM    "PoolNConstrVioSum"
+#define GRB_DBL_ATTR_POOL_INT_VIO           "PoolNIntVio"
+#define GRB_INT_ATTR_POOL_INT_VIO_INDEX     "PoolNIntVioIndex"
+#define GRB_DBL_ATTR_POOL_INT_VIO_SUM       "PoolNIntVioSum"
 
 /* LP sensitivity analysis */
 
@@ -519,6 +548,18 @@ int __stdcall
 #define GRB_DBL_ATTR_OBJNABSTOL   "ObjNAbsTol"   /* absolute tolerance */
 #define GRB_STR_ATTR_OBJNNAME     "ObjNName"     /* name */
 
+#define GRB_INT_ATTR_NUMOBJPASSES          "NumObjPasses"          /* number of optimization passes during the multi-objective solve */
+#define GRB_INT_ATTR_OBJNPASS              "ObjNPass"              /* optimization pass in which the selected objective function was processed */
+#define GRB_DBL_ATTR_OBJPASSNITERCOUNT     "ObjPassNIterCount"     /* simplex iteration count for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNMIPGAP        "ObjPassNMIPGap"        /* MIP gap for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNNODECOUNT     "ObjPassNNodeCount"     /* number of explored nodes for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNOBJBOUND      "ObjPassNObjBound"      /* objective bound for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNOBJVAL        "ObjPassNObjVal"        /* objective value for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNOPENNODECOUNT "ObjPassNOpenNodeCount" /* number of unexplored nodes for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNRUNTIME       "ObjPassNRuntime"       /* runtime for a pass during the multi-objective solve */
+#define GRB_INT_ATTR_OBJPASSNSTATUS        "ObjPassNStatus"        /* status for a pass during the multi-objective solve */
+#define GRB_DBL_ATTR_OBJPASSNWORK          "ObjPassNWork"          /* work done for a pass during the multi-objective solve */
+
 /* Scenario attributes, controlled by parameter ScenarioNumber (= i)
  *
  * Note if you add an new attribute, adjust the const array
@@ -547,7 +588,7 @@ int __stdcall
 
 /* Alternate define */
 
-#define GRB_DBL_ATTR_Xn "Xn"
+#define GRB_DBL_ATTR_Xn "Xn"      /* Deprecated since v13 - use GRB_DBL_ATTR_POOLNX instead */
 
 /* General constraints */
 
@@ -593,6 +634,15 @@ int __stdcall
 #define GRB_OPCODE_LOG2          15
 #define GRB_OPCODE_LOG10         16
 #define GRB_OPCODE_LOGISTIC      17
+#define GRB_OPCODE_TANH          18
+#define GRB_OPCODE_SIGNPOW       19
+
+#define NUMOPCODETYPES           20
+
+/* Additional ones, internally used only */
+#define GRB_OPCODE_VCPOW         20
+#define GRB_OPCODE_CVPOW         21
+
 
 /*
    CALLBACKS
@@ -610,6 +660,9 @@ int __stdcall
 #define GRB_CB_BARRIER   7
 #define GRB_CB_MULTIOBJ  8
 #define GRB_CB_IIS       9
+#define GRB_CB_PDHG     10
+#define GRB_CB_NLBAR    11
+#define GRB_CB_MAX      11
 
 /* Supported names for callback */
 
@@ -694,6 +747,19 @@ int __stdcall
 #define GRB_CB_IIS_BOUNDMIN     9004
 #define GRB_CB_IIS_BOUNDMAX     9005
 #define GRB_CB_IIS_BOUNDGUESS   9006
+
+#define GRB_CB_PDHG_ITRCNT      10001
+#define GRB_CB_PDHG_PRIMOBJ     10002
+#define GRB_CB_PDHG_DUALOBJ     10003
+#define GRB_CB_PDHG_PRIMINF     10004
+#define GRB_CB_PDHG_DUALINF     10005
+#define GRB_CB_PDHG_COMPL       10006
+
+#define GRB_CB_NLBAR_ITRCNT     11001
+#define GRB_CB_NLBAR_PRIMOBJ    11002
+#define GRB_CB_NLBAR_PRIMINF    11003
+#define GRB_CB_NLBAR_DUALINF    11004
+#define GRB_CB_NLBAR_COMPL      11005
 
 /* FeasRelax method parameter values */
 
@@ -828,6 +894,10 @@ GRBmodel * __stdcall
   GRBfixedmodel(GRBmodel *model);
 int __stdcall
   GRBdualmodel(GRBmodel *model, GRBmodel **dualP);
+int __stdcall
+  GRBisgpusupported(GRBenv *env);
+int __stdcall
+  GRBisgpubuild(void);
 
 #define MALLOCCB_ARGS size_t size, void *syscbusrdata
 #define CALLOCCB_ARGS size_t nmemb, size_t size, void *syscbusrdata
@@ -1079,23 +1149,25 @@ int __stdcall
 
 /* Model status codes */
 
-#define GRB_LOADED          1
-#define GRB_OPTIMAL         2
-#define GRB_INFEASIBLE      3
-#define GRB_INF_OR_UNBD     4
-#define GRB_UNBOUNDED       5
-#define GRB_CUTOFF          6
-#define GRB_ITERATION_LIMIT 7
-#define GRB_NODE_LIMIT      8
-#define GRB_TIME_LIMIT      9
-#define GRB_SOLUTION_LIMIT 10
-#define GRB_INTERRUPTED    11
-#define GRB_NUMERIC        12
-#define GRB_SUBOPTIMAL     13
-#define GRB_INPROGRESS     14
-#define GRB_USER_OBJ_LIMIT 15
-#define GRB_WORK_LIMIT     16
-#define GRB_MEM_LIMIT      17
+#define GRB_LOADED              1
+#define GRB_OPTIMAL             2
+#define GRB_INFEASIBLE          3
+#define GRB_INF_OR_UNBD         4
+#define GRB_UNBOUNDED           5
+#define GRB_CUTOFF              6
+#define GRB_ITERATION_LIMIT     7
+#define GRB_NODE_LIMIT          8
+#define GRB_TIME_LIMIT          9
+#define GRB_SOLUTION_LIMIT     10
+#define GRB_INTERRUPTED        11
+#define GRB_NUMERIC            12
+#define GRB_SUBOPTIMAL         13
+#define GRB_INPROGRESS         14
+#define GRB_USER_OBJ_LIMIT     15
+#define GRB_WORK_LIMIT         16
+#define GRB_MEM_LIMIT          17
+#define GRB_LOCALLY_OPTIMAL    18
+#define GRB_LOCALLY_INFEASIBLE 19
 
 /* Basis status info */
 
@@ -1126,6 +1198,7 @@ int __stdcall
 #define GRB_DBL_PAR_SOFTMEMLIMIT   "SoftMemLimit"
 #define GRB_DBL_PAR_BESTOBJSTOP    "BestObjStop"
 #define GRB_DBL_PAR_BESTBDSTOP     "BestBdStop"
+#define GRB_INT_PAR_NLBARITERLIMIT "NLBarIterLimit"
 
 /* Tolerances */
 
@@ -1136,6 +1209,9 @@ int __stdcall
 #define GRB_DBL_PAR_MIPGAPABS      "MIPGapAbs"
 #define GRB_DBL_PAR_OPTIMALITYTOL  "OptimalityTol"
 #define GRB_DBL_PAR_PSDTOL         "PSDTol"
+#define GRB_DBL_PAR_NLBARPFEASTOL  "NLBarPFeasTol"
+#define GRB_DBL_PAR_NLBARDFEASTOL  "NLBarDFeasTol"
+#define GRB_DBL_PAR_NLBARCFEASTOL  "NLBarCFeasTol"
 
 /* Simplex */
 
@@ -1162,34 +1238,47 @@ int __stdcall
 #define GRB_INT_PAR_CROSSOVER      "Crossover"
 #define GRB_INT_PAR_CROSSOVERBASIS "CrossoverBasis"
 
+/* PDHG */
+
+#define GRB_DBL_PAR_PDHGITERLIMIT  "PDHGIterLimit"
+#define GRB_DBL_PAR_PDHGRELTOL     "PDHGRelTol"
+#define GRB_DBL_PAR_PDHGABSTOL     "PDHGAbsTol"
+#define GRB_DBL_PAR_PDHGCONVTOL    "PDHGConvTol"
+#define GRB_INT_PAR_PDHGGPU        "PDHGGPU"
+
 /* MIP */
 
-#define GRB_INT_PAR_BRANCHDIR          "BranchDir"
-#define GRB_INT_PAR_DEGENMOVES         "DegenMoves"
-#define GRB_INT_PAR_DISCONNECTED       "Disconnected"
-#define GRB_DBL_PAR_HEURISTICS         "Heuristics"
-#define GRB_DBL_PAR_IMPROVESTARTGAP    "ImproveStartGap"
-#define GRB_DBL_PAR_IMPROVESTARTTIME   "ImproveStartTime"
-#define GRB_DBL_PAR_IMPROVESTARTNODES  "ImproveStartNodes"
-#define GRB_INT_PAR_INTEGRALITYFOCUS   "IntegralityFocus"
-#define GRB_INT_PAR_MINRELNODES        "MinRelNodes"
-#define GRB_INT_PAR_MIPFOCUS           "MIPFocus"
-#define GRB_INT_PAR_NLPHEUR            "NLPHeur"
-#define GRB_STR_PAR_NODEFILEDIR        "NodefileDir"
-#define GRB_DBL_PAR_NODEFILESTART      "NodefileStart"
-#define GRB_INT_PAR_NODEMETHOD         "NodeMethod"
-#define GRB_DBL_PAR_NORELHEURTIME      "NoRelHeurTime"
-#define GRB_DBL_PAR_NORELHEURWORK      "NoRelHeurWork"
-#define GRB_INT_PAR_OBBT               "OBBT"
-#define GRB_INT_PAR_PUMPPASSES         "PumpPasses"
-#define GRB_INT_PAR_RINS               "RINS"
-#define GRB_STR_PAR_SOLFILES           "SolFiles"
-#define GRB_INT_PAR_STARTNODELIMIT     "StartNodeLimit"
-#define GRB_INT_PAR_SUBMIPNODES        "SubMIPNodes"
-#define GRB_INT_PAR_SYMMETRY           "Symmetry"
-#define GRB_INT_PAR_VARBRANCH          "VarBranch"
-#define GRB_INT_PAR_SOLUTIONNUMBER     "SolutionNumber"
-#define GRB_INT_PAR_ZEROOBJNODES       "ZeroObjNodes"
+#define GRB_INT_PAR_BRANCHDIR           "BranchDir"
+#define GRB_INT_PAR_DEGENMOVES          "DegenMoves"
+#define GRB_INT_PAR_DISCONNECTED        "Disconnected"
+#define GRB_INT_PAR_FIXVARSININDICATORS "FixVarsInIndicators"
+#define GRB_DBL_PAR_HEURISTICS          "Heuristics"
+#define GRB_DBL_PAR_IMPROVESTARTGAP     "ImproveStartGap"
+#define GRB_DBL_PAR_IMPROVESTARTTIME    "ImproveStartTime"
+#define GRB_DBL_PAR_IMPROVESTARTWORK    "ImproveStartWork"
+#define GRB_DBL_PAR_IMPROVESTARTNODES   "ImproveStartNodes"
+#define GRB_INT_PAR_INTEGRALITYFOCUS    "IntegralityFocus"
+#define GRB_INT_PAR_MINRELNODES         "MinRelNodes"
+#define GRB_INT_PAR_MIPFOCUS            "MIPFocus"
+#define GRB_INT_PAR_NLPHEUR             "NLPHeur"
+#define GRB_STR_PAR_NODEFILEDIR         "NodefileDir"
+#define GRB_DBL_PAR_NODEFILESTART       "NodefileStart"
+#define GRB_INT_PAR_NODEMETHOD          "NodeMethod"
+#define GRB_DBL_PAR_NORELHEURTIME       "NoRelHeurTime"
+#define GRB_DBL_PAR_NORELHEURWORK       "NoRelHeurWork"
+#define GRB_INT_PAR_NORELHEURSOLUTIONS  "NoRelHeurSolutions"
+#define GRB_INT_PAR_OBBT                "OBBT"
+#define GRB_INT_PAR_PUMPPASSES          "PumpPasses"
+#define GRB_INT_PAR_RINS                "RINS"
+#define GRB_STR_PAR_SOLFILES            "SolFiles"
+#define GRB_INT_PAR_STARTNODELIMIT      "StartNodeLimit"
+#define GRB_DBL_PAR_STARTTIMELIMIT      "StartTimeLimit"
+#define GRB_DBL_PAR_STARTWORKLIMIT      "StartWorkLimit"
+#define GRB_INT_PAR_SUBMIPNODES         "SubMIPNodes"
+#define GRB_INT_PAR_SYMMETRY            "Symmetry"
+#define GRB_INT_PAR_VARBRANCH           "VarBranch"
+#define GRB_INT_PAR_SOLUTIONNUMBER      "SolutionNumber"
+#define GRB_INT_PAR_ZEROOBJNODES        "ZeroObjNodes"
 
 /* MIP cuts */
 
@@ -1217,6 +1306,7 @@ int __stdcall
 #define GRB_INT_PAR_LIFTPROJECTCUTS "LiftProjectCuts"
 #define GRB_INT_PAR_MIXINGCUTS      "MixingCuts"
 #define GRB_INT_PAR_DUALIMPLIEDCUTS "DualImpliedCuts"
+#define GRB_INT_PAR_MASTERKNAPSACKCUTS "MasterKnapsackCuts"
 
 #define GRB_INT_PAR_CUTAGGPASSES    "CutAggPasses"
 #define GRB_INT_PAR_CUTPASSES       "CutPasses"
@@ -1259,6 +1349,10 @@ int __stdcall
 #define GRB_INT_PAR_LICENSEID         "LicenseID"
 #define GRB_STR_PAR_WLSPROXY          "WLSProxy"
 #define GRB_STR_PAR_WLSCONFIG         "WLSConfig"
+
+/* NL barrier */
+
+#define GRB_INT_PAR_OPTIMALITYTARGET  "OptimalityTarget"
 
 
 /* Other */
@@ -1313,6 +1407,7 @@ int __stdcall
 #define GRB_INT_PAR_TUNEDYNAMICJOBS   "TuneDynamicJobs"
 #define GRB_INT_PAR_UPDATEMODE        "UpdateMode"
 #define GRB_INT_PAR_OBJNUMBER         "ObjNumber"
+#define GRB_INT_PAR_OBJPASSNUMBER     "ObjPassNumber"
 #define GRB_INT_PAR_MULTIOBJMETHOD    "MultiObjMethod"
 #define GRB_INT_PAR_MULTIOBJPRE       "MultiObjPre"
 #define GRB_INT_PAR_SCENARIONUMBER    "ScenarioNumber"
@@ -1331,6 +1426,7 @@ int __stdcall
 #define GRB_INT_PAR_FUNCNONLINEAR     "FuncNonlinear"
 #define GRB_STR_PAR_DUMMY             "Dummy"
 #define GRB_STR_PAR_JOBID             "JobID"
+#define GRB_INT_PAR_INHERITPARAMS     "InheritParams"
 
 
 /* Parameter enumerations */
@@ -1360,6 +1456,7 @@ int __stdcall
 #define GRB_METHOD_CONCURRENT                       3
 #define GRB_METHOD_DETERMINISTIC_CONCURRENT         4
 #define GRB_METHOD_DETERMINISTIC_CONCURRENT_SIMPLEX 5 /* Deprecated since v11 */
+#define GRB_METHOD_PDHG                             6
 
 #define GRB_CONCURRENTMETHOD_AUTO                -1
 #define GRB_CONCURRENTMETHOD_BARRIER_PRIMAL_DUAL  0
@@ -1432,8 +1529,12 @@ int __stdcall
                    double constant, int lnz, int *lind, double *lval);
 void __stdcall
   GRBclean2(int *lenP, int *ind, double *val);
+int __stdcall
+  GRBclean2checknan(int *lenP, int *ind, double *val);
 void __stdcall
   GRBclean3(int *lenP, int *ind0, int *ind1, double *val);
+int __stdcall
+  GRBclean3checknan(int *lenP, int *ind0, int *ind1, double *val);
 
 int __stdcall
   GRBprintquality(GRBmodel *model);
@@ -1479,8 +1580,6 @@ int __stdcall
 int __stdcall
   GRBresetparams(GRBenv *env);
 int __stdcall
-  GRBcopyparams(GRBenv *dest, GRBenv *src);
-int __stdcall
   GRBwriteparams(GRBenv *env, const char *filename);
 int __stdcall
   GRBreadparams(GRBenv *env, const char *filename);
@@ -1490,6 +1589,8 @@ int __stdcall
   GRBreadmultiobjsettings(GRBmodel *model, const char *filename);
 int __stdcall
   GRBreadtunebasesettings(GRBenv *env, const char *filename);
+int __stdcall
+  GRBreadtuneignoresettings(GRBenv *env, const char *filename);
 int __stdcall
   GRBgetnumparams(GRBenv *env);
 int __stdcall
@@ -1637,11 +1738,13 @@ int __stdcall
 int __stdcall
   GRBtunemodels(GRBenv *env, int nummodels, GRBmodel **models);
 int __stdcall
-  GRBgettuneresult(GRBmodel *model, int i);
+  GRBgettuneresult(GRBmodel *model, int result);
 int __stdcall
-  GRBgettunelog(GRBmodel *model, int i, char **logP);
+  GRBgettunelog(GRBmodel *model, int result, char **logP);
 int __stdcall
   GRBwritetunelog(GRBmodel *model, int result, const char *filename);
+int __stdcall
+  GRBwritetuneparamsets(GRBmodel *model, const char *filename);
 void __stdcall
   GRBtuneparamsPrint(void);
  
