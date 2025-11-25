@@ -1,6 +1,7 @@
 #include "pyoptinterface/nlexpr.hpp"
 
 #include <cassert>
+#include <cmath>
 #include "fmt/core.h"
 
 bool ExpressionHandle::operator==(const ExpressionHandle &x) const
@@ -26,6 +27,8 @@ std::string ExpressionHandle::to_string() const
 		return fmt::format("t{}", id);
 	case ArrayType::Nary:
 		return fmt::format("n{}", id);
+	default:
+		return fmt::format("?{}", id);
 	}
 }
 
@@ -147,6 +150,56 @@ ExpressionHandle ExpressionGraph::add_parameter(EntityId id)
 
 ExpressionHandle ExpressionGraph::add_unary(UnaryOperator op, ExpressionHandle operand)
 {
+	// Constant folding: if the operand is a constant, compute the result directly
+	if (operand.array == ArrayType::Constant)
+	{
+		double val = m_constants[operand.id];
+		double result;
+		switch (op)
+		{
+		case UnaryOperator::Neg:
+			result = -val;
+			break;
+		case UnaryOperator::Sin:
+			result = std::sin(val);
+			break;
+		case UnaryOperator::Cos:
+			result = std::cos(val);
+			break;
+		case UnaryOperator::Tan:
+			result = std::tan(val);
+			break;
+		case UnaryOperator::Asin:
+			result = std::asin(val);
+			break;
+		case UnaryOperator::Acos:
+			result = std::acos(val);
+			break;
+		case UnaryOperator::Atan:
+			result = std::atan(val);
+			break;
+		case UnaryOperator::Abs:
+			result = std::abs(val);
+			break;
+		case UnaryOperator::Sqrt:
+			result = std::sqrt(val);
+			break;
+		case UnaryOperator::Exp:
+			result = std::exp(val);
+			break;
+		case UnaryOperator::Log:
+			result = std::log(val);
+			break;
+		case UnaryOperator::Log10:
+			result = std::log10(val);
+			break;
+		default:
+			// Unknown operator, fall through to create the node
+			goto create_node;
+		}
+		return add_constant(result);
+	}
+create_node:
 	m_unaries.emplace_back(op, operand);
 	return {ArrayType::Unary, static_cast<NodeId>(m_unaries.size() - 1)};
 }
@@ -154,6 +207,35 @@ ExpressionHandle ExpressionGraph::add_unary(UnaryOperator op, ExpressionHandle o
 ExpressionHandle ExpressionGraph::add_binary(BinaryOperator op, ExpressionHandle left,
                                              ExpressionHandle right)
 {
+	// Constant folding: if both operands are constants, compute the result directly
+	// Note: comparison operators are not folded as they produce boolean results
+	if (left.array == ArrayType::Constant && right.array == ArrayType::Constant &&
+	    !is_binary_compare_op(op))
+	{
+		double lval = m_constants[left.id];
+		double rval = m_constants[right.id];
+		double result;
+		switch (op)
+		{
+		case BinaryOperator::Sub:
+			result = lval - rval;
+			break;
+		case BinaryOperator::Div:
+			result = lval / rval;
+			break;
+		case BinaryOperator::Pow:
+			result = std::pow(lval, rval);
+			break;
+		case BinaryOperator::Mul2:
+			result = lval * rval;
+			break;
+		default:
+			// Comparison operators or unknown, fall through to create the node
+			goto create_node;
+		}
+		return add_constant(result);
+	}
+create_node:
 	m_binaries.emplace_back(op, left, right);
 	return {ArrayType::Binary, static_cast<NodeId>(m_binaries.size() - 1)};
 }
@@ -168,6 +250,43 @@ ExpressionHandle ExpressionGraph::add_ternary(TernaryOperator op, ExpressionHand
 ExpressionHandle ExpressionGraph::add_nary(NaryOperator op,
                                            const std::vector<ExpressionHandle> &operands)
 {
+	// Constant folding: if all operands are constants, compute the result directly
+	bool all_constants = true;
+	for (const auto &operand : operands)
+	{
+		if (operand.array != ArrayType::Constant)
+		{
+			all_constants = false;
+			break;
+		}
+	}
+
+	if (all_constants && !operands.empty())
+	{
+		double result;
+		switch (op)
+		{
+		case NaryOperator::Add:
+			result = 0.0;
+			for (const auto &operand : operands)
+			{
+				result += m_constants[operand.id];
+			}
+			break;
+		case NaryOperator::Mul:
+			result = 1.0;
+			for (const auto &operand : operands)
+			{
+				result *= m_constants[operand.id];
+			}
+			break;
+		default:
+			goto create_node;
+		}
+		return add_constant(result);
+	}
+
+create_node:
 	m_naries.emplace_back(op, operands);
 	return {ArrayType::Nary, static_cast<NodeId>(m_naries.size() - 1)};
 }
@@ -419,6 +538,8 @@ std::string unary_operator_to_string(UnaryOperator op)
 		return "Log";
 	case UnaryOperator::Log10:
 		return "Log10";
+	default:
+		return "UnknownUnary";
 	}
 }
 
@@ -444,6 +565,10 @@ std::string binary_operator_to_string(BinaryOperator op)
 		return "GreaterEqual";
 	case BinaryOperator::GreaterThan:
 		return "GreaterThan";
+	case BinaryOperator::Mul2:
+		return "Mul2";
+	default:
+		return "UnknownBinary";
 	}
 }
 
@@ -453,6 +578,8 @@ std::string ternary_operator_to_string(TernaryOperator op)
 	{
 	case TernaryOperator::IfThenElse:
 		return "IfThenElse";
+	default:
+		return "UnknownTernary";
 	}
 }
 
@@ -464,6 +591,8 @@ std::string nary_operator_to_string(NaryOperator op)
 		return "Add";
 	case NaryOperator::Mul:
 		return "Mul";
+	default:
+		return "UnknownNary";
 	}
 }
 
