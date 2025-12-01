@@ -87,7 +87,9 @@ variable_attribute_get_func_map = {
     VariableAttribute.Value: lambda model, v: model.get_variable_info(v, "Value"),
     VariableAttribute.LowerBound: lambda model, v: model.get_variable_info(v, "LB"),
     VariableAttribute.UpperBound: lambda model, v: model.get_variable_info(v, "UB"),
-    VariableAttribute.PrimalStart: lambda model, v: model.mip_start_values.get(v, None),
+    VariableAttribute.PrimalStart: lambda model, v: model.variable_start_values.get(
+        v, None
+    ),
     VariableAttribute.Domain: lambda model, v: model.get_variable_type(v),
     VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
     VariableAttribute.IISLowerBound: lambda model, v: model._get_variable_lowerbound_IIS(
@@ -102,8 +104,7 @@ variable_attribute_get_func_map = {
 
 
 def set_variable_start(model, v, val):
-    model.mip_start_values[v] = val
-    model.nl_start_values[v] = val
+    model.variable_start_values[v] = val
 
 
 variable_attribute_set_func_map = {
@@ -380,7 +381,7 @@ class Model(RawModel):
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
-        self.mip_start_values: Dict[VariableIndex, float] = dict()
+        self.variable_start_values: Dict[VariableIndex, float] = dict()
         self.nl_start_values: Dict[VariableIndex, float] = dict()
 
     def add_variables(self, *args, **kwargs):
@@ -449,7 +450,7 @@ class Model(RawModel):
     def _has_nl(self):
         nlconstrs = self.get_raw_attribute_int("NLConstrs")
         hasnlobj = self.get_raw_attribute_int("HasNLObj")
-        return nlconstrs > 0 and hasnlobj > 0
+        return nlconstrs > 0 or hasnlobj > 0
 
     def get_model_attribute(self, attribute: ModelAttribute):
         def e(attribute):
@@ -537,20 +538,21 @@ class Model(RawModel):
         return get_function(param_name)
 
     def optimize(self):
-        if self._is_mip():
-            mip_start = self.mip_start_values
-            if len(mip_start) != 0:
-                variables = list(mip_start.keys())
-                values = list(mip_start.values())
-                self.add_mip_start(variables, values)
-                mip_start.clear()
-        if self._has_nl():
-            nl_start = self.nl_start_values
-            if len(nl_start) != 0:
-                variables = list(nl_start.keys())
-                values = list(nl_start.values())
-                self.add_nl_start(variables, values)
-                nl_start.clear()
+        is_mip = self._is_mip()
+        is_nl = self._has_nl()
+
+        if is_mip or is_nl:
+            variable_start_values = self.variable_start_values
+            if len(variable_start_values) != 0:
+                variables = list(variable_start_values.keys())
+                values = list(variable_start_values.values())
+                variable_start_values.clear()
+
+                if is_mip:
+                    self.add_mip_start(variables, values)
+                if is_nl:
+                    self.add_nl_start(variables, values)
+
         super().optimize()
 
     def cb_get_info(self, what):
