@@ -23,9 +23,9 @@
 extern "C" {
 #endif
 
-#define COPT_VERSION_MAJOR                      7
-#define COPT_VERSION_MINOR                      2
-#define COPT_VERSION_TECHNICAL                  8
+#define COPT_VERSION_MAJOR                      8
+#define COPT_VERSION_MINOR                      0
+#define COPT_VERSION_TECHNICAL                  1
 
 
 /*
@@ -82,6 +82,7 @@ extern "C" {
 #define COPT_RETCODE_THREAD                     6
 #define COPT_RETCODE_SERVER                     7
 #define COPT_RETCODE_NONCONVEX                  8
+#define COPT_RETCODE_MEMORY_GPU                 9
 
 /* Basis status */
 #define COPT_BASIS_LOWER                        0
@@ -99,7 +100,8 @@ extern "C" {
 #define COPT_LPSTATUS_IMPRECISE                 7
 #define COPT_LPSTATUS_TIMEOUT                   8
 #define COPT_LPSTATUS_UNFINISHED                9
-#define COPT_LPSTATUS_INTERRUPTED              10
+#define COPT_LPSTATUS_INTERRUPTED               10
+#define COPT_LPSTATUS_ITERLIMIT                 11
 
 /* MIP status */
 #define COPT_MIPSTATUS_UNSTARTED                0
@@ -151,6 +153,7 @@ extern "C" {
 
 /* Integer parameters */
 #define COPT_INTPARAM_LOGGING                   "Logging"
+#define COPT_INTPARAM_LOGLEVEL                  "LogLevel"
 #define COPT_INTPARAM_LOGTOCONSOLE              "LogToConsole"
 #define COPT_INTPARAM_PRESOLVE                  "Presolve"
 #define COPT_INTPARAM_SCALING                   "Scaling"
@@ -159,6 +162,7 @@ extern "C" {
 #define COPT_INTPARAM_GPUMODE                   "GPUMode"
 #define COPT_INTPARAM_GPUDEVICE                 "GPUDevice"
 #define COPT_INTPARAM_REQFARKASRAY              "ReqFarkasRay"
+#define COPT_INTPARAM_REQSENSITIVITY            "ReqSensitivity"
 #define COPT_INTPARAM_DUALPRICE                 "DualPrice"
 #define COPT_INTPARAM_DUALPERTURB               "DualPerturb"
 #define COPT_INTPARAM_CUTLEVEL                  "CutLevel"
@@ -167,6 +171,7 @@ extern "C" {
 #define COPT_INTPARAM_ROOTCUTROUNDS             "RootCutRounds"
 #define COPT_INTPARAM_NODECUTROUNDS             "NodeCutRounds"
 #define COPT_INTPARAM_HEURLEVEL                 "HeurLevel"
+#define COPT_INTPARAM_PREROOTHEURLEVEL          "PreRootHeurLevel"
 #define COPT_INTPARAM_ROUNDINGHEURLEVEL         "RoundingHeurLevel"
 #define COPT_INTPARAM_DIVINGHEURLEVEL           "DivingHeurLevel"
 #define COPT_INTPARAM_FAPHEURLEVEL              "FAPHeurLevel"
@@ -200,6 +205,10 @@ extern "C" {
 #define COPT_INTPARAM_TUNEOUTPUTLEVEL           "TuneOutputLevel"
 #define COPT_INTPARAM_MULTIOBJPARAMMODE         "MultiObjParamMode"
 #define COPT_INTPARAM_LAZYCONSTRAINTS           "LazyConstraints"
+#define COPT_INTPARAM_LINEARIZEINDICATORS       "LinearizeIndicators"
+#define COPT_INTPARAM_LINEARIZESOS              "LinearizeSos"
+#define COPT_INTPARAM_MIPREPAIR                 "MipRepair"
+#define COPT_INTPARAM_MIPNLPITERLIMIT           "MipNLPIterLimit"
 
 /* Double attributes */
 #define COPT_DBLATTR_SOLVINGTIME                "SolvingTime"
@@ -249,11 +258,13 @@ extern "C" {
 #define COPT_INTATTR_HASPRIMALRAY               "HasPrimalRay"
 #define COPT_INTATTR_HASBASIS                   "HasBasis"
 #define COPT_INTATTR_HASMIPSOL                  "HasMipSol"
+#define COPT_INTATTR_HASBRANCHFACTOR            "HasBranchFactor"
 #define COPT_INTATTR_HASQOBJ                    "HasQObj"
 #define COPT_INTATTR_HASNLOBJ                   "HasNLObj"
 #define COPT_INTATTR_HASPSDOBJ                  "HasPSDObj"
 #define COPT_INTATTR_HASIIS                     "HasIIS"
 #define COPT_INTATTR_HASFEASRELAXSOL            "HasFeasRelaxSol"
+#define COPT_INTATTR_HASSENSITIVITY             "HasSensitivity"
 #define COPT_INTATTR_ISMIP                      "IsMIP"
 #define COPT_INTATTR_ISMINIIS                   "IsMinIIS"
 
@@ -270,6 +281,13 @@ extern "C" {
 #define COPT_DBLINFO_RELAXLB                    "RelaxLB"
 #define COPT_DBLINFO_RELAXUB                    "RelaxUB"
 #define COPT_DBLINFO_RELAXVALUE                 "RelaxValue"
+#define COPT_DBLINFO_BRANCHFACTOR               "BranchFactor"
+#define COPT_DBLINFO_SAOBJLOW                   "SAObjLow"
+#define COPT_DBLINFO_SAOBJUP                    "SAObjUp"
+#define COPT_DBLINFO_SALBLOW                    "SALBLow"
+#define COPT_DBLINFO_SALBUP                     "SALBUp"
+#define COPT_DBLINFO_SAUBLOW                    "SAUBLow"
+#define COPT_DBLINFO_SAUBUP                     "SAUBUp"
 
 /* Nonlinear operation codes */
 #define COPT_NL_PLUS                            -10
@@ -780,6 +798,7 @@ int COPT_CALL COPT_SetColType(copt_prob *prob, int num, const int *list, const c
 int COPT_CALL COPT_SetColLower(copt_prob *prob, int num, const int *list, const double *lower);
 int COPT_CALL COPT_SetColUpper(copt_prob *prob, int num, const int *list, const double *upper);
 int COPT_CALL COPT_SetColNames(copt_prob *prob, int num, const int *list, char const *const *names);
+int COPT_CALL COPT_SetColBranchFactors(copt_prob *prob, int num, const int *list, const double *branchFactors);
 
 int COPT_CALL COPT_SetPSDColNames(copt_prob *prob, int num, const int *list, char const *const *names);
 
@@ -837,8 +856,10 @@ int COPT_CALL COPT_ReadSDPA(copt_prob *prob, const char *sdpafilename);
 int COPT_CALL COPT_ReadCbf(copt_prob *prob, const char *cbffilename);
 int COPT_CALL COPT_ReadBin(copt_prob *prob, const char *binfilename);
 int COPT_CALL COPT_ReadSol(copt_prob *prob, const char *solfilename);
+int COPT_CALL COPT_ReadJsonSol(copt_prob *prob, const char *solfilename);
 int COPT_CALL COPT_ReadBasis(copt_prob *prob, const char *basfilename);
 int COPT_CALL COPT_ReadMst(copt_prob *prob, const char *mstfilename);
+int COPT_CALL COPT_ReadOrd(copt_prob *prob, const char *ordfilename);
 int COPT_CALL COPT_ReadParam(copt_prob *prob, const char *parfilename);
 int COPT_CALL COPT_ReadParamStr(copt_prob *prob, const char *strParam);
 int COPT_CALL COPT_ReadTune(copt_prob *prob, const char *tunefilename);
@@ -852,9 +873,11 @@ int COPT_CALL COPT_WriteNL(copt_prob *prob, const char *nlfilename);
 int COPT_CALL COPT_WriteIIS(copt_prob *prob, const char *iisfilename);
 int COPT_CALL COPT_WriteRelax(copt_prob *prob, const char *relaxfilename);
 int COPT_CALL COPT_WriteSol(copt_prob *prob, const char *solfilename);
+int COPT_CALL COPT_WriteJsonSol(copt_prob *prob, const char *solfilename);
 int COPT_CALL COPT_WritePoolSol(copt_prob *prob, int iSol, const char *solfilename);
 int COPT_CALL COPT_WriteBasis(copt_prob *prob, const char *basfilename);
 int COPT_CALL COPT_WriteMst(copt_prob *prob, const char *mstfilename);
+int COPT_CALL COPT_WriteOrd(copt_prob *prob, const char *ordfilename);
 int COPT_CALL COPT_WriteParam(copt_prob *prob, const char *parfilename);
 int COPT_CALL COPT_WriteTuneParam(copt_prob *prob, int idx, const char *parfilename);
 int COPT_CALL COPT_WriteMpsStr(copt_prob *prob, char *str, int nStrSize, int *pReqSize);
@@ -947,9 +970,10 @@ int COPT_CALL COPT_GetIndicatorName(copt_prob *prob, int iIndicator, char *buff,
 int COPT_CALL COPT_SetLogFile(copt_prob *prob, const char *logfilename);
 int COPT_CALL COPT_SetLogCallback(copt_prob *prob, void (COPT_CALL *logcb)(char *msg, void *userdata), void *userdata);
 
-int COPT_CALL COPT_SetCallback(copt_prob *prob, 
-                               int (COPT_CALL *cb)(copt_prob *prob, void *cbdata, int cbctx, void *userdata),
-                               int cbctx, void *userdata);
+int COPT_CALL COPT_SetCallback(copt_prob *prob,
+    int (COPT_CALL *cb)(copt_prob *prob, void *cbdata, int cbctx, void *userdata),
+    int               cbctx,
+    void              *userdata);
 int COPT_CALL COPT_GetCallbackInfo(void *cbdata, const char *cbinfo, void *p_val);
 int COPT_CALL COPT_AddCallbackSolution(void *cbdata, const double *sol, double *p_objval);
 int COPT_CALL COPT_AddCallbackUserCut(void *cbdata,

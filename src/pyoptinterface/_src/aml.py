@@ -103,8 +103,12 @@ def make_variable_tupledict(
 
 
 def quicksum_(expr: ExprBuilder, terms, f=None):
+    import numpy as np
+
     if isinstance(terms, dict):
         iter = terms.values()
+    elif isinstance(terms, np.ndarray):
+        iter = terms.flat
     else:
         iter = terms
     if f:

@@ -103,7 +103,8 @@ NB_MODULE(core_ext, m)
 
 		        return expr;
 	        },
-	        nb::arg("coefficients"), nb::arg("variables"))
+	        nb::arg("coefficients"), nb::arg("variables"),
+	        nb::rv_policy::take_ownership)
 	    .def_static(
 	        "from_numpy",
 	        [](CoeffNdarrayT coefficients, IndexNdarrayT variables, CoeffT constant) {
@@ -124,7 +125,8 @@ NB_MODULE(core_ext, m)
 
 		        return expr;
 	        },
-	        nb::arg("coefficients"), nb::arg("variables"), nb::arg("constant"))
+	        nb::arg("coefficients"), nb::arg("variables"), nb::arg("constant"),
+	        nb::rv_policy::take_ownership)
 
 	    .def(nb::init<const ExprBuilder &>())
 	    .def_ro("coefficients", &ScalarAffineFunction::coefficients)

@@ -40,7 +40,8 @@ class OnesideLinearConstraintMixin
 	{
 		if (function.degree() >= 2)
 		{
-			throw std::runtime_error("add_linear_constraint expects linear expression but receives a quadratic expression.");
+			throw std::runtime_error("add_linear_constraint expects linear expression but receives "
+			                         "a quadratic expression.");
 		}
 		ScalarAffineFunction f(function);
 		return get_base()->add_linear_constraint(f, sense, rhs, name);
@@ -617,7 +618,16 @@ struct CSCMatrix
 		// Sorting based on column indices
 		std::vector<IDXT> idx(numnz);
 		std::iota(idx.begin(), idx.end(), 0);
-		std::sort(idx.begin(), idx.end(), [&](int i, int j) { return cols[i] < cols[j]; });
+		std::sort(idx.begin(), idx.end(), [&](int i, int j) {
+			if (cols[i] == cols[j])
+			{
+				return rows[i] < rows[j];
+			}
+			else
+			{
+				return cols[i] < cols[j];
+			}
+		});
 
 		// Creating CSC arrays
 		values_CSC.reserve(numnz);

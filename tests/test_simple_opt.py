@@ -145,3 +145,30 @@ def test_add_quadratic_expr_as_linear_throws_error(model_interface):
 
     with pytest.raises(RuntimeError, match="add_linear_constraint"):
         model.add_linear_constraint(x2_sum <= 1.0)
+
+
+def test_exprbuilder_self_operation(model_interface):
+    model = model_interface
+
+    x = model.add_m_variables(2, lb=1.0, ub=4.0)
+
+    expr = poi.ExprBuilder(x[0] + 2.0 * x[1] + 3.0)
+    expr += expr
+    model.set_objective(expr)
+    model.optimize()
+    obj_value = model.get_value(expr)
+    assert obj_value == approx(12.0)
+
+    expr = poi.ExprBuilder(x[0] + 2.0 * x[1] + 3.0)
+    expr -= expr
+    model.set_objective(expr)
+    model.optimize()
+    obj_value = model.get_value(expr)
+    assert obj_value == approx(0.0)
+
+    expr = poi.ExprBuilder(x[0] + 2.0 * x[1] + 3.0)
+    expr *= expr
+    model.set_objective(expr)
+    model.optimize()
+    obj_value = model.get_value(expr)
+    assert obj_value == approx(36.0)

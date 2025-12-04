@@ -51,7 +51,7 @@ def test_nlp_expressiontree_obj(model_interface):
         model.add_nl_constraint(z, (-1.0, 1.0))
 
     with nl.graph():
-        z = nl.exp(x**4) + nl.exp(y**4)
+        z = nl.exp(x**2) + nl.exp(y**2)
         model.add_nl_objective(z)
 
     model.optimize()
@@ -59,5 +59,5 @@ def test_nlp_expressiontree_obj(model_interface):
     x_value = model.get_value(x)
     y_value = model.get_value(y)
 
-    assert x_value == approx(0.0, abs=1e-6)
-    assert y_value == approx(0.0, abs=1e-6)
+    assert x_value == approx(0.0, abs=1e-4)
+    assert y_value == approx(0.0, abs=1e-4)

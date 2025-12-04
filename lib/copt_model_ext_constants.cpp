@@ -51,6 +51,7 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("INF_OR_UNB") = 4;
 	COPT.attr("INTEGER") = "I";
 	COPT.attr("INTERRUPTED") = 10;
+	COPT.attr("ITERLIMIT") = 11;
 	COPT.attr("LESS_EQUAL") = "L";
 	COPT.attr("MAXIMIZE") = -1;
 	COPT.attr("MINIMIZE") = 1;
@@ -65,9 +66,9 @@ void bind_copt_constants(nb::module_ &m)
 	COPT.attr("UNDEFINED") = 1e+40;
 	COPT.attr("UNFINISHED") = 9;
 	COPT.attr("UNSTARTED") = 0;
-	COPT.attr("VERSION_MAJOR") = 7;
-	COPT.attr("VERSION_MINOR") = 2;
-	COPT.attr("VERSION_TECHNICAL") = 5;
+	COPT.attr("VERSION_MAJOR") = 8;
+	COPT.attr("VERSION_MINOR") = 0;
+	COPT.attr("VERSION_TECHNICAL") = 1;
 
 	nb::module_ Attr = COPT.def_submodule("Attr");
 	Attr.attr("AffineCones") = "AffineCones";
@@ -82,6 +83,7 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("ExpCones") = "ExpCones";
 	Attr.attr("FeasRelaxObj") = "FeasRelaxObj";
 	Attr.attr("HasBasis") = "HasBasis";
+	Attr.attr("HasBranchFactor") = "HasBranchFactor";
 	Attr.attr("HasDualFarkas") = "HasDualFarkas";
 	Attr.attr("HasFeasRelaxSol") = "HasFeasRelaxSol";
 	Attr.attr("HasIIS") = "HasIIS";
@@ -91,6 +93,7 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("HasPrimalRay") = "HasPrimalRay";
 	Attr.attr("HasPsdObj") = "HasPSDObj";
 	Attr.attr("HasQObj") = "HasQObj";
+	Attr.attr("HasSensitivity") = "HasSensitivity";
 	Attr.attr("IISCols") = "IISCols";
 	Attr.attr("IISIndicators") = "IISIndicators";
 	Attr.attr("IISRows") = "IISRows";
@@ -103,6 +106,7 @@ void bind_copt_constants(nb::module_ &m)
 	Attr.attr("LpObjVal") = "LpObjVal";
 	Attr.attr("LpStatus") = "LpStatus";
 	Attr.attr("MipStatus") = "MipStatus";
+	Attr.attr("MultiObjs") = "MultiObjs";
 	Attr.attr("NLConstrs") = "NLConstrs";
 	Attr.attr("NLElems") = "NLElems";
 	Attr.attr("NodeCnt") = "NodeCnt";
@@ -147,6 +151,8 @@ void bind_copt_constants(nb::module_ &m)
 	Param.attr("IISMethod") = "IISMethod";
 	Param.attr("IntTol") = "IntTol";
 	Param.attr("LazyConstraints") = "LazyConstraints";
+	Param.attr("LinearizeIndicators") = "LinearizeIndicators";
+	Param.attr("LinearizeSos") = "LinearizeSos";
 	Param.attr("LogToConsole") = "LogToConsole";
 	Param.attr("Logging") = "Logging";
 	Param.attr("LpMethod") = "LpMethod";
@@ -154,6 +160,12 @@ void bind_copt_constants(nb::module_ &m)
 	Param.attr("MipStartMode") = "MipStartMode";
 	Param.attr("MipStartNodeLimit") = "MipStartNodeLimit";
 	Param.attr("MipTasks") = "MipTasks";
+	Param.attr("MultiObjAbsTol") = "MultiObjAbsTol";
+	Param.attr("MultiObjParamMode") = "MultiObjParamMode";
+	Param.attr("MultiObjPriority") = "MultiObjPriority";
+	Param.attr("MultiObjRelTol") = "MultiObjRelTol";
+	Param.attr("MultiObjTimeLimit") = "MultiObjTimeLimit";
+	Param.attr("MultiObjWeight") = "MultiObjWeight";
 	Param.attr("NLPIterLimit") = "NLPIterLimit";
 	Param.attr("NLPLinScale") = "NLPLinScale";
 	Param.attr("NLPMuUpdate") = "NLPMuUpdate";
@@ -165,6 +177,7 @@ void bind_copt_constants(nb::module_ &m)
 	Param.attr("Presolve") = "Presolve";
 	Param.attr("RelGap") = "RelGap";
 	Param.attr("ReqFarkasRay") = "ReqFarkasRay";
+	Param.attr("ReqSensitivity") = "ReqSensitivity";
 	Param.attr("RootCutLevel") = "RootCutLevel";
 	Param.attr("RootCutRounds") = "RootCutRounds";
 	Param.attr("RoundingHeurLevel") = "RoundingHeurLevel";
@@ -187,6 +200,7 @@ void bind_copt_constants(nb::module_ &m)
 	Param.attr("TuneTimeLimit") = "TuneTimeLimit";
 
 	nb::module_ Info = COPT.def_submodule("Info");
+	Info.attr("BranchFactor") = "BranchFactor";
 	Info.attr("Dual") = "Dual";
 	Info.attr("DualFarkas") = "DualFarkas";
 	Info.attr("LB") = "LB";
@@ -196,6 +210,12 @@ void bind_copt_constants(nb::module_ &m)
 	Info.attr("RelaxLB") = "RelaxLB";
 	Info.attr("RelaxUB") = "RelaxUB";
 	Info.attr("RelaxValue") = "RelaxValue";
+	Info.attr("SALBLow") = "SALBLow";
+	Info.attr("SALBUp") = "SALBUp";
+	Info.attr("SAObjLow") = "SAObjLow";
+	Info.attr("SAObjUp") = "SAObjUp";
+	Info.attr("SAUBLow") = "SAUBLow";
+	Info.attr("SAUBUp") = "SAUBUp";
 	Info.attr("Slack") = "Slack";
 	Info.attr("UB") = "UB";
 	Info.attr("Value") = "Value";

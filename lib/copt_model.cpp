@@ -1131,6 +1131,28 @@ void COPTModel::add_mip_start(const Vector<VariableIndex> &variables, const Vect
 	check_error(error);
 }
 
+void COPTModel::add_nl_start(const Vector<VariableIndex> &variables, const Vector<double> &values)
+{
+	if (variables.size() != values.size())
+	{
+		throw std::runtime_error("Number of variables and values do not match");
+	}
+	int numnz = variables.size();
+	if (numnz == 0)
+		return;
+
+	std::vector<int> ind_v(numnz);
+	for (int i = 0; i < numnz; i++)
+	{
+		ind_v[i] = _variable_index(variables[i].index);
+	}
+	int *ind = ind_v.data();
+	double *val = (double *)values.data();
+
+	int error = copt::COPT_SetNLPrimalStart(m_model.get(), numnz, ind, val);
+	check_error(error);
+}
+
 double COPTModel::get_normalized_rhs(const ConstraintIndex &constraint)
 {
 	int row = _checked_constraint_index(constraint);
