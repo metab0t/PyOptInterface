@@ -11,7 +11,7 @@ Compared with the linear and quadratic expressions and objectives we have discus
 
 :::{note}
 
-Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via `pip install pyoptinterface[nlp]` and solvers that support nonlinear programming (IPOPT, COPT, Gurobi) as described in the [Getting Started](getting_started.md) section.
+Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via `pip install pyoptinterface[nlp]` and solvers that support nonlinear programming (IPOPT, COPT, Xpress, Gurobi) as described in the [Getting Started](getting_started.md) section.
 :::
 
 ## Construct nonlinear expressions

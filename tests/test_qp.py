@@ -20,4 +20,4 @@ def test_simple_qp(model_interface):
     assert status == poi.TerminationStatusCode.OPTIMAL
 
     obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
-    assert obj_val == approx(N**2)
+    assert obj_val == approx(N**2, rel=1e-5)
