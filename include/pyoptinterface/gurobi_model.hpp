@@ -73,6 +73,7 @@
 	B(GRBloadenv);            \
 	B(GRBfreeenv);            \
 	B(GRBstartenv);           \
+	B(GRBsetlogcallbackfunc); \
 	B(GRBconverttofixed);     \
 	B(GRBcomputeIIS);
 
@@ -104,10 +105,7 @@ class GurobiEnv
 
 	void check_error(int error);
 
-  private:
 	GRBenv *m_env = nullptr;
-
-	friend class GurobiModel;
 };
 
 struct GRBfreemodelT
@@ -136,6 +134,13 @@ struct GurobiCallbackUserdata
 	bool cb_set_solution_called = false;
 	std::vector<double> heuristic_solution;
 	bool cb_requires_submit_solution = false;
+};
+
+using GurobiLoggingCallback = std::function<void(const char *)>;
+
+struct GurobiLoggingCallbackUserdata
+{
+	GurobiLoggingCallback callback;
 };
 
 class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
@@ -292,6 +297,11 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
 
 	// Non-exported functions
 	void check_error(int error);
+
+	// Control logging
+	void set_logging(const GurobiLoggingCallback &callback);
+
+	GurobiLoggingCallbackUserdata m_logging_callback_userdata;
 
 	// Callback
 	void set_callback(const GurobiCallback &callback);

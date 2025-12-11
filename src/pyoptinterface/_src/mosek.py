@@ -308,7 +308,7 @@ def set_silent(model, value: bool):
     if value:
         model.disable_log()
     else:
-        model.enable_log()
+        model.set_logging(lambda msg: print(msg, end=""))
 
 
 model_attribute_set_func_map = {
@@ -364,7 +364,8 @@ class Model(RawModel):
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
         self.last_solve_return_code: Optional[int] = None
-        self.silent = True
+        self.silent = False
+        self.set_logging(lambda msg: print(msg, end=""))
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):

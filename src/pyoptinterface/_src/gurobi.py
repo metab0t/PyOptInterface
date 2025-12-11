@@ -1,5 +1,3 @@
-# try to load DLL of gurobi in${GUROBI_HOME}/bin
-# only on windows
 import os
 import platform
 from pathlib import Path
@@ -549,6 +547,11 @@ class Model(RawModel):
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
+
+        # Replace default logging behavior to use Python print
+        # otherwise it prints directly to stdout/stderr bypassing Python and causing issues in Jupyter notebooks
+        self.set_raw_parameter("LogToConsole", 0)
+        self.set_logging(lambda msg: print(msg, end=""))
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, settable=False):

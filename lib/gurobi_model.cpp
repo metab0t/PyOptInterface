@@ -1404,8 +1404,25 @@ void GurobiEnv::check_error(int error)
 	}
 }
 
+// Logging callback
+static int RealLoggingCallbackFunction(char *msg, void *logdata)
+{
+	auto real_logdata = static_cast<GurobiLoggingCallbackUserdata *>(logdata);
+	auto &callback = real_logdata->callback;
+	callback(msg);
+	return 0;
+}
+
+void GurobiModel::set_logging(const GurobiLoggingCallback &callback)
+{
+	m_logging_callback_userdata.callback = callback;
+	int error = gurobi::GRBsetlogcallbackfunc(m_model.get(), &RealLoggingCallbackFunction,
+	                                          &m_logging_callback_userdata);
+	check_error(error);
+}
+
 // Callback
-int RealGurobiCallbackFunction(GRBmodel *, void *cbdata, int where, void *usrdata)
+static int RealGurobiCallbackFunction(GRBmodel *, void *cbdata, int where, void *usrdata)
 {
 	auto real_userdata = static_cast<GurobiCallbackUserdata *>(usrdata);
 	auto model = static_cast<GurobiModel *>(real_userdata->model);

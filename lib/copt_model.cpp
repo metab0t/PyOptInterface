@@ -1390,8 +1390,24 @@ void COPTEnvConfig::set(const char *param_name, const char *value)
 	check_error(error);
 }
 
+// Logging callback
+static void RealLoggingCallbackFunction(char *msg, void *logdata)
+{
+	auto real_logdata = static_cast<COPTLoggingCallbackUserdata *>(logdata);
+	auto &callback = real_logdata->callback;
+	callback(msg);
+}
+
+void COPTModel::set_logging(const COPTLoggingCallback &callback)
+{
+	m_logging_callback_userdata.callback = callback;
+	int error = copt::COPT_SetLogCallback(m_model.get(), &RealLoggingCallbackFunction,
+	                                      &m_logging_callback_userdata);
+	check_error(error);
+}
+
 // Callback
-int RealCOPTCallbackFunction(copt_prob *prob, void *cbdata, int cbctx, void *userdata)
+static int RealCOPTCallbackFunction(copt_prob *prob, void *cbdata, int cbctx, void *userdata)
 {
 	auto real_userdata = static_cast<COPTCallbackUserdata *>(userdata);
 	auto model = static_cast<COPTModel *>(real_userdata->model);

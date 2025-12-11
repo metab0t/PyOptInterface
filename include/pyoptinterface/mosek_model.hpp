@@ -121,6 +121,13 @@ struct MOSEKfreemodelT
 	};
 };
 
+using MOSEKLoggingCallback = std::function<void(const char *)>;
+
+struct MOSEKLoggingCallbackUserdata
+{
+	MOSEKLoggingCallback callback;
+};
+
 class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
                    public TwosideLinearConstraintMixin<MOSEKModel>,
                    public OnesideQuadraticConstraintMixin<MOSEKModel>,
@@ -206,7 +213,6 @@ class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
 	double getprimalobj();
 	double getdualobj();
 
-	void enable_log();
 	void disable_log();
 
 	// Accessing information of problem
@@ -245,6 +251,11 @@ class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
 	MSKint32t _checked_variable_index(const VariableIndex &variable);
 	MSKint32t _constraint_index(const ConstraintIndex &constraint);
 	MSKint32t _checked_constraint_index(const ConstraintIndex &constraint);
+
+	// Control logging
+	void set_logging(const MOSEKLoggingCallback &callback);
+
+	MOSEKLoggingCallbackUserdata m_logging_callback_userdata;
 
   private:
 	MonotoneIndexer<MSKint32t> m_variable_index;

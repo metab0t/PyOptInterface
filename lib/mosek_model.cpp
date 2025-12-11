@@ -940,17 +940,6 @@ double MOSEKModel::getdualobj()
 	return retval;
 }
 
-static void printstr(void *handle, const char *str)
-{
-	printf("%s", str);
-	fflush(stdout);
-}
-void MOSEKModel::enable_log()
-{
-	auto error = mosek::MSK_linkfunctotaskstream(m_model.get(), MSK_STREAM_LOG, NULL, printstr);
-	check_error(error);
-}
-
 void MOSEKModel::disable_log()
 {
 	auto error = mosek::MSK_linkfunctotaskstream(m_model.get(), MSK_STREAM_LOG, NULL, NULL);
@@ -1400,6 +1389,22 @@ MSKint32t MOSEKModel::_checked_constraint_index(const ConstraintIndex &constrain
 		throw std::runtime_error("Constraint does not exist");
 	}
 	return row;
+}
+
+// Logging callback
+static void RealLoggingCallbackFunction(void *handle, const char *msg)
+{
+	auto real_logdata = static_cast<MOSEKLoggingCallbackUserdata *>(handle);
+	auto &callback = real_logdata->callback;
+	callback(msg);
+}
+
+void MOSEKModel::set_logging(const MOSEKLoggingCallback &callback)
+{
+	m_logging_callback_userdata.callback = callback;
+	auto error = mosek::MSK_linkfunctotaskstream(
+	    m_model.get(), MSK_STREAM_LOG, &m_logging_callback_userdata, &RealLoggingCallbackFunction);
+	check_error(error);
 }
 
 void *MOSEKModel::get_raw_model()

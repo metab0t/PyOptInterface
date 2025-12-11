@@ -2,6 +2,7 @@
 #include <nanobind/stl/tuple.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/function.h>
 
 #include "pyoptinterface/mosek_model.hpp"
 
@@ -135,7 +136,7 @@ NB_MODULE(mosek_model_ext, m)
 		BIND_F(getprimalobj)
 		BIND_F(getdualobj)
 
-	    BIND_F(enable_log)
+		BIND_F(set_logging)
 	    BIND_F(disable_log)
 
 	    BIND_F(set_variable_name)

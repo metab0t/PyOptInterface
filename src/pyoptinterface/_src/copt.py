@@ -384,6 +384,10 @@ class Model(RawModel):
         self.variable_start_values: Dict[VariableIndex, float] = dict()
         self.nl_start_values: Dict[VariableIndex, float] = dict()
 
+        # override logging
+        self.set_raw_parameter("LogToConsole", 0)
+        self.set_logging(print)
+
     def add_variables(self, *args, **kwargs):
         return make_variable_tupledict(self, *args, **kwargs)
 

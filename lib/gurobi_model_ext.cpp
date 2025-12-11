@@ -153,6 +153,8 @@ NB_MODULE(gurobi_model_ext, m)
 		BIND_F(version_string)
 		BIND_F(get_raw_model)
 
+		BIND_F(set_logging)
+
 		BIND_F(set_callback)
 		BIND_F(cb_get_info_int)
 		BIND_F(cb_get_info_double)

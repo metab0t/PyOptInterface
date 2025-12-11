@@ -98,7 +98,8 @@ extern "C"
 	B(COPT_GetColUpperIIS);        \
 	B(COPT_GetRowLowerIIS);        \
 	B(COPT_GetRowUpperIIS);        \
-	B(COPT_GetSOSIIS);
+	B(COPT_GetSOSIIS);             \
+	B(COPT_SetLogCallback);
 
 namespace copt
 {
@@ -168,6 +169,13 @@ struct COPTCallbackUserdata
 	bool cb_set_solution_called = false;
 	std::vector<double> heuristic_solution;
 	bool cb_requires_submit_solution = false;
+};
+
+using COPTLoggingCallback = std::function<void(const char *)>;
+
+struct COPTLoggingCallbackUserdata
+{
+	COPTLoggingCallback callback;
 };
 
 class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
@@ -303,6 +311,11 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
 	int _checked_variable_index(const VariableIndex &variable);
 	int _constraint_index(const ConstraintIndex &constraint);
 	int _checked_constraint_index(const ConstraintIndex &constraint);
+
+	// Control logging
+	void set_logging(const COPTLoggingCallback &callback);
+
+	COPTLoggingCallbackUserdata m_logging_callback_userdata;
 
 	// Callback
 	void set_callback(const COPTCallback &callback, int cbctx);
