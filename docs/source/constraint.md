@@ -197,7 +197,9 @@ $$
 variables=(t,s,r) \in \mathbb{R}^{3} : t \ge -r \exp(\frac{s}{r} - 1), r \le 0
 $$
 
-Currently, only COPT(after 7.1.4), Mosek support exponential cone constraint. It can be added to the model using the `add_exp_cone_constraint` method of the `Model` class.
+Currently, only COPT(after 7.1.4), Mosek support exponential cone constraint natively. 
+Xpress supports exponential cones by mapping them into generic NLP formulas at the API level. 
+It can be added to the model using the `add_exp_cone_constraint` method of the `Model` class.
 
 ```{py:function} model.add_exp_cone_constraint(variables, [name="", dual=False])
 

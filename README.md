@@ -60,6 +60,7 @@ It currently supports the following problem types:
 It currently supports the following optimizers:
 - [COPT](https://shanshu.ai/copt) ( Commercial )
 - [Gurobi](https://www.gurobi.com/) ( Commercial )
+- [Xpress](https://www.fico.com/en/products/fico-xpress-optimization) ( Commercial )
 - [HiGHS](https://github.com/ERGO-Code/HiGHS) ( Open source )
 - [Mosek](https://www.mosek.com/) ( Commercial )
 - [Ipopt](https://github.com/coin-or/Ipopt) ( Open source )

@@ -239,6 +239,31 @@ nanobind_add_module(
 target_link_libraries(ipopt_model_ext PUBLIC ipopt_model)
 install(TARGETS ipopt_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
 
+# XPRESS
+add_library(xpress_model STATIC)
+target_sources(xpress_model PRIVATE
+    include/pyoptinterface/xpress_model.hpp
+    lib/xpress_model.cpp
+)
+target_link_libraries(xpress_model PUBLIC core nlexpr nleval)
+
+nanobind_add_module(
+    xpress_model_ext
+
+    STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
+
+    lib/xpress_model_ext.cpp
+    lib/xpress_model_ext_constants.cpp
+)
+target_link_libraries(xpress_model_ext PUBLIC xpress_model)
+install(TARGETS xpress_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
+if(DEFINED ENV{XPRESSDIR})
+    message(STATUS "Detected Xpress header file: $ENV{XPRESSDIR}/include")
+    target_include_directories(xpress_model PRIVATE $ENV{XPRESSDIR}/include)
+    target_include_directories(xpress_model_ext PRIVATE $ENV{XPRESSDIR}/include)
+endif()
+
 # stub
 nanobind_add_stub(
   core_ext_stub
@@ -308,6 +333,13 @@ nanobind_add_stub(
   INSTALL_TIME
   MODULE pyoptinterface._src.ipopt_model_ext
   OUTPUT ${POI_INSTALL_DIR}/ipopt_model_ext.pyi
+)
+
+nanobind_add_stub(
+  xpress_model_ext_stub 
+  INSTALL_TIME
+  MODULE pyoptinterface._src.xpress_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/xpress_model_ext.pyi
 )
 
 set(ENABLE_TEST_MAIN OFF BOOL "Enable test c++ function with a main.cpp")
