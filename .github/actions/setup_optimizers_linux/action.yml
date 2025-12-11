@@ -49,7 +49,7 @@ runs:
       name: Download X64 Installers
       run: |
         curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/13.0/gurobi13.0.0_linux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/linux64/CardinalOptimizer-7.2.8-lnx64.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/8.0.2/linux64/CardinalOptimizer-8.0.2-lnx64.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinux64x86.tar.bz2
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-x86_64.tar.gz
 
@@ -58,7 +58,7 @@ runs:
       name: Download ARM64 Installers
       run: |
         curl -L -o ~/installers/gurobi.tar.gz https://packages.gurobi.com/13.0/gurobi13.0.0_armlinux64.tar.gz
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/aarch64/CardinalOptimizer-7.2.8-aarch64_lnx.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/8.0.2/aarch64/CardinalOptimizer-8.0.2-aarch64_lnx.tar.gz
         curl -L -o ~/installers/mosek.tar.bz2 https://download.mosek.com/stable/10.2.0/mosektoolslinuxaarch64.tar.bz2
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-aarch64.tar.gz
 
@@ -104,9 +104,9 @@ runs:
         COPT_CLIENT_INI: ${{ inputs.COPT_CLIENT_INI }}
       run: |
         tar xfz ~/installers/copt.tar.gz -C ~/
-        ls ~/copt72
+        ls ~/copt80
         # set environment variables
-        export COPT_HOME="${HOME}/copt72"
+        export COPT_HOME="${HOME}/copt80"
         echo "COPT_HOME=${COPT_HOME}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${COPT_HOME}/bin" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${COPT_HOME}/lib" >> $GITHUB_ENV

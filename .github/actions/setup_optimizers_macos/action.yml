@@ -49,7 +49,7 @@ runs:
       name: Download Universal Installers
       run: |
         curl -L -o ~/installers/gurobi.pkg https://packages.gurobi.com/13.0/gurobi13.0.0_macos_universal2.pkg
-        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/7.2.8/osx64/CardinalOptimizer-7.2.8-universal_mac.tar.gz
+        curl -L -o ~/installers/copt.tar.gz https://pub.shanshu.ai/download/copt/8.0.2/osx64/CardinalOptimizer-8.0.2-universal_mac.tar.gz
 
     - if: ${{ (steps.cache-installers-macos.outputs.cache-hit != 'true') && (inputs.ARCH == 'X64') }}
       shell: bash
@@ -95,9 +95,9 @@ runs:
         COPT_CLIENT_INI: ${{ inputs.COPT_CLIENT_INI }}
       run: |
         tar xfz ~/installers/copt.tar.gz -C ~/
-        ls ~/copt72
+        ls ~/copt80
         # set environment variables
-        export COPT_HOME="${HOME}/copt72"
+        export COPT_HOME="${HOME}/copt80"
         echo "COPT_HOME=${COPT_HOME}" >> $GITHUB_ENV
         echo "PATH=${PATH}:${COPT_HOME}/bin" >> $GITHUB_ENV
         echo "DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${COPT_HOME}/lib" >> $GITHUB_ENV

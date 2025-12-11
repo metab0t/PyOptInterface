@@ -52,7 +52,7 @@ runs:
       name: Download Installers
       run: |
         curl -L -o D:\installers\gurobi.msi https://packages.gurobi.com/13.0/Gurobi-13.0.0-win64.msi
-        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/7.2.8/win64/CardinalOptimizer-7.2.8-win64.zip
+        curl -L -o D:\installers\copt.zip https://pub.shanshu.ai/download/copt/8.0.2/win64/CardinalOptimizer-8.0.2-win64.zip
         curl -L -o D:\installers\mosek.msi https://download.mosek.com/stable/10.2.0/moseksetupwin64x86.msi
         curl -L -o D:\installers\idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-windows-x86_64.tar.gz
 
@@ -91,10 +91,10 @@ runs:
       run: |
         # unzip with 7zip
         7z x D:\installers\copt.zip -oD:\
-        ls D:\copt72
+        ls D:\copt80
         # set environment variables
-        echo "COPT_HOME=D:\copt72" >> $env:GITHUB_ENV
-        echo "PATH=$env:PATH;D:\copt72\bin" >> $env:GITHUB_ENV
+        echo "COPT_HOME=D:\copt80" >> $env:GITHUB_ENV
+        echo "PATH=$env:PATH;D:\copt80\bin" >> $env:GITHUB_ENV
         echo $env:COPT_HOME
 
         # Just use the size-limited license

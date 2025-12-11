@@ -77,15 +77,15 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - macOS(ARM)
     - macOS(Intel)
 *   - Gurobi
-    - `C:\gurobi1101\win64\bin`
-    - `/opt/gurobi1100/linux64/lib`
-    - `/opt/gurobi1100/macos_universal2/lib`
-    - `/opt/gurobi1100/macos_universal2/lib`
+    - `C:\gurobi1300\win64\bin`
+    - `/opt/gurobi1300/linux64/lib`
+    - `/opt/gurobi1300/macos_universal2/lib`
+    - `/opt/gurobi1300/macos_universal2/lib`
 *   - COPT
-    - `C:\Program Files\copt71\bin`
-    - `/opt/copt72/lib`
-    - `/opt/copt72/lib`
-    - `/opt/copt72/lib`
+    - `C:\Program Files\copt80\bin`
+    - `/opt/copt80/lib`
+    - `/opt/copt80/lib`
+    - `/opt/copt80/lib`
 *   - Mosek
     - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin`
     - `/opt/mosek/10.2/tools/platform/linux64x86/bin`
@@ -101,16 +101,16 @@ The typical paths where the dynamic library of optimizers are located are as fol
 
 ### Gurobi
 
-The currently supported version is **11.0.x** and **12.0.0**. Other versions may work but are not tested.
+The currently supported version is **13.0.0**. Other versions may work but are not tested.
 
 For Gurobi, the automatic detection looks for the following things in order:
 1. The environment variable `GUROBI_HOME` set by the installer of Gurobi
 2. The installation of `gurobipy`
-3. `gurobi110.dll`/`libgurobi110.so`/`libgurobi110.dylib` in the system loadable path
+3. `gurobi130.dll`/`libgurobi130.so`/`libgurobi130.dylib` in the system loadable path
 
 ### COPT
 
-The currently supported version is **7.2.x**. Other versions may work but are not tested.
+The currently supported version is **8.0.x**. Other versions may work but are not tested.
 
 For COPT, the automatic detection looks for the following things in order:
 1. The environment variable `COPT_HOME` set by the installer of COPT
@@ -127,7 +127,7 @@ For Mosek, the automatic detection looks for the following things in order:
 
 ### HiGHS
 
-The currently supported version is **1.8.x**. Other versions may work but are not tested.
+The currently supported version is **1.12.x**. Other versions may work but are not tested.
 
 For HiGHS, the automatic detection looks for the following things in order:
 1. The environment variable `HiGHS_HOME` set by the user
