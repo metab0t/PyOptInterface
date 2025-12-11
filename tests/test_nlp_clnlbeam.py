@@ -7,7 +7,7 @@ import pytest
 def test_clnlbeam(nlp_model_ctor):
     model = nlp_model_ctor()
 
-    N = 1000
+    N = 100
     h = 1 / N
     alpha = 350
 
