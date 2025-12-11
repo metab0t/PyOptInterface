@@ -173,18 +173,18 @@ auto operator+(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
 auto operator+(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator+(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator+(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
-auto operator+(const ScalarAffineFunction &a,
-               const ScalarAffineFunction &b) -> ScalarAffineFunction;
+auto operator+(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
+    -> ScalarAffineFunction;
 auto operator+(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 auto operator+(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator+(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
 auto operator+(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
-auto operator+(const ScalarQuadraticFunction &a,
-               const ScalarAffineFunction &b) -> ScalarQuadraticFunction;
-auto operator+(const ScalarAffineFunction &a,
-               const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
-auto operator+(const ScalarQuadraticFunction &a,
-               const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
+auto operator+(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
+    -> ScalarQuadraticFunction;
+auto operator+(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
+    -> ScalarQuadraticFunction;
+auto operator+(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
+    -> ScalarQuadraticFunction;
 
 auto operator-(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
 auto operator-(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction;
@@ -193,18 +193,18 @@ auto operator-(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
 auto operator-(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator-(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarAffineFunction;
 auto operator-(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
-auto operator-(const ScalarAffineFunction &a,
-               const ScalarAffineFunction &b) -> ScalarAffineFunction;
+auto operator-(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
+    -> ScalarAffineFunction;
 auto operator-(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 auto operator-(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 auto operator-(const ScalarQuadraticFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
 auto operator-(const VariableIndex &a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
-auto operator-(const ScalarQuadraticFunction &a,
-               const ScalarAffineFunction &b) -> ScalarQuadraticFunction;
-auto operator-(const ScalarAffineFunction &a,
-               const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
-auto operator-(const ScalarQuadraticFunction &a,
-               const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
+auto operator-(const ScalarQuadraticFunction &a, const ScalarAffineFunction &b)
+    -> ScalarQuadraticFunction;
+auto operator-(const ScalarAffineFunction &a, const ScalarQuadraticFunction &b)
+    -> ScalarQuadraticFunction;
+auto operator-(const ScalarQuadraticFunction &a, const ScalarQuadraticFunction &b)
+    -> ScalarQuadraticFunction;
 
 auto operator*(const VariableIndex &a, CoeffT b) -> ScalarAffineFunction;
 auto operator*(CoeffT a, const VariableIndex &b) -> ScalarAffineFunction;
@@ -213,8 +213,8 @@ auto operator*(const ScalarAffineFunction &a, CoeffT b) -> ScalarAffineFunction;
 auto operator*(CoeffT a, const ScalarAffineFunction &b) -> ScalarAffineFunction;
 auto operator*(const ScalarAffineFunction &a, const VariableIndex &b) -> ScalarQuadraticFunction;
 auto operator*(const VariableIndex &a, const ScalarAffineFunction &b) -> ScalarQuadraticFunction;
-auto operator*(const ScalarAffineFunction &a,
-               const ScalarAffineFunction &b) -> ScalarQuadraticFunction;
+auto operator*(const ScalarAffineFunction &a, const ScalarAffineFunction &b)
+    -> ScalarQuadraticFunction;
 auto operator*(const ScalarQuadraticFunction &a, CoeffT b) -> ScalarQuadraticFunction;
 auto operator*(CoeffT a, const ScalarQuadraticFunction &b) -> ScalarQuadraticFunction;
 

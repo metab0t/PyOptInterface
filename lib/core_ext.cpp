@@ -103,8 +103,7 @@ NB_MODULE(core_ext, m)
 
 		        return expr;
 	        },
-	        nb::arg("coefficients"), nb::arg("variables"),
-	        nb::rv_policy::take_ownership)
+	        nb::arg("coefficients"), nb::arg("variables"), nb::rv_policy::take_ownership)
 	    .def_static(
 	        "from_numpy",
 	        [](CoeffNdarrayT coefficients, IndexNdarrayT variables, CoeffT constant) {

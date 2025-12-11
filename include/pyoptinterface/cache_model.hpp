@@ -54,4 +54,3 @@ struct QuadraticExpressionCache
 		lin_column_ptr.push_back(lin_variables.size());
 	}
 };
-

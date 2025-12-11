@@ -57,26 +57,22 @@ NB_MODULE(highs_model_ext, m)
 	    .def("set_variable_bounds", &HighsModel::set_variable_bounds, nb::arg("variable"),
 	         nb::arg("lb"), nb::arg("ub"))
 
+	    .def("get_value", nb::overload_cast<const VariableIndex &>(&HighsModel::get_variable_value))
 	    .def("get_value",
-	         nb::overload_cast<const VariableIndex &>(&HighsModel::get_variable_value))
-	    .def("get_value", nb::overload_cast<const ScalarAffineFunction &>(
-	                          &HighsModel::get_expression_value))
-	    .def("get_value", nb::overload_cast<const ScalarQuadraticFunction &>(
-	                          &HighsModel::get_expression_value))
+	         nb::overload_cast<const ScalarAffineFunction &>(&HighsModel::get_expression_value))
 	    .def("get_value",
-	         nb::overload_cast<const ExprBuilder &>(&HighsModel::get_expression_value))
+	         nb::overload_cast<const ScalarQuadraticFunction &>(&HighsModel::get_expression_value))
+	    .def("get_value", nb::overload_cast<const ExprBuilder &>(&HighsModel::get_expression_value))
 
 	    .def("pprint", &HighsModel::pprint_variable)
 	    .def("pprint",
-	         nb::overload_cast<const ScalarAffineFunction &, int>(
-	             &HighsModel::pprint_expression),
+	         nb::overload_cast<const ScalarAffineFunction &, int>(&HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
-	             &HighsModel::pprint_expression),
-	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint",
-	         nb::overload_cast<const ExprBuilder &, int>(&HighsModel::pprint_expression),
+	    .def(
+	        "pprint",
+	        nb::overload_cast<const ScalarQuadraticFunction &, int>(&HighsModel::pprint_expression),
+	        nb::arg("expr"), nb::arg("precision") = 4)
+	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&HighsModel::pprint_expression),
 	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    .def("_add_linear_constraint",
@@ -107,10 +103,9 @@ NB_MODULE(highs_model_ext, m)
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
 	             &HighsModel::set_objective),
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
-	    .def(
-	        "set_objective",
-	        nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&HighsModel::set_objective),
-	        nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
+	    .def("set_objective",
+	         nb::overload_cast<const ExprBuilder &, ObjectiveSense>(&HighsModel::set_objective),
+	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("set_objective",
 	         nb::overload_cast<const VariableIndex &, ObjectiveSense>(
 	             &HighsModel::set_objective_as_variable),

@@ -1,0 +1,16 @@
+repos:
+  # C++ 格式化 - clang-format
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v21.1.7
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
+        files: \.(cpp|hpp|c|h|cc|cxx|hxx)$
+        exclude: ^thirdparty/
+
+  # Python 格式化 - black
+  - repo: https://github.com/psf/black
+    rev: 25.12.0
+    hooks:
+      - id: black
+        language_version: python3

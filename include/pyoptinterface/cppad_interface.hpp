@@ -35,7 +35,6 @@ ADFunDouble sparse_hessian(const ADFunDouble &f, const sparsity_pattern_t &patte
 ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph);
 ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph);
 
-
 struct CppADAutodiffGraph
 {
 	CppAD::cpp_graph f_graph, jacobian_graph, hessian_graph;
