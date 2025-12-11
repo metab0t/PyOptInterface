@@ -352,8 +352,10 @@ Solving MIP model with:
    42 rows
    64 cols (64 binary, 0 integer, 0 implied int., 0 continuous, 0 domain fixed)
    270 nonzeros
-
-Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&gt; Heuristic;
+Termination status: TerminationStatusCode.OPTIMAL
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&gt; Heuristic;
      I =&gt; Shifting; J =&gt; Feasibility jump; L =&gt; Sub-MIP; P =&gt; Empty MIP; R =&gt; Randomized rounding;
      S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded; X =&gt; User solution; Y =&gt; HiGHS solution;
      Z =&gt; ZI Round; l =&gt; Trivial lower; p =&gt; Trivial point; u =&gt; Trivial upper; z =&gt; Trivial zero
@@ -362,7 +364,6 @@ Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&
 Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
 
  J       0       0         0 100.00%   -inf            0                  Large        0      0      0         0     0.0s
-Termination status: TerminationStatusCode.OPTIMAL
          1       0         1 100.00%   0               0                  0.00%        0      0      0         0     0.0s
 
 Solving report
@@ -376,7 +377,7 @@ Solving report
                     0 (bound viol.)
                     0 (int. viol.)
                     0 (row viol.)
-  Timing            0.02
+  Timing            0.01
   Max sub-MIP depth 0
   Nodes             1
   Repair LPs        0
