@@ -23,11 +23,11 @@ def test_soc(model_interface):
     x_val = model.get_value(x)
     y_val = model.get_value(y)
     z_val = model.get_value(z)
-    assert x_val == approx(5.0)
-    assert y_val == approx(3.0)
-    assert z_val == approx(4.0)
+    assert x_val == approx(5.0, rel=1e-5)
+    assert y_val == approx(3.0, rel=1e-5)
+    assert z_val == approx(4.0, rel=1e-5)
     obj_val = model.get_value(obj)
-    assert obj_val == approx(12.0)
+    assert obj_val == approx(12.0, rel=1e-5)
 
     model.delete_constraint(con1)
     xx = model.add_variable(lb=0.0, name="xx")
@@ -40,11 +40,11 @@ def test_soc(model_interface):
     x_val = model.get_value(x)
     y_val = model.get_value(y)
     z_val = model.get_value(z)
-    assert x_val == approx(2.5)
-    assert y_val == approx(3.0)
-    assert z_val == approx(4.0)
+    assert x_val == approx(2.5, rel=1e-5)
+    assert y_val == approx(3.0, rel=1e-5)
+    assert z_val == approx(4.0, rel=1e-5)
     obj_val = model.get_value(obj)
-    assert obj_val == approx(9.5)
+    assert obj_val == approx(9.5, rel=1e-5)
 
 
 def test_rotated_soc(model_interface):

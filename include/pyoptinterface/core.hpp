@@ -229,7 +229,7 @@ auto operator-(const ScalarQuadraticFunction &a) -> ScalarQuadraticFunction;
 auto operator-(const ExprBuilder &a) -> ExprBuilder;
 
 // Operator overloading for	ExprBuilder
-// Sadly, they are inefficient than the +=£¬-=,*=,/= functions but they are important for a
+// Sadly, they are inefficient than the +=,-=,*=,/= functions but they are important for a
 // user-friendly interface
 // The functions are like ScalarQuadraticFunction but returns a ExprBuilder
 auto operator+(const ExprBuilder &a, CoeffT b) -> ExprBuilder;
@@ -273,7 +273,8 @@ enum class ConstraintType
 	Gurobi_General,
 	COPT_ExpCone,
 	COPT_NL,
-	IPOPT_NL
+	IPOPT_NL,
+    Xpress_Nlp
 };
 
 enum class SOSType

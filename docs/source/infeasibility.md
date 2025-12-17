@@ -11,7 +11,7 @@ The optimization model is not ways feasible, and the optimizer may tell us some 
 - Find the IIS (Irreducible Infeasible Set) to identify the minimal set of constraints that cause the infeasibility.
 - Relax the constraints and solve a weaker problem to find out which constraints are violated and how much.
 
-PyOptInterface currently supports the first method to find the IIS (only with Gurobi and COPT). The following code snippet shows how to find the IIS of an infeasible model:
+PyOptInterface currently supports the first method to find the IIS (only with Gurobi, Xpress, and COPT). The following code snippet shows how to find the IIS of an infeasible model:
 
 ```{code-cell}
 import pyoptinterface as poi
