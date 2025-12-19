@@ -59,7 +59,7 @@ NB_MODULE(xpress_model_ext, m)
 
 	    // Variables
 	    .def("add_variable", &Model::add_variable, "domain"_a = VariableDomain::Continuous,
-	         "lb"_a = XPRS_MINUSINFINITY, "ub"_a = XPRS_PLUSINFINITY, "name"_a = "")
+	         "lb"_a = POI_XPRS_MINUSINFINITY, "ub"_a = POI_XPRS_PLUSINFINITY, "name"_a = "")
 	    .def("delete_variable", &Model::delete_variable, "variable"_a)
 	    .def("delete_variables", &Model::delete_variables, "variables"_a)
 	    .def("set_objective_coefficient", &Model::set_objective_coefficient, "variable"_a,

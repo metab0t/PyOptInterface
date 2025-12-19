@@ -63,8 +63,7 @@ bool load_library(const std::string &path)
 		int build = {};
 		XPRSgetversionnumbers(&major, &minor, &build);
 		// Use tuple comparison operator
-		if (std::make_tuple(major, minor, build) <
-		    std::make_tuple(XPRS_VER_MAJOR, XPRS_VER_MINOR, XPRS_VER_BUILD))
+		if (major < XPRS_VER_MAJOR)
 		{
 			fmt::print(
 			    stderr,
@@ -81,7 +80,7 @@ static void check_license(int error)
 		return;
 	}
 
-	char buffer[XPRS_MAXMESSAGELENGTH];
+	char buffer[POI_XPRS_MAXMESSAGELENGTH];
 	if (XPRSgetlicerrmsg(buffer, sizeof buffer) != 0)
 	{
 		throw std::runtime_error("Error while getting the Xpress license error message");
@@ -196,9 +195,9 @@ static int poi_to_xprs_obj_sense(ObjectiveSense sense)
 	switch (sense)
 	{
 	case ObjectiveSense::Minimize:
-		return XPRS_OBJ_MINIMIZE;
+		return POI_XPRS_OBJ_MINIMIZE;
 	case ObjectiveSense::Maximize:
-		return XPRS_OBJ_MAXIMIZE;
+		return POI_XPRS_OBJ_MAXIMIZE;
 	default:
 		throw std::runtime_error("Unknown objective function sense");
 	}
@@ -292,7 +291,7 @@ void Model::_check(int error)
 		return;
 	}
 
-	char error_buffer[XPRS_MAXMESSAGELENGTH];
+	char error_buffer[POI_XPRS_MAXMESSAGELENGTH];
 	if (XPRSgetlasterror(m_model.get(), error_buffer) != 0)
 	{
 		throw std::runtime_error("Error while getting Xpress message error");
@@ -324,17 +323,17 @@ Model::Model(const Env &env)
 	// adjust some controls:
 
 	// Verbose by default, the user can silence if needed
-	set_raw_control_int_by_id(XPRS_OUTPUTLOG, 1);
+	set_raw_control_int_by_id(POI_XPRS_OUTPUTLOG, 1);
 
 	// Register a message callback (can be overridden)
 	_check(XPRSaddcbmessage(m_model.get(), &default_print, nullptr, 0));
 	is_default_message_cb_set = true;
 
 	// We do not support concurrent CBs invocation since each callback have to acquire Python GIL
-	_check(XPRSsetintcontrol64(m_model.get(), XPRS_MUTEXCALLBACKS, 1));
+	_check(XPRSsetintcontrol64(m_model.get(), POI_XPRS_MUTEXCALLBACKS, 1));
 
 	// Use global solver if the model contains non linear formulas
-	set_raw_control_int_by_id(XPRS_NLPSOLVER, XPRS_NLPSOLVER_GLOBAL);
+	set_raw_control_int_by_id(POI_XPRS_NLPSOLVER, POI_XPRS_NLPSOLVER_GLOBAL);
 }
 
 void Model::init(const Env &env)
@@ -403,7 +402,7 @@ void Model::_clear_caches()
 
 double Model::get_infinity()
 {
-	return XPRS_PLUSINFINITY;
+	return POI_XPRS_PLUSINFINITY;
 }
 
 void Model::write(const std::string &filename)
@@ -462,7 +461,7 @@ void Model::write(const std::string &filename)
 
 std::string Model::get_problem_name()
 {
-	int size = get_raw_attribute_int_by_id(XPRS_MAXPROBNAMELENGTH) + 1;
+	int size = get_raw_attribute_int_by_id(POI_XPRS_MAXPROBNAMELENGTH) + 1;
 	std::string probname;
 	probname.resize(size);
 	_check(XPRSgetprobname(m_model.get(), probname.data()));
@@ -486,9 +485,9 @@ VariableIndex Model::add_variable(VariableDomain domain, double lb, double ub, c
 	VariableIndex variable(index);
 
 	double zero[] = {0.0};
-	int colidx = get_raw_attribute_int_by_id(XPRS_COLS);
+	int colidx = get_raw_attribute_int_by_id(POI_XPRS_COLS);
 	_check(XPRSaddcols64(m_model.get(), 1, 0, zero, nullptr, nullptr, nullptr, &lb, &ub));
-	_set_entity_name(XPRS_NAMES_COLUMN, colidx, name);
+	_set_entity_name(POI_XPRS_NAMES_COLUMN, colidx, name);
 	char vtype = poi_to_xprs_var_type(domain);
 	if (domain != VariableDomain::Continuous)
 	{
@@ -558,43 +557,31 @@ std::string Model::pprint_variable(VariableIndex variable)
 
 std::string Model::_get_entity_name(int etype, int eidx)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::MAIN);
+    _check_expected_mode(XPRESS_MODEL_MODE::MAIN);
 	_ensure_postsolved();
 
 	int req_size = {};
 	_check(XPRSgetnamelist(m_model.get(), etype, nullptr, 0, &req_size, eidx, eidx));
-
-	// Small string opt for temporary string
-	char buffer[64];
-	char *value = buffer;
-	if (req_size > sizeof buffer)
+	std::string value = {};
+	value.resize(req_size);
+	_check(XPRSgetnamelist(m_model.get(), etype, value.data(), req_size, &req_size, eidx, eidx));
+	while (value.back() == '\0')
 	{
-		value = (char *)malloc(req_size);
+		value.pop_back();
 	}
-	Defer value_cleanup = [&] {
-		if (req_size > sizeof buffer)
-		{
-			free(value);
-		}
-	};
-
-	_check(XPRSgetnamelist(m_model.get(), etype, value, req_size, &req_size, eidx, eidx));
-
-	assert(value[req_size - 1] == '\0');
-	std::string res(value);
-	return res;
+	return value;
 }
 
 std::string Model::get_variable_name(VariableIndex variable)
 {
 	int colidx = _checked_variable_index(variable);
-	return _get_entity_name(XPRS_NAMES_COLUMN, colidx);
+	return _get_entity_name(POI_XPRS_NAMES_COLUMN, colidx);
 }
 
 std::string Model::get_constraint_name(ConstraintIndex constraint)
 {
 	int rowidx = _checked_constraint_index(constraint);
-	return _get_entity_name(XPRS_NAMES_ROW, rowidx);
+	return _get_entity_name(POI_XPRS_NAMES_ROW, rowidx);
 }
 
 void Model::set_variable_bounds(VariableIndex variable, double lb, double ub)
@@ -678,7 +665,7 @@ void Model::set_variable_name(VariableIndex variable, const char *name)
 	_ensure_postsolved();
 
 	int column = _checked_variable_index(variable);
-	_set_entity_name(XPRS_NAMES_COLUMN, column, name);
+	_set_entity_name(POI_XPRS_NAMES_COLUMN, column, name);
 }
 
 void Model::set_constraint_name(ConstraintIndex constraint, const char *name)
@@ -687,7 +674,7 @@ void Model::set_constraint_name(ConstraintIndex constraint, const char *name)
 	_ensure_postsolved();
 
 	int row = _checked_constraint_index(constraint);
-	_set_entity_name(XPRS_NAMES_ROW, row, name);
+	_set_entity_name(POI_XPRS_NAMES_ROW, row, name);
 }
 
 ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &function,
@@ -700,16 +687,16 @@ ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &functio
 
 	auto [lb, ub] = interval;
 	double constant = static_cast<double>(function.constant.value_or(CoeffT{}));
-	lb = std::clamp(lb - constant, XPRS_MINUSINFINITY, XPRS_PLUSINFINITY);
-	ub = std::clamp(ub - constant, XPRS_MINUSINFINITY, XPRS_PLUSINFINITY);
+	lb = std::clamp(lb - constant, POI_XPRS_MINUSINFINITY, POI_XPRS_PLUSINFINITY);
+	ub = std::clamp(ub - constant, POI_XPRS_MINUSINFINITY, POI_XPRS_PLUSINFINITY);
 	if (lb > ub - 1e-10)
 	{
 		throw std::runtime_error("LB > UB in the provieded interval.");
 	}
 
 	// Handle infinity bounds
-	bool lb_inf = lb <= XPRS_MINUSINFINITY;
-	bool ub_inf = ub >= XPRS_PLUSINFINITY;
+	bool lb_inf = lb <= POI_XPRS_MINUSINFINITY;
+	bool ub_inf = ub >= POI_XPRS_PLUSINFINITY;
 
 	// Determine constraint type and parameters
 	char g_sense = {};
@@ -747,7 +734,7 @@ ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &functio
 
 	IndexT index = m_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
-	int rowidx = get_raw_attribute_int_by_id(XPRS_ROWS);
+	int rowidx = get_raw_attribute_int_by_id(POI_XPRS_ROWS);
 
 	AffineFunctionPtrForm<int, int, double> ptr_form;
 	ptr_form.make(this, function);
@@ -757,7 +744,7 @@ ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &functio
 	const double *cval = ptr_form.value;
 
 	_check(XPRSaddrows64(m_model.get(), 1, numnz, &g_sense, &g_rhs, g_range, beg, cind, cval));
-	_set_entity_name(XPRS_NAMES_ROW, rowidx, name);
+	_set_entity_name(POI_XPRS_NAMES_ROW, rowidx, name);
 
 	return constraint_index;
 }
@@ -771,19 +758,19 @@ ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &functio
 
 	IndexT index = m_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
-	int rowidx = get_raw_attribute_int_by_id(XPRS_ROWS);
+	int rowidx = get_raw_attribute_int_by_id(POI_XPRS_ROWS);
 
 	AffineFunctionPtrForm<int, int, double> ptr_form;
 	ptr_form.make(this, function);
 	int numnz = ptr_form.numnz;
 
 	double g_rhs = static_cast<double>(rhs - function.constant.value_or(CoeffT{}));
-	g_rhs = std::clamp(g_rhs, XPRS_MINUSINFINITY, XPRS_PLUSINFINITY);
+	g_rhs = std::clamp(g_rhs, POI_XPRS_MINUSINFINITY, POI_XPRS_PLUSINFINITY);
 
 	// Map expr >= -inf and expr <= +inf to free rows
 	char g_sense = poi_to_xprs_cons_sense(sense);
-	if ((g_sense == 'G' && g_rhs <= XPRS_MINUSINFINITY) ||
-	    (g_sense == 'L' && g_rhs >= XPRS_PLUSINFINITY))
+	if ((g_sense == 'G' && g_rhs <= POI_XPRS_MINUSINFINITY) ||
+	    (g_sense == 'L' && g_rhs >= POI_XPRS_PLUSINFINITY))
 	{
 		g_sense = 'N'; // Free row
 		g_rhs = 0.0;
@@ -793,7 +780,7 @@ ConstraintIndex Model::add_linear_constraint(const ScalarAffineFunction &functio
 	const int *cind = ptr_form.index;
 	const double *cval = ptr_form.value;
 	_check(XPRSaddrows64(m_model.get(), 1, numnz, &g_sense, &g_rhs, nullptr, beg, cind, cval));
-	_set_entity_name(XPRS_NAMES_ROW, rowidx, name);
+	_set_entity_name(POI_XPRS_NAMES_ROW, rowidx, name);
 
 	return constraint_index;
 }
@@ -857,7 +844,7 @@ ConstraintIndex Model::add_quadratic_constraint(const ScalarQuadraticFunction &f
 	_ensure_postsolved();
 	_clear_caches();
 
-	int rowidx = get_raw_attribute_int_by_id(XPRS_ROWS);
+	int rowidx = get_raw_attribute_int_by_id(POI_XPRS_ROWS);
 
 	const auto &affine_part = function.affine_part.value_or(ScalarAffineFunction{});
 	ConstraintIndex constraint_index = add_linear_constraint(affine_part, sense, rhs, name);
@@ -945,17 +932,17 @@ ConstraintIndex Model::add_exp_cone_constraint(const Vector<VariableIndex> &vari
 	if (dual)
 	{
 		// linear_term + x_2 * exp(x_1 / x_2 - 1) >= 0
-		auto [types, values] = make_type_value_arrays( //
-		    Tvp{XPRS_TOK_COL, var2_idx},               // x_2
-		    Tvp{XPRS_TOK_RB, {}},                      // )
-		    Tvp{XPRS_TOK_COL, var1_idx},               // x_1
-		    Tvp{XPRS_TOK_COL, var2_idx},               // x_2
-		    Tvp{XPRS_TOK_OP, XPRS_OP_DIVIDE},          // /
-		    Tvp{XPRS_TOK_CON, 1.0},                    // 1.0
-		    Tvp{XPRS_TOK_OP, XPRS_OP_MINUS},           // -
-		    Tvp{XPRS_TOK_IFUN, XPRS_IFUN_EXP},         // exp(
-		    Tvp{XPRS_TOK_OP, XPRS_OP_MULTIPLY},        // *
-		    Tvp{XPRS_TOK_EOF, {}});                    // EOF
+		auto [types, values] = make_type_value_arrays(  //
+		    Tvp{POI_XPRS_TOK_COL, var2_idx},            // x_2
+		    Tvp{POI_XPRS_TOK_RB, {}},                   // )
+		    Tvp{POI_XPRS_TOK_COL, var1_idx},            // x_1
+		    Tvp{POI_XPRS_TOK_COL, var2_idx},            // x_2
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_DIVIDE},   // /
+		    Tvp{POI_XPRS_TOK_CON, 1.0},                 // 1.0
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_MINUS},    // -
+		    Tvp{POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_EXP},  // exp(
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_MULTIPLY}, // *
+		    Tvp{POI_XPRS_TOK_EOF, {}});                 // EOF
 
 		int begs[] = {0, std::ssize(types)};
 		_check(XPRSnlpaddformulas(m_model.get(), 1, &rowidx, begs, 1, types, values));
@@ -963,16 +950,16 @@ ConstraintIndex Model::add_exp_cone_constraint(const Vector<VariableIndex> &vari
 	else
 	{
 		// linear_term - x_1 * exp(x_2 / x_1) >= 0
-		auto [types, values] = make_type_value_arrays( //
-		    Tvp{XPRS_TOK_COL, var1_idx},               // x_1
-		    Tvp{XPRS_TOK_RB, {}},                      // )
-		    Tvp{XPRS_TOK_COL, var2_idx},               // x_2
-		    Tvp{XPRS_TOK_COL, var1_idx},               // x_1
-		    Tvp{XPRS_TOK_OP, XPRS_OP_DIVIDE},          // /
-		    Tvp{XPRS_TOK_IFUN, XPRS_IFUN_EXP},         // exp(
-		    Tvp{XPRS_TOK_OP, XPRS_OP_MULTIPLY},        // *
-		    Tvp{XPRS_TOK_OP, XPRS_OP_UMINUS},          // -
-		    Tvp{XPRS_TOK_EOF, {}});                    // EOF
+		auto [types, values] = make_type_value_arrays(  //
+		    Tvp{POI_XPRS_TOK_COL, var1_idx},            // x_1
+		    Tvp{POI_XPRS_TOK_RB, {}},                   // )
+		    Tvp{POI_XPRS_TOK_COL, var2_idx},            // x_2
+		    Tvp{POI_XPRS_TOK_COL, var1_idx},            // x_1
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_DIVIDE},   // /
+		    Tvp{POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_EXP},  // exp(
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_MULTIPLY}, // *
+		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_UMINUS},   // -
+		    Tvp{POI_XPRS_TOK_EOF, {}});                 // EOF
 
 		int begs[] = {0, std::ssize(types)};
 		_check(XPRSnlpaddformulas(m_model.get(), 1, &rowidx, begs, 1, types, values));
@@ -1040,29 +1027,29 @@ Tvp to_xprs_opcode(UnaryOperator opcode_enum)
 	switch (opcode_enum)
 	{
 	case UnaryOperator::Neg:
-		return {XPRS_TOK_OP, XPRS_OP_UMINUS};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_UMINUS};
 	case UnaryOperator::Sin:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_SIN};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_SIN};
 	case UnaryOperator::Cos:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_COS};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_COS};
 	case UnaryOperator::Tan:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_TAN};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_TAN};
 	case UnaryOperator::Asin:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_ARCSIN};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_ARCSIN};
 	case UnaryOperator::Acos:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_ARCCOS};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_ARCCOS};
 	case UnaryOperator::Atan:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_ARCTAN};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_ARCTAN};
 	case UnaryOperator::Abs:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_ABS};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_ABS};
 	case UnaryOperator::Sqrt:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_SQRT};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_SQRT};
 	case UnaryOperator::Exp:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_EXP};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_EXP};
 	case UnaryOperator::Log:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_LOG};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_LN};
 	case UnaryOperator::Log10:
-		return {XPRS_TOK_IFUN, XPRS_IFUN_LOG10};
+		return {POI_XPRS_TOK_IFUN, POI_XPRS_IFUN_LOG10};
 	default: {
 		auto opname = unary_operator_to_string(opcode_enum);
 		auto msg = fmt::format("Unknown unary operator for Xpress: {}", opname);
@@ -1076,15 +1063,15 @@ Tvp to_xprs_opcode(BinaryOperator opcode_enum)
 	switch (opcode_enum)
 	{
 	case BinaryOperator::Sub:
-		return {XPRS_TOK_OP, XPRS_OP_MINUS};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_MINUS};
 	case BinaryOperator::Div:
-		return {XPRS_TOK_OP, XPRS_OP_DIVIDE};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_DIVIDE};
 	case BinaryOperator::Pow:
-		return {XPRS_TOK_OP, XPRS_OP_EXPONENT};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_EXPONENT};
 	case BinaryOperator::Add2:
-		return {XPRS_TOK_OP, XPRS_OP_PLUS};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_PLUS};
 	case BinaryOperator::Mul2:
-		return {XPRS_TOK_OP, XPRS_OP_MULTIPLY};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_MULTIPLY};
 	default:
 		auto opname = binary_operator_to_string(opcode_enum);
 		auto msg = fmt::format("Unknown unary operator for Xpress: {}", opname);
@@ -1104,9 +1091,9 @@ Tvp to_xprs_opcode(NaryOperator opcode_enum)
 	switch (opcode_enum)
 	{
 	case NaryOperator::Add:
-		return {XPRS_TOK_OP, XPRS_OP_PLUS};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_PLUS};
 	case NaryOperator::Mul:
-		return {XPRS_TOK_OP, XPRS_OP_MULTIPLY};
+		return {POI_XPRS_TOK_OP, POI_XPRS_OP_MULTIPLY};
 	default:
 		auto opname = nary_operator_to_string(opcode_enum);
 		auto msg = fmt::format("Unknown nary operator for Xpress: {}", opname);
@@ -1138,9 +1125,9 @@ Tvp Model::_decode_expr(const ExpressionGraph &graph, const ExpressionHandle &ex
 	switch (array_type)
 	{
 	case ArrayType::Constant:
-		return {XPRS_TOK_CON, static_cast<double>(graph.m_constants[index])};
+		return {POI_XPRS_TOK_CON, static_cast<double>(graph.m_constants[index])};
 	case ArrayType::Variable:
-		return {XPRS_TOK_COL,
+		return {POI_XPRS_TOK_COL,
 		        static_cast<double>(_checked_variable_index(graph.m_variables[index]))};
 	case ArrayType::Parameter:
 		break;
@@ -1204,9 +1191,9 @@ std::pair<std::vector<int>, std::vector<double>> Model::_decode_graph_postfix_or
 		}
 
 		// Xpress requires a parenthesis to start an internal or user function
-		if (type == XPRS_TOK_IFUN || type == XPRS_TOK_FUN)
+		if (type == POI_XPRS_TOK_IFUN || type == POI_XPRS_TOK_FUN)
 		{
-			types.push_back(XPRS_TOK_RB);
+			types.push_back(POI_XPRS_TOK_RB);
 			values.push_back({});
 		}
 
@@ -1236,7 +1223,7 @@ std::pair<std::vector<int>, std::vector<double>> Model::_decode_graph_postfix_or
 		visit_children = false;
 	}
 
-	types.push_back(XPRS_TOK_EOF);
+	types.push_back(POI_XPRS_TOK_EOF);
 	values.push_back({});
 	return {std::move(types), std::move(values)};
 }
@@ -1250,7 +1237,7 @@ ConstraintIndex Model::add_single_nl_constraint(ExpressionGraph &graph,
 	_ensure_postsolved();
 	_clear_caches();
 
-	int rowidx = get_raw_attribute_int_by_id(XPRS_ROWS);
+	int rowidx = get_raw_attribute_int_by_id(POI_XPRS_ROWS);
 	ConstraintIndex constraint = add_linear_constraint(ScalarAffineFunction{}, interval, name);
 	constraint.type = ConstraintType::Xpress_Nlp;
 
@@ -1522,8 +1509,8 @@ int Model::_checked_variable_index(VariableIndex variable)
 
 bool Model::_is_mip()
 {
-	return get_raw_attribute_int_by_id(XPRS_MIPENTS) > 0 ||
-	       get_raw_attribute_int_by_id(XPRS_SETS) > 0;
+	return get_raw_attribute_int_by_id(POI_XPRS_MIPENTS) > 0 ||
+	       get_raw_attribute_int_by_id(POI_XPRS_SETS) > 0;
 }
 
 void Model::optimize()
@@ -1533,17 +1520,17 @@ void Model::optimize()
 
 	int stop_status = 0;
 	_check(XPRSoptimize(m_model.get(), "", &stop_status, nullptr));
-	m_need_postsolve = (stop_status == XPRS_SOLVESTATUS_STOPPED);
+	m_need_postsolve = (stop_status == POI_XPRS_SOLVESTATUS_STOPPED);
 }
 
 double Model::get_variable_value(VariableIndex variable)
 {
 	_check_expected_mode(XPRESS_MODEL_MODE::MAIN);
 	int colidx = _checked_variable_index(variable);
-	int status = XPRS_SOLAVAILABLE_NOTFOUND;
+	int status = POI_XPRS_SOLAVAILABLE_NOTFOUND;
 	double value = {};
 	_check(XPRSgetsolution(m_model.get(), &status, &value, colidx, colidx));
-	if (status == XPRS_SOLAVAILABLE_NOTFOUND)
+	if (status == POI_XPRS_SOLAVAILABLE_NOTFOUND)
 	{
 		throw std::runtime_error("No solution found");
 	}
@@ -1554,10 +1541,10 @@ double Model::get_variable_rc(VariableIndex variable)
 {
 	_check_expected_mode(XPRESS_MODEL_MODE::MAIN);
 	int colidx = _checked_variable_index(variable);
-	int status = XPRS_SOLAVAILABLE_NOTFOUND;
+	int status = POI_XPRS_SOLAVAILABLE_NOTFOUND;
 	double value = {};
 	_check(XPRSgetredcosts(m_model.get(), &status, &value, colidx, colidx));
-	if (status == XPRS_SOLAVAILABLE_NOTFOUND)
+	if (status == POI_XPRS_SOLAVAILABLE_NOTFOUND)
 	{
 		throw std::runtime_error("No solution found");
 	}
@@ -1577,7 +1564,7 @@ double Model::get_variable_primal_ray(VariableIndex variable)
 		{
 			throw std::runtime_error("Primal ray not available");
 		}
-		m_primal_ray.resize(get_raw_attribute_int_by_id(XPRS_COLS));
+		m_primal_ray.resize(get_raw_attribute_int_by_id(POI_XPRS_COLS));
 		_check(XPRSgetprimalray(m_model.get(), m_primal_ray.data(), &has_ray));
 		assert(has_ray != 0);
 	}
@@ -1605,23 +1592,24 @@ int Model::_get_basis_stat(int entity_idx, bool is_row)
 
 bool Model::is_variable_basic(VariableIndex variable)
 {
-	return _get_basis_stat(_checked_variable_index(variable), false) == XPRS_BASISSTATUS_BASIC;
+	return _get_basis_stat(_checked_variable_index(variable), false) == POI_XPRS_BASISSTATUS_BASIC;
 }
 
 bool Model::is_variable_nonbasic_lb(VariableIndex variable)
 {
 	return _get_basis_stat(_checked_variable_index(variable), false) ==
-	       XPRS_BASISSTATUS_NONBASIC_LOWER;
+	       POI_XPRS_BASISSTATUS_NONBASIC_LOWER;
 }
 
 bool Model::is_variable_nonbasic_ub(VariableIndex variable)
 {
 	return _get_basis_stat(_checked_variable_index(variable), false) ==
-	       XPRS_BASISSTATUS_NONBASIC_UPPER;
+	       POI_XPRS_BASISSTATUS_NONBASIC_UPPER;
 }
 bool Model::is_variable_superbasic(VariableIndex variable)
 {
-	return _get_basis_stat(_checked_variable_index(variable), false) == XPRS_BASISSTATUS_SUPERBASIC;
+	return _get_basis_stat(_checked_variable_index(variable), false) ==
+	       POI_XPRS_BASISSTATUS_SUPERBASIC;
 }
 
 double Model::get_variable_lowerbound(VariableIndex variable)
@@ -1733,10 +1721,10 @@ double Model::get_constraint_slack(ConstraintIndex constraint)
 	_ensure_postsolved();
 
 	int rowidx = _checked_constraint_index(constraint);
-	int status = XPRS_SOLAVAILABLE_NOTFOUND;
+	int status = POI_XPRS_SOLAVAILABLE_NOTFOUND;
 	double value = {};
 	_check(XPRSgetslacks(m_model.get(), &status, &value, rowidx, rowidx));
-	if (status == XPRS_SOLAVAILABLE_NOTFOUND)
+	if (status == POI_XPRS_SOLAVAILABLE_NOTFOUND)
 	{
 		throw std::runtime_error("No solution found");
 	}
@@ -1749,10 +1737,10 @@ double Model::get_constraint_dual(ConstraintIndex constraint)
 	_ensure_postsolved();
 
 	int rowidx = _checked_constraint_index(constraint);
-	int status = XPRS_SOLAVAILABLE_NOTFOUND;
+	int status = POI_XPRS_SOLAVAILABLE_NOTFOUND;
 	double value = {};
 	_check(XPRSgetduals(m_model.get(), &status, &value, rowidx, rowidx));
-	if (status == XPRS_SOLAVAILABLE_NOTFOUND)
+	if (status == POI_XPRS_SOLAVAILABLE_NOTFOUND)
 	{
 		throw std::runtime_error("No solution found");
 	}
@@ -1773,7 +1761,7 @@ double Model::get_constraint_dual_ray(ConstraintIndex constraint)
 		{
 			throw std::runtime_error("Dual ray not available");
 		}
-		m_dual_ray.resize(get_raw_attribute_int_by_id(XPRS_ROWS));
+		m_dual_ray.resize(get_raw_attribute_int_by_id(POI_XPRS_ROWS));
 		_check(XPRSgetdualray(m_model.get(), m_dual_ray.data(), &has_ray));
 		assert(has_ray != 0);
 	}
@@ -1784,25 +1772,26 @@ double Model::get_constraint_dual_ray(ConstraintIndex constraint)
 
 bool Model::is_constraint_basic(ConstraintIndex constraint)
 {
-	return _get_basis_stat(_checked_constraint_index(constraint), true) == XPRS_BASISSTATUS_BASIC;
+	return _get_basis_stat(_checked_constraint_index(constraint), true) ==
+	       POI_XPRS_BASISSTATUS_BASIC;
 }
 
 bool Model::is_constraint_nonbasic_lb(ConstraintIndex constraint)
 {
 	return _get_basis_stat(_checked_constraint_index(constraint), true) ==
-	       XPRS_BASISSTATUS_NONBASIC_LOWER;
+	       POI_XPRS_BASISSTATUS_NONBASIC_LOWER;
 }
 
 bool Model::is_constraint_nonbasic_ub(ConstraintIndex constraint)
 {
 	return _get_basis_stat(_checked_constraint_index(constraint), true) ==
-	       XPRS_BASISSTATUS_NONBASIC_UPPER;
+	       POI_XPRS_BASISSTATUS_NONBASIC_UPPER;
 }
 
 bool Model::is_constraint_superbasic(ConstraintIndex constraint)
 {
 	return _get_basis_stat(_checked_constraint_index(constraint), true) ==
-	       XPRS_BASISSTATUS_SUPERBASIC;
+	       POI_XPRS_BASISSTATUS_SUPERBASIC;
 }
 
 bool Model::is_constraint_in_IIS(ConstraintIndex constraint)
@@ -2049,7 +2038,7 @@ void Model::set_raw_control_int_by_id(int control, XPRSint64 value)
 {
 	// Disabling Xpress internal callback mutex is forbidden since this could easily create race
 	// condition and deadlocks since it's used in conjunction with Python GIL.
-	if (control == XPRS_MUTEXCALLBACKS)
+	if (control == POI_XPRS_MUTEXCALLBACKS)
 	{
 		throw std::runtime_error(
 		    "Changing Xpress callback mutex setting is currently not supported.");
@@ -2127,37 +2116,37 @@ std::string Model::get_raw_attribute_str_by_id(int attrib)
 
 LPSTATUS Model::get_lp_status()
 {
-	return static_cast<LPSTATUS>(get_raw_attribute_int_by_id(XPRS_LPSTATUS));
+	return static_cast<LPSTATUS>(get_raw_attribute_int_by_id(POI_XPRS_LPSTATUS));
 }
 
 MIPSTATUS Model::get_mip_status()
 {
-	return static_cast<MIPSTATUS>(get_raw_attribute_int_by_id(XPRS_MIPSTATUS));
+	return static_cast<MIPSTATUS>(get_raw_attribute_int_by_id(POI_XPRS_MIPSTATUS));
 }
 
 NLPSTATUS Model::get_nlp_status()
 {
-	return static_cast<NLPSTATUS>(get_raw_attribute_int_by_id(XPRS_NLPSTATUS));
+	return static_cast<NLPSTATUS>(get_raw_attribute_int_by_id(POI_XPRS_NLPSTATUS));
 }
 
 SOLVESTATUS Model::get_solve_status()
 {
-	return static_cast<SOLVESTATUS>(get_raw_attribute_int_by_id(XPRS_SOLVESTATUS));
+	return static_cast<SOLVESTATUS>(get_raw_attribute_int_by_id(POI_XPRS_SOLVESTATUS));
 }
 
 SOLSTATUS Model::get_sol_status()
 {
-	return static_cast<SOLSTATUS>(get_raw_attribute_int_by_id(XPRS_SOLSTATUS));
+	return static_cast<SOLSTATUS>(get_raw_attribute_int_by_id(POI_XPRS_SOLSTATUS));
 }
 
 IISSOLSTATUS Model::get_iis_sol_status()
 {
-	return static_cast<IISSOLSTATUS>(get_raw_attribute_int_by_id(XPRS_IISSOLSTATUS));
+	return static_cast<IISSOLSTATUS>(get_raw_attribute_int_by_id(POI_XPRS_IISSOLSTATUS));
 }
 
 OPTIMIZETYPE Model::get_optimize_type()
 {
-	return static_cast<OPTIMIZETYPE>(get_raw_attribute_int_by_id(XPRS_OPTIMIZETYPEUSED));
+	return static_cast<OPTIMIZETYPE>(get_raw_attribute_int_by_id(POI_XPRS_OPTIMIZETYPEUSED));
 }
 
 void Model::_ensure_postsolved()
@@ -2288,7 +2277,7 @@ void Model::cb_submit_solution()
 void Model::cb_exit()
 {
 	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
-	_check(XPRSinterrupt(m_model.get(), XPRS_STOP_USER));
+	_check(XPRSinterrupt(m_model.get(), POI_XPRS_STOP_USER));
 }
 
 void Model::_cb_add_cut(const ScalarAffineFunction &function, ConstraintSense sense, CoeffT rhs)
@@ -2304,7 +2293,7 @@ void Model::_cb_add_cut(const ScalarAffineFunction &function, ConstraintSense se
 	// Before adding the cut, we must translate it to the presolved model. If this translation fails
 	// then we cannot continue. The translation can only fail if we have presolve operations enabled
 	// that should be disabled in case of dynamically separated constraints.
-	int ncols = get_raw_attribute_int_by_id(XPRS_COLS);
+	int ncols = get_raw_attribute_int_by_id(POI_XPRS_COLS);
 	int ps_numnz = 0;
 	std::vector<int> ps_cind(ncols);
 	std::vector<double> ps_cval(ncols);
@@ -2380,7 +2369,7 @@ void Model::cb_add_lazy_constraint(const ScalarAffineFunction &function, Constra
 	{
 		infeas = std::max(infeas, real_rhs - activity);
 	}
-	const double feastol = get_raw_control_dbl_by_id(XPRS_FEASTOL);
+	const double feastol = get_raw_control_dbl_by_id(POI_XPRS_FEASTOL);
 	if (infeas > feastol)
 	{
 		// The user added a cut, but we are not in a context where it can be added. So, the only
@@ -2453,7 +2442,7 @@ struct Model::CbWrap
 		{
 			// We cannot let any exception slip through a callback, we have to catch it,
 			// terminate Xpress gracefully and then we can throw it again.
-			if (XPRSinterrupt(cb_prob, XPRS_STOP_USER) != 0)
+			if (XPRSinterrupt(cb_prob, POI_XPRS_STOP_USER) != 0)
 			{
 				std::rethrow_exception(std::current_exception()); // We have to terminate somehow
 			}
