@@ -55,7 +55,7 @@ enum class BinaryOperator
 	GreaterThan,
 
 	// Compatibility issue where some solvers only accepts two-arg multiplication
-    Add2,
+	Add2,
 	Mul2
 };
 

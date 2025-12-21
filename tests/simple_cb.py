@@ -1,7 +1,9 @@
-import pyoptinterface as poi from pyoptinterface import gurobi, xpress
+import pyoptinterface as poi
+from pyoptinterface import gurobi, xpress
 
 GRB = gurobi.GRB
 XPRS = xpress.XPRS
+
 
 def simple_cb(f):
     model = f()
@@ -16,7 +18,9 @@ def simple_cb(f):
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
 
     conexpr = x + y
-    model.add_linear_constraint(conexpr, poi.ConstraintSense.GreaterEqual, 10.0, name="con1")
+    model.add_linear_constraint(
+        conexpr, poi.ConstraintSense.GreaterEqual, 10.0, name="con1"
+    )
 
     def cb(model, where):
         runtime = 0.0
@@ -29,13 +33,18 @@ def simple_cb(f):
             print(f"Runtime: {runtime}, Coldel: {coldel}, Rowdel: {rowdel}")
         if isinstance(model, xpress.Model) and where == XPRS.CB_CONTEXT.PRESOLVE:
             runtime = model.get_raw_attribute_dbl_by_id(XPRS.TIME)
-            coldel = model.get_raw_attribute_int_by_id(XPRS.ORIGINALCOLS) - model.get_raw_attribute_int_by_id(XPRS.COLS)
-            rowdel = model.get_raw_attribute_int_by_id(XPRS.ORIGINALROWS) - model.get_raw_attribute_int_by_id(XPRS.ROWS)
-            print(f"CB[AFTER-PRESOLVE] >> Runtime: {runtime}, Coldel: {coldel}, Rowdel: {rowdel}")
+            coldel = model.get_raw_attribute_int_by_id(
+                XPRS.ORIGINALCOLS
+            ) - model.get_raw_attribute_int_by_id(XPRS.COLS)
+            rowdel = model.get_raw_attribute_int_by_id(
+                XPRS.ORIGINALROWS
+            ) - model.get_raw_attribute_int_by_id(XPRS.ROWS)
+            print(
+                f"CB[AFTER-PRESOLVE] >> Runtime: {runtime}, Coldel: {coldel}, Rowdel: {rowdel}"
+            )
         if isinstance(model, xpress.Model) and where == XPRS.CB_CONTEXT.MESSAGE:
             args = model.cb_get_arguments()
             print(f"CB[MESSAGE-{args.msgtype}] >> {args.msg}")
-
 
     if isinstance(model, gurobi.Model):
         model.set_callback(cb)

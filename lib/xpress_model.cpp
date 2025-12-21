@@ -8,7 +8,9 @@
 #include <mutex>
 #include <stack>
 #include <stdexcept>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 namespace xpress
 {
@@ -356,7 +358,7 @@ XPRSprob Model::_toggle_model_mode(XPRSprob model)
 {
 	if (m_mode == XPRESS_MODEL_MODE::MAIN)
 	{
-		m_mode = XPRESS_MODEL_MODE::CALLBACK;
+		m_mode = XPRESS_MODEL_MODE::CALLBACK_;
 	}
 	else
 	{
@@ -381,7 +383,7 @@ catch (std::exception e)
 void Model::close()
 {
 	// In CALLBACK mode we cannot destroy the problem, we release the unique_ptr instead
-	if (m_mode == XPRESS_MODEL_MODE::CALLBACK)
+	if (m_mode == XPRESS_MODEL_MODE::CALLBACK_)
 	{
 		[[maybe_unused]] auto _ = m_model.release();
 	}
@@ -557,7 +559,7 @@ std::string Model::pprint_variable(VariableIndex variable)
 
 std::string Model::_get_entity_name(int etype, int eidx)
 {
-    _check_expected_mode(XPRESS_MODEL_MODE::MAIN);
+	_check_expected_mode(XPRESS_MODEL_MODE::MAIN);
 	_ensure_postsolved();
 
 	int req_size = {};
@@ -2168,12 +2170,12 @@ void Model::_ensure_postsolved()
 
 void Model::_check_expected_mode(XPRESS_MODEL_MODE mode)
 {
-	if (mode == XPRESS_MODEL_MODE::MAIN && m_mode == XPRESS_MODEL_MODE::CALLBACK)
+	if (mode == XPRESS_MODEL_MODE::MAIN && m_mode == XPRESS_MODEL_MODE::CALLBACK_)
 	{
 		throw std::runtime_error("Cannot call this function from within a callback. "
 		                         "This operation is only available on the main model.");
 	}
-	if (mode == XPRESS_MODEL_MODE::CALLBACK && m_mode == XPRESS_MODEL_MODE::MAIN)
+	if (mode == XPRESS_MODEL_MODE::CALLBACK_ && m_mode == XPRESS_MODEL_MODE::MAIN)
 	{
 		throw std::runtime_error("This function can only be called from within a callback. "
 		                         "It is not available on the main model.");
@@ -2182,14 +2184,14 @@ void Model::_check_expected_mode(XPRESS_MODEL_MODE mode)
 
 xpress_cbs_data Model::cb_get_arguments()
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	return cb_args;
 }
 
 // NOTE: XPRSgetcallbacksolution return a context dependent solution
 double Model::_cb_get_context_solution(VariableIndex variable)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	// Xpress already caches solutions internally
 	int p_available = 0;
 	int colidx = _checked_variable_index(variable);
@@ -2207,7 +2209,7 @@ double Model::_cb_get_context_solution(VariableIndex variable)
 // otherwise falls back to the current incumbent solution.
 double Model::cb_get_solution(VariableIndex variable)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	if (cb_where == CB_CONTEXT::intsol || cb_where == CB_CONTEXT::preintsol)
 	{
 		// Context provides a candidate integer solution - return it directly
@@ -2223,7 +2225,7 @@ double Model::cb_get_solution(VariableIndex variable)
 // chgbranchobject, nodelpsolved, optnode). It throws in other contexts.
 double Model::cb_get_relaxation(VariableIndex variable)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	if (cb_where != CB_CONTEXT::bariteration && cb_where != CB_CONTEXT::cutround &&
 	    cb_where != CB_CONTEXT::chgbranchobject && cb_where != CB_CONTEXT::nodelpsolved &&
 	    cb_where != CB_CONTEXT::optnode)
@@ -2240,13 +2242,13 @@ double Model::cb_get_incumbent(VariableIndex variable)
 
 void Model::cb_set_solution(VariableIndex variable, double value)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	cb_sol_cache.emplace_back(_checked_variable_index(variable), value);
 }
 
 void Model::cb_submit_solution()
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 
 	auto &sol = cb_sol_cache;
 	if (sol.empty())
@@ -2276,7 +2278,7 @@ void Model::cb_submit_solution()
 
 void Model::cb_exit()
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	_check(XPRSinterrupt(m_model.get(), POI_XPRS_STOP_USER));
 }
 
@@ -2326,7 +2328,7 @@ void Model::_cb_add_cut(const ScalarAffineFunction &function, ConstraintSense se
 void Model::cb_add_lazy_constraint(const ScalarAffineFunction &function, ConstraintSense sense,
                                    CoeffT rhs)
 {
-	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+	_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 	if (cb_where != CB_CONTEXT::nodelpsolved && cb_where != CB_CONTEXT::optnode &&
 	    cb_where != CB_CONTEXT::preintsol && cb_where != CB_CONTEXT::prenode)
 	{
@@ -2431,7 +2433,7 @@ struct Model::CbWrap
 
 		try
 		{
-			model->_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK);
+			model->_check_expected_mode(XPRESS_MODEL_MODE::CALLBACK_);
 			model->cb_sol_cache.clear();
 			model->cb_where = static_cast<CB_CONTEXT>(Where);
 			model->cb_args = &cb_args;

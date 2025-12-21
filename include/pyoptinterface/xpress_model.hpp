@@ -365,8 +365,8 @@ using Callback = std::function<void(Model *, CB_CONTEXT)>; // Callback opaque co
 // Xpress to mutex callbacks invocations, so concurrent callback execution isn't an issue.
 enum class XPRESS_MODEL_MODE
 {
-	MAIN,     // Owns XPRSprob; holds global callback state
-	CALLBACK, // Non-owning wrapper around Xpress's callback problem clone
+	MAIN,      // Owns XPRSprob; holds global callback state
+	CALLBACK_, // Non-owning wrapper around Xpress's callback problem clone
 };
 
 // Simple conditional struct that define the ret_code field only if it is not void

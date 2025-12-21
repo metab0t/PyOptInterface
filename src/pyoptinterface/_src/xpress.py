@@ -217,7 +217,7 @@ def get_primalstatus(model):
         status = model.get_lp_status()
         if status == XPRS.LPSTATUS.OPTIMAL:
             return ResultStatusCode.FEASIBLE_POINT
-        return ResultStatusCode.NO_SOLUTION  
+        return ResultStatusCode.NO_SOLUTION
 
     elif opt_type == XPRS.OPTIMIZETYPE.MIP:
         status = model.get_mip_status()
@@ -617,9 +617,7 @@ class Model(RawModel):
         graph = ExpressionGraphContext.current_graph()
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
-            raise ValueError(
-                "Expression should be convertible to ExpressionHandle"
-            )
+            raise ValueError("Expression should be convertible to ExpressionHandle")
 
         con = self._add_single_nl_constraint(graph, expr, *args, **kwargs)
         return con
@@ -628,9 +626,7 @@ class Model(RawModel):
         graph = ExpressionGraphContext.current_graph()
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
-            raise ValueError(
-                "Expression should be convertible to ExpressionHandle"
-            )
+            raise ValueError("Expression should be convertible to ExpressionHandle")
         self._add_single_nl_objective(graph, expr)
 
     def set_callback(self, cb, where):

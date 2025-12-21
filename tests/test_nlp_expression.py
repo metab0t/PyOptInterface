@@ -26,11 +26,11 @@ def test_nlp_expressiontree(model_interface):
 
     x_value = model.get_value(x)
     y_value = model.get_value(y)
-    
-    # Note: with a feasibility tolerance defaulted to 1e-6 + the 
+
+    # Note: with a feasibility tolerance defaulted to 1e-6 + the
     # effect of the internal solver scaling, x and y can assume
     # values relatively far away from the expected ones.
-    # E.g.: x = 1.0005, y = 0.49975  
+    # E.g.: x = 1.0005, y = 0.49975
     assert x_value == approx(1.0, rel=1e-2)
     assert y_value == approx(0.5, rel=1e-2)
 

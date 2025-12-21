@@ -274,7 +274,7 @@ enum class ConstraintType
 	COPT_ExpCone,
 	COPT_NL,
 	IPOPT_NL,
-    Xpress_Nlp
+	Xpress_Nlp
 };
 
 enum class SOSType

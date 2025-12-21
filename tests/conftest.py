@@ -44,6 +44,7 @@ if mosek.is_library_loaded():
 if highs.is_library_loaded():
     model_interface_dict["highs"] = highs.Model
 
+
 @pytest.fixture(params=model_interface_dict.keys())
 def model_interface(request):
     name = request.param
