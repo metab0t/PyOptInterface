@@ -1974,6 +1974,10 @@ struct OverloadSet : public Ts...
 	using Ts::operator()...;
 };
 
+// Deduction guide for OverloadSet
+template <typename... Ts>
+OverloadSet(Ts...) -> OverloadSet<Ts...>;
+
 void Model::set_raw_control(const char *control, Model::xprs_type_variant_t &value)
 {
 	std::visit(OverloadSet{[&](double d) { set_raw_control_dbl(control, d); },
