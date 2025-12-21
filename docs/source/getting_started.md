@@ -77,10 +77,15 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - macOS(ARM)
     - macOS(Intel)
 *   - Gurobi
-    - `C:\gurobi1300\win64\bin`
-    - `/opt/gurobi1300/linux64/lib`
-    - `/opt/gurobi1300/macos_universal2/lib`
-    - `/opt/gurobi1300/macos_universal2/lib`
+    - `C:\gurobi1101\win64\bin`
+    - `/opt/gurobi1100/linux64/lib`
+    - `/opt/gurobi1100/macos_universal2/lib`
+    - `/opt/gurobi1100/macos_universal2/lib`
+*   - Xpress
+    - `C:\xpressmp\bin` 
+    - `/opt/xpressmp/lib`
+    - `/Applications/FICO Xpress/xpressmp/lib`
+    - `/Applications/FICO Xpress/xpressmp/lib`
 *   - COPT
     - `C:\Program Files\copt80\bin`
     - `/opt/copt80/lib`
@@ -107,6 +112,14 @@ For Gurobi, the automatic detection looks for the following things in order:
 1. The environment variable `GUROBI_HOME` set by the installer of Gurobi
 2. The installation of `gurobipy`
 3. `gurobi130.dll`/`libgurobi130.so`/`libgurobi130.dylib` in the system loadable path
+
+### Xpress
+
+The currently supported version is **9.8**. Other versions may work but are not tested.
+
+For Xpress, the automatic detection looks for the following things in order:
+1. The environment variable `XPRESSDIR` set by the installer of Xpress
+2. `xprs.dll`/`libxprs.so`/`libxprs.dylib` int the system loadable path
 
 ### COPT
 
@@ -175,7 +188,7 @@ ret = highs.autoload_library()
 print(f"Loading from automatically detected location: {ret}")
 ```
 
-For other optimizers, just replace `highs` with the corresponding optimizer name like `gurobi`, `copt`, `mosek`.
+For other optimizers, just replace `highs` with the corresponding optimizer name like `gurobi`, `xpress`, `copt`, `mosek`.
 
 The typical paths where the dynamic library of optimizers are located are as follows:
 
@@ -197,6 +210,11 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/copt72/lib/libcopt.so`
     - `/opt/copt72/lib/libcopt.dylib`
     - `/opt/copt72/lib/libcopt.dylib`
+*   - Xpress
+    - `C:\xpressmp\bin\xprs.dll` 
+    - `/opt/xpressmp/lib/libxprs.so`
+    - `/Applications/FICO Xpress/xpressmp/lib/libxprs.dylib`
+    - `/Applications/FICO Xpress/xpressmp/lib/libxprs.dylib`
 *   - Mosek
     - `C:\Program Files\Mosek\10.2\tools\platform\win64x86\bin\mosek64_10_1.dll`
     - `/opt/mosek/10.2/tools/platform/linux64x86/bin/libmosek64.so`
@@ -225,7 +243,7 @@ First, we need to create a model object:
 ```{code-cell}
 import pyoptinterface as poi
 from pyoptinterface import highs
-# from pyoptinterface import copt, gurobi, mosek (if you want to use other optimizers)
+# from pyoptinterface import copt, gurobi, xpress, mosek (if you want to use other optimizers)
 
 model = highs.Model()
 ```

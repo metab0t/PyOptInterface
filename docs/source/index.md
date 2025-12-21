@@ -23,6 +23,7 @@ common_model_interface.md
 infeasibility.md
 callback.md
 gurobi.md
+xpress.md
 copt.md
 mosek.md
 highs.md

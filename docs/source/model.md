@@ -24,7 +24,7 @@ You can replace `highs` with the name of the solver you want to use. The availab
 
 Most commercial solvers require a `Environment`-like object to be initialized before creating a model in order to manage the license.
 
-By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: [Gurobi](gurobi.md), [HiGHS](highs.md), [COPT](copt.md), [MOSEK](mosek.md).
+By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: [Gurobi](gurobi.md), [HiGHS](highs.md), [COPT](copt.md), [Xpress](xpress.md), [MOSEK](mosek.md).
 
 ```python
 env = gurobi.Env()
@@ -116,6 +116,8 @@ Besides the standard attributes, we can also set/get the solver-specific attribu
 model.set_raw_parameter("OutputFlag", 0)
 # COPT
 model.set_raw_parameter("Presolve", 0)
+# Xpress
+model.set_raw_control("XPRS_OUTPUTLOG", 0)
 # MOSEK
 model.set_raw_parameter("MSK_IPAR_INTPNT_BASIS", 0)
 ```
@@ -159,3 +161,11 @@ The file format is determined by the file extension. Because we use the native I
 - Gurobi: [Doc](https://www.gurobi.com/documentation/current/refman/c_write.html)
 - HiGHS: [Doc](https://ergo-code.github.io/HiGHS/stable/interfaces/c/#Highs_writeModel-Tuple{Any,%20Any})
 - Mosek: [Doc](https://docs.mosek.com/latest/capi/supported-file-formats.html)
+- Xpress: [`.lp`, `.mps`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeProb.html), 
+          [`.svf`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.saveAs.html),
+          [`.bss`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeBasis.html),
+          [`.asc`, `.hdr`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeSol.html),
+          [`.sol`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeBinSol.html),
+          [`.prt`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writePrtSol.html),
+          [`.slx`](https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeSlxSol.html),
+

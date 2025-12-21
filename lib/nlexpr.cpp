@@ -565,6 +565,8 @@ std::string binary_operator_to_string(BinaryOperator op)
 		return "GreaterEqual";
 	case BinaryOperator::GreaterThan:
 		return "GreaterThan";
+	case BinaryOperator::Add2:
+		return "Add2";
 	case BinaryOperator::Mul2:
 		return "Mul2";
 	default:

@@ -54,7 +54,8 @@ enum class BinaryOperator
 	GreaterEqual,
 	GreaterThan,
 
-	// Compability issue where some solvers only accepts two-arg multiplication
+	// Compatibility issue where some solvers only accepts two-arg multiplication
+    Add2,
 	Mul2
 };
 
