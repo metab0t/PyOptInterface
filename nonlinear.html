@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Container" href="container.html"><link rel="prev" title="Objective" href="objective.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
         <title>Nonlinear Programming - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -210,6 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpress.html">Xpress</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
@@ -231,6 +232,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input aria-label="Toggle navigation of pyoptinterface package" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.xpress.html">pyoptinterface.xpress package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.highs.html">pyoptinterface.highs package</a></li>
 </ul>
@@ -280,7 +282,7 @@
 <p>Compared with the linear and quadratic expressions and objectives we have discussed in the previous sections, nonlinear programming is more general and can handle a wider range of problems. In this section, we will introduce how to use PyOptInterface to formulate and solve general nonlinear programming problems.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyoptinterface[nlp]</span></code> and solvers that support nonlinear programming (IPOPT, COPT, Gurobi) as described in the <a class="reference internal" href="getting_started.html"><span class="std std-doc">Getting Started</span></a> section.</p>
+<p>Before trying out the code snippets, please ensure that you have completed the installation of PyOptInterface with correct dependencies via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyoptinterface[nlp]</span></code> and solvers that support nonlinear programming (IPOPT, COPT, Xpress, Gurobi) as described in the <a class="reference internal" href="getting_started.html"><span class="std std-doc">Getting Started</span></a> section.</p>
 </div>
 </section>
 <section id="construct-nonlinear-expressions">
@@ -497,7 +499,7 @@ Number of inequality constraint evaluations          = 26
 Number of equality constraint Jacobian evaluations   = 0
 Number of inequality constraint Jacobian evaluations = 11
 Number of Lagrangian Hessian evaluations             = 10
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.006
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.002
 Total CPU secs in NLP function evaluations           =      0.000
 
 EXIT: Optimal Solution Found.
@@ -619,7 +621,7 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 0
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 14
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.005
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.006
 Total CPU secs in NLP function evaluations           =      0.000
 
 EXIT: Optimal Solution Found.
@@ -702,12 +704,11 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   1  3.5000000e+02 0.00e+00 0.00e+00  -1.7 0.00e+00    -  1.00e+00 1.00e+00   0
    2  3.5000000e+02 0.00e+00 0.00e+00  -3.8 0.00e+00  -2.0 1.00e+00 1.00e+00T  0
+   3  3.5000000e+02 0.00e+00 0.00e+00  -5.7 0.00e+00   0.2 1.00e+00 1.00e+00T  0
+   4  3.5000000e+02 0.00e+00 0.00e+00  -8.6 0.00e+00  -0.2 1.00e+00 1.00e+00T  0
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   3  3.5000000e+02 0.00e+00 0.00e+00  -5.7 0.00e+00   0.2 1.00e+00 1.00e+00T  0
-   4  3.5000000e+02 0.00e+00 0.00e+00  -8.6 0.00e+00  -0.2 1.00e+00 1.00e+00T  0
-
-Number of Iterations....: 4
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of Iterations....: 4
 
                                    (scaled)                 (unscaled)
 Objective...............:   3.5000000000000318e+02    3.5000000000000318e+02
@@ -724,7 +725,7 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 5
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 4
-Total CPU secs in IPOPT (w/o function evaluations)   =      0.023
+Total CPU secs in IPOPT (w/o function evaluations)   =      0.025
 Total CPU secs in NLP function evaluations           =      0.001
 
 EXIT: Optimal Solution Found.

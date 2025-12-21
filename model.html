@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Variable" href="variable.html"><link rel="prev" title="Frequently Asked Questions" href="faq.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
         <title>Model - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -210,6 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpress.html">Xpress</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
@@ -231,6 +232,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input aria-label="Toggle navigation of pyoptinterface package" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.xpress.html">pyoptinterface.xpress package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.highs.html">pyoptinterface.highs package</a></li>
 </ul>
@@ -292,7 +294,7 @@
 </div>
 <p>You can replace <code class="docutils literal notranslate"><span class="pre">highs</span></code> with the name of the solver you want to use. The available solvers includes <code class="docutils literal notranslate"><span class="pre">copt</span></code>, <code class="docutils literal notranslate"><span class="pre">gurobi</span></code>, <code class="docutils literal notranslate"><span class="pre">highs</span></code> and <code class="docutils literal notranslate"><span class="pre">mosek</span></code>.</p>
 <p>Most commercial solvers require a <code class="docutils literal notranslate"><span class="pre">Environment</span></code>-like object to be initialized before creating a model in order to manage the license.</p>
-<p>By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: <a class="reference internal" href="gurobi.html"><span class="std std-doc">Gurobi</span></a>, <a class="reference internal" href="highs.html"><span class="std std-doc">HiGHS</span></a>, <a class="reference internal" href="copt.html"><span class="std std-doc">COPT</span></a>, <a class="reference internal" href="mosek.html"><span class="std std-doc">MOSEK</span></a>.</p>
+<p>By default, PyOptInterface creates the global environment for each solver. If you want to create a model in a specific environment, you can pass the environment object to the constructor of the model class. The details can be found on the documentation of the corresponding optimizer: <a class="reference internal" href="gurobi.html"><span class="std std-doc">Gurobi</span></a>, <a class="reference internal" href="highs.html"><span class="std std-doc">HiGHS</span></a>, <a class="reference internal" href="copt.html"><span class="std std-doc">COPT</span></a>, <a class="reference internal" href="xpress.html"><span class="std std-doc">Xpress</span></a>, <a class="reference internal" href="mosek.html"><span class="std std-doc">MOSEK</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 </pre></div>
@@ -414,6 +416,7 @@ Coefficient ranges:
   Bound   [1e+00, 1e+00]
   RHS     [1e+00, 1e+00]
   Iteration        Objective     NullspaceDim
+Objective value: 0.49999999999999994
           0                1                0      0.00s
           2       0.50000002                1      0.00s
 Model status        : Optimal
@@ -421,7 +424,6 @@ QP ASM    iterations: 2
 Objective value     :  5.0000000000e-01
 P-D objective error :  2.4999999473e-08
 HiGHS run time      :          0.00
-Objective value: 0.49999999999999994
 </pre></div>
 </div>
 </div>
@@ -431,6 +433,8 @@ Objective value: 0.49999999999999994
 <span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;OutputFlag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="c1"># COPT</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;Presolve&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Xpress</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_control</span><span class="p">(</span><span class="s2">&quot;XPRS_OUTPUTLOG&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="c1"># MOSEK</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;MSK_IPAR_INTPNT_BASIS&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -486,9 +490,7 @@ x[0]^2 = 0.24999999999999994
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: Column names are blank or not present: using names with prefix &quot;c&quot;, beginning with suffix 0
 WARNING: Row    names are blank or not present: using names with prefix &quot;r&quot;, beginning with suffix 0
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Writing the model to model.lp
+Writing the model to model.lp
 </pre></div>
 </div>
 </div>
@@ -499,6 +501,13 @@ WARNING: Row    names are blank or not present: using names with prefix &quot;r&
 <li><p>Gurobi: <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/c_write.html">Doc</a></p></li>
 <li><p>HiGHS: <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/interfaces/c/#Highs_writeModel-Tuple%7BAny,%20Any%7D">Doc</a></p></li>
 <li><p>Mosek: <a class="reference external" href="https://docs.mosek.com/latest/capi/supported-file-formats.html">Doc</a></p></li>
+<li><p>Xpress: <a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeProb.html"><code class="docutils literal notranslate"><span class="pre">.lp</span></code>, <code class="docutils literal notranslate"><span class="pre">.mps</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.saveAs.html"><code class="docutils literal notranslate"><span class="pre">.svf</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeBasis.html"><code class="docutils literal notranslate"><span class="pre">.bss</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeSol.html"><code class="docutils literal notranslate"><span class="pre">.asc</span></code>, <code class="docutils literal notranslate"><span class="pre">.hdr</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeBinSol.html"><code class="docutils literal notranslate"><span class="pre">.sol</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writePrtSol.html"><code class="docutils literal notranslate"><span class="pre">.prt</span></code></a>,
+<a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/python/HTML/problem.writeSlxSol.html"><code class="docutils literal notranslate"><span class="pre">.slx</span></code></a>,</p></li>
 </ul>
 </section>
 </section>

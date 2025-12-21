@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Gurobi" href="gurobi.html"><link rel="prev" title="Infeasibility Analysis" href="infeasibility.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
         <title>Callback - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -210,6 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpress.html">Xpress</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
@@ -231,6 +232,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/pyoptinterface.html">pyoptinterface package</a><input aria-label="Toggle navigation of pyoptinterface package" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.gurobi.html">pyoptinterface.gurobi package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.copt.html">pyoptinterface.copt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.xpress.html">pyoptinterface.xpress package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.mosek.html">pyoptinterface.mosek package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pyoptinterface.highs.html">pyoptinterface.highs package</a></li>
 </ul>
@@ -280,25 +282,27 @@
 <p>The behavior of callback function highly depends on the optimizer and the specific problem. Please refer to the official documentation of the optimizer for more details.</p>
 </div>
 <p>In most optimization problems, we build the model, set the parameters, and then call the optimizer to solve the problem. However, in some cases, we may want to monitor the optimization process and intervene in the optimization process. For example, we may want to stop the optimization process when a certain condition is met, or we may want to record the intermediate results of the optimization process. In these cases, we can use the callback function. The callback function is a user-defined function that is called by the optimizer at specific points during the optimization process. Callback is especially useful for mixed-integer programming problems, where we can control the branch and bound process in callback functions.</p>
-<p>Callback is not supported for all optimizers. Currently, we only support callback for Gurobi and COPT optimizer. Because callback is tightly coupled with the optimizer, we choose not to implement a strictly unified API for callback. Instead, we try to unify the common parts of the callback API of Gurobi and COPT and aims to provide all callback features included in vendored Python bindings of Gurobi and COPT.</p>
+<p>Callback is not supported for all optimizers. Currently, we only support callback for Gurobi, COPT, and Xpress optimizer. Because callback is tightly coupled with the optimizer, we choose not to implement a strictly unified API for callback. Instead, we try to unify the common parts of the callback API and aim to provide all callback features included in the vendored Python bindings.</p>
 <p>In PyOptInterface, the callback function is simply a Python function that takes two arguments:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">model</span></code>: The instance of the <a class="reference internal" href="model.html"><span class="std std-doc">optimization model</span></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">where</span></code>: The flag indicates the stage of optimization process when our callback function is invoked. For Gurobi, the value of <code class="docutils literal notranslate"><span class="pre">where</span></code> is <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/cb_codes.html#sec:CallbackCodes">CallbackCodes</a>. For COPT, the value of <code class="docutils literal notranslate"><span class="pre">where</span></code> is called as <a class="reference external" href="https://guide.coap.online/copt/en-doc/callback.html">callback contexts</a> such as <code class="docutils literal notranslate"><span class="pre">COPT.CBCONTEXT_MIPNODE</span></code> and <code class="docutils literal notranslate"><span class="pre">COPT.CBCONTEXT_MIPRELAX</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">where</span></code>: The flag indicates the stage of optimization process when our callback function is invoked. For Gurobi, the value of <code class="docutils literal notranslate"><span class="pre">where</span></code> is <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/cb_codes.html#sec:CallbackCodes">CallbackCodes</a>. For COPT, the value of <code class="docutils literal notranslate"><span class="pre">where</span></code> is called as <a class="reference external" href="https://guide.coap.online/copt/en-doc/callback.html">callback contexts</a> such as <code class="docutils literal notranslate"><span class="pre">COPT.CBCONTEXT_MIPNODE</span></code> and <code class="docutils literal notranslate"><span class="pre">COPT.CBCONTEXT_MIPRELAX</span></code>. For Xpress, the <code class="docutils literal notranslate"><span class="pre">where</span></code> value corresponds to specific callback points such as <code class="docutils literal notranslate"><span class="pre">XPRS.CB_CONTEXT.PREINTSOL</span></code> or <code class="docutils literal notranslate"><span class="pre">XPRS.CB_CONTEXT.OPTNODE</span></code>. A description of supported Xpress callbacks can be found <a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/HTML/chapter5.html?scroll=section5002">here</a>.</p></li>
 </ul>
 <p>In the function body of the callback function, we can do the following four kinds of things:</p>
 <ul class="simple">
-<li><p>Query the current information of the optimization process. For scalar information, we can use <code class="docutils literal notranslate"><span class="pre">model.cb_get_info</span></code> function to get the information, and its argument is the value of <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/cb_codes.html"><code class="docutils literal notranslate"><span class="pre">what</span></code></a> in Gurobi and the value of <a class="reference external" href="https://guide.coap.online/copt/en-doc/information.html#chapinfo-cbc">callback information</a> in COPT. For array information such as the MIP solution or relaxation, PyOptInterface provides special functions such as <code class="docutils literal notranslate"><span class="pre">model.cb_get_solution</span></code> and <code class="docutils literal notranslate"><span class="pre">model.cb_get_relaxation</span></code>.</p></li>
+<li><p>Query the current information of the optimization process. For scalar information, we can use <code class="docutils literal notranslate"><span class="pre">model.cb_get_info</span></code> function to get the information, and its argument is the value of <a class="reference external" href="https://www.gurobi.com/documentation/current/refman/cb_codes.html"><code class="docutils literal notranslate"><span class="pre">what</span></code></a> in Gurobi and the value of <a class="reference external" href="https://guide.coap.online/copt/en-doc/information.html#chapinfo-cbc">callback information</a> in COPT. For Xpress, use regular attribute access methods such as <code class="docutils literal notranslate"><span class="pre">model.get_raw_attribute</span></code>. For array information such as the MIP solution or relaxation, PyOptInterface provides special functions such as <code class="docutils literal notranslate"><span class="pre">model.cb_get_solution</span></code> and <code class="docutils literal notranslate"><span class="pre">model.cb_get_relaxation</span></code>.</p></li>
 <li><p>Add lazy constraint: Use <code class="docutils literal notranslate"><span class="pre">model.cb_add_lazy_constraint</span></code> just like <code class="docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code> except for the <code class="docutils literal notranslate"><span class="pre">name</span></code> argument.</p></li>
 <li><p>Add user cut: Use <code class="docutils literal notranslate"><span class="pre">model.cb_add_user_cut</span></code> just like <code class="docutils literal notranslate"><span class="pre">model.add_linear_constraint</span></code> except for the <code class="docutils literal notranslate"><span class="pre">name</span></code> argument.</p></li>
-<li><p>Set a heuristic solution: Use <code class="docutils literal notranslate"><span class="pre">model.set_solution</span></code> to set individual values of variables and use <code class="docutils literal notranslate"><span class="pre">model.cb_submit_solution</span></code> to submit the solution to the optimizer immediately (<code class="docutils literal notranslate"><span class="pre">model.cb_submit_solution</span></code> will be called automatically in the end of callback if <code class="docutils literal notranslate"><span class="pre">model.set_solution</span></code> is called).</p></li>
+<li><p>Set a heuristic solution: Use <code class="docutils literal notranslate"><span class="pre">model.cb_set_solution</span></code> to set individual values of variables and use <code class="docutils literal notranslate"><span class="pre">model.cb_submit_solution</span></code> to submit the solution to the optimizer immediately (<code class="docutils literal notranslate"><span class="pre">model.cb_submit_solution</span></code> will be called automatically in the end of callback if <code class="docutils literal notranslate"><span class="pre">model.cb_set_solution</span></code> is called).</p></li>
 <li><p>Terminate the optimizer: Use <code class="docutils literal notranslate"><span class="pre">model.cb_exit</span></code>.</p></li>
 </ul>
 <p>Here is an example of a callback function that stops the optimization process when the objective value reaches a certain threshold:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">poi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">gurobi</span><span class="p">,</span> <span class="n">copt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">gurobi</span><span class="p">,</span> <span class="n">copt</span><span class="p">,</span> <span class="n">xpress</span>
+
 <span class="n">GRB</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">GRB</span>
 <span class="n">COPT</span> <span class="o">=</span> <span class="n">copt</span><span class="o">.</span><span class="n">COPT</span>
+<span class="n">XPRS</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">XPRS</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">cb_gurobi</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">where</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="n">GRB</span><span class="o">.</span><span class="n">Callback</span><span class="o">.</span><span class="n">MIPSOL</span><span class="p">:</span>
@@ -311,9 +315,15 @@
         <span class="n">obj</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cb_get_info</span><span class="p">(</span><span class="s2">&quot;MipCandObj&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
             <span class="n">model</span><span class="o">.</span><span class="n">cb_exit</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cb_xpress</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">where</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="n">XPRS</span><span class="o">.</span><span class="n">CB_CONTEXT</span><span class="o">.</span><span class="n">PREINTSOL</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_attribute</span><span class="p">(</span><span class="s2">&quot;LPOBJVAL&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">cb_exit</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To use the callback function, we need to call <code class="docutils literal notranslate"><span class="pre">model.set_callback(cb)</span></code> to pass the callback function to the optimizer. For COPT, <code class="docutils literal notranslate"><span class="pre">model.set_callback</span></code> needs an additional argument <code class="docutils literal notranslate"><span class="pre">where</span></code> to specify the context where the callback function is invoked. For Gurobi, the <code class="docutils literal notranslate"><span class="pre">where</span></code> argument is not needed.</p>
+<p>To use the callback function, we need to call <code class="docutils literal notranslate"><span class="pre">model.set_callback(cb)</span></code> to pass the callback function to the optimizer. For COPT and Xpress, <code class="docutils literal notranslate"><span class="pre">model.set_callback</span></code> needs an additional argument <code class="docutils literal notranslate"><span class="pre">where</span></code> to specify the context where the callback function is invoked. For Gurobi, the <code class="docutils literal notranslate"><span class="pre">where</span></code> argument is not needed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_gurobi</span> <span class="o">=</span> <span class="n">gurobi</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 <span class="n">model_gurobi</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">cb_gurobi</span><span class="p">)</span>
 
@@ -321,9 +331,14 @@
 <span class="n">model_copt</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">cb_copt</span><span class="p">,</span> <span class="n">COPT</span><span class="o">.</span><span class="n">CBCONTEXT_MIPSOL</span><span class="p">)</span>
 <span class="c1"># callback can also be registered for multiple contexts</span>
 <span class="n">model_copt</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">cb_copt</span><span class="p">,</span> <span class="n">COPT</span><span class="o">.</span><span class="n">CBCONTEXT_MIPSOL</span> <span class="o">+</span> <span class="n">COPT</span><span class="o">.</span><span class="n">CBCONTEXT_MIPNODE</span><span class="p">)</span>
+
+<span class="n">model_xpress</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">model_xpress</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">cb_xpress</span><span class="p">,</span> <span class="n">XPRS</span><span class="o">.</span><span class="n">CB_CONTEXT</span><span class="o">.</span><span class="n">PREINTSOL</span><span class="p">)</span>
+<span class="c1"># callback can also be registered for multiple contexts</span>
+<span class="n">model_xpress</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">cb_xpress</span><span class="p">,</span> <span class="n">XPRS</span><span class="o">.</span><span class="n">CB_CONTEXT</span><span class="o">.</span><span class="n">PREINTSOL</span> <span class="o">+</span> <span class="n">XPRS</span><span class="o">.</span><span class="n">CB_CONTEXT</span><span class="o">.</span><span class="n">CUTROUND</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In order to help users to migrate code using gurobipy and/or coptpy to PyOptInterface, we list a translation table as follows.</p>
+<p>In order to help users to migrate code using gurobipy, coptpy, and Xpress Python to PyOptInterface, we list a translation table as follows.</p>
 <div class="table-wrapper colwidths-auto docutils container" id="id1">
 <table class="docutils align-left" id="id1">
 <caption><span class="caption-text">Callback in gurobipy and PyOptInterface</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
@@ -405,7 +420,46 @@
 </tbody>
 </table>
 </div>
-<p>For a detailed example to use callbacks in PyOptInterface, we provide a <a class="reference external" href="https://github.com/metab0t/PyOptInterface/blob/master/tests/tsp_cb.py">concrete callback example</a> to solve the Traveling Salesman Problem (TSP) with callbacks in PyOptInterface, gurobipy and coptpy. The example is adapted from the official Gurobi example <a class="reference external" href="https://www.gurobi.com/documentation/current/examples/tsp_py.html">tsp.py</a>.</p>
+<div class="table-wrapper colwidths-auto docutils container" id="id3">
+<table class="docutils align-left" id="id3">
+<caption><span class="caption-text">Callback in Xpress Python and PyOptInterface</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Xpress Python</p></th>
+<th class="head"><p>PyOptInterface</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model.addPreIntsolCallback(cb)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.set_callback(cb,</span> <span class="pre">XPRS.CB_CONTEXT.PREINTSOL)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model.attributes.bestbound</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.get_raw_attribute(&quot;BESTBOUND&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model.getCallbackSolution(var)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_get_solution(var)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model.getCallbackSolution(var)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_get_relaxation(var)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model.getSolution(var)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_get_incumbent(var)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model.addCuts(0,</span> <span class="pre">'L',</span> <span class="pre">3,</span> <span class="pre">[0],</span> <span class="pre">[0,</span> <span class="pre">1],</span> <span class="pre">[1,</span> <span class="pre">1])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_add_lazy_constraint(x[0]</span> <span class="pre">+</span> <span class="pre">x[1],</span> <span class="pre">poi.Leq,</span> <span class="pre">3)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model.addManagedCuts(1,</span> <span class="pre">'L',</span> <span class="pre">3,</span> <span class="pre">[0],</span> <span class="pre">[0,</span> <span class="pre">1],</span> <span class="pre">[1,</span> <span class="pre">1])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_add_user_cut(x[0]</span> <span class="pre">+</span> <span class="pre">x[1],</span> <span class="pre">poi.Leq,</span> <span class="pre">3)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model.addMipSol([x],</span> <span class="pre">[1.0])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_set_solution(x,</span> <span class="pre">1.0)</span></code> + <code class="docutils literal notranslate"><span class="pre">model.cb_submit_solution()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model.interrupt()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">model.cb_exit()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For a detailed example to use callbacks in PyOptInterface, we provide a <a class="reference external" href="https://github.com/metab0t/PyOptInterface/blob/master/tests/tsp_cb.py">concrete callback example</a> to solve the Traveling Salesman Problem (TSP) with callbacks in PyOptInterface, gurobipy, coptpy, and Xpress Python. The example is adapted from the official Gurobi example <a class="reference external" href="https://www.gurobi.com/documentation/current/examples/tsp_py.html">tsp.py</a>.</p>
 </section>
 
         </article>

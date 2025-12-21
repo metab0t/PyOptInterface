@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Ipopt" href="ipopt.html"><link rel="prev" title="Mosek" href="mosek.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="COPT" href="copt.html"><link rel="prev" title="Gurobi" href="gurobi.html">
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
-        <title>HiGHS - PyOptInterface documentation</title>
+        <title>Xpress - PyOptInterface documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -210,10 +210,10 @@
 <li class="toctree-l1"><a class="reference internal" href="infeasibility.html">Infeasibility Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="callback.html">Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gurobi.html">Gurobi</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xpress.html">Xpress</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Xpress</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copt.html">COPT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">HiGHS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ipopt.html">Ipopt</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -257,7 +257,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/highs.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/xpress.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -275,19 +275,31 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="highs">
-<h1>HiGHS<a class="headerlink" href="#highs" title="Link to this heading">¶</a></h1>
+          <section class="tex2jax_ignore mathjax_ignore" id="xpress">
+<h1>Xpress<a class="headerlink" href="#xpress" title="Link to this heading">¶</a></h1>
 <section id="initial-setup">
 <h2>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">highs</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyoptinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">xpress</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#highs"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
+<p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#xpress"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
+<p>If you want to manage the license of Xpress manually, you can create a <code class="docutils literal notranslate"><span class="pre">xpress.Env</span></code> object and pass it to the constructor of the <code class="docutils literal notranslate"><span class="pre">xpress.Model</span></code> object, otherwise we will initialize an implicit global <code class="docutils literal notranslate"><span class="pre">xpress.Env</span></code> object automatically and use it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For users who want to release the license immediately after the optimization, you can call the <code class="docutils literal notranslate"><span class="pre">close</span></code> method of all models created and the <code class="docutils literal notranslate"><span class="pre">xpress.Env</span></code> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+<span class="c1"># do something with the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
-<section id="the-capability-of-highs-model">
-<h2>The capability of <code class="docutils literal notranslate"><span class="pre">highs.Model</span></code><a class="headerlink" href="#the-capability-of-highs-model" title="Link to this heading">¶</a></h2>
+<section id="the-capability-of-xpress-model">
+<h2>The capability of <code class="docutils literal notranslate"><span class="pre">xpress.Model</span></code><a class="headerlink" href="#the-capability-of-xpress-model" title="Link to this heading">¶</a></h2>
 <section id="supported-constraints">
 <h3>Supported constraints<a class="headerlink" href="#supported-constraints" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper docutils container">
@@ -302,13 +314,19 @@
 <td><p>✅</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_quadratic_constraint" title="model.add_quadratic_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_quadratic_constraint</span></code></a></p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_second_order_cone_constraint" title="model.add_second_order_cone_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_second_order_cone_constraint</span></code></a></p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_sos_constraint" title="model.add_sos_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_sos_constraint</span></code></a></p></td>
-<td><p>❌</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="constraint.html#model.add_exp_cone_constraint" title="model.add_exp_cone_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_exp_cone_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="constraint.html#model.add_sos_constraint" title="model.add_sos_constraint"><code class="xref myst py py-func docutils literal notranslate"><span class="pre">model.add_sos_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#model.add_nl_constraint"><code class="xref myst docutils literal notranslate"><span class="pre">model.add_nl_constraint</span></code></a></p></td>
+<td><p>✅</p></td>
 </tr>
 </tbody>
 </table>
@@ -326,8 +344,8 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Name</p></td>
-<td><p>❌</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
+<td><p>✅</p></td>
 </tr>
 <tr class="row-odd"><td><p>ObjectiveSense</p></td>
 <td><p>✅</p></td>
@@ -350,15 +368,15 @@
 <td><p>❌</p></td>
 </tr>
 <tr class="row-even"><td><p>BarrierIterations</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>DualObjectiveValue</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-even"><td><p>NodeCount</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>NumberOfThreads</p></td>
@@ -366,7 +384,7 @@
 <td><p>✅</p></td>
 </tr>
 <tr class="row-even"><td><p>ObjectiveBound</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>ObjectiveValue</p></td>
@@ -382,7 +400,7 @@
 <td><p>✅</p></td>
 </tr>
 <tr class="row-even"><td><p>SimplexIterations</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>SolverName</p></td>
@@ -441,11 +459,11 @@
 <td><p>✅</p></td>
 </tr>
 <tr class="row-even"><td><p>IISLowerBound</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>IISUpperBound</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 </tbody>
@@ -476,7 +494,7 @@
 <td><p>❌</p></td>
 </tr>
 <tr class="row-odd"><td><p>IIS</p></td>
-<td><p>❌</p></td>
+<td><p>✅</p></td>
 <td><p>❌</p></td>
 </tr>
 </tbody>
@@ -486,22 +504,112 @@
 </section>
 <section id="solver-specific-operations">
 <h2>Solver-specific operations<a class="headerlink" href="#solver-specific-operations" title="Link to this heading">¶</a></h2>
-<section id="parameter">
-<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">¶</a></h3>
-<p>For <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/options/definitions/">solver-specific parameters</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_parameter</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_parameter</span></code> methods to get and set the parameters.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">highs</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-
-<span class="c1"># get the value of the parameter</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_parameter</span><span class="p">(</span><span class="s2">&quot;time_limit&quot;</span><span class="p">)</span>
-
-<span class="c1"># set the value of the parameter</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_raw_parameter</span><span class="p">(</span><span class="s2">&quot;time_limit&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+<section id="controls-and-attributes">
+<h3>Controls and Attributes<a class="headerlink" href="#controls-and-attributes" title="Link to this heading">¶</a></h3>
+<p>Xpress uses different terminology than PyOptInterface:</p>
+<ul class="simple">
+<li><p><strong>Controls</strong> govern the solution procedure and output format (similar to PyOptInterface parameters)</p></li>
+<li><p><strong>Attributes</strong> are read-only properties of the problem and solution</p></li>
+</ul>
+<p>PyOptInterface maps these as follows:</p>
+<ul class="simple">
+<li><p>PyOptInterface <strong>parameters</strong> correspond to Xpress controls</p></li>
+<li><p>PyOptInterface <strong>attributes</strong> may access Xpress controls, attributes, or variable/constraint properties through dedicated methods</p></li>
+</ul>
+</section>
+<section id="controls-parameters">
+<h3>Controls (Parameters)<a class="headerlink" href="#controls-parameters" title="Link to this heading">¶</a></h3>
+<p>For <a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/HTML/chapter7.html">solver-specific controls</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_control</span></code> and <code class="docutils literal notranslate"><span class="pre">set_raw_control</span></code> methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">xpress</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="c1"># Get the value of a control</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_control</span><span class="p">(</span><span class="s2">&quot;XPRS_TIMELIMIT&quot;</span><span class="p">)</span>
+<span class="c1"># Set the value of a control</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_raw_control</span><span class="p">(</span><span class="s2">&quot;XPRS_TIMELIMIT&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="information">
-<h3>Information<a class="headerlink" href="#information" title="Link to this heading">¶</a></h3>
-<p>HiGHS provides <a class="reference external" href="https://ergo-code.github.io/HiGHS/stable/structures/classes/HighsInfo/">information</a> for the model. We provide <code class="docutils literal notranslate"><span class="pre">model.get_raw_information(name:</span> <span class="pre">str)</span></code> method to access the value of information.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
+<p>For <a class="reference external" href="https://www.fico.com/fico-xpress-optimization/docs/latest/solver/optimizer/HTML/chapter8.html">problem attributes</a>, we provide <code class="docutils literal notranslate"><span class="pre">get_raw_attribute</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get number of columns in the problem</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_attribute</span><span class="p">(</span><span class="s2">&quot;XPRS_COLS&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We also provide <code class="docutils literal notranslate"><span class="pre">xpress.XPRS</span></code> to contain common constants from the Xpress C API.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using constants</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_raw_control_dbl_by_id</span><span class="p">(</span><span class="n">xpress</span><span class="o">.</span><span class="n">XPRS</span><span class="o">.</span><span class="n">TIMELIMIT</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="variable-and-constraint-properties">
+<h3>Variable and Constraint Properties<a class="headerlink" href="#variable-and-constraint-properties" title="Link to this heading">¶</a></h3>
+<p>Common variable and constraint properties are provided through PyOptInterface dedicated methods:</p>
+<p><strong>Variable methods:</strong></p>
+<ul class="simple">
+<li><p><strong>Bounds</strong>: <code class="docutils literal notranslate"><span class="pre">set_variable_lowerbound</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_lowerbound</span></code>, <code class="docutils literal notranslate"><span class="pre">set_variable_upperbound</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_upperbound</span></code>, <code class="docutils literal notranslate"><span class="pre">set_variable_bounds</span></code></p></li>
+<li><p><strong>Objective</strong>: <code class="docutils literal notranslate"><span class="pre">set_objective_coefficient</span></code>, <code class="docutils literal notranslate"><span class="pre">get_objective_coefficient</span></code></p></li>
+<li><p><strong>Type and name</strong>: <code class="docutils literal notranslate"><span class="pre">set_variable_type</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_type</span></code>, <code class="docutils literal notranslate"><span class="pre">set_variable_name</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_name</span></code></p></li>
+<li><p><strong>Solution values</strong>: <code class="docutils literal notranslate"><span class="pre">get_variable_value</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_rc</span></code>, <code class="docutils literal notranslate"><span class="pre">get_variable_primal_ray</span></code></p></li>
+<li><p><strong>Basis status</strong>: <code class="docutils literal notranslate"><span class="pre">is_variable_basic</span></code>, <code class="docutils literal notranslate"><span class="pre">is_variable_nonbasic_lb</span></code>, <code class="docutils literal notranslate"><span class="pre">is_variable_nonbasic_ub</span></code>, <code class="docutils literal notranslate"><span class="pre">is_variable_superbasic</span></code></p></li>
+<li><p><strong>IIS information</strong>: <code class="docutils literal notranslate"><span class="pre">is_variable_lowerbound_IIS</span></code>, <code class="docutils literal notranslate"><span class="pre">is_variable_upperbound_IIS</span></code></p></li>
+</ul>
+<p><strong>Constraint methods:</strong></p>
+<ul class="simple">
+<li><p><strong>Definition</strong>: <code class="docutils literal notranslate"><span class="pre">set_constraint_sense</span></code>, <code class="docutils literal notranslate"><span class="pre">get_constraint_sense</span></code>, <code class="docutils literal notranslate"><span class="pre">set_constraint_rhs</span></code>, <code class="docutils literal notranslate"><span class="pre">get_constraint_rhs</span></code>, <code class="docutils literal notranslate"><span class="pre">set_constraint_name</span></code>, <code class="docutils literal notranslate"><span class="pre">get_constraint_name</span></code></p></li>
+<li><p><strong>Coefficients</strong>: <code class="docutils literal notranslate"><span class="pre">set_normalized_coefficient</span></code>, <code class="docutils literal notranslate"><span class="pre">get_normalized_coefficient</span></code>, <code class="docutils literal notranslate"><span class="pre">set_normalized_rhs</span></code>, <code class="docutils literal notranslate"><span class="pre">get_normalized_rhs</span></code></p></li>
+<li><p><strong>Solution values</strong>: <code class="docutils literal notranslate"><span class="pre">get_constraint_dual</span></code>, <code class="docutils literal notranslate"><span class="pre">get_constraint_slack</span></code>, <code class="docutils literal notranslate"><span class="pre">get_constraint_dual_ray</span></code></p></li>
+<li><p><strong>Basis status</strong>: <code class="docutils literal notranslate"><span class="pre">is_constraint_basic</span></code>, <code class="docutils literal notranslate"><span class="pre">is_constraint_nonbasic_lb</span></code>, <code class="docutils literal notranslate"><span class="pre">is_constraint_nonbasic_ub</span></code>, <code class="docutils literal notranslate"><span class="pre">is_constraint_superbasic</span></code></p></li>
+<li><p><strong>IIS information</strong>: <code class="docutils literal notranslate"><span class="pre">is_constraint_in_IIS</span></code></p></li>
+</ul>
+<p><strong>Usage examples:</strong></p>
+<p>Variable properties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Bounds</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_lowerbound</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">lb</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_lowerbound</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_upperbound</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+<span class="n">ub</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_upperbound</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+<span class="c1"># Objective coefficient</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_objective_coefficient</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="n">coef</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_objective_coefficient</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+<span class="c1"># Type and name</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_type</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">VariableDomain</span><span class="o">.</span><span class="n">Integer</span><span class="p">)</span>
+<span class="n">vtype</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_type</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_variable_name</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_name</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+<span class="c1"># Solution values</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_value</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_rc</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<span class="n">ray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_variable_primal_ray</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+<span class="c1"># Basis status</span>
+<span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">is_variable_basic</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Constraint properties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sense and RHS</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_constraint_sense</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">ConstraintSense</span><span class="o">.</span><span class="n">LessEqual</span><span class="p">)</span>
+<span class="n">sense</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_sense</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_constraint_rhs</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="n">rhs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_rhs</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+<span class="c1"># Name</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_constraint_name</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_name</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+<span class="c1"># Solution values</span>
+<span class="n">dual</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_dual</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+<span class="n">slack</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_slack</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+<span class="n">ray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_constraint_dual_ray</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+<span class="c1"># Basis status</span>
+<span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">is_constraint_basic</span><span class="p">(</span><span class="n">constraint</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
 </section>
 </section>
 </section>
@@ -511,23 +619,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="ipopt.html">
+          <a class="next-page" href="copt.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Ipopt</div>
+                <div class="title">COPT</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="mosek.html">
+          <a class="prev-page" href="gurobi.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Mosek</div>
+                <div class="title">Gurobi</div>
                 
               </div>
             </a>
@@ -561,9 +669,9 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">HiGHS</a><ul>
+<li><a class="reference internal" href="#">Xpress</a><ul>
 <li><a class="reference internal" href="#initial-setup">Initial setup</a></li>
-<li><a class="reference internal" href="#the-capability-of-highs-model">The capability of <code class="docutils literal notranslate"><span class="pre">highs.Model</span></code></a><ul>
+<li><a class="reference internal" href="#the-capability-of-xpress-model">The capability of <code class="docutils literal notranslate"><span class="pre">xpress.Model</span></code></a><ul>
 <li><a class="reference internal" href="#supported-constraints">Supported constraints</a></li>
 <li><a class="reference internal" href="#supported-model-attribute">Supported <span class="xref myst">model attribute</span></a></li>
 <li><a class="reference internal" href="#supported-variable-attribute">Supported <span class="xref myst">variable attribute</span></a></li>
@@ -571,8 +679,10 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#solver-specific-operations">Solver-specific operations</a><ul>
-<li><a class="reference internal" href="#parameter">Parameter</a></li>
-<li><a class="reference internal" href="#information">Information</a></li>
+<li><a class="reference internal" href="#controls-and-attributes">Controls and Attributes</a></li>
+<li><a class="reference internal" href="#controls-parameters">Controls (Parameters)</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#variable-and-constraint-properties">Variable and Constraint Properties</a></li>
 </ul>
 </li>
 </ul>
