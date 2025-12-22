@@ -52,7 +52,7 @@ jobs:
           python -m pytest tests -k "highs or ipopt" -v
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pyoptinterface-wheel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.python-version }}
           path: dist/
