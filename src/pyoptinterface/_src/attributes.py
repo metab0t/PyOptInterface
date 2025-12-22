@@ -11,6 +11,7 @@ class VariableAttribute(Enum):
     Name = auto()
     IISLowerBound = auto()
     IISUpperBound = auto()
+    ReducedCost = auto()
 
 
 var_attr_type_map = {
@@ -22,6 +23,7 @@ var_attr_type_map = {
     VariableAttribute.Name: str,
     VariableAttribute.IISLowerBound: bool,
     VariableAttribute.IISUpperBound: bool,
+    VariableAttribute.ReducedCost: float,
 }
 
 

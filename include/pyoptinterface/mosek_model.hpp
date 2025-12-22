@@ -70,6 +70,8 @@
 	B(MSK_putxxslice);                 \
 	B(MSK_getxcslice);                 \
 	B(MSK_getyslice);                  \
+	B(MSK_getslxslice);                \
+	B(MSK_getsuxslice);                \
 	B(MSK_getconnamelen);              \
 	B(MSK_getconname);                 \
 	B(MSK_getobjsense);                \
@@ -225,6 +227,9 @@ class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
 	void set_variable_lower_bound(const VariableIndex &variable, double lb);
 	void set_variable_upper_bound(const VariableIndex &variable, double ub);
 	void set_variable_primal(const VariableIndex &variable, double primal);
+
+	// reduced cost of variable
+	double get_variable_dual(const VariableIndex &variable);
 
 	double get_constraint_primal(const ConstraintIndex &constraint);
 	double get_constraint_dual(const ConstraintIndex &constraint);

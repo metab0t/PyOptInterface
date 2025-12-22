@@ -121,6 +121,7 @@ variable_attribute_get_func_map = {
     # VariableAttribute.PrimalStart: lambda model, v: model.mip_start_values.get(v, None),
     VariableAttribute.Domain: lambda model, v: model.get_variable_type(v),
     VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_dual(v),
 }
 
 variable_attribute_set_func_map = {

@@ -245,7 +245,7 @@ target_sources(xpress_model PRIVATE
     include/pyoptinterface/xpress_model.hpp
     lib/xpress_model.cpp
 )
-target_link_libraries(xpress_model PUBLIC core nlexpr nleval)
+target_link_libraries(xpress_model PUBLIC core nlexpr)
 
 nanobind_add_module(
     xpress_model_ext
@@ -336,7 +336,7 @@ nanobind_add_stub(
 )
 
 nanobind_add_stub(
-  xpress_model_ext_stub 
+  xpress_model_ext_stub
   INSTALL_TIME
   MODULE pyoptinterface._src.xpress_model_ext
   OUTPUT ${POI_INSTALL_DIR}/xpress_model_ext.pyi

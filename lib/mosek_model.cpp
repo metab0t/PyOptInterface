@@ -1116,6 +1116,20 @@ void MOSEKModel::set_variable_primal(const VariableIndex &variable, double prima
 	check_error(error);
 }
 
+double MOSEKModel::get_variable_dual(const VariableIndex &variable)
+{
+	MSKrealt slx, sux;
+	auto column = _checked_variable_index(variable);
+	auto error =
+	    mosek::MSK_getslxslice(m_model.get(), get_current_solution(), column, column + 1, &slx);
+	check_error(error);
+	error = mosek::MSK_getsuxslice(m_model.get(), get_current_solution(), column, column + 1, &sux);
+	check_error(error);
+
+	double retval = slx - sux;
+	return retval;
+}
+
 double MOSEKModel::get_constraint_primal(const ConstraintIndex &constraint)
 {
 	int row = _checked_constraint_index(constraint);

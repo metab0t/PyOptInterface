@@ -778,6 +778,16 @@ double POIHighsModel::get_constraint_dual(const ConstraintIndex &constraint)
 	throw std::runtime_error("No solution available");
 }
 
+double POIHighsModel::get_variable_dual(const VariableIndex &variable)
+{
+	auto col = _checked_variable_index(variable);
+	if (m_solution.primal_solution_status != kHighsSolutionStatusNone)
+	{
+		return m_solution.coldual[col];
+	}
+	throw std::runtime_error("No solution available");
+}
+
 ObjectiveSense POIHighsModel::get_obj_sense()
 {
 	HighsInt obj_sense;

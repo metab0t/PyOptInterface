@@ -100,6 +100,9 @@ variable_attribute_get_func_map = {
         v
     )
     > 0,
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_info(
+        v, "RedCost"
+    ),
 }
 
 

@@ -146,6 +146,9 @@ variable_attribute_get_func_map = {
         v, "IISUB"
     )
     > 0,
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_raw_attribute_double(
+        v, "RC"
+    ),
 }
 
 variable_attribute_get_translate_func_map = {

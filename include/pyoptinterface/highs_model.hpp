@@ -193,6 +193,9 @@ class POIHighsModel : public OnesideLinearConstraintMixin<POIHighsModel>,
 	double get_constraint_primal(const ConstraintIndex &constraint);
 	double get_constraint_dual(const ConstraintIndex &constraint);
 
+	// dual of variable as reduced cost
+	double get_variable_dual(const VariableIndex &variable);
+
 	ObjectiveSense get_obj_sense();
 	void set_obj_sense(ObjectiveSense sense);
 	double get_obj_value();

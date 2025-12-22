@@ -149,6 +149,8 @@ NB_MODULE(highs_model_ext, m)
 		BIND_F(get_variable_lower_bound)
 	    BIND_F(get_variable_upper_bound)
 
+		BIND_F(get_variable_dual)
+
 	    BIND_F(get_constraint_primal)
 	    BIND_F(get_constraint_dual)
 	    BIND_F(get_constraint_name)

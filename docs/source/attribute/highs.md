@@ -97,6 +97,9 @@
 *   - IISUpperBound
     - ❌
     - ❌
+*   - ReducedCost
+    - ✅
+    - ❌
 :::
 
 ### Supported [constraint attribute](#pyoptinterface.ConstraintAttribute)
