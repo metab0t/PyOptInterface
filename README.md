@@ -94,20 +94,7 @@ y_val = model.get_value(y)
 ```
 
 ## Citation
-If you use PyOptInterface in your research, please consider citing [the following paper](https://arxiv.org/abs/2405.10130):
-
-```bibtex
-@misc{yang2024pyoptinterface,
-      title={PyOptInterface: Design and implementation of an efficient modeling language for mathematical optimization}, 
-      author={Yue Yang and Chenhui Lin and Luo Xu and Wenchuan Wu},
-      year={2024},
-      eprint={2405.10130},
-      archivePrefix={arXiv},
-      primaryClass={cs.MS}
-}
-```
-
-If you use the nonlinear optimization feature of PyOptInterface, please consider citing [the following paper](https://ieeexplore.ieee.org/document/10721402) as well:
+If you use PyOptInterface in your research, please consider citing [the following paper](https://ieeexplore.ieee.org/document/10721402):
 
 ```bibtex
 @article{yang2024accelerating,
