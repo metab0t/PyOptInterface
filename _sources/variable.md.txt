@@ -36,6 +36,8 @@ After a variable is created, we can query or modify its attributes. The followin
     - bool
 *   - IISUpperBound
     - bool
+*   - ReducedCost
+    - float
 :::
 
 ```python
