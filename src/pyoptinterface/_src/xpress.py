@@ -279,7 +279,7 @@ variable_attribute_get_func_map = {  # UB, LB, Name, etc
     VariableAttribute.IISUpperBound: lambda model, v: model.get_variable_upperbound_IIS(
         v
     ),
-    # VariableAttribute.??: lambda model, v: model.get_variable_rc(v),
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_rc(v),
 }
 
 variable_attribute_set_func_map = (
