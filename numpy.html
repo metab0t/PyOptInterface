@@ -363,7 +363,6 @@ Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&
         Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
 Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
 
-Termination status: TerminationStatusCode.OPTIMAL
  J       0       0         0 100.00%   -inf            0                  Large        0      0      0         0     0.0s
          1       0         1 100.00%   0               0                  0.00%        0      0      0         0     0.0s
 
@@ -383,6 +382,7 @@ Solving report
   Nodes             1
   Repair LPs        0
   LP iterations     0
+Termination status: TerminationStatusCode.OPTIMAL
 </pre></div>
 </div>
 </div>
@@ -447,9 +447,7 @@ Presolving model
 0 rows, 0 cols, 0 nonzeros  0s
 Presolve reductions: rows 0(-16); columns 0(-8); nonzeros 0(-16) - Reduced to empty
 Performed postsolve
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Solving the original LP from the solution after postsolve
+Solving the original LP from the solution after postsolve
 
 Model status        : Optimal
 Objective value     :  8.0000000000e+00
