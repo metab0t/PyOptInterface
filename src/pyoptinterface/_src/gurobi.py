@@ -257,6 +257,14 @@ _RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusString
         TerminationStatusCode.MEMORY_LIMIT,
         "Optimization terminated because the total amount of allocated memory exceeded the value specified in the SoftMemLimit parameter.",
     ),
+    (
+        TerminationStatusCode.LOCALLY_SOLVED,
+        "Model solved to local optimality. A solution satisfying the first-order optimality conditions (subject to tolerances) was found and is available.",
+    ),
+    (
+        TerminationStatusCode.LOCALLY_INFEASIBLE,
+        "Model appears to be locally infeasible. A first-order minimizer of a measure for the constraint violations was found.",
+    ),
 ]
 
 gurobi_raw_type_map = {
