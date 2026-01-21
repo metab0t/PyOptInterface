@@ -277,7 +277,7 @@ gurobi_raw_type_map = {
 
 def get_terminationstatus(model):
     status = model.get_model_raw_attribute_int("Status")
-    assert status >= 1 and status <= 15, f"Unknown status code: {status}"
+    assert status >= 1 and status <= 19, f"Unknown status code: {status}"
     return _RAW_STATUS_STRINGS[status - 1][0]
 
 
