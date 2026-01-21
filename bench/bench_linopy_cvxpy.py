@@ -34,8 +34,8 @@ def create_cvxpy_model(N):
 
 def create_poi_model(Model, N):
     m = Model()
-    x = m.add_variables(range(N), range(N))
-    y = m.add_variables(range(N), range(N))
+    x = m.add_m_variables((N, N))
+    y = m.add_m_variables((N, N))
     for i in range(N):
         for j in range(N):
             m.add_linear_constraint(x[i, j] - y[i, j], poi.Geq, i)
