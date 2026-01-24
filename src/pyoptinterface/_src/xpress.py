@@ -645,7 +645,6 @@ class Model(RawModel):
 
         super().set_callback(cb_wrapper, where)
 
-
-Model.add_variables = make_variable_tupledict
-Model.add_m_variables = make_variable_ndarray
-Model.add_m_linear_constraints = add_matrix_constraints
+    add_variables = make_variable_tupledict
+    add_m_variables = make_variable_ndarray
+    add_m_linear_constraints = add_matrix_constraints

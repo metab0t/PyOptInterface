@@ -1,18 +1,18 @@
-from .core_ext import ExprBuilder
+from .core_ext import ExprBuilder, VariableDomain
 from .tupledict import make_tupledict
 
 from collections.abc import Collection
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 
 def make_variable_ndarray(
     model,
     shape: Union[Tuple[int, ...], int],
-    domain=None,
-    lb=None,
-    ub=None,
-    name=None,
-    start=None,
+    domain: Optional[VariableDomain] = None,
+    lb: Optional[float] = None,
+    ub: Optional[float] = None,
+    name: Optional[str] = None,
+    start: Optional[float] = None,
 ):
     import numpy as np
 
@@ -41,7 +41,13 @@ def make_variable_ndarray(
 
 
 def make_variable_tupledict(
-    model, *coords: Collection, domain=None, lb=None, ub=None, name=None, start=None
+    model,
+    *coords: Collection,
+    domain: Optional[VariableDomain] = None,
+    lb: Optional[float] = None,
+    ub: Optional[float] = None,
+    name: Optional[str] = None,
+    start: Optional[float] = None,
 ):
     kw_args = dict()
     if domain is not None:

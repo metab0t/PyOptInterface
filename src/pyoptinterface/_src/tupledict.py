@@ -1,7 +1,6 @@
 from typing import Iterable
 from itertools import product
 
-
 WILDCARD = "*"
 
 
