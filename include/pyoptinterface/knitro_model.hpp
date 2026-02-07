@@ -1,0 +1,465 @@
+#pragma once
+
+#include <deque>
+#include <memory>
+#include <optional>
+#include <variant>
+
+#include "solvers/knitro/knitro.h"
+
+#include "pyoptinterface/core.hpp"
+#include "pyoptinterface/container.hpp"
+#include "pyoptinterface/cppad_interface.hpp"
+#define USE_NLMIXIN
+#include "pyoptinterface/solver_common.hpp"
+#include "pyoptinterface/dylib.hpp"
+
+// Define Knitro C APIs to be dynamically loaded
+#define APILIST                         \
+	B(KN_new);                          \
+	B(KN_free);                         \
+	B(KN_update);                       \
+	B(KN_reset_params_to_defaults);     \
+	B(KN_load_param_file);              \
+	B(KN_save_param_file);              \
+	B(KN_get_param_id);                 \
+	B(KN_get_param_type);               \
+	B(KN_set_int_param);                \
+	B(KN_set_char_param);               \
+	B(KN_set_double_param);             \
+	B(KN_get_int_param);                \
+	B(KN_get_double_param);             \
+	B(KN_add_vars);                     \
+	B(KN_add_var);                      \
+	B(KN_add_cons);                     \
+	B(KN_add_con);                      \
+	B(KN_set_var_lobnd);                \
+	B(KN_set_var_upbnd);                \
+	B(KN_get_var_lobnd);                \
+	B(KN_get_var_upbnd);                \
+	B(KN_set_var_type);                 \
+	B(KN_get_var_type);                 \
+	B(KN_set_var_name);                 \
+	B(KN_get_var_name);                 \
+	B(KN_set_con_lobnd);                \
+	B(KN_set_con_upbnd);                \
+	B(KN_set_con_eqbnd);                \
+	B(KN_get_con_lobnd);                \
+	B(KN_get_con_upbnd);                \
+	B(KN_get_con_eqbnd);                \
+	B(KN_set_con_name);                 \
+	B(KN_get_con_name);                 \
+	B(KN_set_obj_goal);                 \
+	B(KN_get_obj_goal);                 \
+	B(KN_set_var_primal_init_value);    \
+	B(KN_add_obj_constant);             \
+	B(KN_del_obj_constant);             \
+	B(KN_add_obj_linear_struct);        \
+	B(KN_del_obj_linear_struct);        \
+	B(KN_del_obj_linear_struct_all);    \
+	B(KN_add_obj_quadratic_struct);     \
+	B(KN_del_obj_quadratic_struct);     \
+	B(KN_del_obj_quadratic_struct_all); \
+	B(KN_add_con_constant);             \
+	B(KN_add_con_linear_struct);        \
+	B(KN_add_con_linear_struct_one);    \
+	B(KN_add_con_linear_term);          \
+	B(KN_add_con_quadratic_struct);     \
+	B(KN_add_con_quadratic_struct_one); \
+	B(KN_add_con_quadratic_term);       \
+	B(KN_add_con_L2norm);               \
+	B(KN_del_con_linear_struct);        \
+	B(KN_del_con_quadratic_struct);     \
+	B(KN_chg_con_linear_term);          \
+	B(KN_add_eval_callback);            \
+	B(KN_del_obj_eval_callback_all);    \
+	B(KN_del_eval_callbacks);           \
+	B(KN_set_cb_user_params);           \
+	B(KN_set_cb_grad);                  \
+	B(KN_set_cb_hess);                  \
+	B(KN_solve);                        \
+	B(KN_get_solution);                 \
+	B(KN_get_obj_value);                \
+	B(KN_get_number_cons);              \
+	B(KN_get_number_vars);              \
+	B(KN_get_var_primal_values);        \
+	B(KN_get_var_primal_values_all);    \
+	B(KN_get_var_dual_values);          \
+	B(KN_get_var_dual_values_all);      \
+	B(KN_get_con_values);               \
+	B(KN_get_con_values_all);           \
+	B(KN_get_con_dual_values);          \
+	B(KN_get_con_dual_values_all);
+
+namespace knitro
+{
+#define B DYLIB_EXTERN_DECLARE
+APILIST
+#undef B
+
+bool is_library_loaded();
+
+bool load_library(const std::string &path);
+} // namespace knitro
+
+struct KnitroFreeProblemT
+{
+	void operator()(KN_context *kc) const
+	{
+		if (kc != nullptr)
+		{
+			knitro::KN_free(&kc);
+		}
+	}
+};
+
+struct KnitroResult
+{
+	bool is_valid = false;
+	int status = 0;
+	double obj_val = 0.0;
+	std::vector<double> x;
+	std::vector<double> lambda;
+	std::vector<double> con_values;
+	std::vector<double> con_duals;
+};
+
+enum ObjectiveFlags
+{
+	OBJ_CONSTANT = 1 << 0,  // 0x01
+	OBJ_LINEAR = 1 << 1,    // 0x02
+	OBJ_QUADRATIC = 1 << 2, // 0x04
+	OBJ_NONLINEAR = 1 << 3  // 0x08
+};
+
+enum ConstraintSenseFlags
+{
+	CON_LOBND = 1 << 0, // 0x01
+	CON_UPBND = 1 << 1, // 0x02
+};
+
+struct NLCallbackData
+{
+	size_t idx;
+	CppAD::ADFun<double> function;
+	std::vector<KNINT> indexVars;
+	std::vector<std::set<size_t>> jac_pattern;
+	std::vector<size_t> jac_rows;
+	std::vector<size_t> jac_cols;
+	CppAD::sparse_jacobian_work jac_work;
+};
+
+class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
+                    public TwosideLinearConstraintMixin<KnitroModel>,
+                    public OnesideQuadraticConstraintMixin<KnitroModel>,
+                    public TwosideQuadraticConstraintMixin<KnitroModel>,
+					public TwosideNLConstraintMixin<KnitroModel>,
+                    public LinearObjectiveMixin<KnitroModel>,
+                    public PPrintMixin<KnitroModel>,
+                    public GetValueMixin<KnitroModel>
+{
+  public:
+	KnitroModel();
+	void init();
+	void close();
+
+	double get_infinity() const;
+	KNINT _variable_index(const VariableIndex &variable);
+	KNINT _constraint_index(const ConstraintIndex &constraint);
+
+	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
+	                           double lb = -KN_INFINITY, double ub = KN_INFINITY,
+	                           const char *name = nullptr);
+	void delete_variable(const VariableIndex &variable);
+
+	double get_variable_lb(const VariableIndex &variable);
+	double get_variable_ub(const VariableIndex &variable);
+	void set_variable_lb(const VariableIndex &variable, double lb);
+	void set_variable_ub(const VariableIndex &variable, double ub);
+	void set_variable_bounds(const VariableIndex &variable, double lb, double ub);
+	double get_variable_value(const VariableIndex &variable);
+	void set_variable_start(const VariableIndex &variable, double start);
+	std::string get_variable_name(const VariableIndex &variable);
+	void set_variable_name(const VariableIndex &variable, const std::string &name);
+	void set_variable_domain(const VariableIndex &variable, VariableDomain domain);
+	double get_variable_rc(const VariableIndex &variable);
+
+	std::string pprint_variable(const VariableIndex &variable);
+
+	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
+	                                      double rhs, const char *name = nullptr);
+	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f,
+	                                      const std::tuple<double, double> &interval,
+	                                      const char *name = nullptr);
+	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &f,
+	                                         ConstraintSense sense, double rhs,
+	                                         const char *name = nullptr);
+	ConstraintIndex add_quadratic_constraint(const ScalarQuadraticFunction &f,
+	                                         const std::tuple<double, double> &interval,
+	                                         const char *name = nullptr);
+	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
+	                                                 const char *name, bool rotated);
+	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
+	                                         const std::tuple<double, double> &interval,
+	                                         const char *name = nullptr);
+
+	void delete_constraint(ConstraintIndex constraint);
+	void set_constraint_name(const ConstraintIndex &constraint, const std::string &name);
+	std::string get_constraint_name(const ConstraintIndex &constraint);
+
+	double get_constraint_primal(const ConstraintIndex &constraint);
+	double get_constraint_dual(const ConstraintIndex &constraint);
+
+	void set_normalized_rhs(const ConstraintIndex &constraint, double rhs);
+	double get_normalized_rhs(const ConstraintIndex &constraint);
+	void set_normalized_coefficient(const ConstraintIndex &constraint,
+	                                const VariableIndex &variable, double coefficient);
+
+	// Objective functions
+	void set_objective(const ScalarAffineFunction &f, ObjectiveSense sense);
+	void set_objective(const ScalarQuadraticFunction &f, ObjectiveSense sense);
+	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
+	void add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result);
+	double get_obj_value();
+
+	void optimize();
+	void _optimize();
+
+	template <typename T>
+	void set_raw_parameter(const std::string &name, T value)
+	{
+		int error;
+		int param_id;
+		error = knitro::KN_get_param_id(m_kc.get(), name.c_str(), &param_id);
+		check_error(error);
+		set_raw_parameter<T>(param_id, value);
+	}
+
+	template <typename T>
+	void set_raw_parameter(int param_id, T value)
+	{
+		int error;
+		if constexpr (std::is_same_v<T, int>)
+		{
+			error = knitro::KN_set_int_param(m_kc.get(), param_id, value);
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			error = knitro::KN_set_double_param(m_kc.get(), param_id, value);
+		}
+		else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char *>)
+		{
+			if constexpr (std::is_same_v<T, std::string>)
+			{
+				error = knitro::KN_set_char_param(m_kc.get(), param_id, value.c_str());
+			}
+			else
+			{
+				error = knitro::KN_set_char_param(m_kc.get(), param_id, value);
+			}
+		}
+		else
+		{
+			static_assert(std::is_same_v<T, int> || std::is_same_v<T, double> ||
+			                  std::is_same_v<T, std::string> || std::is_same_v<T, const char *>,
+			              "T must be int, double, std::string, or const char*");
+		}
+		check_error(error);
+	}
+
+	template <typename T>
+	T get_raw_parameter(const std::string &name)
+	{
+		int error;
+		int param_id;
+		error = knitro::KN_get_param_id(m_kc.get(), name.c_str(), &param_id);
+		check_error(error);
+		return get_raw_parameter<T>(param_id);
+	}
+
+	template <typename T>
+	T get_raw_parameter(int param_id)
+	{
+		int error;
+		T value;
+		if constexpr (std::is_same_v<T, int>)
+		{
+			error = knitro::KN_get_int_param(m_kc.get(), param_id, &value);
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			error = knitro::KN_get_double_param(m_kc.get(), param_id, &value);
+		}
+		else
+		{
+			static_assert(std::is_same_v<T, int> || std::is_same_v<T, double>,
+			              "T must be int or double for get_raw_parameter");
+		}
+		check_error(error);
+		return value;
+	}
+
+	void check_error(int error) const;
+
+	std::unique_ptr<KN_context, KnitroFreeProblemT> m_kc = nullptr;
+
+	// Basic model statistics
+	size_t n_vars = 0;
+	size_t n_cons = 0;
+	size_t n_lincons = 0;
+	size_t n_quadcons = 0;
+	size_t n_soccons = 0;
+
+	// Auxiliary data for constraints and objectives
+	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_aux_cons;
+	std::unordered_map<KNINT, uint8_t> m_con_sense_flags;
+	uint8_t m_obj_flag = 0;
+
+	// Store NL functions to keep them alive for callbacks
+	// Use unique_ptr for pointer stability (unordered_map can rehash and invalidate references)
+	std::unordered_map<KNINT, std::unique_ptr<NLCallbackData>> m_con_nl_data_map;
+	std::vector<std::unique_ptr<NLCallbackData>> m_obj_nl_data;
+
+	// Solution and solve status
+	KnitroResult m_result;
+	bool m_is_dirty = true;
+	int m_solve_status = 0;
+
+	static bool is_name_empty(const char *name)
+	{
+		return name == nullptr || name[0] == '\0';
+	}
+
+	static int knitro_var_type(VariableDomain domain)
+	{
+		switch (domain)
+		{
+		case VariableDomain::Continuous:
+			return KN_VARTYPE_CONTINUOUS;
+		case VariableDomain::Integer:
+			return KN_VARTYPE_INTEGER;
+		case VariableDomain::Binary:
+			return KN_VARTYPE_BINARY;
+		default:
+			throw std::runtime_error("Unknown variable domain");
+		}
+	}
+
+	static int knitro_obj_goal(ObjectiveSense sense)
+	{
+		switch (sense)
+		{
+		case ObjectiveSense::Minimize:
+			return KN_OBJGOAL_MINIMIZE;
+		case ObjectiveSense::Maximize:
+			return KN_OBJGOAL_MAXIMIZE;
+		default:
+			throw std::runtime_error("Unknown objective sense");
+		}
+	}
+
+  private:
+	std::tuple<double, double> _sense_to_interval(ConstraintSense sense, double rhs);
+	void _update_con_sense_flags(const ConstraintIndex &constraint, ConstraintSense sense);
+
+	void _set_linear_constraint(const ConstraintIndex &constraint, const ScalarAffineFunction &f);
+	void _set_quadratic_constraint(const ConstraintIndex &constraint,
+	                               const ScalarQuadraticFunction &f);
+	void _set_second_order_cone_constraint(const ConstraintIndex &constraint,
+	                                       const Vector<VariableIndex> &variables);
+	void _set_second_order_cone_constraint_rotated(const ConstraintIndex &constraint,
+	                                               const Vector<VariableIndex> &variables);
+	void _set_nonlinear_constraint(const ConstraintIndex &constraint, ExpressionGraph &graph);
+	void _set_linear_objective(const ScalarAffineFunction &f);
+	void _set_quadratic_objective(const ScalarQuadraticFunction &f);
+	void _add_nonlinear_objective(ExpressionGraph &graph);
+	void _reset_objective();
+
+	template <typename F>
+	ConstraintIndex _add_constraint_impl(ConstraintType type,
+	                                     const std::tuple<double, double> &interval,
+	                                     const char *name, size_t *np, const F &setter)
+	{
+		KNINT indexCon;
+		int error = knitro::KN_add_con(m_kc.get(), &indexCon);
+		check_error(error);
+
+		IndexT index = indexCon;
+		ConstraintIndex constraint(type, index);
+
+		double lb = std::get<0>(interval);
+		double ub = std::get<1>(interval);
+
+		error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon, lb);
+		check_error(error);
+		error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon, ub);
+		check_error(error);
+
+		setter(constraint);
+
+		if (!is_name_empty(name))
+		{
+			error = knitro::KN_set_con_name(m_kc.get(), indexCon, name);
+			check_error(error);
+		}
+
+		m_con_sense_flags[indexCon] = CON_UPBND;
+
+		n_cons++;
+		if (np != nullptr)
+		{
+			(*np)++;
+		}
+		m_is_dirty = true;
+
+		return constraint;
+	}
+
+	template <typename S, typename F>
+	ConstraintIndex _add_constraint_with_sense(const S &function, ConstraintSense sense, double rhs,
+	                                           const char *name, const F &add)
+	{
+		auto interval = _sense_to_interval(sense, rhs);
+		auto constraint = add(function, interval, name);
+		_update_con_sense_flags(constraint, sense);
+		return constraint;
+	}
+
+	template <typename F>
+	void _set_objective_impl(ObjectiveSense sense, const F &setter)
+	{
+		_reset_objective();
+		setter();
+		int goal = knitro_obj_goal(sense);
+		int error = knitro::KN_set_obj_goal(m_kc.get(), goal);
+		check_error(error);
+		m_is_dirty = true;
+		m_result.is_valid = false;
+	}
+
+	template <typename F>
+	std::string _get_name(KNINT index, F get, const char *prefix) const
+	{
+		char name[1024];
+		name[0] = '\0';
+		int error = get(m_kc.get(), index, 1024, name);
+		check_error(error);
+
+		if (name[0] != '\0')
+		{
+			return std::string(name);
+		}
+		else
+		{
+			return fmt::format("{}{}", prefix, index);
+		}
+	}
+
+	template <typename F>
+	void _set_name(KNINT index, const std::string &name, F set)
+	{
+		int error = set(m_kc.get(), index, name.c_str());
+		check_error(error);
+		m_is_dirty = true;
+	}
+};

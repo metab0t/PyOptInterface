@@ -1,0 +1,412 @@
+import os
+import platform
+from pathlib import Path
+import re
+import logging
+from typing import Tuple, Union, overload
+
+from .knitro_model_ext import RawModel, KN, load_library
+from .matrix import add_matrix_constraints
+from .attributes import (
+    VariableAttribute,
+    ConstraintAttribute,
+    ModelAttribute,
+    ResultStatusCode,
+    TerminationStatusCode,
+)
+from .core_ext import (
+    VariableIndex,
+    ConstraintIndex,
+    ConstraintType,
+    ConstraintSense,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    ExprBuilder,
+)
+from .comparison_constraint import ComparisonConstraint
+from .solver_common import (
+    _get_model_attribute,
+    _set_model_attribute,
+    _get_entity_attribute,
+    _set_entity_attribute,
+)
+from .aml import make_variable_ndarray, make_variable_tupledict
+from .nlexpr_ext import ExpressionHandle
+from .nlfunc import ExpressionGraphContext, convert_to_expressionhandle
+
+
+def detected_libraries():
+    libs = []
+
+    subdir = {
+        "Linux": "lib",
+        "Darwin": "lib",
+        "Windows": "bin",
+    }[platform.system()]
+    libname_pattern = {
+        "Linux": r"libknitro\.so.*",
+        "Darwin": r"libknitro\.dylib.*",
+        "Windows": r"knitro\d*\.dll",
+    }[platform.system()]
+    suffix_pattern = {
+        "Linux": "*.so*",
+        "Darwin": "*.dylib*",
+        "Windows": "*.dll",
+    }[platform.system()]
+
+    # Environment variable
+    knitro_dir = os.environ.get("KNITRODIR", None)
+    if knitro_dir and os.path.exists(knitro_dir):
+        dir = Path(knitro_dir) / subdir
+        if dir.exists():
+            for path in dir.glob(suffix_pattern):
+                match = re.match(libname_pattern, path.name)
+                if match:
+                    libs.append(str(path))
+
+    # Default library names
+    default_libname = {
+        "Linux": ["libknitro.so"],
+        "Darwin": ["libknitro.dylib"],
+        "Windows": ["knitro.dll"],
+    }[platform.system()]
+    libs.extend(default_libname)
+
+    return libs
+
+
+def autoload_library():
+    libs = detected_libraries()
+    for lib in libs:
+        ret = load_library(lib)
+        if ret:
+            logging.info(f"Loaded KNITRO library: {lib}")
+            return True
+    return False
+
+
+autoload_library()
+
+
+# Variable Attribute
+variable_attribute_get_func_map = {
+    VariableAttribute.Value: lambda model, v: model.get_value(v),
+    VariableAttribute.LowerBound: lambda model, v: model.get_variable_lb(v),
+    VariableAttribute.UpperBound: lambda model, v: model.get_variable_ub(v),
+    VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_rc(v)
+}
+
+variable_attribute_set_func_map = {
+    VariableAttribute.LowerBound: lambda model, v, x: model.set_variable_lb(v, x),
+    VariableAttribute.UpperBound: lambda model, v, x: model.set_variable_ub(v, x),
+    VariableAttribute.PrimalStart: lambda model, v, x: model.set_variable_start(v, x),
+    VariableAttribute.Name: lambda model, v, x: model.set_variable_name(v, x),
+    VariableAttribute.Domain: lambda model, v, x: model.set_variable_domain(v, x),
+}
+
+# Constraint Attribute
+constraint_attribute_get_func_map = {
+    ConstraintAttribute.Primal: lambda model, c: model.get_constraint_primal(c),
+    ConstraintAttribute.Dual: lambda model, c: model.get_constraint_dual(c),
+    ConstraintAttribute.Name: lambda model, c: model.get_constraint_name(c),
+}
+
+constraint_attribute_set_func_map = {
+    ConstraintAttribute.Name: lambda model, c, x: model.set_constraint_name(c, x),
+}
+
+# Status code mapping
+_RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusCode
+    (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL),
+    (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL_OR_SATISFACTORY),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_NEAR_OPT),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_XTOL),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_NO_IMPROVE),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_FTOL),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_BEST),
+    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_MULTISTART),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEASIBLE),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_XTOL),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_NO_IMPROVE),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_MULTISTART),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_CON_BOUNDS),
+    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_VAR_BOUNDS),
+    (TerminationStatusCode.DUAL_INFEASIBLE, KN.RC_UNBOUNDED),
+    (TerminationStatusCode.INFEASIBLE_OR_UNBOUNDED, KN.RC_UNBOUNDED_OR_INFEAS),
+    (TerminationStatusCode.ITERATION_LIMIT, KN.RC_ITER_LIMIT_FEAS),
+    (TerminationStatusCode.ITERATION_LIMIT, KN.RC_ITER_LIMIT_INFEAS),
+    (TerminationStatusCode.TIME_LIMIT, KN.RC_TIME_LIMIT_FEAS),
+    (TerminationStatusCode.TIME_LIMIT, KN.RC_TIME_LIMIT_INFEAS),
+    (TerminationStatusCode.OTHER_LIMIT, KN.RC_FEVAL_LIMIT_FEAS),
+    (TerminationStatusCode.OTHER_LIMIT, KN.RC_FEVAL_LIMIT_INFEAS),
+    (TerminationStatusCode.SOLUTION_LIMIT, KN.RC_MIP_EXH_FEAS),
+    (TerminationStatusCode.SOLUTION_LIMIT, KN.RC_MIP_EXH_INFEAS),
+    (TerminationStatusCode.NODE_LIMIT, KN.RC_MIP_NODE_LIMIT_FEAS),
+    (TerminationStatusCode.NODE_LIMIT, KN.RC_MIP_NODE_LIMIT_INFEAS),
+    (TerminationStatusCode.INTERRUPTED, KN.RC_USER_TERMINATION),
+    (TerminationStatusCode.NUMERICAL_ERROR, KN.RC_EVAL_ERR),
+    (TerminationStatusCode.MEMORY_LIMIT, KN.RC_OUT_OF_MEMORY),
+    (TerminationStatusCode.OTHER_ERROR, KN.RC_CALLBACK_ERR),
+    (TerminationStatusCode.OTHER_ERROR, KN.RC_LP_SOLVER_ERR),
+    (TerminationStatusCode.OTHER_ERROR, KN.RC_LINEAR_SOLVER_ERR),
+    (TerminationStatusCode.OTHER_ERROR, KN.RC_INTERNAL_ERROR),
+]
+
+
+def _termination_status_knitro(model: "Model"):
+    status_code = model.m_solve_status
+    for ts, rs in _RAW_STATUS_STRINGS:
+        if status_code == rs:
+            return ts
+    return TerminationStatusCode.OTHER_ERROR
+
+
+def _result_status_knitro(model: "Model"):
+    status_code = model.m_solve_status
+    if status_code == KN.RC_OPTIMAL or status_code == KN.RC_OPTIMAL_OR_SATISFACTORY:
+        return ResultStatusCode.FEASIBLE_POINT
+    elif status_code in [KN.RC_NEAR_OPT, KN.RC_FEAS_XTOL, KN.RC_FEAS_NO_IMPROVE,
+                         KN.RC_FEAS_FTOL, KN.RC_FEAS_BEST, KN.RC_FEAS_MULTISTART]:
+        return ResultStatusCode.FEASIBLE_POINT
+    elif status_code in [KN.RC_INFEASIBLE, KN.RC_INFEAS_XTOL, KN.RC_INFEAS_NO_IMPROVE,
+                         KN.RC_INFEAS_MULTISTART, KN.RC_INFEAS_CON_BOUNDS, KN.RC_INFEAS_VAR_BOUNDS]:
+        return ResultStatusCode.INFEASIBLE_POINT
+    elif status_code in [KN.RC_ITER_LIMIT_FEAS, KN.RC_TIME_LIMIT_FEAS, KN.RC_FEVAL_LIMIT_FEAS,
+                         KN.RC_MIP_EXH_FEAS, KN.RC_MIP_TERM_FEAS, KN.RC_MIP_SOLVE_LIMIT_FEAS,
+                         KN.RC_MIP_NODE_LIMIT_FEAS]:
+        return ResultStatusCode.FEASIBLE_POINT
+    elif status_code in [KN.RC_ITER_LIMIT_INFEAS, KN.RC_TIME_LIMIT_INFEAS, KN.RC_FEVAL_LIMIT_INFEAS,
+                         KN.RC_MIP_EXH_INFEAS, KN.RC_MIP_SOLVE_LIMIT_INFEAS, KN.RC_MIP_NODE_LIMIT_INFEAS]:
+        return ResultStatusCode.INFEASIBLE_POINT
+    return ResultStatusCode.NO_SOLUTION
+
+
+model_attribute_get_func_map = {
+    ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),
+    ModelAttribute.TerminationStatus: _termination_status_knitro,
+    ModelAttribute.RawStatusString: lambda model: f"KNITRO status code: {model.m_solve_status}",
+    ModelAttribute.DualStatus: _result_status_knitro,
+    ModelAttribute.PrimalStatus: _result_status_knitro,
+}
+
+
+class Model(RawModel):
+    """
+    KNITRO model class for PyOptInterface.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._variable_tupledict_maker = None
+        self._constraint_tupledict_maker = None
+
+    @staticmethod
+    def supports_variable_attribute(attribute: VariableAttribute, setable: bool = False) -> bool:
+        if setable:
+            return attribute in variable_attribute_set_func_map
+        else:
+            return attribute in variable_attribute_get_func_map
+
+    @staticmethod
+    def supports_constraint_attribute(attribute: ConstraintAttribute, setable: bool = False) -> bool:
+        if setable:
+            return attribute in constraint_attribute_set_func_map
+        else:
+            return attribute in constraint_attribute_get_func_map
+
+    def number_of_variables(self):
+        return self.n_vars
+
+    def number_of_constraints(self, constraint_type: Union[ConstraintType, None] = None):
+        if constraint_type is None:
+            return self.n_cons
+        elif constraint_type == ConstraintType.Linear:
+            return self.n_lincons
+        elif constraint_type == ConstraintType.Quadratic:
+            return self.n_quadcons
+        else:
+            raise ValueError(f"Unknown constraint type: {constraint_type}")
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
+        interval: Tuple[float, float],
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_linear_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_linear_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_linear_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_linear_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        expr: Union[ScalarQuadraticFunction, ExprBuilder],
+        sense: ConstraintSense,
+        rhs: float,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_quadratic_constraint(
+        self,
+        con: ComparisonConstraint,
+        name: str = "",
+    ): ...
+
+    def add_quadratic_constraint(self, arg, *args, **kwargs):
+        if isinstance(arg, ComparisonConstraint):
+            return self._add_quadratic_constraint(
+                arg.lhs, arg.sense, arg.rhs, *args, **kwargs
+            )
+        else:
+            return self._add_quadratic_constraint(arg, *args, **kwargs)
+
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        sense: ConstraintSense,
+        rhs: float,
+        /,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_nl_constraint(
+        self,
+        expr,
+        interval: Tuple[float, float],
+        /,
+        name: str = "",
+    ): ...
+
+    @overload
+    def add_nl_constraint(
+        self,
+        con,
+        /,
+        name: str = "",
+    ): ...
+
+    def add_nl_constraint(self, expr, *args, **kwargs):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError("Expression should be convertible to ExpressionHandle")
+        return self._add_single_nl_constraint(graph, expr, *args, **kwargs)
+
+    def add_nl_objective(self, expr):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError("Expression should be convertible to ExpressionHandle")
+        self._add_single_nl_objective(graph, expr)
+
+    def get_model_attribute(self, attr: ModelAttribute):
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to get: {attribute}")
+
+        return _get_model_attribute(
+            self, attr, model_attribute_get_func_map, {}, e
+        )
+
+    def set_model_attribute(self, attr: ModelAttribute, value):
+        def e(attribute):
+            raise ValueError(f"Unknown model attribute to set: {attribute}")
+
+        _set_model_attribute(self, attr, value, {}, {}, e)
+
+    def get_variable_attribute(
+        self, variable: VariableIndex, attr: VariableAttribute
+    ):
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to get: {attribute}")
+
+        return _get_entity_attribute(
+            self,
+            variable,
+            attr,
+            variable_attribute_get_func_map,
+            {},
+            e,
+        )
+
+    def set_variable_attribute(
+        self, variable: VariableIndex, attr: VariableAttribute, value
+    ):
+        def e(attribute):
+            raise ValueError(f"Unknown variable attribute to set: {attribute}")
+
+        _set_entity_attribute(
+            self,
+            variable,
+            attr,
+            value,
+            variable_attribute_set_func_map,
+            {},
+            e,
+        )
+
+    def get_constraint_attribute(
+        self, constraint: ConstraintIndex, attr: ConstraintAttribute
+    ):
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to get: {attribute}")
+
+        return _get_entity_attribute(
+            self,
+            constraint,
+            attr,
+            constraint_attribute_get_func_map,
+            {},
+            e,
+        )
+
+    def set_constraint_attribute(
+        self, constraint: ConstraintIndex, attr: ConstraintAttribute, value
+    ):
+        def e(attribute):
+            raise ValueError(f"Unknown constraint attribute to set: {attribute}")
+
+        _set_entity_attribute(
+            self,
+            constraint,
+            attr,
+            value,
+            constraint_attribute_set_func_map,
+            {},
+        )
+
+    def optimize(self):
+        self._optimize()
+
+    def is_empty(self):
+        return not self or self.m_is_dirty
+
+
+Model.add_variables = make_variable_tupledict
+Model.add_m_variables = make_variable_ndarray
+Model.add_m_linear_constraints = add_matrix_constraints
