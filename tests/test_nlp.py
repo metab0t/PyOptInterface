@@ -10,6 +10,8 @@ def test_easy_nlp(nlp_model_ctor):
 
     x = model.add_variable(lb=0.1, ub=10.0)
     y = model.add_variable(lb=0.1, ub=10.0)
+    model.set_variable_start(x, 0.5)
+    model.set_variable_start(y, 0.5)
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
@@ -101,6 +103,7 @@ def test_nlfunc_ifelse(nlp_model_ctor):
         assert x_value == pytest.approx(x_)
 
 
+@pytest.mark.skipif(not ipopt.is_library_loaded(), reason="IPOPT library not available")
 def test_ipopt_optimizer_not_called():
     model = ipopt.Model()
 
