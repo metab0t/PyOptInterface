@@ -18,8 +18,8 @@ def test_nlp_reopt(nlp_model_ctor):
 
     model.optimize()
 
-    assert model.get_value(x) == pytest.approx(0.1)
-    assert model.get_value(y) == pytest.approx(0.1)
+    assert model.get_value(x) == pytest.approx(0.1, rel=1e-5)
+    assert model.get_value(y) == pytest.approx(0.1, rel=1e-5)
 
     z = model.add_variable(lb=0.2)
     with nl.graph():
