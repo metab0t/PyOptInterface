@@ -102,7 +102,7 @@ bool is_library_loaded();
 bool load_library(const std::string &path);
 } // namespace knitro
 
-struct KnitroFreeProblemT
+struct KNITROFreeProblemT
 {
 	void operator()(KN_context *kc) const
 	{
@@ -113,7 +113,7 @@ struct KnitroFreeProblemT
 	}
 };
 
-struct KnitroResult
+struct KNITROResult
 {
 	bool is_valid = false;
 	int status = 0;
@@ -138,28 +138,45 @@ enum ConstraintSenseFlags
 	CON_UPBND = 1 << 1, // 0x02
 };
 
-struct NLCallbackData
+struct KNITROCallbackLoad
 {
-	size_t idx;
-	CppAD::ADFun<double> function;
 	std::vector<KNINT> indexVars;
+	std::vector<KNINT> indexCons;
+
+	CppAD::ADFun<double> fun;
+
+	std::vector<size_t> fun_rows;
 	std::vector<std::set<size_t>> jac_pattern;
 	std::vector<size_t> jac_rows;
 	std::vector<size_t> jac_cols;
 	CppAD::sparse_jacobian_work jac_work;
+	std::vector<std::set<size_t>> hess_pattern;
+	std::vector<size_t> hess_rows;
+	std::vector<size_t> hess_cols;
+	CppAD::sparse_hessian_work hess_work;
+
+	std::vector<double> x;
+	std::vector<double> jac;
+	std::vector<double> hess;
 };
 
-class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
-                    public TwosideLinearConstraintMixin<KnitroModel>,
-                    public OnesideQuadraticConstraintMixin<KnitroModel>,
-                    public TwosideQuadraticConstraintMixin<KnitroModel>,
-					public TwosideNLConstraintMixin<KnitroModel>,
-                    public LinearObjectiveMixin<KnitroModel>,
-                    public PPrintMixin<KnitroModel>,
-                    public GetValueMixin<KnitroModel>
+struct KNITROGraph
+{
+	std::vector<size_t> m_objs;
+	std::unordered_map<size_t, ConstraintIndex> m_cons;
+};
+
+class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
+                    public TwosideLinearConstraintMixin<KNITROModel>,
+                    public OnesideQuadraticConstraintMixin<KNITROModel>,
+                    public TwosideQuadraticConstraintMixin<KNITROModel>,
+                    public TwosideNLConstraintMixin<KNITROModel>,
+                    public LinearObjectiveMixin<KNITROModel>,
+                    public PPrintMixin<KNITROModel>,
+                    public GetValueMixin<KNITROModel>
 {
   public:
-	KnitroModel();
+	KNITROModel();
 	void init();
 	void close();
 
@@ -202,6 +219,10 @@ class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
 	ConstraintIndex add_single_nl_constraint(ExpressionGraph &graph, const ExpressionHandle &result,
 	                                         const std::tuple<double, double> &interval,
 	                                         const char *name = nullptr);
+	ConstraintIndex add_single_nl_constraint_sense_rhs(ExpressionGraph &graph,
+	                                                   const ExpressionHandle &result,
+	                                                   ConstraintSense sense, double rhs,
+	                                                   const char *name = nullptr);
 
 	void delete_constraint(ConstraintIndex constraint);
 	void set_constraint_name(const ConstraintIndex &constraint, const std::string &name);
@@ -215,7 +236,6 @@ class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
 	void set_normalized_coefficient(const ConstraintIndex &constraint,
 	                                const VariableIndex &variable, double coefficient);
 
-	// Objective functions
 	void set_objective(const ScalarAffineFunction &f, ObjectiveSense sense);
 	void set_objective(const ScalarQuadraticFunction &f, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
@@ -223,7 +243,6 @@ class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
 	double get_obj_value();
 
 	void optimize();
-	void _optimize();
 
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
@@ -301,27 +320,25 @@ class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
 
 	void check_error(int error) const;
 
-	std::unique_ptr<KN_context, KnitroFreeProblemT> m_kc = nullptr;
+	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
 
-	// Basic model statistics
 	size_t n_vars = 0;
 	size_t n_cons = 0;
 	size_t n_lincons = 0;
 	size_t n_quadcons = 0;
-	size_t n_soccons = 0;
+	size_t n_coniccons = 0;
+	size_t n_nlcons = 0;
 
-	// Auxiliary data for constraints and objectives
 	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_aux_cons;
 	std::unordered_map<KNINT, uint8_t> m_con_sense_flags;
 	uint8_t m_obj_flag = 0;
 
-	// Store NL functions to keep them alive for callbacks
-	// Use unique_ptr for pointer stability (unordered_map can rehash and invalidate references)
-	std::unordered_map<KNINT, std::unique_ptr<NLCallbackData>> m_con_nl_data_map;
-	std::vector<std::unique_ptr<NLCallbackData>> m_obj_nl_data;
+	std::unordered_map<ExpressionGraph *, KNITROGraph> m_graphs;
+	std::vector<std::unique_ptr<KNITROCallbackLoad>> m_loads;
+	bool m_need_to_add_callbacks = false;
 
 	// Solution and solve status
-	KnitroResult m_result;
+	KNITROResult m_result;
 	bool m_is_dirty = true;
 	int m_solve_status = 0;
 
@@ -369,11 +386,15 @@ class KnitroModel : public OnesideLinearConstraintMixin<KnitroModel>,
 	                                       const Vector<VariableIndex> &variables);
 	void _set_second_order_cone_constraint_rotated(const ConstraintIndex &constraint,
 	                                               const Vector<VariableIndex> &variables);
-	void _set_nonlinear_constraint(const ConstraintIndex &constraint, ExpressionGraph &graph);
 	void _set_linear_objective(const ScalarAffineFunction &f);
 	void _set_quadratic_objective(const ScalarQuadraticFunction &f);
-	void _add_nonlinear_objective(ExpressionGraph &graph);
 	void _reset_objective();
+	void _add_graph(ExpressionGraph &graph);
+	void _add_callbacks();
+	void _update();
+	void _pre_solve();
+	void _solve();
+	void _post_solve();
 
 	template <typename F>
 	ConstraintIndex _add_constraint_impl(ConstraintType type,

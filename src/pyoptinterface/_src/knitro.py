@@ -31,7 +31,7 @@ from .solver_common import (
     _set_entity_attribute,
 )
 from .aml import make_variable_ndarray, make_variable_tupledict
-from .nlexpr_ext import ExpressionHandle
+from .nlexpr_ext import ExpressionHandle, ExpressionGraph
 from .nlfunc import ExpressionGraphContext, convert_to_expressionhandle
 
 
@@ -198,8 +198,7 @@ class Model(RawModel):
 
     def __init__(self):
         super().__init__()
-        self._variable_tupledict_maker = None
-        self._constraint_tupledict_maker = None
+        self.graph_map: dict[ExpressionGraph, int] = {}
 
     @staticmethod
     def supports_variable_attribute(attribute: VariableAttribute, setable: bool = False) -> bool:
@@ -316,6 +315,8 @@ class Model(RawModel):
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
             raise ValueError("Expression should be convertible to ExpressionHandle")
+        if graph not in self.graph_map:
+            self.graph_map[graph] = len(self.graph_map)
         return self._add_single_nl_constraint(graph, expr, *args, **kwargs)
 
     def add_nl_objective(self, expr):
@@ -323,6 +324,8 @@ class Model(RawModel):
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
             raise ValueError("Expression should be convertible to ExpressionHandle")
+        if graph not in self.graph_map:
+            self.graph_map[graph] = len(self.graph_map)
         self._add_single_nl_objective(graph, expr)
 
     def get_model_attribute(self, attr: ModelAttribute):
@@ -399,9 +402,6 @@ class Model(RawModel):
             constraint_attribute_set_func_map,
             {},
         )
-
-    def optimize(self):
-        self._optimize()
 
     def is_empty(self):
         return not self or self.m_is_dirty
