@@ -10,8 +10,6 @@ def test_easy_nlp(nlp_model_ctor):
 
     x = model.add_variable(lb=0.1, ub=10.0)
     y = model.add_variable(lb=0.1, ub=10.0)
-    model.set_variable_start(x, 0.5)
-    model.set_variable_start(y, 0.5)
 
     model.add_linear_constraint(x + y, poi.Eq, 1.0)
 
