@@ -810,7 +810,8 @@ double KNITROModel::get_obj_value()
 	return m_result.obj_val;
 }
 
-void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs)
+void KNITROModel::_add_constraint_callback(ExpressionGraph *graph,
+                                           const KNITROPendingOutputs &outputs)
 {
 	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
@@ -834,7 +835,8 @@ void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const KNITROP
 	_add_callback_impl(*graph, outputs.m_con_idxs, outputs.m_cons, trace, f, g, h);
 }
 
-void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs)
+void KNITROModel::_add_objective_callback(ExpressionGraph *graph,
+                                          const KNITROPendingOutputs &outputs)
 {
 	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
