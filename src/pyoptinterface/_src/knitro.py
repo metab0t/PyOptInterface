@@ -220,12 +220,22 @@ def _result_status_knitro(model: "Model"):
 
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),
+    ModelAttribute.ObjectiveSense: lambda model: model.get_obj_sense(),
     ModelAttribute.TerminationStatus: _termination_status_knitro,
     ModelAttribute.RawStatusString: lambda model: (
         f"KNITRO status code: {model.m_solve_status}"
     ),
     ModelAttribute.DualStatus: _result_status_knitro,
     ModelAttribute.PrimalStatus: _result_status_knitro,
+    ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter(KN.PARAM_THREADS),
+    ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter(KN.PARAM_TIME_LIMIT),
+}
+
+model_attribute_set_func_map = {
+    ModelAttribute.ObjectiveSense: lambda model, x: model.set_obj_sense(x),
+    ModelAttribute.NumberOfThreads: lambda model, x: model.set_raw_parameter(KN.PARAM_THREADS, x),
+    ModelAttribute.Silent: lambda model, x: model.set_raw_parameter(KN.PARAM_OUTLEV, KN.OUTLEV_NONE if x else KN.OUTLEV_ITER),
+    ModelAttribute.TimeLimitSec: lambda model, x: model.set_raw_parameter(KN.PARAM_TIME_LIMIT, x),
 }
 
 
@@ -255,6 +265,15 @@ class Model(RawModel):
             return attribute in constraint_attribute_set_func_map
         else:
             return attribute in constraint_attribute_get_func_map
+
+    @staticmethod
+    def supports_model_attribute(
+        attribute: ModelAttribute, setable: bool = False
+    ) -> bool:
+        if setable:
+            return attribute in model_attribute_set_func_map
+        else:
+            return attribute in model_attribute_get_func_map
 
     def number_of_variables(self):
         return self.n_vars
@@ -386,7 +405,7 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown model attribute to set: {attribute}")
 
-        _set_model_attribute(self, attr, value, {}, {}, e)
+        _set_model_attribute(self, attr, value, model_attribute_set_func_map, {}, e)
 
     def get_variable_attribute(self, variable: VariableIndex, attr: VariableAttribute):
         def e(attribute):

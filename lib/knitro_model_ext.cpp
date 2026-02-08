@@ -150,6 +150,8 @@ NB_MODULE(knitro_model_ext, m)
 
 	    // clang-format off
 		BIND_F(get_obj_value)
+		BIND_F(set_obj_sense)
+		BIND_F(get_obj_sense)
 	    // clang-format on
 
 	    .def("optimize", &KNITROModel::optimize, nb::call_guard<nb::gil_scoped_release>())

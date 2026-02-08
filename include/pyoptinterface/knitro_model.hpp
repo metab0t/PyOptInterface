@@ -395,6 +395,8 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
 	void add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result);
 	double get_obj_value();
+	void set_obj_sense(ObjectiveSense sense);
+	ObjectiveSense get_obj_sense();
 
 	void optimize();
 

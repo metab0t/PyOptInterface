@@ -710,6 +710,32 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 	m_result.is_valid = false;
 }
 
+void KNITROModel::set_obj_sense(ObjectiveSense sense)
+{
+	int goal = knitro_obj_goal(sense);
+	int error = knitro::KN_set_obj_goal(m_kc.get(), goal);
+	check_error(error);
+}
+
+ObjectiveSense KNITROModel::get_obj_sense()
+{
+	int goal;
+	int error = knitro::KN_get_obj_goal(m_kc.get(), &goal);
+	check_error(error);
+	if (goal == KN_OBJGOAL_MINIMIZE)
+	{
+		return ObjectiveSense::Minimize;
+	}
+	else if (goal == KN_OBJGOAL_MAXIMIZE)
+	{
+		return ObjectiveSense::Maximize;
+	}
+	else
+	{
+		throw std::runtime_error("Unknown objective goal");
+	}
+}
+
 void KNITROModel::_add_graph(ExpressionGraph &graph)
 {
 	if (m_pending_outputs.find(&graph) == m_pending_outputs.end())
