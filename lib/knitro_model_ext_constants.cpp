@@ -112,11 +112,4 @@ void bind_knitro_constants(nb::module_ &m)
 	KN.attr("PARAMTYPE_INTEGER") = KN_PARAMTYPE_INTEGER;
 	KN.attr("PARAMTYPE_FLOAT") = KN_PARAMTYPE_FLOAT;
 	KN.attr("PARAMTYPE_STRING") = KN_PARAMTYPE_STRING;
-
-	// Common parameters (selection from knitro.h)
-	KN.attr("PARAM_ALG") = KN_PARAM_ALG;
-	KN.attr("PARAM_HONORBNDS") = KN_PARAM_HONORBNDS;
-	KN.attr("PARAM_MAXIT") = KN_PARAM_MAXIT;
-	KN.attr("PARAM_OUTLEV") = KN_PARAM_OUTLEV;
-	KN.attr("PARAM_OUTMODE") = KN_PARAM_OUTMODE;
 }

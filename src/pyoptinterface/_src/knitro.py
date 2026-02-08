@@ -1,38 +1,38 @@
+import logging
 import os
 import platform
-from pathlib import Path
 import re
-import logging
+from pathlib import Path
 from typing import Tuple, Union, overload
 
-from .knitro_model_ext import RawModel, KN, load_library
-from .matrix import add_matrix_constraints
+from .aml import make_variable_ndarray, make_variable_tupledict
 from .attributes import (
-    VariableAttribute,
     ConstraintAttribute,
     ModelAttribute,
     ResultStatusCode,
     TerminationStatusCode,
-)
-from .core_ext import (
-    VariableIndex,
-    ConstraintIndex,
-    ConstraintType,
-    ConstraintSense,
-    ScalarAffineFunction,
-    ScalarQuadraticFunction,
-    ExprBuilder,
+    VariableAttribute,
 )
 from .comparison_constraint import ComparisonConstraint
-from .solver_common import (
-    _get_model_attribute,
-    _set_model_attribute,
-    _get_entity_attribute,
-    _set_entity_attribute,
+from .core_ext import (
+    ConstraintIndex,
+    ConstraintSense,
+    ConstraintType,
+    ExprBuilder,
+    ScalarAffineFunction,
+    ScalarQuadraticFunction,
+    VariableIndex,
 )
-from .aml import make_variable_ndarray, make_variable_tupledict
-from .nlexpr_ext import ExpressionHandle, ExpressionGraph
+from .knitro_model_ext import KN, RawModel, load_library
+from .matrix import add_matrix_constraints
+from .nlexpr_ext import ExpressionGraph, ExpressionHandle
 from .nlfunc import ExpressionGraphContext, convert_to_expressionhandle
+from .solver_common import (
+    _get_entity_attribute,
+    _get_model_attribute,
+    _set_entity_attribute,
+    _set_model_attribute,
+)
 
 
 def detected_libraries():
@@ -64,6 +64,18 @@ def detected_libraries():
                 if match:
                     libs.append(str(path))
 
+    try:
+        import knitro
+
+        dir = Path(knitro.__path__[0])
+        dir = dir / "lib"
+        for path in dir.glob(suffix_pattern):
+            match = re.match(libname_pattern, path.name)
+            if match:
+                libs.append(str(path))
+    except ImportError:
+        pass
+
     # Default library names
     default_libname = {
         "Linux": ["libknitro.so"],
@@ -94,7 +106,7 @@ variable_attribute_get_func_map = {
     VariableAttribute.LowerBound: lambda model, v: model.get_variable_lb(v),
     VariableAttribute.UpperBound: lambda model, v: model.get_variable_ub(v),
     VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
-    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_rc(v)
+    VariableAttribute.ReducedCost: lambda model, v: model.get_variable_rc(v),
 }
 
 variable_attribute_set_func_map = {
@@ -116,8 +128,7 @@ constraint_attribute_set_func_map = {
     ConstraintAttribute.Name: lambda model, c, x: model.set_constraint_name(c, x),
 }
 
-# Status code mapping
-_RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusCode
+_RAW_STATUS_STRINGS = [
     (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL),
     (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL_OR_SATISFACTORY),
     (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_NEAR_OPT),
@@ -166,20 +177,43 @@ def _termination_status_knitro(model: "Model"):
 
 def _result_status_knitro(model: "Model"):
     status_code = model.m_solve_status
-    if status_code == KN.RC_OPTIMAL or status_code == KN.RC_OPTIMAL_OR_SATISFACTORY:
+
+    feasible = {
+        KN.RC_OPTIMAL,
+        KN.RC_OPTIMAL_OR_SATISFACTORY,
+        KN.RC_NEAR_OPT,
+        KN.RC_FEAS_XTOL,
+        KN.RC_FEAS_NO_IMPROVE,
+        KN.RC_FEAS_FTOL,
+        KN.RC_FEAS_BEST,
+        KN.RC_FEAS_MULTISTART,
+        KN.RC_ITER_LIMIT_FEAS,
+        KN.RC_TIME_LIMIT_FEAS,
+        KN.RC_FEVAL_LIMIT_FEAS,
+        KN.RC_MIP_EXH_FEAS,
+        KN.RC_MIP_TERM_FEAS,
+        KN.RC_MIP_SOLVE_LIMIT_FEAS,
+        KN.RC_MIP_NODE_LIMIT_FEAS,
+    }
+
+    infeasible = {
+        KN.RC_INFEASIBLE,
+        KN.RC_INFEAS_XTOL,
+        KN.RC_INFEAS_NO_IMPROVE,
+        KN.RC_INFEAS_MULTISTART,
+        KN.RC_INFEAS_CON_BOUNDS,
+        KN.RC_INFEAS_VAR_BOUNDS,
+        KN.RC_ITER_LIMIT_INFEAS,
+        KN.RC_TIME_LIMIT_INFEAS,
+        KN.RC_FEVAL_LIMIT_INFEAS,
+        KN.RC_MIP_EXH_INFEAS,
+        KN.RC_MIP_SOLVE_LIMIT_INFEAS,
+        KN.RC_MIP_NODE_LIMIT_INFEAS,
+    }
+
+    if status_code in feasible:
         return ResultStatusCode.FEASIBLE_POINT
-    elif status_code in [KN.RC_NEAR_OPT, KN.RC_FEAS_XTOL, KN.RC_FEAS_NO_IMPROVE,
-                         KN.RC_FEAS_FTOL, KN.RC_FEAS_BEST, KN.RC_FEAS_MULTISTART]:
-        return ResultStatusCode.FEASIBLE_POINT
-    elif status_code in [KN.RC_INFEASIBLE, KN.RC_INFEAS_XTOL, KN.RC_INFEAS_NO_IMPROVE,
-                         KN.RC_INFEAS_MULTISTART, KN.RC_INFEAS_CON_BOUNDS, KN.RC_INFEAS_VAR_BOUNDS]:
-        return ResultStatusCode.INFEASIBLE_POINT
-    elif status_code in [KN.RC_ITER_LIMIT_FEAS, KN.RC_TIME_LIMIT_FEAS, KN.RC_FEVAL_LIMIT_FEAS,
-                         KN.RC_MIP_EXH_FEAS, KN.RC_MIP_TERM_FEAS, KN.RC_MIP_SOLVE_LIMIT_FEAS,
-                         KN.RC_MIP_NODE_LIMIT_FEAS]:
-        return ResultStatusCode.FEASIBLE_POINT
-    elif status_code in [KN.RC_ITER_LIMIT_INFEAS, KN.RC_TIME_LIMIT_INFEAS, KN.RC_FEVAL_LIMIT_INFEAS,
-                         KN.RC_MIP_EXH_INFEAS, KN.RC_MIP_SOLVE_LIMIT_INFEAS, KN.RC_MIP_NODE_LIMIT_INFEAS]:
+    if status_code in infeasible:
         return ResultStatusCode.INFEASIBLE_POINT
     return ResultStatusCode.NO_SOLUTION
 
@@ -187,7 +221,9 @@ def _result_status_knitro(model: "Model"):
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),
     ModelAttribute.TerminationStatus: _termination_status_knitro,
-    ModelAttribute.RawStatusString: lambda model: f"KNITRO status code: {model.m_solve_status}",
+    ModelAttribute.RawStatusString: lambda model: (
+        f"KNITRO status code: {model.m_solve_status}"
+    ),
     ModelAttribute.DualStatus: _result_status_knitro,
     ModelAttribute.PrimalStatus: _result_status_knitro,
 }
@@ -203,14 +239,18 @@ class Model(RawModel):
         self.graph_map: dict[ExpressionGraph, int] = {}
 
     @staticmethod
-    def supports_variable_attribute(attribute: VariableAttribute, setable: bool = False) -> bool:
+    def supports_variable_attribute(
+        attribute: VariableAttribute, setable: bool = False
+    ) -> bool:
         if setable:
             return attribute in variable_attribute_set_func_map
         else:
             return attribute in variable_attribute_get_func_map
 
     @staticmethod
-    def supports_constraint_attribute(attribute: ConstraintAttribute, setable: bool = False) -> bool:
+    def supports_constraint_attribute(
+        attribute: ConstraintAttribute, setable: bool = False
+    ) -> bool:
         if setable:
             return attribute in constraint_attribute_set_func_map
         else:
@@ -219,13 +259,19 @@ class Model(RawModel):
     def number_of_variables(self):
         return self.n_vars
 
-    def number_of_constraints(self, constraint_type: Union[ConstraintType, None] = None):
+    def number_of_constraints(
+        self, constraint_type: Union[ConstraintType, None] = None
+    ):
         if constraint_type is None:
             return self.n_cons
         elif constraint_type == ConstraintType.Linear:
             return self.n_lincons
         elif constraint_type == ConstraintType.Quadratic:
             return self.n_quadcons
+        elif constraint_type == ConstraintType.Cone:
+            return self.n_coniccons
+        elif constraint_type == ConstraintType.KNITRO_NL:
+            return self.n_nlcons
         else:
             raise ValueError(f"Unknown constraint type: {constraint_type}")
 
@@ -334,9 +380,7 @@ class Model(RawModel):
         def e(attribute):
             raise ValueError(f"Unknown model attribute to get: {attribute}")
 
-        return _get_model_attribute(
-            self, attr, model_attribute_get_func_map, {}, e
-        )
+        return _get_model_attribute(self, attr, model_attribute_get_func_map, {}, e)
 
     def set_model_attribute(self, attr: ModelAttribute, value):
         def e(attribute):
@@ -344,9 +388,7 @@ class Model(RawModel):
 
         _set_model_attribute(self, attr, value, {}, {}, e)
 
-    def get_variable_attribute(
-        self, variable: VariableIndex, attr: VariableAttribute
-    ):
+    def get_variable_attribute(self, variable: VariableIndex, attr: VariableAttribute):
         def e(attribute):
             raise ValueError(f"Unknown variable attribute to get: {attribute}")
 
