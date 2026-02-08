@@ -8,6 +8,7 @@
 {xrst_begin chkpoint_two_dynamic}
 {xrst_spell
    chk
+   dyn
 }
 
 Dynamic Parameters in Checkpoint Functions

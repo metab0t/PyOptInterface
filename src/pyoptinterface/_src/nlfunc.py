@@ -13,16 +13,9 @@ from .core_ext import (
     ConstraintSense,
 )
 from .comparison_constraint import ComparisonConstraint
-import inspect
 import functools
 import math
-import types
 import threading
-
-# Trace an ordinary Python function to get its expression graph
-
-Vars = types.SimpleNamespace
-Params = types.SimpleNamespace
 
 
 class ExpressionGraphContext:

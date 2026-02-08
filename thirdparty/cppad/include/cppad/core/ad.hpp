@@ -2,7 +2,7 @@
 # define CPPAD_CORE_AD_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 // simple AD operations that must be defined for AD as well as base class
@@ -124,6 +124,7 @@ private :
 
    // classes
    friend class local::ADTape<Base>;
+   friend class local::dyn_recorder<Base>;
    friend class local::recorder<Base>;
    friend class ADFun<Base>;
    friend class atomic_base<Base>;
@@ -192,10 +193,10 @@ public:
    AD(const Base &b);
 # endif
 
-   // implicit contructor from VecAD<Base>::reference
+   // implicit constructor from VecAD<Base>::reference
    AD(const VecAD_reference<Base> &x);
 
-   // explicit construction from some other type (depricated)
+   // explicit construction from some other type (deprecated)
    template <class T> explicit AD(const T &t);
 
    // conversion from AD to Base type
@@ -204,7 +205,7 @@ public:
    // use default assignment operator
    // AD& operator=(const AD &x);
 
-   // assingment from base type
+   // assignment from base type
    AD& operator=(const Base &b);
 
    // assignment from VecAD<Base>::reference
@@ -278,6 +279,16 @@ private:
       tape_id_ = id;
       taddr_   = taddr;
       ad_type_ = variable_enum;
+   }
+   // -----------------------------------------------------------------
+   // Make this parameter a new dynamic
+   void make_dynamic(tape_id_t id,  addr_t taddr)
+   {   CPPAD_ASSERT_UNKNOWN( Parameter(*this) ); // currently a par
+       CPPAD_ASSERT_UNKNOWN( taddr > 0 );        // sure valid taddr
+
+       tape_id_ = id;
+       taddr_   = taddr;
+       ad_type_ = dynamic_enum;
    }
    // ---------------------------------------------------------------
    // tape linking functions

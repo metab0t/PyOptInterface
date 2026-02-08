@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_GET_OP_USAGE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <cppad/local/optimize/cexp_info.hpp>
 # include <cppad/local/optimize/usage.hpp>
@@ -227,7 +227,7 @@ vecad_used
 **********
 The input size of this vector must be zero.
 Upon return it has size equal to the number of VecAD vectors
-in the operations sequences; i.e., play->num_var_vecad_rec().
+in the operations sequences; i.e., play->num_var_vecad().
 The VecAD vectors are indexed in the order that their indices appear
 in the one large play->GetVecInd that holds all the VecAD vectors.
 
@@ -267,7 +267,7 @@ void get_op_usage(
    CPPAD_ASSERT_UNKNOWN( op_usage.size()   == 0 );
 
    // number of operators in the tape
-   const size_t num_op = play->num_op_rec();
+   const size_t num_op = play->num_var_op();
    //
    // initialize mapping from variable index to operator index
    CPPAD_ASSERT_UNKNOWN(
@@ -293,14 +293,14 @@ void get_op_usage(
    //
    // parameter information (used by atomic function calls)
 # ifndef NDEBUG
-   size_t num_par = play->num_par_rec();
+   size_t num_par = play->num_par_all();
 # endif
    CPPAD_ASSERT_UNKNOWN( num_par > 0 )
-   const Base* parameter = play->GetPar();
+   const Base* parameter = play->par_ptr();
    // -----------------------------------------------------------------------
    // vecad information
-   size_t num_vecad      = play->num_var_vecad_rec();
-   size_t num_vecad_ind  = play->num_var_vecad_ind_rec();
+   size_t num_vecad      = play->num_var_vecad();
+   size_t num_vecad_ind  = play->num_var_vec_ind();
    //
    vecad_used.resize(num_vecad);
    for(size_t i = 0; i < num_vecad; i++)
@@ -349,7 +349,7 @@ void get_op_usage(
    if( num_set > 0 )
       cexp_set.resize(num_set, end_set);
    // -----------------------------------------------------------------------
-   // initilaize operator usage for reverse dependency analysis.
+   // initialize operator usage for reverse dependency analysis.
    op_usage.resize( num_op );
    for(i_op = 0; i_op < num_op; ++i_op)
       op_usage[i_op] = usage_t(no_usage);
@@ -474,14 +474,14 @@ void get_op_usage(
          }
          if( use_result != usage_t(no_usage) )
          {  CPPAD_ASSERT_UNKNOWN( NumArg(CExpOp) == 6 );
-            // propgate from result to left argument
+            // propagate from result to left argument
             if( arg[1] & 1 )
             {  size_t j_op = random_itr.var2op(size_t(arg[2]));
                op_inc_arg_usage(
                   play, check_csum, i_op, j_op, op_usage, cexp_set
                );
             }
-            // propgate from result to right argument
+            // propagate from result to right argument
             if( arg[1] & 2 )
             {  size_t j_op = random_itr.var2op(size_t(arg[3]));
                op_inc_arg_usage(
@@ -751,7 +751,7 @@ void get_op_usage(
                );
                for(size_t j = 0; j < atom_n; j++)
                if( depend_x[j] )
-               {  // The parameter or variable correspnding to the j-th
+               {  // The parameter or variable corresponding to the j-th
                   // argument gets used
                   op_usage[i_op + 1 + j] = true;
                   if( type_x[j] == variable_enum )
@@ -765,7 +765,7 @@ void get_op_usage(
                   }
                }
             }
-            // copy set infomation from last to first
+            // copy set information from last to first
             if( cexp_set.n_set() > 0 )
             {  cexp_set.process_post(last_atom_i_op);
                cexp_set.assignment(i_op, last_atom_i_op, cexp_set);
@@ -790,7 +790,7 @@ void get_op_usage(
          //
          // parameter arguments
          atom_x[atom_j] = parameter[arg[0]];
-         if( play->dyn_par_is()[arg[0]] )
+         if( play->par_is_dyn()[arg[0]] )
             type_x[atom_j] = dynamic_enum;
          else
             type_x[atom_j] = constant_enum;

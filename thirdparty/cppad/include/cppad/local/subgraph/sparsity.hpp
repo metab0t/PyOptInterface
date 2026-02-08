@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SUBGRAPH_SPARSITY_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/pod_vector.hpp>
@@ -90,9 +90,10 @@ void subgraph_sparsity(
    pod_vector<size_t>&                        col_out       )
 {
    // get random access iterator for this player
-   play->template setup_random<Addr>();
+   Addr not_used;
+   play->setup_random( not_used );
    local::play::const_random_iterator<Addr> random_itr =
-      play->template get_random<Addr>();
+      play->get_random( not_used );
 
    // check dimension assumptions
    CPPAD_ASSERT_UNKNOWN(
@@ -120,7 +121,7 @@ void subgraph_sparsity(
    {  CPPAD_ASSERT_UNKNOWN( sub_info.check_map_user_op(play) );
    }
    CPPAD_ASSERT_UNKNOWN(
-         sub_info.map_user_op().size() == play->num_op_rec()
+         sub_info.map_user_op().size() == play->num_var_op()
    );
 
    // subgraph of operators that are are connected to one of the selected
@@ -130,7 +131,7 @@ void subgraph_sparsity(
    // initialize a reverse mode subgraph calculation
    sub_info.init_rev(random_itr, select_domain);
    CPPAD_ASSERT_UNKNOWN(
-      sub_info.in_subgraph().size() == play->num_op_rec()
+      sub_info.in_subgraph().size() == play->num_var_op()
    );
    //
 # ifndef NDEBUG

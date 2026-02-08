@@ -11,15 +11,18 @@ namespace CppAD { namespace local { namespace var_op {
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvv_op(
-   size_t        p           ,
-   size_t        q           ,
+inline void zmulvv_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvvOp) == 1 );
@@ -41,15 +44,18 @@ inline void forward_zmulvv_op(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvv_op_dir(
-   size_t        q           ,
-   size_t        r           ,
+inline void zmulvv_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvvOp) == 1 );
@@ -74,13 +80,14 @@ inline void forward_zmulvv_op_dir(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvv_op_0(
+inline void zmulvv_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvvOp) == 1 );
@@ -96,7 +103,7 @@ inline void forward_zmulvv_op_0(
 
 // See dev documentation: reverse_binary_op
 template <class Base>
-inline void reverse_zmulvv_op(
+inline void zmulvv_reverse(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
@@ -105,6 +112,7 @@ inline void reverse_zmulvv_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions
@@ -137,15 +145,18 @@ inline void reverse_zmulvv_op(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulpv_op(
-   size_t        p           ,
-   size_t        q           ,
+inline void zmulpv_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulpvOp) == 1 );
@@ -165,15 +176,18 @@ inline void forward_zmulpv_op(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulpv_op_dir(
-   size_t        q           ,
-   size_t        r           ,
+inline void zmulpv_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulpvOp) == 1 );
@@ -195,13 +209,14 @@ inline void forward_zmulpv_op_dir(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulpv_op_0(
+inline void zmulpv_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulpvOp) == 1 );
@@ -219,7 +234,7 @@ inline void forward_zmulpv_op_0(
 
 // See dev documentation: reverse_binary_op
 template <class Base>
-inline void reverse_zmulpv_op(
+inline void zmulpv_reverse(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
@@ -228,6 +243,7 @@ inline void reverse_zmulpv_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions
@@ -253,15 +269,18 @@ inline void reverse_zmulpv_op(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvp_op(
-   size_t        p           ,
-   size_t        q           ,
+inline void zmulvp_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvpOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvpOp) == 1 );
@@ -281,15 +300,18 @@ inline void forward_zmulvp_op(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvp_op_dir(
-   size_t        q           ,
-   size_t        r           ,
+inline void zmulvp_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvpOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvpOp) == 1 );
@@ -311,13 +333,14 @@ inline void forward_zmulvp_op_dir(
 
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_zmulvp_op_0(
+inline void zmulvp_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(ZmulvpOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(ZmulvpOp) == 1 );
@@ -335,7 +358,7 @@ inline void forward_zmulvp_op_0(
 
 // See dev documentation: reverse_binary_op
 template <class Base>
-inline void reverse_zmulvp_op(
+inline void zmulvp_reverse(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
@@ -344,6 +367,7 @@ inline void reverse_zmulvp_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions

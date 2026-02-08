@@ -3,7 +3,7 @@
 
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/core/ad_fun.hpp>
@@ -80,18 +80,18 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
    // dynamic parameter information
    const pod_vector<opcode_t>& dyn_par_op ( play_.dyn_par_op()  );
    const pod_vector<addr_t>&   dyn_par_arg( play_.dyn_par_arg() );
-   const pod_vector<addr_t>&   dyn_ind2par_ind ( play_.dyn_ind2par_ind() );
-   const pod_vector<bool>&     dyn_par_is( play_.dyn_par_is() );
+   const pod_vector<addr_t>&   dyn2par_index ( play_.dyn2par_index() );
+   const pod_vector<bool>&     par_is_dyn( play_.par_is_dyn() );
    //
    // number of dynamic parameters
-   const size_t n_dynamic     = dyn_ind2par_ind.size();
+   const size_t n_dynamic     = dyn2par_index.size();
    //
    // output: n_dynamic_ind
-   size_t n_dynamic_ind = play_.num_dynamic_ind();
+   size_t n_dynamic_ind = play_.n_dyn_independent();
    graph_obj.n_dynamic_ind_set(n_dynamic_ind);
    //
    // number of parameters
-   const size_t n_parameter = play_.num_par_rec();
+   const size_t n_parameter = play_.num_par_all();
    //
    // number of constant parameters
 # ifndef NDEBUG
@@ -103,17 +103,17 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
    graph_obj.n_variable_ind_set(n_variable_ind);
    //
    // value of parameters
-   const Base* parameter = play_.GetPar();
+   const Base* parameter = play_.par_ptr();
    //
    // number of variables
-   const size_t n_variable = play_.num_var_rec();
+   const size_t n_variable = play_.num_var();
    //
    // some checks
    CPPAD_ASSERT_UNKNOWN( n_dynamic_ind <= n_dynamic );
-   CPPAD_ASSERT_UNKNOWN( dyn_par_is.size() == n_parameter );
+   CPPAD_ASSERT_UNKNOWN( par_is_dyn.size() == n_parameter );
    CPPAD_ASSERT_UNKNOWN( n_parameter > 0 );
    CPPAD_ASSERT_UNKNOWN( CppAD::isnan( parameter[0] ) );
-   CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[0] );
+   CPPAD_ASSERT_UNKNOWN( ! par_is_dyn[0] );
    // --------------------------------------------------------------------
    // par2node
    pod_vector<size_t> par2node(n_parameter);
@@ -137,7 +137,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
    // output: constant_vec
    // constant_vec and par2node for constants
    for(size_t i = 1; i < n_parameter; ++i)
-   {  if( ! dyn_par_is[i] )
+   {  if( ! par_is_dyn[i] )
       {  // this is a constant node
          graph_obj.constant_vec_push_back( parameter[i] );
          par2node[i] = ++previous_node;
@@ -163,7 +163,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
       local::op_code_dyn dyn_op = local::op_code_dyn( dyn_par_op[i_dyn] );
       //
       // parameter index for this dynamic parameter
-      size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
+      size_t i_par = size_t( dyn2par_index[i_dyn] );
       CPPAD_ASSERT_UNKNOWN( par2node[i_par] == 0 );
       par2node[i_par] = ++previous_node;
       //
@@ -330,7 +330,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
          {
             // arg[0]: discrete function index
             size_t discrete_index = size_t( dyn_par_arg[i_arg + 0] );
-            // get the name for this dicrete function
+            // get the name for this discrete function
             std::string name = discrete<Base>::name( discrete_index );
             //
             // set graph index for this discrete function call
@@ -465,7 +465,7 @@ void CppAD::ADFun<Base,RecBase>::to_graph(
    // ----------------------------------------------------------------------
    // variable operators
    pod_vector<size_t> var2node(n_variable);
-   var2node[0] = 0; // invalide node value
+   var2node[0] = 0; // invalid node value
    for(size_t i = 1; i <= n_variable_ind; ++i)
       var2node[i] = n_dynamic_ind + i;
    for(size_t i = n_variable_ind + 1; i < n_variable; ++i)

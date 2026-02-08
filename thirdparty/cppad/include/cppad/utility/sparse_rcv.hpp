@@ -11,6 +11,7 @@
 {xrst_spell
    nnz
    nr
+   rc
 }
 Sparse Matrix Row, Column, Value Representation
 ###############################################

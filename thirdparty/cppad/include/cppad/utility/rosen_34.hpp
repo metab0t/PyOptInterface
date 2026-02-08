@@ -9,7 +9,6 @@
 {xrst_begin Rosen34}
 {xrst_spell
    dep
-   rd
    rosenbrock
    test test
    tf

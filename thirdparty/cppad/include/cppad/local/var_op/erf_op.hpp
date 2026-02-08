@@ -43,7 +43,7 @@ highest order of the Taylor coefficients that we are computing.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary results are called y_j have index i_z - j.
+The auxiliary results are called y_j have index i_z - j.
 
 \param arg
 arg[0]: is the variable index corresponding to x.
@@ -84,16 +84,19 @@ is the k-th order Taylor coefficient corresponding to the j-th result for z.
 
 */
 template <class Base>
-inline void forward_erf_op(
+inline void erf_forward_any(
    op_code_var   op          ,
-   size_t        p           ,
-   size_t        q           ,
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( op == ErfOp || op == ErfcOp );
    CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
@@ -113,27 +116,28 @@ inline void forward_erf_op(
    // z_0 = x * x
    addr[0] = arg[0]; // x
    addr[1] = arg[0]; // x
-   forward_mulvv_op(p, q, i_z+0, addr, parameter, cap_order, taylor);
+   mulvv_forward_any(p, q, i_z+0, addr, parameter, cap_order, taylor);
 
    // z_1 = - x * x
    addr[0] = arg[1];           // zero
    addr[1] = addr_t( i_z );    // z_0
-   forward_subpv_op(p, q, i_z+1, addr, parameter, cap_order, taylor);
+   subpv_forward_any(p, q, i_z+1, addr, parameter, cap_order, taylor);
 
    // z_2 = exp( - x * x )
-   forward_exp_op(p, q, i_z+2, i_z+1, cap_order, taylor);
+   addr[0] = addr_t(i_z+1);
+   exp_forward_any(p, q, i_z+2, addr, cap_order, taylor);
 
    // z_3 = (2 / sqrt(pi)) * exp( - x * x )
    addr[0] = arg[2];            // 2 / sqrt(pi)
    addr[1] = addr_t( i_z + 2 ); // z_2
-   forward_mulpv_op(p, q, i_z+3, addr, parameter, cap_order, taylor);
+   mulpv_forward_any(p, q, i_z+3, addr, parameter, cap_order, taylor);
 
    // pointers to taylor coefficients for x , z_3, and z_4
    Base* x    = taylor + size_t(arg[0]) * cap_order;
    Base* z_3  = taylor + (i_z+3) * cap_order;
    Base* z_4  = taylor + (i_z+4) * cap_order;
 
-   // calculte z_4 coefficients
+   // calculate z_4 coefficients
    if( p == 0 )
    {  // z4 (t) = erf[x(t)]
       if( op == ErfOp )
@@ -179,7 +183,7 @@ z = erf(x) or z = erfc(x).
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary results are called y_j have index i_z - j.
+The auxiliary results are called y_j have index i_z - j.
 
 \param arg
 arg[0]: is the variable index corresponding to x.
@@ -211,14 +215,15 @@ is the zero order Taylor coefficient for j-th result corresponding to z.
 
 */
 template <class Base>
-inline void forward_erf_op_0(
+inline void erf_forward_0(
    op_code_var   op          ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( op == ErfOp || op == ErfcOp );
    CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
@@ -237,20 +242,21 @@ inline void forward_erf_op_0(
    // z_0 = x * x
    addr[0] = arg[0]; // x
    addr[1] = arg[0]; // x
-   forward_mulvv_op_0(i_z+0, addr, parameter, cap_order, taylor);
+   mulvv_forward_0(i_z+0, addr, parameter, cap_order, taylor);
 
    // z_1 = - x * x
    addr[0] = arg[1];       // zero
    addr[1] = addr_t(i_z);  // z_0
-   forward_subpv_op_0(i_z+1, addr, parameter, cap_order, taylor);
+   subpv_forward_0(i_z+1, addr, parameter, cap_order, taylor);
 
    // z_2 = exp( - x * x )
-   forward_exp_op_0(i_z+2, i_z+1, cap_order, taylor);
+   addr[0] = addr_t(i_z+1);
+   exp_forward_0(i_z+2, addr, cap_order, taylor);
 
    // z_3 = (2 / sqrt(pi)) * exp( - x * x )
    addr[0] = arg[2];          // 2 / sqrt(pi)
    addr[1] = addr_t(i_z + 2); // z_2
-   forward_mulpv_op_0(i_z+3, addr, parameter, cap_order, taylor);
+   mulpv_forward_0(i_z+3, addr, parameter, cap_order, taylor);
 
    // zero order Taylor coefficient for z_4
    Base* x    = taylor + size_t(arg[0]) * cap_order;
@@ -286,7 +292,7 @@ number of directions for the Taylor coefficients that we afre computing.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary results have index i_z - j for j = 0 , ... , 4
+The auxiliary results have index i_z - j for j = 0 , ... , 4
 (and include z).
 
 \param arg
@@ -338,16 +344,19 @@ and j-th auzillary result.
 
 */
 template <class Base>
-inline void forward_erf_op_dir(
+inline void erf_forward_dir(
    op_code_var   op          ,
-   size_t        q           ,
-   size_t        r           ,
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( op == ErfOp || op == ErfcOp );
    CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
@@ -367,20 +376,21 @@ inline void forward_erf_op_dir(
    // z_0 = x * x
    addr[0] = arg[0]; // x
    addr[1] = arg[0]; // x
-   forward_mulvv_op_dir(q, r, i_z+0, addr, parameter, cap_order, taylor);
+   mulvv_forward_dir(q, r, i_z+0, addr, parameter, cap_order, taylor);
 
    // z_1 = - x * x
    addr[0] = arg[1];         // zero
    addr[1] = addr_t( i_z );  // z_0
-   forward_subpv_op_dir(q, r, i_z+1, addr, parameter, cap_order, taylor);
+   subpv_forward_dir(q, r, i_z+1, addr, parameter, cap_order, taylor);
 
    // z_2 = exp( - x * x )
-   forward_exp_op_dir(q, r, i_z+2, i_z+1, cap_order, taylor);
+   addr[0] = addr_t(i_z+1);
+   exp_forward_dir(q, r, i_z+2, addr, cap_order, taylor);
 
    // z_3 = (2 / sqrt(pi)) * exp( - x * x )
    addr[0] = arg[2];            // 2 / sqrt(pi)
    addr[1] = addr_t( i_z + 2 ); // z_2
-   forward_mulpv_op_dir(q, r, i_z+3, addr, parameter, cap_order, taylor);
+   mulpv_forward_dir(q, r, i_z+3, addr, parameter, cap_order, taylor);
 
    // pointers to taylor coefficients for x , z_3, and z_4
    size_t num_taylor_per_var = (cap_order - 1) * r + 1;
@@ -436,7 +446,7 @@ the partial derivatives with respect to.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary results are called y_j have index i_z - j.
+The auxiliary results are called y_j have index i_z - j.
 
 \param arg
 arg[0]: is the variable index corresponding to x.
@@ -495,7 +505,7 @@ may be used as work space; i.e., may change in an unspecified manner.
 
 */
 template <class Base>
-inline void reverse_erf_op(
+inline void erf_reverse(
    op_code_var   op          ,
    size_t        i_z         ,
    const addr_t* arg         ,
@@ -505,6 +515,7 @@ inline void reverse_erf_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions
@@ -562,26 +573,27 @@ inline void reverse_erf_op(
    // z_3 = (2 / sqrt(pi)) * exp( - x * x )
    addr[0] = arg[2];            // 2 / sqrt(pi)
    addr[1] = addr_t( i_z + 2 ); // z_2
-   reverse_mulpv_op(
+   mulpv_reverse(
       i_z+3, addr, parameter, cap_order, taylor, n_order, partial
    );
 
    // z_2 = exp( - x * x )
-   reverse_exp_op(
-      i_z+2, i_z+1, cap_order, taylor, n_order, partial
+   addr[0] = addr_t(i_z + 1);
+   exp_reverse(
+      i_z+2, addr, cap_order, taylor, n_order, partial
    );
 
    // z_1 = - x * x
    addr[0] = arg[1];           // zero
    addr[1] = addr_t( i_z );    // z_0
-   reverse_subpv_op(
+   subpv_reverse(
       i_z+1, addr, parameter, cap_order, taylor, n_order, partial
    );
 
    // z_0 = x * x
    addr[0] = arg[0]; // x
    addr[1] = arg[0]; // x
-   reverse_mulvv_op(
+   mulvv_reverse(
       i_z+0, addr, parameter, cap_order, taylor, n_order, partial
    );
 

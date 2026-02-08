@@ -221,7 +221,7 @@ public:
          data_[i] = other.data_[i];
    }
    // capacity_ is only value required to make destructor work for other
-   // after this move semantics constuctor
+   // after this move semantics constructor
    vector(vector&& other) : capacity_(0), length_(0), data_(nullptr)
    {  swap(other); }
    ~vector(void)
@@ -372,7 +372,7 @@ public:
    }
 
 // BEGIN_MOVE_ASSIGN
-   // move assingment does not doe any allocation and hence is declared noexcept
+   // move assignment does not doe any allocation and hence is declared noexcept
    vector& operator=(vector&& other) noexcept
 // END_MOVE_ASSIGN
    {  swap(other);
@@ -395,7 +395,6 @@ public:
 -------------------------------------------------------------------------------
 {xrst_begin cppad_vector_compare dev}
 {xrst_spell
-   ture
 }
 
 Vector Class: Comparison Operators
@@ -434,7 +433,7 @@ The *result* is true if the comparison
 
 |  *vec* [ *i* ] *op* *other [ *i* ]
 
-ture for all valid indices *i* .  Otherwise, the *result* is false
+true for all valid indices *i* .  Otherwise, the *result* is false
 
 {xrst_end cppad_vector_compare}
 -------------------------------------------------------------------------------
@@ -629,7 +628,7 @@ see :ref:`use API push_vector<cppad_vector_push_vector-name>`
       CheckSimpleVector<Type, Vector>();
       size_t m = other.size();
 
-      // case where no allcoation is necessary
+      // case where no allocation is necessary
       if( length_ + m <= capacity_ )
       {  for(size_t i = 0; i < m; i++)
             data_[length_++] = other[i];

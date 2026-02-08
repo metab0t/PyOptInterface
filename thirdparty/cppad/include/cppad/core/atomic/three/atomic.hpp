@@ -2,10 +2,13 @@
 # define CPPAD_CORE_ATOMIC_THREE_ATOMIC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin atomic_three_define}
+{xrst_spell
+   ctor
+}
 
 Defining Atomic Functions: Third Generation
 ###########################################
@@ -336,8 +339,8 @@ public:
       bool                             dependency   ,
       const vector<Base>&              parameter_x  ,
       const vector<ad_type_enum>&      type_x       ,
-      const local::pod_vector<size_t>& x_index      ,
-      const local::pod_vector<size_t>& y_index      ,
+      const vector<size_t>&            x_index      ,
+      const vector<size_t>&            y_index      ,
       InternalSparsity&                var_sparsity
    );
    template <class InternalSparsity>
@@ -345,8 +348,8 @@ public:
       bool                             dependency   ,
       const vector<Base>&              parameter_x  ,
       const vector<ad_type_enum>&      type_x       ,
-      const local::pod_vector<size_t>& x_index      ,
-      const local::pod_vector<size_t>& y_index      ,
+      const vector<size_t>&            x_index      ,
+      const vector<size_t>&            y_index      ,
       InternalSparsity&                var_sparsity
    );
    // ------------------------------------------------------------
@@ -362,8 +365,8 @@ public:
    bool for_hes_sparsity(
       const vector<Base>&              parameter_x      ,
       const vector<ad_type_enum>&      type_x           ,
-      const local::pod_vector<size_t>& x_index          ,
-      const local::pod_vector<size_t>& y_index          ,
+      const vector<size_t>&            x_index          ,
+      const vector<size_t>&            y_index          ,
       size_t                           np1              ,
       size_t                           numvar           ,
       const InternalSparsity&          rev_jac_sparsity ,
@@ -373,8 +376,8 @@ public:
    bool rev_hes_sparsity(
       const vector<Base>&              parameter_x      ,
       const vector<ad_type_enum>&      type_x           ,
-      const local::pod_vector<size_t>& x_index          ,
-      const local::pod_vector<size_t>& y_index          ,
+      const vector<size_t>&            x_index          ,
+      const vector<size_t>&            y_index          ,
       const InternalSparsity&          for_jac_pattern  ,
       bool*                            rev_jac_flag     ,
       InternalSparsity&                hes_sparsity
@@ -428,7 +431,7 @@ public:
    {  if( work_[thread] != nullptr )
       {  // call destructor
          work_[thread]->~work_struct();
-         // return memory to avialable pool for this thread
+         // return memory to available pool for this thread
          thread_alloc::return_memory(
             reinterpret_cast<void*>(work_[thread])
          );

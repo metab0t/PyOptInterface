@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_CALL_ATOMIC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/atomic_index.hpp>
@@ -342,6 +342,9 @@ void call_atomic_reverse(
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin atomic_for_jac_sparsity_callback dev}
+{xrst_spell
+   setvec
+}
 
 Forward Jacobian Sparsity Callback to Atomic Functions
 ######################################################
@@ -415,8 +418,8 @@ void call_atomic_for_jac_sparsity(
    bool                         dependency    ,
    const vector<Base>&          parameter_x   ,
    const vector<ad_type_enum>&  type_x        ,
-   const pod_vector<size_t>&    x_index       ,
-   const pod_vector<size_t>&    y_index       ,
+   const vector<size_t>&        x_index       ,
+   const vector<size_t>&        y_index       ,
    InternalSparsity&            var_sparsity  )
 // END_FOR_JAC_SPARSITY
 {  CPPAD_ASSERT_UNKNOWN( 0 < atom_index );
@@ -507,6 +510,9 @@ void call_atomic_for_jac_sparsity(
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin atomic_rev_jac_sparsity_callback dev}
+{xrst_spell
+   setvec
+}
 
 Reverse Jacobian sparsity Callback to Atomic Functions
 ######################################################
@@ -577,8 +583,8 @@ void call_atomic_rev_jac_sparsity(
    bool                         dependency    ,
    const vector<Base>&          parameter_x   ,
    const vector<ad_type_enum>&  type_x        ,
-   const pod_vector<size_t>&    x_index       ,
-   const pod_vector<size_t>&    y_index       ,
+   const vector<size_t>&        x_index       ,
+   const vector<size_t>&        y_index       ,
    InternalSparsity&            var_sparsity  )
 // END_REV_JAC_SPARSITY
 {  CPPAD_ASSERT_UNKNOWN( 0 < atom_index );
@@ -670,8 +676,7 @@ void call_atomic_rev_jac_sparsity(
 /*
 {xrst_begin atomic_for_hes_sparsity_callback dev}
 {xrst_spell
-   np
-   numvar
+   setvec
 }
 
 Forward Hessian Sparsity Callback to Atomic Functions
@@ -730,8 +735,8 @@ np1
 This is the number of independent variables plus one;
 i.e. size of *x* plus one.
 
-numvar
-******
+num_var
+*******
 This is the total number of variables in the tape.
 
 rev_jac_sparsity
@@ -744,7 +749,7 @@ computing the Hessian of.
 for_sparsity
 ************
 We have the conditions *np1* = *for_sparsity* . ``end`` ()
-and *for_sparsity* . ``n_set`` () = *np1* + *numvar* .
+and *for_sparsity* . ``n_set`` () = *np1* + *num_var* .
 
 Input Jacobian Sparsity
 =======================
@@ -782,16 +787,16 @@ void call_atomic_for_hes_sparsity(
    size_t                       call_id           ,
    const vector<Base>&          parameter_x       ,
    const vector<ad_type_enum>&  type_x            ,
-   const pod_vector<size_t>&    x_index           ,
-   const pod_vector<size_t>&    y_index           ,
+   const vector<size_t>&        x_index           ,
+   const vector<size_t>&        y_index           ,
    size_t                       np1               ,
-   size_t                       numvar            ,
+   size_t                       num_var           ,
    const InternalSparsity&      rev_jac_sparsity  ,
    InternalSparsity&            for_sparsity      )
 // END_FOR_HES_SPARSITY
 {  CPPAD_ASSERT_UNKNOWN( 0 < atom_index );
    CPPAD_ASSERT_UNKNOWN( for_sparsity.end() == np1 );
-   CPPAD_ASSERT_UNKNOWN( for_sparsity.n_set() == np1 + numvar );
+   CPPAD_ASSERT_UNKNOWN( for_sparsity.n_set() == np1 + num_var );
 
    bool         set_null = false;
    size_t       type     = 0;          // set to avoid warning
@@ -824,7 +829,7 @@ void call_atomic_for_hes_sparsity(
             x_index,
             y_index,
             np1,
-            numvar,
+            num_var,
             rev_jac_sparsity,
             for_sparsity
          );
@@ -838,7 +843,7 @@ void call_atomic_for_hes_sparsity(
             x_index,
             y_index,
             np1,
-            numvar,
+            num_var,
             rev_jac_sparsity,
             for_sparsity
          );
@@ -853,7 +858,7 @@ void call_atomic_for_hes_sparsity(
             x_index,
             y_index,
             np1,
-            numvar,
+            num_var,
             rev_jac_sparsity,
             for_sparsity
          );
@@ -882,7 +887,7 @@ void call_atomic_for_hes_sparsity(
          x_index,
          y_index,
          np1,
-         numvar,
+         num_var,
          rev_jac_sparsity,
          for_sparsity
       );
@@ -896,7 +901,7 @@ void call_atomic_for_hes_sparsity(
          x_index,
          y_index,
          np1,
-         numvar,
+         num_var,
          rev_jac_sparsity,
          for_sparsity
       );
@@ -910,7 +915,7 @@ void call_atomic_for_hes_sparsity(
          x_index,
          y_index,
          np1,
-         numvar,
+         num_var,
          rev_jac_sparsity,
          for_sparsity
       );
@@ -920,6 +925,9 @@ void call_atomic_for_hes_sparsity(
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin atomic_rev_hes_sparsity_callback dev}
+{xrst_spell
+   setvec
+}
 
 Reverse Hessian Sparsity Callback to Atomic Functions
 #####################################################
@@ -997,8 +1005,8 @@ void call_atomic_rev_hes_sparsity(
    size_t                       call_id           ,
    const vector<Base>&          parameter_x       ,
    const vector<ad_type_enum>&  type_x            ,
-   const pod_vector<size_t>&    x_index           ,
-   const pod_vector<size_t>&    y_index           ,
+   const vector<size_t>&        x_index           ,
+   const vector<size_t>&        y_index           ,
    const InternalSparsity&      for_jac_sparsity  ,
    bool*                        rev_jac_flag      ,
    InternalSparsity&            rev_hes_sparsity  )

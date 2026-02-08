@@ -17,7 +17,6 @@
    sini
    smax
    smin
-   tb
    test test
    tf
    xf

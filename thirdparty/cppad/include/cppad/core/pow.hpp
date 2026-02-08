@@ -2,7 +2,7 @@
 # define CPPAD_CORE_POW_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 /*
@@ -152,7 +152,7 @@ pow(const AD<Base>& x, const AD<Base>& y)
          result.tape_id_ = tape_id;
          result.ad_type_ = variable_enum;
       }
-      else if( IdenticalZero( y.value_ ) )
+      else if( (! dyn_y) && IdenticalZero( y.value_ ) )
       {  // result = variable^0
       }
       else
@@ -175,7 +175,7 @@ pow(const AD<Base>& x, const AD<Base>& y)
       }
    }
    else if( var_y )
-   {  if( IdenticalZero(x.value_) )
+   {  if( (! dyn_x) && IdenticalZero(x.value_) )
       {  // result = 0^variable
       }
       else
@@ -198,19 +198,25 @@ pow(const AD<Base>& x, const AD<Base>& y)
       }
    }
    else if( dyn_x | dyn_y )
-   {  addr_t arg0 = x.taddr_;
-      addr_t arg1 = y.taddr_;
-      if( ! dyn_x )
-         arg0 = tape->Rec_.put_con_par(x.value_);
-      if( ! dyn_y )
-         arg1 = tape->Rec_.put_con_par(y.value_);
-      //
-      // parameters with a dynamic parameter result
-      result.taddr_   = tape->Rec_.put_dyn_par(
-         result.value_, local::pow_dyn,   arg0, arg1
-      );
-      result.tape_id_ = tape_id;
-      result.ad_type_ = dynamic_enum;
+   {  if( (!dyn_x) && IdenticalZero(x.value_) )
+      { // result = 0^dynamic
+      } else if( (! dyn_y) && IdenticalZero( y.value_ ) )
+      {  // result = dynamic^0
+      } else {
+         addr_t arg0 = x.taddr_;
+         addr_t arg1 = y.taddr_;
+         if( ! dyn_x )
+            arg0 = tape->Rec_.put_con_par(x.value_);
+         if( ! dyn_y )
+            arg1 = tape->Rec_.put_con_par(y.value_);
+         //
+         // parameters with a dynamic parameter result
+         result.taddr_   = tape->Rec_.put_dyn_par(
+            result.value_, local::pow_dyn,   arg0, arg1
+         );
+         result.tape_id_ = tape_id;
+         result.ad_type_ = dynamic_enum;
+      }
    }
    else
    {  CPPAD_ASSERT_KNOWN( ! (dyn_x | dyn_y) ,
@@ -272,7 +278,7 @@ template <class Base> AD<Base>
 pow(const VecAD_reference<Base>& x, const double& y)
 {  return pow(x.ADBase(), AD<Base>(y)); }
 // -------------------------------------------------------------------------
-// Special case to avoid ambuigity when Base is double
+// Special case to avoid ambiguity when Base is double
 
 inline AD<double>
 pow(const double& x, const AD<double>& y)

@@ -320,7 +320,7 @@ is either sparse_pack or sparse_list.
 is a simple vector class with elements of type size_t.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \param p_transpose [in]
 If <code>work.color.size() != 0</code>,
@@ -475,7 +475,7 @@ size_t ADFun<Base,RecBase>::SparseJacobianFor(
       size_t r = std::min<size_t>(max_r , n_color - count_color);
       BaseVector dx(n * r), dy(m * r);
 
-      // loop over colors we will do this tme
+      // loop over colors we will do this time
       for(ell = 0; ell < r; ell++)
       {  // combine all columns with this color
          for(j = 0; j < n; j++)
@@ -517,7 +517,7 @@ is either sparse_pack or sparse_list.
 is a simple vector class with elements of type size_t.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \param p [in]
 If <code>work.color.size() != 0</code>, then p is not used.
@@ -670,7 +670,7 @@ Compute user specified subset of a sparse Jacobian using forward mode.
 
 The C++ source code corresponding to this operation is
 \verbatim
-   SparceJacobianForward(x, p, row, col, jac, work)
+   SparseJacobinanForward(x, p, row, col, jac, work)
 \endverbatim
 
 \tparam Base
@@ -688,7 +688,7 @@ is a simple vector class with elements of type
 is a simple vector class with elements of type size_t.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \param p [in]
 is the sparsity pattern for the Jacobian that we are calculating.
@@ -785,7 +785,7 @@ Compute user specified subset of a sparse Jacobian using forward mode.
 
 The C++ source code corresponding to this operation is
 \verbatim
-   SparceJacobianReverse(x, p, row, col, jac, work)
+   SparseJacobinanReverse(x, p, row, col, jac, work)
 \endverbatim
 
 \tparam Base
@@ -803,7 +803,7 @@ is a simple vector class with elements of type
 is a simple vector class with elements of type size_t.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \param p [in]
 is the sparsity pattern for the Jacobian that we are calculating.
@@ -915,7 +915,7 @@ is a simple vector class with elements of type
  bool or std::set<size_t>.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \param p [in]
 is the sparsity pattern for the Jacobian that we are calculating.
@@ -1033,7 +1033,7 @@ is the base type for the recording that is stored in this
 is a simple vector class with elements of the Base.
 
 \param x [in]
-is a vector specifing the point at which to compute the Jacobian.
+is a vector specifying the point at which to compute the Jacobian.
 
 \return
 Will be a vector of size m * n containing the Jacobian at the

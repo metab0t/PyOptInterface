@@ -195,7 +195,7 @@ a vector of length n, the number of independent variables in f
 (this ADFun object).
 
 \param subset
-specifices the subset of the sparsity pattern where the Jacobian is evaluated.
+spedifies the subset of the sparsity pattern where the Jacobian is evaluated.
 subset.nr() == m,
 subset.nc() == n.
 */
@@ -225,7 +225,7 @@ void ADFun<Base,RecBase>::subgraph_jac_rev(
    const SizeVector& col( subset.col() );
    SizeVector row_major = subset.row_major();
    //
-   // determine set of independent variabels
+   // determine set of independent variables
    local::pod_vector<bool> select_domain(n);
    for(size_t j = 0; j < n; j++)
       select_domain[j] = false;

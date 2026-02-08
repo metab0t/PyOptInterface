@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_GET_DYN_PREVIOUS_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*!
 \file get_cexp_info.hpp
@@ -22,11 +22,11 @@ mapping from a dynamic parameter index to its arguments
 \param i_dyn
 is the dynamic parameter index
 
-\param dyn_ind2par_ind
+\param dyn2par_index
 is the mapping from dynamic parameter index to parameter index
 (size is number of dynamic parameters).
 
-\param dyn_par_is
+\param par_is_dyn
 i-th element is true (false) if i-th parameter is (is not) dynamic
 (size is number of parameters).
 
@@ -52,15 +52,15 @@ This is only defined for dynamic parameters indices less than or equal i_dyn.
 \param arg_match
 Size of this vector must be number of arguments for operator for i_dyn.
 The input value of its elements does not matter.
-Upn return it containts the parameter indices for the arguments
+Upn return it contains the parameter indices for the arguments
 to use when matching this operator
-Arguments that are dynamic prarameters, and have previous matches,
+Arguments that are dynamic parameters, and have previous matches,
 have been replaced by their previous matches.
 */
 inline void dyn_arg_match(
    size_t                    i_dyn           ,
-   const pod_vector<addr_t>& dyn_ind2par_ind ,
-   const pod_vector<bool>  & dyn_par_is      ,
+   const pod_vector<addr_t>& dyn2par_index ,
+   const pod_vector<bool>  & par_is_dyn      ,
    const pod_vector<addr_t>& dyn_arg_offset  ,
    const pod_vector<addr_t>& dyn_par_arg     ,
    const pod_vector<addr_t>& par_ind2dyn_ind ,
@@ -68,12 +68,12 @@ inline void dyn_arg_match(
    pod_vector<addr_t>&       arg_match       )
 {
    // number of dynamic parameters
-   addr_t num_dynamic_par = addr_t( dyn_ind2par_ind.size() );
+   addr_t num_dynamic_par = addr_t( dyn2par_index.size() );
    //
    // check some assumptions
    CPPAD_ASSERT_UNKNOWN( size_t( num_dynamic_par ) == dyn_arg_offset.size() );
    CPPAD_ASSERT_UNKNOWN( size_t( num_dynamic_par ) == dyn_previous.size() );
-   CPPAD_ASSERT_UNKNOWN( dyn_par_is.size() == par_ind2dyn_ind.size() );
+   CPPAD_ASSERT_UNKNOWN( par_is_dyn.size() == par_ind2dyn_ind.size() );
    //
    // number of arguments for this operator
    addr_t n_arg = addr_t( arg_match.size() );
@@ -85,17 +85,17 @@ inline void dyn_arg_match(
    for(addr_t j = 0; j < n_arg; ++j)
    {  // parameter index for this argument
       addr_t j_par = dyn_par_arg[i_arg + j];
-      CPPAD_ASSERT_UNKNOWN( j_par < dyn_ind2par_ind[i_dyn] );
+      CPPAD_ASSERT_UNKNOWN( j_par < dyn2par_index[i_dyn] );
       //
       // map dynamic parameters arguments to previous matches
-      if( dyn_par_is[j_par] )
+      if( par_is_dyn[j_par] )
       {  addr_t j_dyn = par_ind2dyn_ind[j_par];
          if( dyn_previous[j_dyn] != num_dynamic_par )
          {  CPPAD_ASSERT_UNKNOWN( dyn_previous[j_dyn] < j_dyn );
             // previous dynamic parameter
             j_dyn = dyn_previous[j_dyn];
-            // correspoding parameter
-            j_par = dyn_ind2par_ind[j_dyn];
+            // corresponding parameter
+            j_par = dyn2par_index[j_dyn];
          }
       }
       arg_match[j] = j_par;
@@ -115,9 +115,6 @@ using AD< Base > and computations by this routine are done using type
 \param play
 This is the old operation sequence.
 
-\param random_itr
-This is a random iterator for the old operation sequence.
-
 \param par_usage
 The size of this vector is the number of parameters in the
 operation sequence.i.e., play->nun_var_rec().
@@ -130,41 +127,40 @@ operation sequence; i.e., num_dyn = play->num_dynamic_par().
 Let k = dyn_parvious[j]. If k == num_dyn, no replacement was found for the
 j-th dynamic parameter. If k != num_dyn, the k-th dynamic parameter can be
 used in place of the j-th dynamic parameter, k < j, dyn_previous[k] != num_dyn,
-par_usage[dyn_ind2par_ind[k]] == true.
+par_usage[dyn2par_index[k]] == true.
 */
 
-template <class Addr, class Base>
+template <class Base>
 void get_dyn_previous(
    const player<Base>*                         play                ,
-   const play::const_random_iterator<Addr>&    random_itr          ,
    pod_vector<bool>&                           par_usage           ,
    pod_vector<addr_t>&                         dyn_previous        )
 {
    // number of parameters in the recording
-   size_t num_par = play->num_par_rec();
+   size_t num_par = play->num_par_all();
 
    // number of dynamic parameters in the recording
    size_t num_dynamic_par = play->num_dynamic_par();
 
    // number of independent dynamic parameters in the recording
-   size_t num_dynamic_ind  = play->num_dynamic_ind();
+   size_t n_dyn_independent= play->n_dyn_independent();
 
    // check some assumptions
    CPPAD_ASSERT_UNKNOWN( dyn_previous.size() == 0 );
    CPPAD_ASSERT_UNKNOWN( par_usage.size() == num_par );
    CPPAD_ASSERT_UNKNOWN( num_dynamic_par <= num_par );
-   CPPAD_ASSERT_UNKNOWN( num_dynamic_ind <= num_dynamic_par );
+   CPPAD_ASSERT_UNKNOWN( n_dyn_independent <= num_dynamic_par );
    CPPAD_ASSERT_UNKNOWN( num_arg_dyn( ind_dyn ) == 0 );
 
    // dynamic parameter information
    dyn_previous.resize( num_dynamic_par );
-   const pod_vector<addr_t>&   dyn_ind2par_ind( play->dyn_ind2par_ind() );
-   const pod_vector<bool>&     dyn_par_is( play->dyn_par_is() );
+   const pod_vector<addr_t>&   dyn2par_index( play->dyn2par_index() );
+   const pod_vector<bool>&     par_is_dyn( play->par_is_dyn() );
    const pod_vector<opcode_t>& dyn_par_op( play->dyn_par_op() );
    const pod_vector<addr_t>&   dyn_par_arg( play->dyn_par_arg() );
 
    // mapping from parameter index to dynamic parameter index
-   // only defined when dyn_par_is is true
+   // only defined when par_is_dyn is true
    pod_vector<addr_t> par_ind2dyn_ind(num_par);
 
    // mapping from dynamic parameter index to first argument index
@@ -181,9 +177,9 @@ void get_dyn_previous(
    size_t i_arg = 0;
    //
    // independent dynamic parameters
-   for(size_t i_dyn = 0; i_dyn < num_dynamic_ind; ++i_dyn)
+   for(size_t i_dyn = 0; i_dyn < n_dyn_independent; ++i_dyn)
    {  // parameter index
-      size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
+      size_t i_par = size_t( dyn2par_index[i_dyn] );
       // dynamic parameter index is one greater because phantom parameter
       // at index 0 is not dynamic
       CPPAD_ASSERT_UNKNOWN( i_par == i_dyn + 1 );
@@ -194,7 +190,7 @@ void get_dyn_previous(
    }
    //
    // other dynamic parameters
-   for(size_t i_dyn = num_dynamic_ind; i_dyn < num_dynamic_par; ++i_dyn)
+   for(size_t i_dyn = n_dyn_independent; i_dyn < num_dynamic_par; ++i_dyn)
    {  // Initialize previous for this dynamic parameter. This is only
       // defined for dynamic parameter indices less than or equal i_dyn
       dyn_previous[i_dyn] = addr_t( num_dynamic_par );
@@ -204,12 +200,12 @@ void get_dyn_previous(
       dyn_arg_offset[i_dyn] = addr_t( i_arg );
       //
       // parameter index for this dynamic parameter
-      size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
+      size_t i_par = size_t( dyn2par_index[i_dyn] );
       //
       // mapping from parameter indices to dynamic parameter indices
-      // is only defined when dyn_par_is[i_par] is true and for parameter
+      // is only defined when par_is_dyn[i_par] is true and for parameter
       // indices less than or equal i_par
-      CPPAD_ASSERT_UNKNOWN( dyn_par_is[i_par] );
+      CPPAD_ASSERT_UNKNOWN( par_is_dyn[i_par] );
       par_ind2dyn_ind[i_par] = addr_t( i_dyn );
       //
       // operator for this dynamic parameter
@@ -252,13 +248,13 @@ void get_dyn_previous(
          case tan_dyn:
          case tanh_dyn:
          CPPAD_ASSERT_UNKNOWN( num_arg_dyn(op) == 1);
-         CPPAD_ASSERT_UNKNOWN( dyn_par_is[i_par] );
+         CPPAD_ASSERT_UNKNOWN( par_is_dyn[i_par] );
          {  size_t num_arg = 1;
             arg_match.resize(num_arg);
             dyn_arg_match(
                i_dyn,
-               dyn_ind2par_ind,
-               dyn_par_is,
+               dyn2par_index,
+               par_is_dyn,
                dyn_arg_offset,
                dyn_par_arg,
                par_ind2dyn_ind,
@@ -319,14 +315,14 @@ void get_dyn_previous(
          case sub_dyn:
          case zmul_dyn:
          CPPAD_ASSERT_UNKNOWN( num_arg_dyn(op) == 2);
-         CPPAD_ASSERT_UNKNOWN( dyn_par_is[i_par] );
+         CPPAD_ASSERT_UNKNOWN( par_is_dyn[i_par] );
          match = false;
          {  size_t num_arg = 2;
             arg_match.resize(num_arg);
             dyn_arg_match(
                i_dyn,
-               dyn_ind2par_ind,
-               dyn_par_is,
+               dyn2par_index,
+               par_is_dyn,
                dyn_arg_offset,
                dyn_par_arg   ,
                par_ind2dyn_ind,

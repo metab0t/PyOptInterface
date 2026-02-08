@@ -2,10 +2,13 @@
 # define  CPPAD_LOCAL_VAL_GRAPH_VAL2FUN_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // --------------------------------------------------------------------------
 /*
 {xrst_begin val2fun_graph dev}
+{xrst_spell
+   dyn
+}
 
 Create an ADFun Object Corresponding to a Value Graph
 #####################################################
@@ -171,11 +174,11 @@ void ADFun<Base, RecBase>::val2fun(
 # endif
    //
    // dyn_n_ind
-   // number of independent dynamc parameters
+   // number of independent dynamic parameters
    size_t dyn_n_ind = dyn_ind.size();
    //
    // var_n_ind
-   // number of independent varibles
+   // number of independent variables
    size_t var_n_ind = var_ind.size();
    //
    // val_n_op
@@ -210,16 +213,16 @@ void ADFun<Base, RecBase>::val2fun(
       val2fun_index[i] = std::numeric_limits<addr_t>::max(); // invalid
    //
    // rec
-   // start a functon recording
+   // start a function recording
    local::recorder<Base> rec;
-   CPPAD_ASSERT_UNKNOWN( rec.num_op_rec() == 0 );
-   rec.set_num_dynamic_ind(dyn_n_ind);
+   CPPAD_ASSERT_UNKNOWN( rec.num_var_op() == 0 );
+   rec.set_n_dyn_independent(dyn_n_ind);
    rec.set_abort_op_index(0);
    rec.set_record_compare(false);
    //
    // parameter
 # ifndef NDEBUG
-   const local::pod_vector_maybe<Base>& parameter( rec.all_par_vec());
+   const local::pod_vector_maybe<Base>& parameter( rec.par_all());
    CPPAD_ASSERT_UNKNOWN( parameter.size() == 0 );
 # endif
    //
@@ -234,7 +237,7 @@ void ADFun<Base, RecBase>::val2fun(
    CPPAD_ASSERT_UNKNOWN( NumArg(local::BeginOp) == 1);
    CPPAD_ASSERT_UNKNOWN( NumRes(local::BeginOp) == 1);
    rec.PutOp(local::BeginOp);
-   rec.PutArg(0); // parameter argumnet is the nan above
+   rec.PutArg(0); // parameter argument is the nan above
    //
    // rec, vecad_offset
    // place the VecAD objects in the recording
@@ -258,7 +261,7 @@ void ADFun<Base, RecBase>::val2fun(
    }
    //
    // rec, fun_ad_type, val2fun_index
-   // put the independent dynamic paraeters in the function recording
+   // put the independent dynamic parameters in the function recording
    for(size_t i = 0; i < dyn_n_ind; ++i)
    {  CPPAD_ASSERT_KNOWN( dyn_ind[i] < val_n_ind,
          "val2fun: number of independent values is <= dyn_ind[i]"
@@ -599,7 +602,7 @@ void ADFun<Base, RecBase>::val2fun(
             addr_t value  = fun_arg[1];
             //
             // is_var
-            // base 2 representaiton of [ is_var(flag), is_var(value) ]
+            // base 2 representation of [ is_var(flag), is_var(value) ]
             addr_t is_var = 0;
             if( fun_ad_type[flag] == variable_enum )
                is_var += 1;
@@ -801,7 +804,7 @@ void ADFun<Base, RecBase>::val2fun(
                      csum_arg[i_variable++] = fun_arg[n_add + i];
                }
                CPPAD_ASSERT_UNKNOWN( i_dynamic == n_tot - 1 );
-               csum_arg[i_dynamic] = i_dynamic;
+               csum_arg[n_tot - 1] = n_tot;
                //
                // rec, tmp_addr
                tmp_addr = rec.PutOp(local::CSumOp);
@@ -816,14 +819,14 @@ void ADFun<Base, RecBase>::val2fun(
          // -------------------------------------------------------------------
          // vec_op
          case local::val_graph::vec_op_enum:
-         // All the VecAD objects have alread been initialized
+         // All the VecAD objects have already been initialized
          break;
          //
          // load_op
          case local::val_graph::load_op_enum:
          {  addr_t which_vector  = val_arg_vec[arg_index + 0];
             offset               = vecad_offset[which_vector];
-            addr_t load_op_index = addr_t( rec.num_var_load_rec() );
+            addr_t load_op_index = addr_t( rec.num_var_load() );
             rec.PutArg(offset, fun_arg[0], load_op_index);
             if( ad_type_x[0] < variable_enum )
                var_addr = rec.PutLoadOp(local::LdpOp);
@@ -958,16 +961,16 @@ void ADFun<Base, RecBase>::val2fun(
    num_order_taylor_          = 0;
    cap_order_taylor_          = 0;
    num_direction_taylor_      = 0;
-   num_var_tape_              = rec.num_var_rec();
+   num_var_tape_              = rec.num_var();
    //
    // taylor_
    taylor_.resize(0);
    //
    // cskip_op_
-   cskip_op_.resize( rec.num_op_rec() );
+   cskip_op_.resize( rec.num_var_op() );
    //
    // load_op2var_
-   load_op2var_.resize( rec.num_var_load_rec() );
+   load_op2var_.resize( rec.num_var_load() );
    //
    // play_
    // Now that each dependent variable has a place in the recording,
@@ -991,8 +994,8 @@ void ADFun<Base, RecBase>::val2fun(
    subgraph_info_.resize(
       ind_taddr_.size(),   // n_dep
       dep_taddr_.size(),   // n_ind
-      play_.num_op_rec(),  // n_op
-      play_.num_var_rec()  // n_var
+      play_.num_var_op(),  // n_op
+      play_.num_var()      // n_var
    );
    //
    // set the function name

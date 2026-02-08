@@ -7,10 +7,10 @@
 /*
 {xrst_begin atomic_two app}
 {xrst_spell
+   ctor
    px
    py
    tx
-   ty
    vx
    vy
 }
@@ -315,8 +315,8 @@ public:
    template <class InternalSparsity>
    bool for_sparse_jac(
       const vector<Base>&              x            ,
-      const local::pod_vector<size_t>& x_index      ,
-      const local::pod_vector<size_t>& y_index      ,
+      const vector<size_t>&            x_index      ,
+      const vector<size_t>&            y_index      ,
       InternalSparsity&                var_sparsity
    );
    // deprecated versions
@@ -358,8 +358,8 @@ public:
    template <class InternalSparsity>
    bool rev_sparse_jac(
       const vector<Base>&        x            ,
-      const local::pod_vector<size_t>& x_index ,
-      const local::pod_vector<size_t>& y_index ,
+      const vector<size_t>&            x_index ,
+      const vector<size_t>&            y_index ,
       InternalSparsity&          var_sparsity
    );
    // deprecated versions
@@ -404,8 +404,8 @@ public:
    template <class InternalSparsity>
    bool for_sparse_hes(
       const vector<Base>&              x                ,
-      const local::pod_vector<size_t>& x_index          ,
-      const local::pod_vector<size_t>& y_index          ,
+      const vector<size_t>&            x_index          ,
+      const vector<size_t>&            y_index          ,
       size_t                           np1              ,
       size_t                           numvar           ,
       const InternalSparsity&          rev_jac_sparsity ,
@@ -465,8 +465,8 @@ public:
    template <class InternalSparsity>
    bool rev_sparse_hes(
       const vector<Base>&              x                ,
-      const local::pod_vector<size_t>& x_index          ,
-      const local::pod_vector<size_t>& y_index          ,
+      const vector<size_t>&            x_index          ,
+      const vector<size_t>&            y_index          ,
       const InternalSparsity&          for_jac_sparsity ,
       bool*                            rev_jac_flag     ,
       InternalSparsity&                rev_hes_sparsity
@@ -563,7 +563,7 @@ public:
    {  if( work_[thread] != nullptr )
       {  // call destructor
          work_[thread]->~work_struct();
-         // return memory to avialable pool for this thread
+         // return memory to available pool for this thread
          thread_alloc::return_memory(
             reinterpret_cast<void*>(work_[thread])
          );
@@ -605,7 +605,7 @@ public:
 };
 } // END_CPPAD_NAMESPACE
 
-// functitons implemented in cppad/core/atomic_base files
+// functions implemented in cppad/core/atomic_base files
 # include <cppad/core/atomic/two/ctor.hpp>
 # include <cppad/core/atomic/two/option.hpp>
 # include <cppad/core/atomic/two/afun.hpp>

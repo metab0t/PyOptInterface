@@ -2,7 +2,7 @@
 # define CPPAD_CORE_REVERSE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <algorithm>
@@ -152,11 +152,10 @@ BaseVector ADFun<Base,RecBase>::Reverse(size_t q, const BaseVector &w)
       }
    }
    // evaluate the derivatives
-   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
-   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );
+   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_var_op() );
+   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load() );
    local::play::const_sequential_iterator play_itr = play_.end();
    local::sweep::reverse(
-      n,
       num_var_tape_,
       &play_,
       cap_order_taylor_,
@@ -193,7 +192,7 @@ BaseVector ADFun<Base,RecBase>::Reverse(size_t q, const BaseVector &w)
    }
    CPPAD_ASSERT_KNOWN( ! ( hasnan(value) && check_for_nan_ ) ,
       "dw = f.Reverse(q, w): has a nan,\n"
-      "but none of its Taylor coefficents are nan."
+      "but none of its Taylor coefficients are nan."
    );
 
    return value;

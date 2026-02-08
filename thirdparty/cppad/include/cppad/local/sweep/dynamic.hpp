@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_DYNAMIC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/atom_op_info.hpp>
@@ -11,15 +11,15 @@
 namespace CppAD { namespace local { namespace sweep {
 /*!
 \file sweep/dynamic.hpp
-Under Consruction
+Under Construction
 */
 
 /*!
 \def CPPAD_DYNAMIC_TRACE
 This value is either zero or one.
 Zero is the normal operational value.
-If it is one, a trace for each dynamic parameter is compuation is printed.
-Sometimes it is usefull to trace f.new_dynamic with the same
+If it is one, a trace for each dynamic parameter is computation is printed.
+Sometimes it is useful to trace f.new_dynamic with the same
 dynamic parameter values as during the recording
 (to debug the recording process).
 */
@@ -37,25 +37,25 @@ is a simple vector class with elements of type Base.
 \param ind_dynamic
 new value for the independent dynamic parameter vector.
 
-\param all_par_vec
+\param par_all
 is the vector of all the parameters.
-Ths constant parameters are inputs and the dynamic parameters are outputs.
+The constant parameters are inputs and the dynamic parameters are outputs.
 
-\param dyn_par_is
+\param par_is_dyn
 is a vector with the same length as par_vec.
-The i-th parameter is dynamic if and only if dyn_par_is[i] is true.
+The i-th parameter is dynamic if and only if par_is_dyn[i] is true.
 
-\param dyn_ind2par_ind
+\param dyn2par_index
 is a vector with length equal to the number of dynamic parameters.
-The element dyn_ind2par_ind[j] is the index in all_par_vec corresponding
+The element dyn2par_index[j] is the index in par_all corresponding
 to the j-th dynamic parameter.
-Note that if dyn_par_is[i] is false, the i-th parameter does not
+Note that if par_is_dyn[i] is false, the i-th parameter does not
 appear in this vector.
 
 \param dyn_par_op
 is a vector with length equal to the number of dynamic parameters.
 The element dyn_par_op_[j] is the operator for the j-th dynamic parameter.
-Note that if dyn_par_is[i] is false, the i-th parameter does not
+Note that if par_is_dyn[i] is false, the i-th parameter does not
 have a parameter in this list.
 
 \param dyn_par_arg
@@ -85,25 +85,25 @@ AD<RecBase> discrete_eval(
 
 template <class Base, class BaseVector, class RecBase>
 void dynamic(
-   pod_vector_maybe<Base>&       all_par_vec        ,
+   pod_vector_maybe<Base>&       par_all            ,
    const BaseVector&             ind_dynamic        ,
-   const pod_vector<bool>&       dyn_par_is         ,
-   const pod_vector<addr_t>&     dyn_ind2par_ind    ,
+   const pod_vector<bool>&       par_is_dyn         ,
+   const pod_vector<addr_t>&     dyn2par_index      ,
    const pod_vector<opcode_t>&   dyn_par_op         ,
    const pod_vector<addr_t>&     dyn_par_arg        ,
    const RecBase&                not_used_rec_base  )
 {
    // number of dynamic parameters
-   size_t num_dynamic_par = dyn_ind2par_ind.size();
+   size_t num_dynamic_par = dyn2par_index.size();
 
-   // vectors used in call to atomic fuctions
+   // vectors used in call to atomic functions
    vector<ad_type_enum> type_x;
    vector<Base>         taylor_x, taylor_y;
    vector<bool>         select_y;
 # ifndef NDEBUG
    for(size_t j = 0; j < ind_dynamic.size(); ++j)
       CPPAD_ASSERT_UNKNOWN(
-         dyn_par_is[j+1] && op_code_dyn( dyn_par_op[j] ) == ind_dyn
+         par_is_dyn[j+1] && op_code_dyn( dyn_par_op[j] ) == ind_dyn
    );
 # endif
 # if CPPAD_DYNAMIC_TRACE
@@ -139,10 +139,10 @@ void dynamic(
       size_t n_dyn = 1;
       //
       // parameter index for this dynamic parameter
-      size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
+      size_t i_par = size_t( dyn2par_index[i_dyn] );
       //
 # if CPPAD_DYNAMIC_TRACE
-      Base old_value = all_par_vec[i_par];
+      Base old_value = par_all[i_par];
 # endif
       //
       // operator for this dynamic parameter
@@ -161,7 +161,7 @@ void dynamic(
       if( unary_or_binary )
       {  CPPAD_ASSERT_UNKNOWN( n_arg == 1 || n_arg == 2 );
            for(size_t j = 0; j < n_arg; ++j)
-            par[j] = & all_par_vec[ dyn_par_arg[i_arg + j] ];
+            par[j] = & par_all[ dyn_par_arg[i_arg + j] ];
       }
       //
       switch(op)
@@ -171,210 +171,210 @@ void dynamic(
          // acos
          case acos_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = acos( *par[0] );
+         par_all[i_par] = acos( *par[0] );
          break;
 
          // asin
          case asin_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = asin( *par[0] );
+         par_all[i_par] = asin( *par[0] );
          break;
 
          // atan
          case atan_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = atan( *par[0] );
+         par_all[i_par] = atan( *par[0] );
          break;
 
          // cos
          case cos_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = cos( *par[0] );
+         par_all[i_par] = cos( *par[0] );
          break;
 
          // cosh
          case cosh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = cosh( *par[0] );
+         par_all[i_par] = cosh( *par[0] );
          break;
 
          // ind
          case ind_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 0 );
          CPPAD_ASSERT_UNKNOWN( i_par == i_dyn + 1 );
-         all_par_vec[i_par] = ind_dynamic[i_dyn];
+         par_all[i_par] = ind_dynamic[i_dyn];
          break;
 
          // exp
          case exp_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = exp( *par[0] );
+         par_all[i_par] = exp( *par[0] );
          break;
 
          // fabs
          case fabs_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = fabs( *par[0] );
+         par_all[i_par] = fabs( *par[0] );
          break;
 
          // log
          case log_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = log( *par[0] );
+         par_all[i_par] = log( *par[0] );
          break;
 
          // sin
          case sin_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = sin( *par[0] );
+         par_all[i_par] = sin( *par[0] );
          break;
 
          // sinh
          case sinh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = sinh( *par[0] );
+         par_all[i_par] = sinh( *par[0] );
          break;
 
          // sqrt
          case sqrt_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = sqrt( *par[0] );
+         par_all[i_par] = sqrt( *par[0] );
          break;
 
          // tan
          case tan_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = tan( *par[0] );
+         par_all[i_par] = tan( *par[0] );
          break;
 
          // tanh
          case tanh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = tanh( *par[0] );
+         par_all[i_par] = tanh( *par[0] );
          break;
 
          // ---------------------------------------------------------------
          // asinh
          case asinh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = asinh( *par[0] );
+         par_all[i_par] = asinh( *par[0] );
          break;
 
          // acosh
          case acosh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = acosh( *par[0] );
+         par_all[i_par] = acosh( *par[0] );
          break;
 
          // atanh
          case atanh_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = atanh( *par[0] );
+         par_all[i_par] = atanh( *par[0] );
          break;
 
          // expm1
          case expm1_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = expm1( *par[0] );
+         par_all[i_par] = expm1( *par[0] );
          break;
 
          // erf
          case erf_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = erf( *par[0] );
+         par_all[i_par] = erf( *par[0] );
          break;
 
          // erfc
          case erfc_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = erfc( *par[0] );
+         par_all[i_par] = erfc( *par[0] );
          break;
 
          // log1p
          case log1p_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = log1p( *par[0] );
+         par_all[i_par] = log1p( *par[0] );
          break;
          // ---------------------------------------------------------------
          // abs
          case abs_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = fabs( *par[0] );
+         par_all[i_par] = fabs( *par[0] );
          break;
 
          // add
          case add_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = *par[0] + *par[1];
+         par_all[i_par] = *par[0] + *par[1];
          break;
 
          // div
          case div_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = *par[0] / *par[1];
+         par_all[i_par] = *par[0] / *par[1];
          break;
 
          // mul
          case mul_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = *par[0] * *par[1];
+         par_all[i_par] = *par[0] * *par[1];
          break;
 
          // neg
          case neg_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = - *par[0];
+         par_all[i_par] = - *par[0];
          break;
 
          // pow
          case pow_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = pow( *par[0], *par[1] );
+         par_all[i_par] = pow( *par[0], *par[1] );
          break;
 
          // sign
          case sign_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 1 );
-         all_par_vec[i_par] = sign( *par[0] );
+         par_all[i_par] = sign( *par[0] );
          break;
 
          // sub
          case sub_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = *par[0] - *par[1];
+         par_all[i_par] = *par[0] - *par[1];
          break;
 
          // zmul
          case zmul_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 2 );
-         all_par_vec[i_par] = azmul( *par[0],  *par[1] );
+         par_all[i_par] = azmul( *par[0],  *par[1] );
          break;
 
          // ---------------------------------------------------------------
          // discrete(index, argument)
          case dis_dyn:
-         all_par_vec[i_par] = discrete_eval(
+         par_all[i_par] = discrete_eval(
                size_t(      dyn_par_arg[i_arg + 0] ) , // index
-               all_par_vec[ dyn_par_arg[i_arg + 1] ] , // argument
+               par_all[ dyn_par_arg[i_arg + 1] ] , // argument
                RecBase(0)                              // not_used
          );
 # if CPPAD_DYNAMIC_TRACE
          std::cout
          << std::setw(10) << std::left << i_par
          << std::setw(10) << std::left << old_value
-         << std::setw(10) << std::left << all_par_vec[i_par]
+         << std::setw(10) << std::left << par_all[i_par]
          << "="
          << std::setw(10) << std::right << op_name_dyn(op)
          << "("
          << std::setw(12) << std::right <<
             discrete<Base>::name( size_t( dyn_par_arg[i_arg + 0] ) );
-         if( dyn_par_is[ dyn_par_arg[i_arg + 1] ] )
+         if( par_is_dyn[ dyn_par_arg[i_arg + 1] ] )
          {  std::cout << ", i=" << std::setw(10) << std::right
             << dyn_par_arg[i_arg + 1];
          }
          else
          {  std::cout << ", v=" << std::setw(10) << std::right
-            << all_par_vec[ dyn_par_arg[i_arg + 1] ];
+            << par_all[ dyn_par_arg[i_arg + 1] ];
          }
          std::cout << ")" << std::endl;
 # endif
@@ -385,30 +385,30 @@ void dynamic(
          // (not yet implemented)
          case cond_exp_dyn:
          CPPAD_ASSERT_UNKNOWN( n_arg == 5 );
-         all_par_vec[i_par] = CondExpOp(
+         par_all[i_par] = CondExpOp(
             CompareOp(   dyn_par_arg[i_arg + 0] ) , // cop
-            all_par_vec[ dyn_par_arg[i_arg + 1] ] , // left
-            all_par_vec[ dyn_par_arg[i_arg + 2] ] , // right
-            all_par_vec[ dyn_par_arg[i_arg + 3] ] , // if_true
-            all_par_vec[ dyn_par_arg[i_arg + 4] ]   // if_false
+            par_all[ dyn_par_arg[i_arg + 1] ] , // left
+            par_all[ dyn_par_arg[i_arg + 2] ] , // right
+            par_all[ dyn_par_arg[i_arg + 3] ] , // if_true
+            par_all[ dyn_par_arg[i_arg + 4] ]   // if_false
          );
 # if CPPAD_DYNAMIC_TRACE
          std::cout
          << std::setw(10) << std::left << i_par
          << std::setw(10) << std::left << old_value
-         << std::setw(10) << std::left << all_par_vec[i_par]
+         << std::setw(10) << std::left << par_all[i_par]
          << "="
          << std::setw(10) << std::right
          << cond_exp_name[ dyn_par_arg[i_arg + 0] ]
          << "(";
          for(size_t i = 1; i < 5; ++i)
-         {  if( dyn_par_is[ dyn_par_arg[i_arg + i] ] )
+         {  if( par_is_dyn[ dyn_par_arg[i_arg + i] ] )
             {  std::cout << "i=" << std::setw(10) << std::right
                << dyn_par_arg[i_arg + i];
             }
             else
             {  std::cout << "v=" << std::setw(10) << std::right
-               << all_par_vec[ dyn_par_arg[i_arg + i] ];
+               << par_all[ dyn_par_arg[i_arg + i] ];
             }
             if( i < 4 )
                std::cout << ",";
@@ -444,10 +444,10 @@ void dynamic(
             // taylor_x, type_x
             for(size_t j = 0; j < n; ++j)
             {  addr_t arg_j = dyn_par_arg[i_arg + 5 + j];
-               taylor_x[j]   = all_par_vec[ arg_j ];
+               taylor_x[j]   = par_all[ arg_j ];
                if( arg_j == 0 )
                   type_x[j] = variable_enum;
-               else if ( dyn_par_is[arg_j] )
+               else if ( par_is_dyn[arg_j] )
                   type_x[j] = dynamic_enum;
                else
                   type_x[j] = constant_enum;
@@ -455,7 +455,7 @@ void dynamic(
             // select_y
             for(size_t i = 0; i < m; ++i)
             {  i_par = size_t( dyn_par_arg[i_arg + 5 + n + i] );
-               select_y[i] = dyn_par_is[i_par];
+               select_y[i] = par_is_dyn[i_par];
             }
             call_atomic_forward<Base, RecBase>(
                taylor_x,
@@ -490,9 +490,9 @@ void dynamic(
 # endif
             for(size_t i = 0; i < m; ++i)
             {  i_par = size_t( dyn_par_arg[i_arg + 5 + n + i] );
-               if( dyn_par_is[i_par] )
+               if( par_is_dyn[i_par] )
                {  CPPAD_ASSERT_UNKNOWN( i_par != 0 );
-                  all_par_vec[i_par] = taylor_y[i];
+                  par_all[i_par] = taylor_y[i];
 # ifndef NDEBUG
                   ++count_dyn;
 # endif
@@ -500,7 +500,7 @@ void dynamic(
                   std::cout
                   << std::setw(10) << std::left << i_par
                   << std::setw(10) << std::left << old_value
-                  << std::setw(10) << std::left << all_par_vec[i_par]
+                  << std::setw(10) << std::left << par_all[i_par]
                   << "= " << name << "_" << i << std::endl;
 # endif
                }
@@ -528,28 +528,28 @@ void dynamic(
          std::cout
          << std::setw(10) << std::left << i_par
          << std::setw(10) << std::left << old_value
-         << std::setw(10) << std::left << all_par_vec[i_par]
+         << std::setw(10) << std::left << par_all[i_par]
          << "="
          << std::setw(10) << std::right << op_name_dyn(op)
          << "(";
          if( 0 < n_arg )
-         {  if( dyn_par_is[ dyn_par_arg[i_arg + 0] ] )
+         {  if( par_is_dyn[ dyn_par_arg[i_arg + 0] ] )
             {  std::cout << "i=" << std::setw(10) << std::right
                << dyn_par_arg[i_arg + 0];
             }
             else
             {  std::cout << "v=" << std::setw(10) << std::right
-               << all_par_vec[ dyn_par_arg[i_arg + 0] ];
+               << par_all[ dyn_par_arg[i_arg + 0] ];
             }
          }
          if( 1 < n_arg )
-         {  if( dyn_par_is[ dyn_par_arg[i_arg + 1] ] )
+         {  if( par_is_dyn[ dyn_par_arg[i_arg + 1] ] )
             {  std::cout << ", i=" << std::setw(10) << std::right
                << dyn_par_arg[i_arg + 1];
             }
             else
             {  std::cout << ", v=" << std::setw(10) << std::right
-               << all_par_vec[ dyn_par_arg[i_arg + 1] ];
+               << par_all[ dyn_par_arg[i_arg + 1] ];
             }
          }
          std::cout << ")" << std::endl;

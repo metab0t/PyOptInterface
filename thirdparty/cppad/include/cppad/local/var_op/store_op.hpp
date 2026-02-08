@@ -40,10 +40,15 @@ y
 *
 is the value being stored.
 
+RecBase
+*******
+is the base type use when recording this operator;
+i.e., this operation was recording using AD< *RecBase* > operations.
+
 Base
 ****
-base type for the operator; i.e., this operation was recorded
-using AD<Base> and computations by these operators done using type Base.
+is the type used for computations by this operator.
+This is either *RecBase* or AD< *RecBase* >.
 
 op_code
 *******
@@ -94,19 +99,19 @@ If *y* is a parameter (variable), arg[2] is the parameter index
 Zero Order Forward Store an Element of a VecAD Vector
 #####################################################
 
-Prototype
-*********
-{xrst_literal
-   // BEGIN_STORE_FORWARD_0
-   // END_STORE_FORWARD_0
-}
-
 v, x, y
 *******
 see
 :ref:`var_store_op@v` ,
 :ref:`var_store_op@x` ,
 :ref:`var_store_op@y`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_STORE_FORWARD_0
+   // END_STORE_FORWARD_0
+}
 
 Base, op_code, num_vecad_ind, arg
 *********************************
@@ -130,7 +135,7 @@ This is the vector of parameters for this recording which has size *num_par* .
 
 cap_order
 *********
-number of columns in the matrix containing the Taylor coefficients.
+is the maximum number of orders that can fit in *taylor* .
 
 taylor
 ******
@@ -174,6 +179,7 @@ inline void store_forward_0(
    pod_vector<size_t>&  vec_ad2index   )
 // END_STORE_FORWARD_0
 {  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 0);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( vec_ad2isvar.size() == vec_ad2index.size() )
@@ -227,17 +233,10 @@ inline void store_forward_0(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_store_forward_jac dev}
+{xrst_begin var_store_for_jac dev}
 
 Forward Jacobian Sparsity for Store a VecAD Element
 ###################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_STORE_FORWARD_JAC
-   // END_STORE_FORWARD_JAC
-}
 
 v, x, y
 *******
@@ -245,6 +244,13 @@ see
 :ref:`var_store_op@v` ,
 :ref:`var_store_op@x` ,
 :ref:`var_store_op@y`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_STORE_FOR_JAC
+   // END_STORE_FOR_JAC
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -290,11 +296,11 @@ to the sparsity pattern for *v* .
 If *dependency* is true and *x* is a variable,
 the sparsity pattern for *x* is also added to the sparsity pattern for *v*.
 
-{xrst_end var_store_forward_jac}
+{xrst_end var_store_for_jac}
 */
-// BEGIN_STORE_FORWARD_JAC
+// BEGIN_STORE_FOR_JAC
 template <class Vector_set>
-inline void store_forward_jac(
+inline void store_for_jac(
    op_code_var               op_code        ,
    size_t                    num_vecad_ind  ,
    const addr_t*             arg            ,
@@ -302,8 +308,9 @@ inline void store_forward_jac(
    const pod_vector<size_t>& vecad_ind      ,
    const Vector_set&         var_sparsity   ,
    Vector_set&               vecad_sparsity )
-// END_STORE_FORWARD_JAC
+// END_STORE_FOR_JAC
 {  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 0);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( num_vecad_ind == vecad_ind.size() );
@@ -345,17 +352,10 @@ inline void store_forward_jac(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_store_reverse_jac dev}
+{xrst_begin var_store_rev_jac dev}
 
 Reverse Jacobian Sparsity for Store a VecAD Element
 ###################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_STORE_REVERSE_JAC
-   // END_STORE_REVERSE_JAC
-}
 
 v, x, y
 *******
@@ -363,6 +363,13 @@ see
 :ref:`var_store_op@v` ,
 :ref:`var_store_op@x` ,
 :ref:`var_store_op@y`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_STORE_REV_JAC
+   // END_STORE_REV_JAC
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -404,11 +411,11 @@ vecad_sparsity
 The set with index *i_v* in *vecad_sparsity
 is the sparsity pattern for the vector *v*.
 
-{xrst_end var_store_reverse_jac}
+{xrst_end var_store_rev_jac}
 */
-// BEGIN_STORE_REVERSE_JAC
+// BEGIN_STORE_REV_JAC
 template <class Vector_set>
-inline void store_reverse_jac(
+inline void store_rev_jac(
    op_code_var               op_code        ,
    size_t                    num_vecad_ind  ,
    const addr_t*             arg            ,
@@ -416,8 +423,9 @@ inline void store_reverse_jac(
    const pod_vector<size_t>& vecad_ind      ,
    Vector_set&               var_sparsity   ,
    const Vector_set&         vecad_sparsity )
-// END_STORE_REVERSE_JAC
+// END_STORE_REV_JAC
 {  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 0);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( num_vecad_ind == vecad_ind.size() );
@@ -459,17 +467,10 @@ inline void store_reverse_jac(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_store_reverse_hes dev}
+{xrst_begin var_store_rev_hes dev}
 
 Reverse Hessian Sparsity for Store a VecAD Element
 ##################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_STORE_REVERSE_HES
-   // END_STORE_REVERSE_HES
-}
 
 v, x, y
 *******
@@ -477,6 +478,13 @@ see
 :ref:`var_store_op@v` ,
 :ref:`var_store_op@x` ,
 :ref:`var_store_op@y`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_STORE_REV_HES
+   // END_STORE_REV_HES
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -524,11 +532,11 @@ vecad_rev_jac
 the *i_v* component of this vector is true ,
 if the scalar function has non-zero partial w.r.t *v*.
 
-{xrst_end var_store_reverse_hes}
+{xrst_end var_store_rev_hes}
 */
-// BEGIN_STORE_REVERSE_HES
+// BEGIN_STORE_REV_HES
 template <class Vector_set>
-inline void store_reverse_hes(
+inline void store_rev_hes(
    op_code_var               op_code        ,
    const addr_t*             arg            ,
    size_t                    num_vecad_ind  ,
@@ -537,8 +545,9 @@ inline void store_reverse_hes(
    const Vector_set&         vecad_sparsity ,
    bool*                     var_rev_jac    ,
    const pod_vector<bool>&   vecad_rev_jac  )
-// END_STORE_REVERSE_HES
-{
+// END_STORE_REV_HES
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 0);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_vecad_ind );
@@ -572,17 +581,10 @@ inline void store_reverse_hes(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_store_forward_hes dev}
+{xrst_begin var_store_for_hes dev}
 
 Forward Hessian Sparsity for Store a VecAD Element
 ##################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_STORE_FORWARD_HES
-   // END_STORE_FORWARD_HES
-}
 
 v, x, y
 *******
@@ -590,6 +592,13 @@ see
 :ref:`var_store_op@v` ,
 :ref:`var_store_op@x` ,
 :ref:`var_store_op@y`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_STORE_FOR_HES
+   // END_STORE_FOR_HES
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -637,11 +646,11 @@ vecad_rev_jac
 the *i_v* component of this vector is true ,
 if the scalar function has non-zero partial w.r.t *v*.
 
-{xrst_end var_store_forward_hes}
+{xrst_end var_store_for_hes}
 */
-// BEGIN_STORE_FORWARD_HES
+// BEGIN_STORE_FOR_HES
 template <class Vector_set>
-inline void store_forward_hes(
+inline void store_for_hes(
    op_code_var               op_code        ,
    const addr_t*             arg            ,
    size_t                    num_vecad_ind  ,
@@ -649,8 +658,9 @@ inline void store_forward_hes(
    const pod_vector<size_t>& vecad_ind      ,
    Vector_set&               vecad_sparsity ,
    const Vector_set&         for_hes_sparse )
-// END_STORE_FORWARD_HES
-{
+// END_STORE_FOR_HES
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 0);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_vecad_ind );

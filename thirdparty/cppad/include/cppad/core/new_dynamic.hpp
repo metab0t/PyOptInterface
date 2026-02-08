@@ -2,7 +2,7 @@
 # define CPPAD_CORE_NEW_DYNAMIC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 /*
@@ -95,7 +95,7 @@ template <class BaseVector>
 void ADFun<Base,RecBase>::new_dynamic(const BaseVector& dynamic)
 {  using local::pod_vector;
    CPPAD_ASSERT_KNOWN(
-      size_t( dynamic.size() ) == play_.num_dynamic_ind() ,
+      size_t( dynamic.size() ) == play_.n_dyn_independent() ,
       "f.new_dynamic: dynamic.size() different from corresponding "
       "call to Independent"
    );
@@ -103,19 +103,19 @@ void ADFun<Base,RecBase>::new_dynamic(const BaseVector& dynamic)
    CheckSimpleVector<Base, BaseVector>();
 
    // retrieve player information about the dynamic parameters
-   local::pod_vector_maybe<Base>&     all_par_vec( play_.all_par_vec() );
-   const pod_vector<bool>&            dyn_par_is ( play_.dyn_par_is()  );
+   local::pod_vector_maybe<Base>&     par_all( play_.par_all() );
+   const pod_vector<bool>&            par_is_dyn ( play_.par_is_dyn()  );
    const pod_vector<local::opcode_t>& dyn_par_op ( play_.dyn_par_op()  );
    const pod_vector<addr_t>&          dyn_par_arg( play_.dyn_par_arg() );
-   const pod_vector<addr_t>&     dyn_ind2par_ind ( play_.dyn_ind2par_ind() );
+   const pod_vector<addr_t>&     dyn2par_index ( play_.dyn2par_index() );
 
    // set the dependent dynamic parameters
    RecBase not_used_rec_base(0.0);
    local::sweep::dynamic(
-      all_par_vec         ,
+      par_all             ,
       dynamic             ,
-      dyn_par_is          ,
-      dyn_ind2par_ind     ,
+      par_is_dyn          ,
+      dyn2par_index       ,
       dyn_par_op          ,
       dyn_par_arg         ,
       not_used_rec_base

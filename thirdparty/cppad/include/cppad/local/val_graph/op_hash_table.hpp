@@ -2,7 +2,7 @@
 # define  CPPAD_LOCAL_VAL_GRAPH_OP_HASH_TABLE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2023-24 Bradley M. Bell
+// SPDX-FileContributor: 2023-25 Bradley M. Bell
 // ---------------------------------------------------------------------------
 # include <cppad/local/sparse/size_setvec.hpp>
 # include <cppad/local/val_graph/tape.hpp>
@@ -32,7 +32,7 @@ A reference to *tape* is stored in *op_hash_tale* ; i.e.,
 op2arg_index
 ============
 This is a mapping from operator index to corresponding offset in the
-tape argument vector *tape*.arg_vec_ .
+tape argument vector *tape*.var_arg_ .
 
 n_hash_code
 ===========
@@ -153,7 +153,7 @@ private:
          // code
          code = 0;
          //
-         // These are auxillary indices
+         // These are auxiliary indices
          for(addr_t i = 0; i < n_before; ++i)
             code += size_t( arg_vec[arg_index + i] );
          //
@@ -162,7 +162,7 @@ private:
          for(addr_t i = n_before; i < n_arg - n_after; ++i)
             code += size_t( new_val_index[ arg_vec[arg_index + i] ] );
          //
-         // These are auxillary indices
+         // These are auxiliary indices
          for(addr_t i = n_arg - n_after; i < n_arg ; ++i)
             code += size_t( arg_vec[arg_index + i] );
       }

@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_GET_PAR_USAGE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*!
 \file get_cexp_info.hpp
@@ -54,7 +54,7 @@ the i-th operator in the operation sequence.
 vecad_used
 **********
 This argument has size equal to the number of VecAD vectors
-in the operations sequences; i.e., play->num_var_vecad_rec().
+in the operations sequences; i.e., play->num_var_vecad().
 The VecAD vectors are indexed in the order that their indices appear
 in the one large play->GetVecInd that holds all the VecAD vectors.
 
@@ -62,7 +62,7 @@ par_usage
 *********
 The input size of this vector must be zero.
 Upon return it has size equal to the number of parameters
-in the operation sequence; i.e., play->num_par_rec();
+in the operation sequence; i.e., play->num_par_all();
 The value *par_usage* [ *i* ] is true if an only if
 the i-th parameter is used to compute a dependent variable
 or parameter.
@@ -82,37 +82,37 @@ void get_par_usage(
    pod_vector<bool>&                           par_usage           )
 // END_PROTOTYPE
 {
-   CPPAD_ASSERT_UNKNOWN( op_usage.size()   == play->num_op_rec() );
+   CPPAD_ASSERT_UNKNOWN( op_usage.size()   == play->num_var_op() );
    CPPAD_ASSERT_UNKNOWN( par_usage.size()  == 0 );
    //
    // number of operators in the tape
-   const size_t num_op = play->num_op_rec();
+   const size_t num_op = play->num_var_op();
    //
    // number of parameters in the tape
-   const size_t num_par = play->num_par_rec();
+   const size_t num_par = play->num_par_all();
    //
    // number of dynamic parameters
    const size_t num_dynamic_par = play->num_dynamic_par();
    //
    // number of independent dynamic parameters
-   size_t num_dynamic_ind = play->num_dynamic_ind();
+   size_t n_dyn_independent = play->n_dyn_independent();
    //
    // number of VecAD vectors
-   size_t num_vecad_vec = play->num_var_vecad_rec();
+   size_t num_vecad_vec = play->num_var_vecad();
    //
    // dynamic parameter information
-   const pod_vector<bool>&        dyn_par_is( play->dyn_par_is() );
+   const pod_vector<bool>&        par_is_dyn( play->par_is_dyn() );
    const pod_vector<opcode_t>&    dyn_par_op( play->dyn_par_op() );
    const pod_vector<addr_t>&      dyn_par_arg( play->dyn_par_arg() );
-   const pod_vector<addr_t>&      dyn_ind2par_ind( play->dyn_ind2par_ind() );
-   const pod_vector_maybe<Base>&  all_par_vec( play->all_par_vec() );
+   const pod_vector<addr_t>&      dyn2par_index( play->dyn2par_index() );
+   const pod_vector_maybe<Base>&  par_all( play->par_all() );
    // -----------------------------------------------------------------------
    // initialize par_usage
    par_usage.resize(num_par);
    par_usage[0] = true; // true for nan at beginning of parameter vector
-   for(size_t i_par = 1; i_par <= num_dynamic_ind; ++i_par)
+   for(size_t i_par = 1; i_par <= n_dyn_independent; ++i_par)
       par_usage[i_par] = true;  // true for independent dynamic parameters
-   for(size_t i_par = num_dynamic_ind+1; i_par < num_par; ++i_par)
+   for(size_t i_par = n_dyn_independent+1; i_par < num_par; ++i_par)
       par_usage[i_par] = false; // initialize as false for other parameters
    //
    // -----------------------------------------------------------------------
@@ -128,14 +128,14 @@ void get_par_usage(
          {  // index of parameter used by this VecAD vector
             size_t i_par = play->GetVecInd(start_this_vector + k);
             // must not be a dynamic parameter
-            CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[i_par] );
+            CPPAD_ASSERT_UNKNOWN( ! par_is_dyn[i_par] );
             // set usage for this parameter
             par_usage[i_par] = true;
          }
       }
       start_this_vector += length + 1;
    }
-   CPPAD_ASSERT_UNKNOWN( start_this_vector == play->num_var_vecad_ind_rec() );
+   CPPAD_ASSERT_UNKNOWN( start_this_vector == play->num_var_vec_ind() );
    //
    // -----------------------------------------------------------------------
    // forward pass to mark which parameters are used by necessary operators
@@ -167,7 +167,7 @@ void get_par_usage(
          // add or subtract with left a parameter and right a variable
          case AddpvOp:
          case SubpvOp:
-         if( dyn_par_is[ arg[0] ] )
+         if( par_is_dyn[ arg[0] ] )
             par_usage[ arg[0] ] = true;
          else
          {  // determine if this parameter will be absorbed by csum
@@ -183,7 +183,7 @@ void get_par_usage(
 
          // subtract with left a variable and right a parameter
          case SubvpOp:
-         if( dyn_par_is[ arg[1] ] )
+         if( par_is_dyn[ arg[1] ] )
             par_usage[ arg[1] ] = true;
          else
          {  // determine if this parameter will be absorbed by csum
@@ -277,7 +277,7 @@ void get_par_usage(
          par_usage[arg[1]] = true;
          break;
 
-         // cases where second and thrid arguments are parameters
+         // cases where second and third arguments are parameters
          case ErfOp:
          case ErfcOp:
          case StppOp:
@@ -358,7 +358,7 @@ void get_par_usage(
          // this argument is a variable
          CPPAD_ASSERT_UNKNOWN( atom_state == arg_atom );
          atom_ix[atom_j]     = 0;
-         parameter_x[atom_j] = all_par_vec[0]; // variables get value nan
+         parameter_x[atom_j] = par_all[0]; // variables get value nan
          type_x[atom_j]      = variable_enum;
          ++atom_j;
          if( atom_j == atom_n )
@@ -369,8 +369,8 @@ void get_par_usage(
          // this argument is a parameter
          CPPAD_ASSERT_UNKNOWN( atom_state == arg_atom );
          atom_ix[atom_j]     = size_t( arg[0] );
-         parameter_x[atom_j] = all_par_vec[arg[0]]; // parameter value
-         if( dyn_par_is[arg[0]] )
+         parameter_x[atom_j] = par_all[arg[0]]; // parameter value
+         if( par_is_dyn[arg[0]] )
             type_x[atom_j] = dynamic_enum;
          else
             type_x[atom_j] = constant_enum;
@@ -407,8 +407,8 @@ void get_par_usage(
    // reverse pass to determine which dynamic parameters are necessary
    // -----------------------------------------------------------------------
    size_t i_arg = dyn_par_arg.size(); // index in dyn_par_arg
-   size_t i_dyn = num_dynamic_par;    // index in dyn_ind2par_ind
-   while(i_dyn)
+   size_t i_dyn = num_dynamic_par;    // index in dyn2par_index
+     while(i_dyn)
    {  // next dynamic parameter in reverse order
       --i_dyn;
       op_code_dyn op = op_code_dyn( dyn_par_op[i_dyn] );
@@ -435,12 +435,12 @@ void get_par_usage(
          type_x.resize(n);
          for(size_t j = 0; j < n; ++j)
          {  // parameter index zero is used for variable
-            CPPAD_ASSERT_UNKNOWN( CppAD::isnan( all_par_vec[0] ) );
+            CPPAD_ASSERT_UNKNOWN( CppAD::isnan( par_all[0] ) );
             addr_t arg_j = dyn_par_arg[i_arg + 5 + j];
-            parameter_x[j] = all_par_vec[arg_j];
+            parameter_x[j] = par_all[arg_j];
             if( arg_j == 0 )
                type_x[j] = variable_enum;
-            else if( dyn_par_is[arg_j] )
+            else if( par_is_dyn[arg_j] )
                type_x[j] = dynamic_enum;
             else
                type_x[j] = constant_enum;
@@ -449,7 +449,7 @@ void get_par_usage(
          // depend_y
          depend_y.resize(m);
          for(size_t i = 0; i < m; ++i)
-         {  // a constant prameter cannot depend on a dynamic parameter
+         {  // a constant parameter cannot depend on a dynamic parameter
             // so do not worry about constant parameters in depend_y
             size_t i_par = size_t( dyn_par_arg[i_arg + 5 + n + i] );
             depend_y[i]  = par_usage[i_par];
@@ -469,10 +469,10 @@ void get_par_usage(
       }
       else
       {  // corresponding parameter index
-         size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
-         CPPAD_ASSERT_UNKNOWN( dyn_par_is[i_par] );
+         size_t i_par = size_t( dyn2par_index[i_dyn] );
+         CPPAD_ASSERT_UNKNOWN( par_is_dyn[i_par] );
          //
-         // number of argumens to this operator
+         // number of arguments to this operator
          size_t n_arg = num_arg_dyn(op);
          //
          // index of first argument for this operator

@@ -2,10 +2,10 @@
 # define CPPAD_CORE_FORWARD_FORWARD_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
-// documened after Forward but included here so easy to see
+// documented after Forward but included here so easy to see
 # include <cppad/core/capacity_order.hpp>
 # include <cppad/core/num_skip.hpp>
 # include <cppad/core/check_for_nan.hpp>
@@ -159,7 +159,7 @@ BaseVector ADFun<Base,RecBase>::Forward(
    size_t C = cap_order_taylor_;
 
    // The optimizer may skip a step that does not affect dependent variables.
-   // Initilaizing zero order coefficients avoids following valgrind warning:
+   // Initializing zero order coefficients avoids following valgrind warning:
    // "Conditional jump or move depends on uninitialised value(s)".
    for(j = 0; j < num_var_tape_; j++)
    {  for(k = p; k <= q; k++)
@@ -189,27 +189,42 @@ BaseVector ADFun<Base,RecBase>::Forward(
    }
    //
    // evaluate the derivatives
-   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
-   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );
+   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_var_op() );
+   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load() );
    if( q == 0 )
-   {
-      local::sweep::forward0(&play_, s, true,
-         n, num_var_tape_, C,
-         taylor_.data(), cskip_op_.data(), load_op2var_,
+   {  bool print = true;
+      local::sweep::forward_0(
+         not_used_rec_base,
+         &play_,
+         num_var_tape_,
+         C,
+         cskip_op_.data(),
+         load_op2var_,
          compare_change_count_,
          compare_change_number_,
          compare_change_op_index_,
-         not_used_rec_base
+         s,
+         print,
+         taylor_.data()
       );
    }
    else
-   {  local::sweep::forward1(&play_, s, true, p, q,
-         n, num_var_tape_, C,
-         taylor_.data(), cskip_op_.data(), load_op2var_,
+   {  bool print = true;
+      local::sweep::forward_any(
+         not_used_rec_base,
+         &play_,
+         num_var_tape_,
+         C,
+         cskip_op_.data(),
+         load_op2var_,
          compare_change_count_,
          compare_change_number_,
          compare_change_op_index_,
-         not_used_rec_base
+         s,
+         print,
+         p,
+         q,
+         taylor_.data()
       );
    }
 
@@ -454,19 +469,18 @@ BaseVector ADFun<Base,RecBase>::Forward(
    }
 
    // evaluate the derivatives
-   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
-   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );
-   local::sweep::forward2(
+   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_var_op() );
+   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load() );
+   local::sweep::forward_dir(
+      not_used_rec_base,
       &play_,
-      q,
-      r,
-      n,
       num_var_tape_,
       c,
-      taylor_.data(),
       cskip_op_.data(),
       load_op2var_,
-      not_used_rec_base
+      q,
+      r,
+      taylor_.data()
    );
 
    // return Taylor coefficients for dependent variables

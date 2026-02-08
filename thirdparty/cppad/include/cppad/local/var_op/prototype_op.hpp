@@ -60,14 +60,20 @@ is the k-th order Taylor coefficient corresponding to z.
 \li p <= q
 */
 template <class Base>
-inline void forward_unary1_op(
-   size_t p           ,
-   size_t q           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary1_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -135,14 +141,20 @@ corresponding to z and the ell-th direction.
 \li q < cap_order
 */
 template <class Base>
-inline void forward_unary1_op_dir(
-   size_t q           ,
-   size_t r           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary1_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -179,12 +191,16 @@ is the zero order Taylor coefficient corresponding to z.
 \li 0 < cap_order
 */
 template <class Base>
-inline void forward_unary1_op_0(
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary1_forward_0(
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -229,7 +245,7 @@ for k = 0 , ... , d
 is the k-th order Taylor coefficient corresponding to z.
 
 \param n_order
-number of colums in the matrix containing all the partial derivatives.
+number of columns in the matrix containing all the partial derivatives.
 
 \param partial
 \b Input: partial [ i_x * n_order + k ]
@@ -260,14 +276,18 @@ may be used as work space; i.e., may change in an unspecified manner.
 \li d < n_order
 */
 template <class Base>
-inline void reverse_unary1_op(
-   size_t      i_z          ,
-   size_t      i_x          ,
-   size_t      cap_order    ,
-   const Base* taylor       ,
-   size_t      n_order      ,
-   Base*       partial      )
-{  // d
+inline void unary1_reverse(
+   size_t        i_z          ,
+   const addr_t* arg          ,
+   size_t        cap_order    ,
+   const Base*   taylor       ,
+   size_t        n_order      ,
+   Base*         partial      )
+{  // d  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    size_t d = n_order - 1;
    //
    // This routine is only for documentation, it should not be used
@@ -293,7 +313,7 @@ highest order of the Taylor coefficients that we are computing.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary result is called y has index i_z - 1.
+The auxiliary result is called y has index i_z - 1.
 
 \param i_x
 variable index corresponding to the argument for this operator;
@@ -313,7 +333,7 @@ is the k-th order Taylor coefficient corresponding to z.
 \n
 \b Input: <code>taylor [ ( i_z - 1) * cap_order + k ]</code>
 for k = 0 , ... , p-1,
-is the k-th order Taylor coefficient corresponding to the auxillary result y.
+is the k-th order Taylor coefficient corresponding to the auxiliary result y.
 \n
 \b Output: <code>taylor [ i_z * cap_order + k ]</code>,
 for k = p , ... , q,
@@ -332,14 +352,20 @@ the autillary result y.
 \li p <= q
 */
 template <class Base>
-inline void forward_unary2_op(
-   size_t p           ,
-   size_t q           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary2_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -362,7 +388,7 @@ number of directions for Taylor coefficients that we are computing.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary result is called y has index i_z - 1.
+The auxiliary result is called y has index i_z - 1.
 
 \param i_x
 variable index corresponding to the argument for this operator;
@@ -399,7 +425,7 @@ is the zero order Taylor coefficient for all directions and
 for k = 1 , ... , q-1,
 ell = 0, ..., r-1,
 is the k-th order Taylor coefficient
-corresponding to the auxillary result y and the ell-th direction.
+corresponding to the auxiliary result y and the ell-th direction.
 \n
 \b Output:
 <code>taylor [ i_z * tpv + (q-1)*r + ell + 1]</code>,
@@ -415,14 +441,20 @@ corresponding to z and the ell-th direction.
 \li q < cap_order
 */
 template <class Base>
-inline void forward_unary2_op_dir(
-   size_t q           ,
-   size_t r           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary2_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -437,7 +469,7 @@ using AD< Base > and computations by this routine are done using type
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor corresponding to z.
-The auxillary result is called y and has index i_z - 1.
+The auxiliary result is called y and has index i_z - 1.
 
 \param i_x
 variable index corresponding to the argument for this operator;
@@ -464,12 +496,16 @@ the autillary result y.
 \li j < cap_order
 */
 template <class Base>
-inline void forward_unary2_op_0(
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void unary2_forward_0(
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -496,7 +532,7 @@ we are computing the partial derivatives with respect to.
 \param i_z
 variable index corresponding to the last (primary) result for this operation;
 i.e. the row index in taylor to z.
-The auxillary result is called y and has index i_z - 1.
+The auxiliary result is called y and has index i_z - 1.
 
 \param i_x
 variable index corresponding to the argument for this operation;
@@ -517,10 +553,10 @@ is the k-th order Taylor coefficient corresponding to z.
  taylor [ ( i_z - 1) * cap_order + k ]
 for k = 0 , ... , d
 is the k-th order Taylor coefficient corresponding to
-the auxillary variable y.
+the auxiliary variable y.
 
 \param n_order
-number of colums in the matrix containing all the partial derivatives.
+number of columns in the matrix containing all the partial derivatives.
 
 \param partial
 \b Input: partial [ i_x * n_order + k ]
@@ -537,7 +573,7 @@ the k-th order Taylor coefficient for z.
 \b Input: partial [ ( i_z - 1) * n_order + k ]
 for k = 0 , ... , d
 is the partial derivative of G( z , x , w , u , ... ) with respect to
-the k-th order Taylor coefficient for the auxillary variable y.
+the k-th order Taylor coefficient for the auxiliary variable y.
 \n
 \b Output: partial [ i_x * n_order + k ]
 for k = 0 , ... , d
@@ -557,14 +593,18 @@ may be used as work space; i.e., may change in an unspecified manner.
 \li d < n_order
 */
 template <class Base>
-inline void reverse_unary2_op(
-   size_t      i_z          ,
-   size_t      i_x          ,
-   size_t      cap_order    ,
-   const Base* taylor       ,
-   size_t      n_order      ,
-   Base*       partial      )
-{  // d
+inline void unary2_reverse(
+   size_t        i_z          ,
+   const addr_t* arg          ,
+   size_t        cap_order    ,
+   const Base*   taylor       ,
+   size_t        n_order      ,
+   Base*         partial      )
+{  // d  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    size_t d = n_order - 1;
    //
    // This routine is only for documentation, it should not be used
@@ -635,15 +675,18 @@ is the k-th order Taylor coefficient corresponding to z.
 \li p <=  q
 */
 template <class Base>
-inline void forward_binary_op(
-   size_t        p          ,
-   size_t        q          ,
+inline void binary_forward_any(
+   size_t        order_low  ,
+   size_t        order_up   ,
    size_t        i_z        ,
    const addr_t* arg        ,
    const Base*   parameter  ,
    size_t        cap_order  ,
    Base*         taylor     )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -729,15 +772,18 @@ corresponding to z and the ell-th direction.
 \li 0 < q <  cap_order
 */
 template <class Base>
-inline void forward_binary_op_dir(
-   size_t        q          ,
-   size_t        r          ,
+inline void binary_forward_dir(
+   size_t        order_up   ,
+   size_t        n_dir      ,
    size_t        i_z        ,
    const addr_t* arg        ,
    const Base*   parameter  ,
    size_t        cap_order  ,
    Base*         taylor     )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -789,13 +835,14 @@ is the zero order Taylor coefficient corresponding to z.
 \li NumRes(op) == 1
 */
 template <class Base>
-inline void forward_binary_op_0(
+inline void binary_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -856,7 +903,7 @@ for k = 0 , ... , d
 is the k-th order Taylor coefficient corresponding to y.
 
 \param n_order
-number of colums in the matrix containing all the partial derivatives.
+number of columns in the matrix containing all the partial derivatives.
 
 \param partial
 \b Input: partial [ i_z * n_order + k ]
@@ -873,7 +920,7 @@ the k-th order Taylor coefficient for x.
 \b Input: If y is a variable, partial [ arg[1] * n_order + k ]
 for k = 0 , ... , d
 is the partial derivative of G( z , x , w , u , ... ) with respect to
-the k-th order Taylor coefficient for the auxillary variable y.
+the k-th order Taylor coefficient for the auxiliary variable y.
 \n
 \b Output: If x is a variable, partial [ arg[0] * n_order + k ]
 for k = 0 , ... , d
@@ -898,7 +945,7 @@ may be used as work space; i.e., may change in an unspecified manner.
 \li d < n_order
 */
 template <class Base>
-inline void reverse_binary_op(
+inline void binary_reverse(
    size_t      i_z          ,
    addr_t*     arg          ,
    const Base* parameter    ,
@@ -907,6 +954,7 @@ inline void reverse_binary_op(
    size_t      n_order      ,
    Base*       partial      )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // This routine is only for documentation, it should not be used
@@ -985,15 +1033,18 @@ is the k-th order Taylor coefficient corresponding to z_j.
 \li p <= q
 */
 template <class Base>
-inline void forward_pow_op(
-   size_t        p          ,
-   size_t        q          ,
+inline void pow_forward_any(
+   size_t        order_low  ,
+   size_t        order_up   ,
    size_t        i_z        ,
    const addr_t* arg        ,
    const Base*   parameter  ,
    size_t        cap_order  ,
    Base*         taylor     )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -1092,15 +1143,18 @@ for the ell-th direction.
 \li q < cap_order
 */
 template <class Base>
-inline void forward_pow_op_dir(
-   size_t        q          ,
-   size_t        r          ,
+inline void pow_forward_dir(
+   size_t        order_up   ,
+   size_t        n_dir      ,
    size_t        i_z        ,
    const addr_t* arg        ,
    const Base*   parameter  ,
    size_t        cap_order  ,
    Base*         taylor     )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -1160,13 +1214,14 @@ is the zero order Taylor coefficient corresponding to z_j.
 \li If y is a variable, arg[1] < i_z - 2
 */
 template <class Base>
-inline void forward_pow_op_0(
+inline void pow_forward_0(
    size_t        i_z        ,
    const addr_t* arg        ,
    const Base*   parameter  ,
    size_t        cap_order  ,
    Base*         taylor     )
-{
+{  //
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -1234,7 +1289,7 @@ for k = 0 , ... , d
 is the k-th order Taylor coefficient corresponding to y.
 
 \param n_order
-number of colums in the matrix containing all the partial derivatives.
+number of columns in the matrix containing all the partial derivatives.
 
 \param partial
 \b Input: partial [ (i_z - 2 + j) * n_order + k ]
@@ -1251,7 +1306,7 @@ the k-th order Taylor coefficient for x.
 \b Input: If y is a variable, partial [ arg[1] * n_order + k ]
 for k = 0 , ... , d
 is the partial derivative of G( z , x , w , u , ... ) with respect to
-the k-th order Taylor coefficient for the auxillary variable y.
+the k-th order Taylor coefficient for the auxiliary variable y.
 \n
 \b Output: If x is a variable, partial [ arg[0] * n_order + k ]
 for k = 0 , ... , d
@@ -1276,7 +1331,7 @@ may be used as work space; i.e., may change in an unspecified manner.
 \li d < n_order
 */
 template <class Base>
-inline void reverse_pow_op(
+inline void pow_reverse(
    size_t      i_z          ,
    addr_t*     arg          ,
    const Base* parameter    ,
@@ -1285,6 +1340,7 @@ inline void reverse_pow_op(
    size_t      n_order      ,
    Base*       partial      )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // This routine is only for documentation, it should not be used
@@ -1297,8 +1353,8 @@ Prototype for reverse mode Hessian sparsity unary operators.
 
 This routine is given the forward mode Jacobian sparsity patterns for x.
 It is also given the reverse mode dependence of G on z.
-In addition, it is given the revese mode Hessian sparsity
-for the quanity of interest G(z , y , ... )
+In addition, it is given the reverse mode Hessian sparsity
+for the quantity of interest G(z , y , ... )
 and it uses them to compute the sparsity patterns for
 \verbatim
    H( x , w , u , ... ) = G[ z(x) , x , w , u , ... ]
@@ -1355,7 +1411,8 @@ inline void reverse_sparse_hessian_unary_op(
    bool*               rev_jacobian      ,
    Vector_set&         for_jac_sparsity  ,
    Vector_set&         rev_hes_sparsity  )
-{
+{  //
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }
@@ -1382,7 +1439,7 @@ i.e. the row index in sparsity corresponding to z.
  arg[0]
 variable index corresponding to the left operand for this operator;
 i.e. the set with index arg[0] in var_sparsity
-is the spasity pattern correspoding to x.
+is the spasity pattern corresponding to x.
 \n
 \n arg[1]
 variable index corresponding to the right operand for this operator;
@@ -1416,7 +1473,7 @@ The set with index arg[1] in for_jac_sparsity
 is the forward sparsity pattern for y.
 
 \param rev_hes_sparsity
-The set wiht index i_x in rev_hes_sparsity
+The set with index i_x in rev_hes_sparsity
 is the Hessian sparsity pattern for the function G
 where one of the partial derivatives is with respect to z.
 \n
@@ -1445,7 +1502,8 @@ inline void reverse_sparse_hessian_binary_op(
    bool*             jac_reverse        ,
    Vector_set&       for_jac_sparsity   ,
    Vector_set&       rev_hes_sparsity   )
-{
+{  //
+   //
    // This routine is only for documentation, it should not be used
    CPPAD_ASSERT_UNKNOWN( false );
 }

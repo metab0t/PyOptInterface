@@ -2,7 +2,7 @@
 # define CPPAD_CORE_OPTIMIZE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # define CPPAD_CORE_OPTIMIZE_PRINT_RESULT 0
@@ -246,7 +246,7 @@ namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 Optimize a player object operation sequence
 
 The operation sequence for this object is replaced by one with fewer operations
-but the same funcition and derivative values.
+but the same function and derivative values.
 
 \tparam Base
 base type for the operator; i.e., this operation was recorded
@@ -280,7 +280,7 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
 
 # ifndef NDEBUG
    // n_ind_dyn, ind_dynamic
-   size_t n_ind_dyn = play_.num_dynamic_ind();
+   size_t n_ind_dyn = play_.n_dyn_independent();
    CppAD::vector<Base> ind_dynamic(n_ind_dyn);
    //
    // n_dep_var, x, y, check, max_taylor, check_zero_order
@@ -292,8 +292,8 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
    {  //
       // ind_dynamic
       for(size_t j = 0; j < n_ind_dyn; ++j)
-      {  const addr_t par_ind = play_.dyn_ind2par_ind()[j];
-         ind_dynamic[j]       = play_.all_par_vec()[par_ind];
+      {  const addr_t par_ind = play_.dyn2par_index()[j];
+         ind_dynamic[j]       = play_.par_all()[par_ind];
       }
       //
       // x
@@ -311,7 +311,7 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
       }
       // max_taylor
       // maximum zero order coefficient not counting BeginOp at beginning
-      // (which is correpsonds to uninitialized memory).
+      // (which is corresponds to uninitialized memory).
       for(size_t i = 1; i < num_var_tape_; i++)
       {  if(  abs_geq(taylor_[i*cap_order_taylor_+0] , max_taylor) )
             max_taylor = taylor_[i*cap_order_taylor_+0];
@@ -342,8 +342,8 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
          );
          break;
 
-         case local::play::unsigned_int_enum:
-         exceed = local::optimize::optimize_run<unsigned int>(
+         case local::play::addr_t_enum:
+         exceed = local::optimize::optimize_run<addr_t>(
             options, n_ind_var, dep_taddr_, &play_, &rec
          );
          break;
@@ -364,7 +364,7 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
    }
 
    // number of variables in the recording
-   num_var_tape_  = play_.num_var_rec();
+   num_var_tape_  = play_.num_var();
 
    // set flag so this function knows it has been optimized
    has_been_optimized_ = true;
@@ -379,16 +379,16 @@ void ADFun<Base,RecBase>::optimize(const std::string& options)
    num_order_taylor_     = 0;
    cap_order_taylor_     = 0;
 
-   // resize and initilaize conditional skip vector
+   // resize and initialize conditional skip vector
    // (must use player size because it now has the recoreder information)
-   cskip_op_.resize( play_.num_op_rec() );
+   cskip_op_.resize( play_.num_var_op() );
 
    // resize subgraph_info_
    subgraph_info_.resize(
       ind_taddr_.size(),    // n_ind
       dep_taddr_.size(),    // n_dep
-      play_.num_op_rec(),   // n_op
-      play_.num_var_rec()   // n_var
+      play_.num_var_op(),   // n_op
+      play_.num_var()       // n_var
    );
 
 # ifndef NDEBUG

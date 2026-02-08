@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SUBGRAPH_INFO_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/random_iterator.hpp>
@@ -40,14 +40,14 @@ private:
 
    /// Mapping atomic call operators to AFunOp that begins call sequence,
    /// other operators are not changed by the map.
-   /// (size zero after construtor or resize)
+   /// (size zero after constructor or resize)
    pod_vector<addr_t> map_user_op_;
 
    // -----------------------------------------------------------------------
    // other private member data
    // -----------------------------------------------------------------------
 
-   /// flags which operatiors are in subgraph
+   /// flags which operators are in subgraph
    /// (size zero or n_op_).
    pod_vector<addr_t> in_subgraph_;
 
@@ -90,7 +90,7 @@ public:
    const pod_vector<bool>& process_range(void) const
    {  return process_range_; }
 
-   /// amount of memory corresonding to this object
+   /// amount of memory corresponding to this object
    size_t memory(void) const
    {  size_t sum = map_user_op_.size()   * sizeof(addr_t);
       sum       += in_subgraph_.size()   * sizeof(addr_t);
@@ -193,7 +193,7 @@ public:
    set sizes for this object (the default sizes are zero)
 
    \param n_ind
-   number of indepent variables.
+   number of independent variables.
 
    \param n_dep
    number of dependent variables.
@@ -260,8 +260,8 @@ public:
    void set_map_user_op(const player<Base>* play)
    {  CPPAD_ASSERT_UNKNOWN( map_user_op_.size()   == 0 );
       //
-      CPPAD_ASSERT_UNKNOWN( n_op_  == play->num_op_rec() );
-      CPPAD_ASSERT_UNKNOWN( n_var_ == play->num_var_rec() );
+      CPPAD_ASSERT_UNKNOWN( n_op_  == play->num_var_op() );
+      CPPAD_ASSERT_UNKNOWN( n_var_ == play->num_var() );
       //
       // resize map_user_op_
       map_user_op_.resize(n_op_);

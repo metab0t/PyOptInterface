@@ -6,6 +6,9 @@
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin rev_hes_sparsity}
+{xrst_spell
+   rc
+}
 
 Reverse Mode Hessian Sparsity Patterns
 ######################################
@@ -168,7 +171,6 @@ void ADFun<Base,RecBase>::rev_hes_sparsity(
    // used to identify the RecBase type in calls to sweeps
    RecBase not_used_rec_base(0.0);
    //
-   size_t n  = Domain();
    size_t m  = Range();
    //
    CPPAD_ASSERT_KNOWN(
@@ -191,20 +193,19 @@ void ADFun<Base,RecBase>::rev_hes_sparsity(
    {  CPPAD_ASSERT_KNOWN(
          for_jac_sparse_pack_.n_set() > 0,
          "rev_hes_sparsity: previous call to for_jac_sparsity did not "
-         "use bool for interanl sparsity patterns."
+         "use bool for internal sparsity patterns."
       );
       // column dimension of internal sparstiy pattern
       size_t ell = for_jac_sparse_pack_.end();
       //
       // allocate memory for bool sparsity calculation
-      // (sparsity pattern is emtpy after a resize)
+      // (sparsity pattern is empty after a resize)
       local::sparse::pack_setvec internal_hes;
       internal_hes.resize(num_var_tape_, ell);
       //
       // compute the Hessian sparsity pattern
-      local::sweep::rev_hes<addr_t>(
+      local::sweep::rev_hes(
          &play_,
-         n,
          num_var_tape_,
          for_jac_sparse_pack_,
          rev_jac_pattern.data(),
@@ -220,20 +221,19 @@ void ADFun<Base,RecBase>::rev_hes_sparsity(
    {  CPPAD_ASSERT_KNOWN(
          for_jac_sparse_set_.n_set() > 0,
          "rev_hes_sparsity: previous call to for_jac_sparsity did not "
-         "use bool for interanl sparsity patterns."
+         "use bool for internal sparsity patterns."
       );
       // column dimension of internal sparstiy pattern
       size_t ell = for_jac_sparse_set_.end();
       //
       // allocate memory for bool sparsity calculation
-      // (sparsity pattern is emtpy after a resize)
+      // (sparsity pattern is empty after a resize)
       local::sparse::list_setvec internal_hes;
       internal_hes.resize(num_var_tape_, ell);
       //
       // compute the Hessian sparsity pattern
-      local::sweep::rev_hes<addr_t>(
+      local::sweep::rev_hes(
          &play_,
-         n,
          num_var_tape_,
          for_jac_sparse_set_,
          rev_jac_pattern.data(),

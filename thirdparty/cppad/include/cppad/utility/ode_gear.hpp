@@ -9,7 +9,6 @@
 {xrst_begin OdeGear}
 {xrst_spell
    dep
-   jan
    pp
    test test
    vol
