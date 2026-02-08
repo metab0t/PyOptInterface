@@ -264,6 +264,25 @@ if(DEFINED ENV{XPRESSDIR})
     target_include_directories(xpress_model_ext PRIVATE $ENV{XPRESSDIR}/include)
 endif()
 
+# KNITRO
+add_library(knitro_model STATIC)
+target_sources(knitro_model PRIVATE
+    include/pyoptinterface/knitro_model.hpp
+    lib/knitro_model.cpp
+)
+target_link_libraries(knitro_model PUBLIC core cppad_interface)
+
+nanobind_add_module(
+    knitro_model_ext
+
+    STABLE_ABI NB_STATIC NB_DOMAIN pyoptinterface
+
+    lib/knitro_model_ext.cpp
+    lib/knitro_model_ext_constants.cpp
+)
+target_link_libraries(knitro_model_ext PUBLIC knitro_model)
+install(TARGETS knitro_model_ext LIBRARY DESTINATION ${POI_INSTALL_DIR})
+
 # stub
 nanobind_add_stub(
   core_ext_stub
@@ -340,6 +359,13 @@ nanobind_add_stub(
   INSTALL_TIME
   MODULE pyoptinterface._src.xpress_model_ext
   OUTPUT ${POI_INSTALL_DIR}/xpress_model_ext.pyi
+)
+
+nanobind_add_stub(
+  knitro_model_ext_stub
+  INSTALL_TIME
+  MODULE pyoptinterface._src.knitro_model_ext
+  OUTPUT ${POI_INSTALL_DIR}/knitro_model_ext.pyi
 )
 
 set(ENABLE_TEST_MAIN OFF BOOL "Enable test c++ function with a main.cpp")
