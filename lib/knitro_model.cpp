@@ -335,9 +335,10 @@ ConstraintIndex KNITROModel::add_single_nl_constraint(ExpressionGraph &graph,
 {
 	_add_graph(graph);
 	graph.add_constraint_output(result);
+	size_t i = graph.m_constraint_outputs.size() - 1;
+	m_pending_outputs[&graph].m_con_idxs.push_back(i);
 	auto setter = [this, &graph](const ConstraintIndex &constraint) {
-		size_t i = graph.m_constraint_outputs.size() - 1;
-		m_graphs[&graph].m_cons[i] = constraint;
+		m_pending_outputs[&graph].m_cons.push_back(constraint);
 		m_need_to_add_callbacks = true;
 	};
 	return _add_constraint_impl(ConstraintType::KNITRO_NL, interval, name, &n_nlcons, setter);
@@ -702,7 +703,7 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 	_add_graph(graph);
 	graph.add_objective_output(result);
 	size_t i = graph.m_objective_outputs.size() - 1;
-	m_graphs[&graph].m_objs.push_back(i);
+	m_pending_outputs[&graph].m_obj_idxs.push_back(i);
 	m_need_to_add_callbacks = true;
 	m_obj_flag |= OBJ_NONLINEAR;
 	m_is_dirty = true;
@@ -711,9 +712,9 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 
 void KNITROModel::_add_graph(ExpressionGraph &graph)
 {
-	if (m_graphs.find(&graph) == m_graphs.end())
+	if (m_pending_outputs.find(&graph) == m_pending_outputs.end())
 	{
-		m_graphs[&graph] = KNITROGraph();
+		m_pending_outputs[&graph] = KNITROPendingOutputs();
 	}
 }
 
@@ -740,10 +741,12 @@ void KNITROModel::_reset_objective()
 	{
 		error = knitro::KN_del_obj_eval_callback_all(m_kc.get());
 		check_error(error);
+		for (auto &[graph, outputs] : m_pending_outputs)
+		{
+			outputs.m_obj_idxs.clear();
+		}
 	}
-
 	m_obj_flag = 0;
-
 	_update();
 }
 
@@ -807,6 +810,55 @@ double KNITROModel::get_obj_value()
 	return m_result.obj_val;
 }
 
+void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs)
+{
+	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		evaluator->eval_fun(req->x, res->c);
+		return 0;
+	};
+	auto g = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		evaluator->eval_jac(req->x, res->jac);
+		return 0;
+	};
+	auto h = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		evaluator->eval_hess(req->x, req->lambda, res->hess);
+		return 0;
+	};
+	auto trace = cppad_trace_graph_constraints;
+	_add_callback_impl(*graph, outputs.m_con_idxs, outputs.m_cons, trace, f, g, h);
+}
+
+void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs)
+{
+	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		res->obj[0] = 0.0;
+		evaluator->eval_fun(req->x, res->obj, true);
+		return 0;
+	};
+	auto g = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		evaluator->eval_jac(req->x, res->objGrad);
+		return 0;
+	};
+	auto h = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	            void *data) -> int {
+		KNITROADEvaluator *evaluator = static_cast<KNITROADEvaluator *>(data);
+		evaluator->eval_hess(req->x, req->sigma, res->hess, true);
+		return 0;
+	};
+	auto trace = cppad_trace_graph_objective;
+	_add_callback_impl(*graph, outputs.m_obj_idxs, {}, trace, f, g, h);
+}
+
 void KNITROModel::_add_callbacks()
 {
 	if (!m_need_to_add_callbacks)
@@ -814,197 +866,19 @@ void KNITROModel::_add_callbacks()
 		return;
 	}
 
-	for (const auto &[graph, pending] : m_graphs)
+	for (const auto &[graph, outputs] : m_pending_outputs)
 	{
-		if (graph->has_constraint_output() && !pending.m_cons.empty())
+		if (graph->has_constraint_output() && !outputs.m_con_idxs.empty())
 		{
-			auto f = cppad_trace_graph_constraints(*graph);
-			f.optimize();
-
-			size_t n = f.Domain();
-			size_t m = pending.m_cons.size();
-			auto load_ptr = std::make_unique<KNITROCallbackLoad>();
-			KNITROCallbackLoad *load = load_ptr.get();
-			load->fun = f;
-			load->indexVars.resize(n);
-			load->indexCons.resize(m);
-			load->fun_rows.resize(m);
-			for (size_t i = 0; i < n; i++)
-			{
-				load->indexVars[i] = _variable_index(graph->m_variables[i]);
-			}
-			auto it = pending.m_cons.begin();
-			for (size_t k = 0; k < m; k++, it++)
-			{
-				auto &[j, constraint] = *it;
-				load->fun_rows[k] = j;
-				load->indexCons[k] = _constraint_index(constraint);
-			}
-			std::vector<std::set<size_t>> jac_sparsity(m);
-			for (size_t k = 0; k < m; k++)
-			{
-				jac_sparsity[k].insert(load->fun_rows[k]);
-			}
-			load->jac_pattern = load->fun.RevSparseJac(jac_sparsity.size(), jac_sparsity);
-			for (size_t k = 0; k < load->jac_pattern.size(); k++)
-			{
-				for (size_t i : load->jac_pattern[k])
-				{
-					load->jac_rows.push_back(load->fun_rows[k]);
-					load->jac_cols.push_back(i);
-				}
-			}
-			std::vector<KNINT> jacIndexCons(load->jac_rows.size());
-			std::vector<KNINT> jacIndexVars(load->jac_cols.size());
-			size_t idx = 0;
-			for (size_t k = 0; k < load->jac_pattern.size(); k++)
-			{
-				for (size_t i : load->jac_pattern[k])
-				{
-					jacIndexCons[idx] = load->indexCons[k];
-					jacIndexVars[idx] = load->indexVars[i];
-					idx++;
-				}
-			}
-			load->x.resize(n);
-			load->jac.resize(load->jac_cols.size());
-			auto cb_eval = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-			                  void *data) -> int {
-				KNITROCallbackLoad *load = static_cast<KNITROCallbackLoad *>(data);
-				for (size_t i = 0; i < load->indexVars.size(); i++)
-				{
-					load->x[i] = req->x[load->indexVars[i]];
-				}
-				auto y = load->fun.Forward(0, load->x);
-				for (size_t k = 0; k < load->fun_rows.size(); k++)
-				{
-					res->c[k] = y[load->fun_rows[k]];
-				}
-				return 0;
-			};
-			auto cb_grad = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-			                  void *data) -> int {
-				KNITROCallbackLoad *load = static_cast<KNITROCallbackLoad *>(data);
-				for (size_t i = 0; i < load->indexVars.size(); i++)
-				{
-					load->x[i] = req->x[load->indexVars[i]];
-				}
-				load->fun.SparseJacobianReverse(load->x, load->jac_pattern, load->jac_rows,
-				                                load->jac_cols, load->jac, load->jac_work);
-				for (size_t i = 0; i < load->jac.size(); i++)
-				{
-					res->jac[i] = load->jac[i];
-				}
-				return 0;
-			};
-			CB_context *cb = nullptr;
-			int error;
-			error = knitro::KN_add_eval_callback(m_kc.get(), FALSE, load->indexCons.size(),
-			                                     load->indexCons.data(), cb_eval, &cb);
-			check_error(error);
-			error = knitro::KN_set_cb_user_params(m_kc.get(), cb, load);
-			check_error(error);
-			error = knitro::KN_set_cb_grad(m_kc.get(), cb, 0, NULL, jacIndexCons.size(),
-			                               jacIndexCons.data(), jacIndexVars.data(), cb_grad);
-			check_error(error);
-			m_loads.push_back(std::move(load_ptr));
+			_add_constraint_callback(graph, outputs);
 		}
 
-		if (graph->has_objective_output() && !pending.m_objs.empty())
+		if (graph->has_objective_output() && !outputs.m_obj_idxs.empty())
 		{
-			auto f = cppad_trace_graph_objective(*graph);
-			f.optimize();
-
-			size_t n = f.Domain();
-			size_t m = pending.m_objs.size();
-			auto load_ptr = std::make_unique<KNITROCallbackLoad>();
-			KNITROCallbackLoad *load = load_ptr.get();
-			load->fun = f;
-			load->indexVars.resize(n);
-			load->indexCons.resize(0);
-			load->fun_rows.resize(m);
-			for (size_t i = 0; i < n; i++)
-			{
-				load->indexVars[i] = _variable_index(graph->m_variables[i]);
-			}
-			auto it = pending.m_objs.begin();
-			for (size_t k = 0; k < m; k++, it++)
-			{
-				auto &j = *it;
-				load->fun_rows[k] = j;
-			}
-			std::vector<std::set<size_t>> jac_sparsity(m);
-			for (size_t k = 0; k < m; k++)
-			{
-				jac_sparsity[k].insert(load->fun_rows[k]);
-			}
-			load->jac_pattern = load->fun.RevSparseJac(jac_sparsity.size(), jac_sparsity);
-			for (size_t k = 0; k < load->jac_pattern.size(); k++)
-			{
-				for (size_t i : load->jac_pattern[k])
-				{
-					load->jac_rows.push_back(load->fun_rows[k]);
-					load->jac_cols.push_back(i);
-				}
-			}
-			std::vector<KNINT> objGradIndexVars(load->jac_cols.size());
-			size_t idx = 0;
-			for (size_t k = 0; k < load->jac_pattern.size(); k++)
-			{
-				for (size_t i : load->jac_pattern[k])
-				{
-					objGradIndexVars[idx] = load->indexVars[i];
-					idx++;
-				}
-			}
-			load->x.resize(n);
-			load->jac.resize(load->jac_cols.size());
-			auto cb_eval = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-			                  void *data) -> int {
-				KNITROCallbackLoad *load = static_cast<KNITROCallbackLoad *>(data);
-				for (size_t i = 0; i < load->indexVars.size(); i++)
-				{
-					load->x[i] = req->x[load->indexVars[i]];
-				}
-				auto y = load->fun.Forward(0, load->x);
-				res->obj[0] = 0.0;
-				for (size_t k = 0; k < load->fun_rows.size(); k++)
-				{
-					size_t j = load->fun_rows[k];
-					res->obj[0] += y[j];
-				}
-				return 0;
-			};
-			auto cb_grad = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-			                  void *data) -> int {
-				KNITROCallbackLoad *load = static_cast<KNITROCallbackLoad *>(data);
-				for (size_t i = 0; i < load->indexVars.size(); i++)
-				{
-					load->x[i] = req->x[load->indexVars[i]];
-				}
-				load->fun.SparseJacobianReverse(load->x, load->jac_pattern, load->jac_rows,
-				                                load->jac_cols, load->jac, load->jac_work);
-				for (size_t i = 0; i < load->jac.size(); i++)
-				{
-					res->objGrad[i] = load->jac[i];
-				}
-				return 0;
-			};
-
-			CB_context *cb = nullptr;
-			int error;
-			error = knitro::KN_add_eval_callback(m_kc.get(), TRUE, 0, NULL, cb_eval, &cb);
-			check_error(error);
-			error = knitro::KN_set_cb_user_params(m_kc.get(), cb, load);
-			check_error(error);
-			error = knitro::KN_set_cb_grad(m_kc.get(), cb, objGradIndexVars.size(),
-			                              objGradIndexVars.data(), 0, NULL, NULL, cb_grad);
-			check_error(error);
-			m_loads.push_back(std::move(load_ptr));
+			_add_objective_callback(graph, outputs);
 		}
 	}
-
-	m_graphs.clear();
+	m_pending_outputs.clear();
 	m_need_to_add_callbacks = false;
 }
 
