@@ -138,7 +138,7 @@ enum ConstraintSenseFlags
 	CON_UPBND = 1 << 1, // 0x02
 };
 
-struct KNITROCallbackPattern
+struct CallbackPattern
 {
 	std::vector<KNINT> indexCons;
 	std::vector<KNINT> objGradIndexVars;
@@ -148,12 +148,13 @@ struct KNITROCallbackPattern
 	std::vector<KNINT> hessIndexVars2;
 };
 
-struct KNITROADEvaluator
+template <typename V>
+struct CallbackEvaluator
 {
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
-	CppAD::ADFun<double> fun;
+	CppAD::ADFun<V> fun;
 
 	std::vector<size_t> fun_rows;
 	std::vector<std::set<size_t>> jac_pattern;
@@ -165,10 +166,10 @@ struct KNITROADEvaluator
 	std::vector<size_t> hess_cols;
 	CppAD::sparse_hessian_work hess_work;
 
-	std::vector<double> x;
-	std::vector<double> jac;
-	std::vector<double> w;
-	std::vector<double> hess;
+	std::vector<V> x;
+	std::vector<V> jac;
+	std::vector<V> w;
+	std::vector<V> hess;
 
 	void setup()
 	{
@@ -214,7 +215,7 @@ struct KNITROADEvaluator
 		hess.resize(hess_rows.size());
 	}
 
-	void eval_fun(const double *req_x, double *res_y, bool aggregate = false)
+	void eval_fun(const V *req_x, V *res_y, bool aggregate = false)
 	{
 		for (size_t i = 0; i < indexVars.size(); i++)
 		{
@@ -234,7 +235,7 @@ struct KNITROADEvaluator
 		}
 	}
 
-	void eval_jac(const double *req_x, double *res_jac)
+	void eval_jac(const V *req_x, V *res_jac)
 	{
 		for (size_t i = 0; i < indexVars.size(); i++)
 		{
@@ -247,7 +248,7 @@ struct KNITROADEvaluator
 		}
 	}
 
-	void eval_hess(const double *req_x, const double *req_w, double *res_hess,
+	void eval_hess(const V *req_x, const V *req_w, V *res_hess,
 	               bool aggregate = false)
 	{
 		for (size_t i = 0; i < indexVars.size(); i++)
@@ -272,11 +273,22 @@ struct KNITROADEvaluator
 		}
 	}
 
-	KNITROCallbackPattern get_callback_pattern() const
+	CallbackPattern get_callback_pattern() const
 	{
-		KNITROCallbackPattern pattern;
+		CallbackPattern pattern;
 		pattern.indexCons = indexCons;
-		if (indexCons.size() > 0)
+
+		if (indexCons.empty())
+		{
+			for (size_t k = 0; k < jac_pattern.size(); k++)
+			{
+				for (size_t i : jac_pattern[k])
+				{
+					pattern.objGradIndexVars.push_back(indexVars[i]);
+				}
+			}
+		}
+		else
 		{
 			for (size_t k = 0; k < jac_pattern.size(); k++)
 			{
@@ -287,16 +299,7 @@ struct KNITROADEvaluator
 				}
 			}
 		}
-		else
-		{
-			for (size_t k = 0; k < jac_pattern.size(); k++)
-			{
-				for (size_t i : jac_pattern[k])
-				{
-					pattern.objGradIndexVars.push_back(indexVars[i]);
-				}
-			}
-		}
+
 		for (size_t k = 0; k < hess_pattern.size(); k++)
 		{
 			for (size_t i : hess_pattern[k])
@@ -305,15 +308,16 @@ struct KNITROADEvaluator
 				pattern.hessIndexVars2.push_back(indexVars[i]);
 			}
 		}
+
 		return pattern;
 	}
 };
 
-struct KNITROPendingOutputs
+struct Outputs
 {
-	std::vector<size_t> m_obj_idxs;
-	std::vector<size_t> m_con_idxs;
-	std::vector<ConstraintIndex> m_cons;
+	std::vector<size_t> obj_idxs;
+	std::vector<size_t> con_idxs;
+	std::vector<ConstraintIndex> cons;
 };
 
 class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
@@ -479,13 +483,14 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	size_t n_coniccons = 0;
 	size_t n_nlcons = 0;
 
-	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_aux_cons;
+	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_soc_aux_cons;
 	std::unordered_map<KNINT, uint8_t> m_con_sense_flags;
 	uint8_t m_obj_flag = 0;
 
-	std::unordered_map<ExpressionGraph *, KNITROPendingOutputs> m_pending_outputs;
-	std::vector<std::unique_ptr<KNITROADEvaluator>> m_evaluators;
+	std::unordered_map<ExpressionGraph *, Outputs> m_pending_outputs;
+	std::vector<std::unique_ptr<CallbackEvaluator<double>>> m_evaluators;
 	bool m_need_to_add_callbacks = false;
+
 	KNITROResult m_result;
 	bool m_is_dirty = true;
 	int m_solve_status = 0;
@@ -539,8 +544,8 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void _reset_objective();
 	void _add_graph(ExpressionGraph &graph);
 	void _add_callbacks();
-	void _add_constraint_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs);
-	void _add_objective_callback(ExpressionGraph *graph, const KNITROPendingOutputs &outputs);
+	void _add_constraint_callback(ExpressionGraph *graph, const Outputs &outputs);
+	void _add_objective_callback(ExpressionGraph *graph, const Outputs &outputs);
 	void _update();
 	void _pre_solve();
 	void _solve();
@@ -609,7 +614,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	}
 
 	template <typename F, typename G, typename H>
-	void _register_callback(KNITROADEvaluator *evaluator, const F f, const G g, const H h)
+	void _register_callback(CallbackEvaluator<double> *evaluator, const F f, const G g, const H h)
 	{
 		CB_context *cb = nullptr;
 		auto p = evaluator->get_callback_pattern();
@@ -633,7 +638,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	                        const std::vector<ConstraintIndex> cons, const T &trace, const F f,
 	                        const G g, const H h)
 	{
-		auto evaluator_ptr = std::make_unique<KNITROADEvaluator>();
+		auto evaluator_ptr = std::make_unique<CallbackEvaluator<double>>();
 		auto *evaluator = evaluator_ptr.get();
 		evaluator->fun = trace(graph);
 		evaluator->fun_rows = rows;

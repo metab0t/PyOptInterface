@@ -155,6 +155,8 @@ _RAW_STATUS_STRINGS = [  # TerminationStatus, RawStatusCode
 
 
 def _termination_status_knitro(model: "Model"):
+    if model.m_is_dirty:
+        return TerminationStatusCode.OPTIMIZE_NOT_CALLED
     status_code = model.m_solve_status
     for ts, rs in _RAW_STATUS_STRINGS:
         if status_code == rs:
@@ -404,7 +406,7 @@ class Model(RawModel):
         )
 
     def is_empty(self):
-        return not self or self.m_is_dirty
+        return self.n_vars == 0
 
 
 Model.add_variables = make_variable_tupledict

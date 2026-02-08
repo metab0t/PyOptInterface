@@ -21,15 +21,19 @@ NB_MODULE(knitro_model_ext, m)
 #define BIND_F(f) .def(#f, &KNITROModel::f)
 	nb::class_<KNITROModel>(m, "RawModel")
 	    .def(nb::init<>())
-	    // clang-format off
+
+		// clang-format off
 		BIND_F(init)
 		BIND_F(close)
 		BIND_F(get_infinity)
 	    // clang-format on
+
 	    .def_ro("n_vars", &KNITROModel::n_vars)
 	    .def_ro("n_cons", &KNITROModel::n_cons)
 	    .def_ro("n_lincons", &KNITROModel::n_lincons)
 	    .def_ro("n_quadcons", &KNITROModel::n_quadcons)
+		.def_ro("n_coniccons", &KNITROModel::n_coniccons)
+		.def_ro("n_nlcons", &KNITROModel::n_nlcons)
 
 	    .def("add_variable", &KNITROModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -KN_INFINITY,
@@ -40,18 +44,14 @@ NB_MODULE(knitro_model_ext, m)
 		BIND_F(get_variable_ub)
 		BIND_F(set_variable_lb)
 		BIND_F(set_variable_ub)
-	    // clang-format on
-	    .def("set_variable_bounds", &KNITROModel::set_variable_bounds, nb::arg("variable"),
-	         nb::arg("lb"), nb::arg("ub"))
-
-	    // clang-format off
-		BIND_F(set_variable_start)
+		BIND_F(set_variable_bounds)
+	    BIND_F(set_variable_start)
 		BIND_F(get_variable_name)
 		BIND_F(set_variable_name)
 		BIND_F(set_variable_domain)
+		BIND_F(get_variable_rc)
+		BIND_F(delete_variable)
 	    // clang-format on
-	    .def("get_variable_rc", &KNITROModel::get_variable_rc, nb::arg("variable"))
-	    .def("delete_variable", &KNITROModel::delete_variable, nb::arg("variable"))
 
 	    .def("get_value", &KNITROModel::get_variable_value)
 	    .def("get_value",
@@ -123,7 +123,9 @@ NB_MODULE(knitro_model_ext, m)
 	    .def("_add_single_nl_constraint", &KNITROModel::add_single_nl_constraint_from_comparison,
 	         nb::arg("graph"), nb::arg("expr"), nb::arg("name") = "")
 
-	    .def("delete_constraint", &KNITROModel::delete_constraint, nb::arg("constraint"))
+		// clang-format off
+	    BIND_F(delete_constraint)
+		// clang-format on
 
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(
@@ -211,25 +213,6 @@ NB_MODULE(knitro_model_ext, m)
 		        return m.get_raw_parameter<double>(param_id);
 	        },
 	        nb::arg("param_id"))
-
-	    .def("get_value", &KNITROModel::get_variable_value)
-	    .def("get_value",
-	         nb::overload_cast<const ScalarAffineFunction &>(&KNITROModel::get_expression_value))
-	    .def("get_value",
-	         nb::overload_cast<const ScalarQuadraticFunction &>(&KNITROModel::get_expression_value))
-	    .def("get_value",
-	         nb::overload_cast<const ExprBuilder &>(&KNITROModel::get_expression_value))
-
-	    .def("pprint", &KNITROModel::pprint_variable)
-	    .def("pprint",
-	         nb::overload_cast<const ScalarAffineFunction &, int>(&KNITROModel::pprint_expression),
-	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint",
-	         nb::overload_cast<const ScalarQuadraticFunction &, int>(
-	             &KNITROModel::pprint_expression),
-	         nb::arg("expr"), nb::arg("precision") = 4)
-	    .def("pprint", nb::overload_cast<const ExprBuilder &, int>(&KNITROModel::pprint_expression),
-	         nb::arg("expr"), nb::arg("precision") = 4)
 
 	    .def_rw("m_is_dirty", &KNITROModel::m_is_dirty)
 	    .def_ro("m_solve_status", &KNITROModel::m_solve_status);
