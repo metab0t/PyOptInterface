@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_EXTRACT_OPTION_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 /*!
@@ -59,7 +59,7 @@ struct options_t {
 inline options_t extract_option(const std::string& options)
 // END_OPTIMIZE_OPTIONS
 {  //
-   // result: defualt value
+   // result: default value
    struct options_t result = {
       true,  // compare_op
       true,  // conditional_skip

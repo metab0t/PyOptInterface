@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OPTIMIZE_RECORD_CSUM_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 // BEGIN_CPPAD_LOCAL_OPTIMIZE_NAMESPACE
@@ -25,7 +25,7 @@ Prototype
 *********
 {xrst_literal
    // BEGIN_RECORD_CSUM
-   // END_PROROTYPE
+   // END_PROTOTYPE
 }
 
 play
@@ -98,20 +98,20 @@ struct_size_pair record_csum(
    recorder<Base>*                                    rec            ,
    // local information passed so stacks need not be allocated for every call
    struct_csum_stacks&                                stack          )
-// END_PROROTYPE
+// END_PROTOTYPE
 {
 # ifndef NDEBUG
    // number of parameters corresponding to the old operation sequence.
-   size_t npar = play->num_par_rec();
+   size_t npar = play->num_par_all();
 # endif
 
    // vector of length npar containing the parameters the old operation
    // sequence; i.e., given a parameter index i < npar, the corresponding
    // parameter value is par[i].
-   const Base* par = play->GetPar();
+   const Base* par = play->par_ptr();
 
    // which parameters are dynamic
-   const pod_vector<bool>& dyn_par_is( play->dyn_par_is() );
+   const pod_vector<bool>& par_is_dyn( play->par_is_dyn() );
 
    // check assumption about work space
    CPPAD_ASSERT_UNKNOWN( stack.op_info.empty() );
@@ -122,11 +122,11 @@ struct_size_pair record_csum(
    size_t i_op = random_itr.var2op(current);
    CPPAD_ASSERT_UNKNOWN( ! ( op_usage[i_op] == usage_t(csum_usage) ) );
    //
-   // information corresponding to the root node in the cummulative summation
+   // information corresponding to the root node in the cumulative summation
    struct struct_csum_op_info info;
    size_t not_used;
    random_itr.op_info(i_op, info.op, info.arg, not_used);
-   info.add = true;  // was parrent operator positive or negative
+   info.add = true;  // was parent operator positive or negative
    //
    // initialize stack as containing this one operator
    stack.op_info.push( info );
@@ -138,12 +138,12 @@ struct_size_pair record_csum(
    // one argument of this operator must have been csum connected to it
    bool ok = info.op == CSumOp;
    if( (! ok) && (info.op != SubpvOp) && (info.op != AddpvOp) )
-   {  // first argument is a varialbe being added
+   {  // first argument is a variable being added
       i_op = random_itr.var2op(size_t(info.arg[0]));
       ok  |= op_usage[i_op] == usage_t(csum_usage);
    }
    if( (! ok) && (info.op != SubvpOp) )
-   {  // second argument is a varialbe being added or subtracted
+   {  // second argument is a variable being added or subtracted
       i_op = random_itr.var2op(size_t(info.arg[1]));
       ok  |= op_usage[i_op] == usage_t(csum_usage);
    }
@@ -166,7 +166,7 @@ struct_size_pair record_csum(
          //
          // arg[0] is constant parameter that initializes the sum
          CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < npar );
-         CPPAD_ASSERT_UNKNOWN( ! dyn_par_is[ arg[0] ] );
+         CPPAD_ASSERT_UNKNOWN( ! par_is_dyn[ arg[0] ] );
          if( add )
             sum_par += par[arg[0]];
          else
@@ -212,7 +212,7 @@ struct_size_pair record_csum(
          {  for(size_t i = dyn_start; i < dyn_end; ++i)
             {  // i-th argument is a dynamic parameter
                // (can't yet be a result, so no nodes below)
-               CPPAD_ASSERT_UNKNOWN( dyn_par_is[ arg[i] ] );
+               CPPAD_ASSERT_UNKNOWN( par_is_dyn[ arg[i] ] );
                if( dny_add )
                   stack.add_dyn.push(arg[i]);
                else
@@ -232,7 +232,7 @@ struct_size_pair record_csum(
          // is this a subtraction operator
          bool subtract = (op==SubpvOp) || (op==SubvpOp) || (op==SubvvOp);
          //
-         // is the i-th arguemnt a parameter
+         // is the i-th argument a parameter
          CPPAD_ASSERT_UNKNOWN( NumArg(op) == 2 );
          bool par_arg[2];
          switch(op)
@@ -261,7 +261,7 @@ struct_size_pair record_csum(
             {  // case where i-th argument is a parameter
                CPPAD_ASSERT_UNKNOWN( size_t(arg[i]) < npar );
                //
-               if( dyn_par_is[ arg[i] ] )
+               if( par_is_dyn[ arg[i] ] )
                {  // i-th argument is a dynamic parameter
                   // (can't yet be a result, so no nodes below)
                   if( add )
@@ -305,16 +305,16 @@ struct_size_pair record_csum(
          // ---------------------------------------------------------------
       }
    }
-   // number of variables to add in this cummulative sum operator
+   // number of variables to add in this cumulative sum operator
    size_t n_add_var = stack.add_var.size();
 
-   // number of variables to subtract in this cummulative sum operator
+   // number of variables to subtract in this cumulative sum operator
    size_t n_sub_var = stack.sub_var.size();
 
-   // number of dynamics to add in this cummulative sum operator
+   // number of dynamics to add in this cumulative sum operator
    size_t n_add_dyn = stack.add_dyn.size();
 
-   // number of dynamics to subtract in this cummulative sum operator
+   // number of dynamics to subtract in this cumulative sum operator
    size_t n_sub_dyn = stack.sub_dyn.size();
 
    // first five arguments to cumulative sum operator
@@ -365,12 +365,12 @@ struct_size_pair record_csum(
       stack.sub_dyn.pop();
    }
 
-   // number of additions plus number of subtractions
-   rec->PutArg( addr_t(end) );    // arg[arg[4]] = arg[4]
+   // number of arguments to this operator
+   rec->PutArg( addr_t(end + 1) );    // arg[4] + 1
    //
    // return value
    struct_size_pair ret;
-   ret.i_op  = rec->num_op_rec();
+   ret.i_op  = rec->num_var_op();
    ret.i_var = size_t(rec->PutOp(CSumOp));
    //
    return ret;

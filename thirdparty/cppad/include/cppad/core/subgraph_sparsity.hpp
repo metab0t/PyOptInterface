@@ -2,11 +2,12 @@
 # define CPPAD_CORE_SUBGRAPH_SPARSITY_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin subgraph_sparsity}
 {xrst_spell
+   rc
    subgraphs
 }
 
@@ -154,7 +155,7 @@ row, column index sparsity patterns.
 sparsity pattern for the diagonal of the square matrix D.
 
 \param select_range
-sparsity pattern for the diagnoal of the square matrix R
+sparsity pattern for the diagonal of the square matrix R
 
 \param transpose
 If true, the return is a dependency sparsity pattern for
@@ -194,8 +195,8 @@ void ADFun<Base,RecBase>::subgraph_sparsity(
       );
       break;
 
-      case local::play::unsigned_int_enum:
-      local::subgraph::subgraph_sparsity<unsigned int>(
+      case local::play::addr_t_enum:
+      local::subgraph::subgraph_sparsity<addr_t>(
          &play_,
          subgraph_info_,
          dep_taddr_,

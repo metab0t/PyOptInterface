@@ -12,15 +12,18 @@ namespace CppAD { namespace local { namespace var_op {
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addvv_op(
-   size_t        p           ,
-   size_t        q           ,
+inline void addvv_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddvvOp) == 1 );
@@ -39,15 +42,18 @@ inline void forward_addvv_op(
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addvv_op_dir(
-   size_t        q           ,
-   size_t        r           ,
+inline void addvv_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddvvOp) == 1 );
@@ -69,13 +75,14 @@ inline void forward_addvv_op_dir(
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addvv_op_0(
+inline void addvv_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddvvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddvvOp) == 1 );
@@ -92,7 +99,7 @@ inline void forward_addvv_op_0(
 // See dev documentation: reverse_unary_op
 // See dev documentation: reverse_binary_op
 template <class Base>
-inline void reverse_addvv_op(
+inline void addvv_reverse(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
@@ -101,6 +108,7 @@ inline void reverse_addvv_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions
@@ -126,15 +134,18 @@ inline void reverse_addvv_op(
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addpv_op(
-   size_t        p           ,
-   size_t        q           ,
+inline void addpv_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddpvOp) == 1 );
@@ -157,15 +168,18 @@ inline void forward_addpv_op(
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addpv_op_dir(
-   size_t        q           ,
-   size_t        r           ,
+inline void addpv_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddpvOp) == 1 );
@@ -185,13 +199,14 @@ inline void forward_addpv_op_dir(
 // See dev documentation: forward_unary_op
 // See dev documentation: forward_binary_op
 template <class Base>
-inline void forward_addpv_op_0(
+inline void addpv_forward_0(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
    size_t        cap_order   ,
    Base*         taylor      )
-{
+{  //
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AddpvOp) == 2 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AddpvOp) == 1 );
@@ -210,7 +225,7 @@ inline void forward_addpv_op_0(
 // See dev documentation: reverse_unary_op
 // See dev documentation: reverse_binary_op
 template <class Base>
-inline void reverse_addpv_op(
+inline void addpv_reverse(
    size_t        i_z         ,
    const addr_t* arg         ,
    const Base*   parameter   ,
@@ -219,6 +234,7 @@ inline void reverse_addpv_op(
    size_t        n_order     ,
    Base*         partial     )
 {  // d
+   //
    size_t d = n_order - 1;
    //
    // check assumptions

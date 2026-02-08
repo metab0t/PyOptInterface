@@ -2,7 +2,7 @@
 # define  CPPAD_LOCAL_VAL_GRAPH_COMPRESS_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2023-24 Bradley M. Bell
+// SPDX-FileContributor: 2023-25 Bradley M. Bell
 // ---------------------------------------------------------------------------
 # include <cppad/local/val_graph/tape.hpp>
 # include <cppad/local/val_graph/op_hash_table.hpp>
@@ -127,13 +127,13 @@ vectorBool tape_t<Value>::compress(void)
 # ifndef NDEBUG
    // nan at index n_ind_
    assert( op_enum_t( new_tape.op_enum_vec_[0] ) == con_op_enum );
-   assert( new_tape.arg_vec_[0] == 0 );
+   assert( new_tape.var_arg_[0] == 0 );
    assert( CppAD::isnan( new_tape.con_vec_[0] ) );
 # endif
    //
    // new_use_val
    // Because the call operator can have more than one result, not all the
-   // results for all the needed operators are used. Initilaize as all the
+   // results for all the needed operators are used. Initialize as all the
    // independent values and the nan after them are used.
    vectorBool new_use_val(n_ind_ + 1);
    for(addr_t i = 0; i <= n_ind_; ++i)
@@ -152,14 +152,14 @@ vectorBool tape_t<Value>::compress(void)
       // arg_index_i, res_index_i
       addr_t arg_index_i = op2arg_index[i_op];
       addr_t res_index_i = op2res_index[i_op];
-      addr_t n_res        = op_ptr->n_res(arg_index_i, arg_vec_);
+      addr_t n_res        = op_ptr->n_res(arg_index_i, var_arg_);
       //
       // use_op
       bool use_op = false;
       if( n_res == 0 )
       {  op_enum_t op_enum = op_ptr->op_enum();
          if( op_enum == vec_op_enum || op_enum == store_op_enum )
-         {  addr_t which_vector = arg_vec_[arg_index_i + 0];
+         {  addr_t which_vector = var_arg_[arg_index_i + 0];
             use_op              = i_op < vec_last_load[which_vector];
          }
          else if( op_enum == pri_op_enum )
@@ -182,7 +182,7 @@ vectorBool tape_t<Value>::compress(void)
             assert( j_op < i_op );
             //
             // new_val_index
-            // mapping so use op_j results in palce of op_i results.
+            // mapping so use op_j results in place of op_i results.
             addr_t res_index_j = op2res_index[j_op];
             for(addr_t k = 0; k < n_res; ++k)
                new_val_index[res_index_i + k] = res_index_j + k;

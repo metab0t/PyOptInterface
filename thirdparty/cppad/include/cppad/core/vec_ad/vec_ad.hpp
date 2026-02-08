@@ -2,7 +2,7 @@
 # define CPPAD_CORE_VEC_AD_VEC_AD_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <cppad/local/pod_vector.hpp>
 namespace CppAD { //  BEGIN_CPPAD_NAMESPACE
@@ -185,7 +185,7 @@ public:
    /// Conversion from VecAD_reference to AD<Base>.
    /// puts the correspond vecad load instruction in the tape.
    AD<Base> ADBase(void) const
-   {  // start with default construtor (hence dynamic_ is false).
+   {  // start with default constructor (hence dynamic_ is false).
       AD<Base> result;
 
       size_t i = static_cast<size_t>( Integer(ind_) );
@@ -235,7 +235,7 @@ public:
       // index corresponding to this element
       CPPAD_ASSERT_UNKNOWN( var_vec );
       {  CPPAD_ASSERT_UNKNOWN( vec_.offset_ > 0  );
-         size_t load_op_index = tape->Rec_.num_var_load_rec();
+         size_t load_op_index = tape->Rec_.num_var_load();
          //
          if( var_ind )
          {  CPPAD_ASSERT_UNKNOWN( local::NumRes(local::LdvOp) == 1 );
@@ -453,7 +453,7 @@ public:
       if( tape == nullptr )
          return VecAD_reference<Base>(*this, ind);
 
-      // tape_id cannot match the defautl value zero
+      // tape_id cannot match the default value zero
       CPPAD_ASSERT_UNKNOWN( tape->id_ > 0 );
 
       // check if vector, index match tape_id
@@ -487,13 +487,13 @@ public:
          offset_ = tape->Rec_.put_var_vecad(length_, taddr_);
 
          // Advance pointer by one so starts at first component of this
-         // vector; i.e., skip length at begining (so is always > 0)
+         // vector; i.e., skip length at beginning (so is always > 0)
          offset_++;
 
          // tape_id corresponding to this vector
          tape_id_ = ind.tape_id_;
 
-         // VecAD objects go striaght from constants to variables; i.e.,
+         // VecAD objects go straight from constants to variables; i.e.,
          // they never are dynamic parameters.
          ad_type_ = variable_enum;
       }
@@ -519,7 +519,7 @@ void VecAD_reference<Base>::operator=(const AD<Base> &right)
    if( tape == nullptr )
       return;
 
-   // tape_id cannot match the defautl value zero
+   // tape_id cannot match the default value zero
    tape_id_t tape_id = tape->id_;
    CPPAD_ASSERT_UNKNOWN( tape_id > 0 );
 
@@ -572,7 +572,7 @@ void VecAD_reference<Base>::operator=(const AD<Base> &right)
       // tape_id corresponding to this vector
       vec_.tape_id_ = right.tape_id_;
 
-      // VecAD objects go striaght from constants to variables; i.e.,
+      // VecAD objects go straight from constants to variables; i.e.,
       // they never are dynamic parameters.
       vec_.ad_type_ = variable_enum;
    }

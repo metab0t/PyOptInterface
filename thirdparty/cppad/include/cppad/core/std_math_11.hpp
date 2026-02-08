@@ -722,8 +722,8 @@ It then uses this function to define Name(x) where x has type
 AD<Base> or VecAD_reference<Base>.
 
 If x is a variable, the tape unary operator Op is used
-to record the operation and the result is identified as correspoding
-to this operation; i.e., Name(x).taddr_ idendifies the operation and
+to record the operation and the result is identified as corresponding
+to this operation; i.e., Name(x).taddr_ identifies the operation and
 Name(x).tape_id_ identifies the tape.
 
 This macro is used to define AD<Base> versions of
@@ -827,7 +827,7 @@ namespace CppAD {
          if( complement )
             op = local::erfc_dyn;
 
-           // dynamic paramter argument
+           // dynamic parameter argument
          result.taddr_   = tape->Rec_.put_dyn_par(
             result.value_, op, taddr_
          );

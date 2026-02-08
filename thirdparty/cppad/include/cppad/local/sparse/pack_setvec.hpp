@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SPARSE_PACK_SETVEC_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-22 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <cppad/core/cppad_assert.hpp>
 # include <cppad/local/pod_vector.hpp>
@@ -400,7 +400,7 @@ public:
       // initialize count of non-zero bits in this set
       size_t count = 0;
       //
-      // mask corresonding to first bit in Pack
+      // mask corresponding to first bit in Pack
       Pack mask = one_;
       //
       // number of bits in last Packing unit

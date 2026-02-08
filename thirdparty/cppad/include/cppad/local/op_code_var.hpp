@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_OP_CODE_VAR_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 # include <string>
 # include <sstream>
@@ -20,7 +20,6 @@ namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 {xrst_begin op_code_var dev}
 {xrst_spell
-   addpv
    funap
    funav
    funrp
@@ -28,17 +27,7 @@ namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
    ldp
    ldv
    opcode
-   pos
-   powpv
-   powvv
    pri
-   pv
-   stpp
-   stpv
-   stvp
-   stvv
-   vp
-   vv
 }
 
 Variable Op Codes
@@ -71,87 +60,50 @@ We use the notation *arg* [ ``i`` ] below
 for the *i*-th operator argument which is a position integer
 represented using the type ``addr_t`` .
 
+{xrst_comment ------------------------------------------------------------- }
 Unary
 *****
-An operator commented as unary below
-has one argument (arg[0]) and it is a variable index.
-All of these operators have one result variable.
-
-Binary And Compare
-******************
-An operator commented as binary or compare below
-has two arguments.
-If it is a compare operator it has no result variables
-(the result is true or false but not a variable).
-Otherwise, it has one result variable.
-These operators use the following convention for the operator ending
-and the left argument (arg[0]) and right argument (arg[1]):
-
-.. csv-table::
-   :widths: auto
-
-   *Ending*,*Left*,*Right*
-   ``pvOp``,parameter index,variable index
-   ``vpOp``,variable index,parameter index
-   ``vvOp``,variable index,variable index
-
-For example, ``AddpvOp`` represents the addition operator where the left
-operand is a parameter and the right operand is a variable.
-
-Pow
-===
-The binary ``pow`` ( *x* , *y* ) operators PowpvOp, PowvvOp are
-special because they have three variable results instead of one.
-To be specific, they compute
-``log`` ( *x* ) ,
-``log`` ( *x* ) * *y* ,
-``exp`` ( ``log`` ( *x* ) * *y* )
+see :ref:`var_unary_op-name`
 
 {xrst_comment ------------------------------------------------------------- }
+Binary
+******
+see :ref:`var_binary_op-name`
+
+{xrst_comment ------------------------------------------------------------- }
+{xrst_spell_off}
+
+EqppOp, LeppOp, LtppOp, NeppOp
+******************************
+see :ref:`var_compare_op@op_code@EqppOp, LeppOp, LtppOp, NeppOp`
+
+EqpvOp, LepvOp, LtpvOp, NepvOp
+******************************
+see :ref:`var_compare_op@op_code@EqpvOp, LepvOp, LtpvOp, NepvOp`
+
+LevpOp, LtvpOp
+**************
+see :ref:`var_compare_op@op_code@LevpOp, LtvpOp`
+
+EqvvOp, LevvOp, LtvvOp, NevvOp
+******************************
+see :ref:`var_compare_op@op_code@EqvvOp, LevvOp, LtvvOp, NevvOp`
+
+{xrst_spell_on}
+{xrst_comment ------------------------------------------------------------- }
+
 AFunOp
 ******
-This operator appears at the start and end of every atomic function call.
-This operator has no results variables.
+see :ref:`var_atomic_op@AFunOp`
 
-arg[0]
-======
-This is the :ref:`atomic_index-name` for this function.
+FunapOp, FunavOp
+****************
+see :ref:`var_atomic_op@FunapOp, FunavOp`
 
-arg[1]
-======
-This is the :ref:`atomic_four_call@call_id` information.
-It is also he :ref:`atomic_one@id`
-for atomic one functions which have been deprecated.
+FunrpOp, FunrvOp
+****************
+see :ref:`var_atomic_op@FunrpOp, FunrvOp`
 
-arg[2]
-======
-is the number of arguments to this atomic function.
-We use the notation *n* = *arg* [2] below.
-
-arg[3]
-======
-is the number of results for this atomic function.
-We use the notation *m* = *arg* [3] below.
-
-Arguments
-=========
-There are *n* operators after the first ``AFunOp`` ,
-one for each argument.
-If the *j*-th argument is a parameter (variable)
-the corresponding operator is ``FunapOp`` ( ``FunavOp`` ), and
-the corresponding operator argument is a parameter index (variable index).
-These operators have no result variables.
-
-Results
-=======
-There are *m* operators after the last argument operator
-one for each result.
-If the *i*-th result is a parameter (variable)
-the corresponding operator is ``FunrpOp`` ( ``FunrvOp`` ).
-In the parameter case, there is one argument and it is the parameter index,
-and not result variables.
-In the variable case, there are no arguments and one result variable.
-The index for the new variable with the next possible index.
 
 {xrst_comment ------------------------------------------------------------- }
 BeginOp
@@ -164,113 +116,28 @@ indicate that a value is not a variable.
 for indicate an parameter.
 
 {xrst_comment ------------------------------------------------------------- }
+
 CExpOp
 ******
-This is a :ref:`conditional expression<condexp-name>` ; i.e., the corresponding
-source code is
-
-   *result* = ``CondExp`` *Rel* ( *left* , *right* , *if_true* , *if_false*
-
-This operator has one variable result.
-
-arg[0]
-======
-This is a :ref:`base_cond_exp@CompareOp` value corresponding
-to :ref:`condexp@Rel` above.  ( *Rel* = ``Ne`` is not possible).
-
-arg[1]
-======
-The first four bits of this integer are used as flags; see below.
-
-arg[2]
-======
-If arg[1] & 1 is true (false),
-this is the variable index (parameter index) corresponding to *left* .
-
-arg[3]
-======
-If arg[1] & 2 is true (false),
-this is the variable index (parameter index) corresponding to *right* .
-
-arg[4]
-======
-If arg[1] & 4 is true (false),
-this is the variable index (parameter index) corresponding to *if_true* .
-
-arg[5]
-======
-If arg[1] & 8 is true (false),
-this is the variable index (parameter index) corresponding to *if_false* .
+see :ref:`var_cexp_op@CExpOp`
 
 {xrst_comment ------------------------------------------------------------- }
+
 CSkipOp
 *******
-The conditional skip operator (used to skip operations that depend on false
-branches to conditional expressions).
-This operator has not result variables.
-
-arg[0]
-======
-This is a :ref:`base_cond_exp@CompareOp` value corresponding
-to this conditional skip.
-
-arg[1]
-======
-The first two bits of this integer are used as flags; see below.
-
-arg[2]
-======
-If arg[1] & 1 is true (false),
-this is the variable index (parameter index) corresponding to *left* .
-
-arg[3]
-======
-If arg[1] & 2 is true (false),
-this is the variable index (parameter index) corresponding to *right* .
-
-arg[4]
-======
-is the number of operations to skip if the comparison is true.
-We use the notation *n* = *arg* [4] below.
-
-arg[5]
-======
-is the number of operations to skip if the comparison is false.
-We use the notation *m* = *arg* [5] below.
-
-arg[6+i]
-========
-For *i* = 0, ..., *n* ``-1`` , this is the index
-of an operator that can be skipped if the comparison is true.
-
-arg[6+n+i]
-==========
-For *i* = 0, ..., *m* ``-1`` , this is the index
-of an operator that can be skipped if the comparison is false.
-
-arg[6+n+m]
-==========
-The is the total number operators that might be skipped; i.e., *n* + *m* .
+see :ref:`var_cskip_op@CSkipOp` .
 
 {xrst_comment ------------------------------------------------------------- }
+
 CSumOp
 ******
 see :ref:`var_csum_op@CSumOp`
 
 {xrst_comment ------------------------------------------------------------- }
+
 DisOp
 *****
-Call to a user defined :ref:`discrete-name` function.
-This operator has one result variable.
-
-arg[0]
-======
-is the index, in the order of the functions defined by the user,
-for this discrete function.
-
-arg[1]
-======
-variable index corresponding to the argument for this function call.
+see :ref:`var_dis_op@DisOp`
 
 {xrst_comment ------------------------------------------------------------- }
 
@@ -279,57 +146,45 @@ LdpOp, LdvOp
 see :ref:`var_load_op@LdpOp, LdvOp`
 
 {xrst_comment ------------------------------------------------------------- }
+{xrst_spell_off}
 
 StppOp, StpvOp, StvpOp, StvvOp
 ==============================
 see :ref:`var_store_op@StppOp, StpvOp, StvpOp, StvvOp`
 
+{xrst_spell_on}
 {xrst_comment ------------------------------------------------------------- }
+
 ParOp
-*****
-This operator has one result that is equal to a parameter
-(not that all the derivatives for this result will be zero).
-
-arg[0]
-======
-Is the index of the parameter that determines the value of the variable.
+=====
+see :ref:`var_par_op@ParOp`
 
 {xrst_comment ------------------------------------------------------------- }
+
 PriOp
 *****
-This operator implements the :ref:`PrintFor-name` command
-
-   ``PrintFor`` ( *pos* , *before* , *value* , *after* )
-
-arg[0]
-======
-The first two bits of this integer are used as flags; see below.
-
-arg[1]
-======
-If arg[1] & 1 is true (false),
-this is the variable index (parameter index) corresponding to *pos* .
-
-arg[2]
-======
-is the text index corresponding to *before* .
-
-arg[3]
-======
-If arg[1] & 2 is true (false),
-this is the variable index (parameter index) corresponding to *value* .
-
-arg[4]
-======
-is the text index corresponding to *after* .
+see :ref:`var_pri_op@PriOp`
 
 {xrst_comment ------------------------------------------------------------- }
 
+{xrst_comment // BEGIN_SORT_THIS_LINE_PLUS_2 }
 {xrst_toc_table
-   include/cppad/local/var_op/load_op.hpp
-   include/cppad/local/var_op/store_op.hpp
+   include/cppad/local/var_op/atomic_op.hpp
+   include/cppad/local/var_op/binary_op.xrst
+   include/cppad/local/var_op/cexp_op.hpp
+   include/cppad/local/var_op/compare_op.hpp
+   include/cppad/local/var_op/cskip_op.hpp
    include/cppad/local/var_op/csum_op.hpp
+   include/cppad/local/var_op/dis_op.hpp
+   include/cppad/local/var_op/load_op.hpp
+   include/cppad/local/var_op/one_var.hpp
+   include/cppad/local/var_op/par_op.hpp
+   include/cppad/local/var_op/pri_op.hpp
+   include/cppad/local/var_op/store_op.hpp
+   include/cppad/local/var_op/two_var.hpp
+   include/cppad/local/var_op/unary_op.xrst
 }
+{xrst_comment // END_SORT_THIS_LINE_MINUS_2 }
 
 Source
 ******
@@ -369,7 +224,7 @@ enum op_code_var {
    FunavOp,  // ...
    FunrpOp,  // ...
    FunrvOp,  // ...
-   InvOp,    // independent variable, no argumements, one result variable
+   InvOp,    // independent variable, no arguments, one result variable
    LdpOp,    // see its heading above
    LdvOp,    // ...
    LeppOp,   // compare <=
@@ -390,9 +245,9 @@ enum op_code_var {
    NevvOp,   // ...
    ParOp,    // see its heading above
    PowpvOp,  // see its heading above
-   PowvpOp,  // binary
-   PowvvOp,  // see its heading above
-   PriOp,    // see its heading above
+   PowvpOp,  // binary pow
+   PowvvOp,  // ..
+   PriOp,    // ..
    SignOp,   // unary sign
    SinOp,    // unary sin
    SinhOp,   // unary sinh
@@ -427,11 +282,11 @@ Number of arguments for a specified operator.
 Number of arguments corresponding to the specified operator.
 
 \param op
-Operator for which we are fetching the number of arugments.
+Operator for which we are fetching the number of arguments.
 
 \par NumArgTable
-this table specifes the number of arguments stored for each
-occurance of the operator that is the i-th value in the op_code_var enum type.
+this table specifies the number of arguments stored for each
+occurrence of the operator that is the i-th value in the op_code_var enum type.
 For example, for the first three op_code_var enum values we have
 \verbatim
 op_code_var j   NumArgTable[j]  Meaning
@@ -552,8 +407,8 @@ Number of variables resulting from the specified operation.
 Operator for which we are fecching the number of results.
 
 \par NumResTable
-table specifes the number of varibles that result for each
-occurance of the operator that is the i-th value in the op_code_var enum type.
+table specifies the number of variables that result for each
+occurrence of the operator that is the i-th value in the op_code_var enum type.
 For example, for the first three op_code_var enum values we have
 \verbatim
 op_code_var j   NumResTable[j]  Meaning
@@ -807,7 +662,7 @@ void printOpField(
       return;
    }
 
-   // count number of spaces at begining
+   // count number of spaces at beginning
    size_t nspace = 0;
    while(str[nspace] == ' ' && nspace < len)
       nspace++;
@@ -886,24 +741,24 @@ void printOp(
       arg[0]     = the Rel operator: Lt, Le, Eq, Ge, Gt, or Ne
       arg[1] & 1 = is left a variable
       arg[1] & 2 = is right a variable
-      arg[2]     = index correspoding to left
-      arg[3]     = index correspoding to right
+      arg[2]     = index corresponding to left
+      arg[3]     = index corresponding to right
       arg[4] = number of operations to skip if CExpOp comparison is true
       arg[5] = number of operations to skip if CExpOp comparison is false
       arg[6] -> arg[5+arg[4]]               = skip operations if true
       arg[6+arg[4]] -> arg[5+arg[4]+arg[5]] = skip operations if false
-      arg[6+arg[4]+arg[5]] = arg[4] + arg[5]
+      arg[6+arg[4]+arg[5]] = 6+arg[4]+arg[5]+1
       */
-      CPPAD_ASSERT_UNKNOWN( arg[6+arg[4]+arg[5]] == arg[4]+arg[5] );
+      CPPAD_ASSERT_UNKNOWN( arg[6+arg[4]+arg[5]] == 6+arg[4]+arg[5]+1 );
       CPPAD_ASSERT_UNKNOWN(arg[1] != 0);
       if( arg[1] & 1 )
          printOpField(os, " vl=", arg[2], ncol);
       else
-         printOpField(os, " pl=", play->GetPar( size_t(arg[2]) ), ncol);
+         printOpField(os, " pl=", play->par_one( size_t(arg[2]) ), ncol);
       if( arg[1] & 2 )
          printOpField(os, " vr=", arg[3], ncol);
       else
-         printOpField(os, " pr=", play->GetPar( size_t(arg[3]) ), ncol);
+         printOpField(os, " pr=", play->par_one( size_t(arg[3]) ), ncol);
       if( size_t(arg[4]) < 3 )
       {  for(addr_t i = 0; i < arg[4]; i++)
             printOpField(os, " ot=", arg[6+i], ncol);
@@ -934,26 +789,26 @@ void printOp(
       arg[4] = end in arg of subtraction dynamic parameters in summation
       arg[5],      ... , arg[arg[1]-1]: indices for addition variables
       arg[arg[1]], ... , arg[arg[2]-1]: indices for subtraction variables
-      arg[arg[2]], ... , arg[arg[3]-1]: indices for additon dynamics
+      arg[arg[2]], ... , arg[arg[3]-1]: indices for addition dynamics
       arg[arg[3]], ... , arg[arg[4]-1]: indices for subtraction dynamics
-      arg[arg[4]] = arg[4]
+      arg[arg[4]] = arg[4] + 1
       */
-      CPPAD_ASSERT_UNKNOWN( arg[arg[4]] == arg[4] );
-      printOpField(os, " pr=", play->GetPar( size_t(arg[0]) ), ncol);
+      CPPAD_ASSERT_UNKNOWN( arg[arg[4]] == arg[4] + 1 );
+      printOpField(os, " pr=", play->par_one( size_t(arg[0]) ), ncol);
       for(addr_t i = 5; i < arg[1]; i++)
              printOpField(os, " +v=", arg[i], ncol);
       for(addr_t i = arg[1]; i < arg[2]; i++)
              printOpField(os, " -v=", arg[i], ncol);
       for(addr_t i = arg[2]; i < arg[3]; i++)
-             printOpField(os, " +d=", play->GetPar( size_t(arg[i]) ), ncol);
+             printOpField(os, " +d=", play->par_one( size_t(arg[i]) ), ncol);
       for(addr_t i = arg[3]; i < arg[4]; i++)
-             printOpField(os, " -d=", play->GetPar( size_t(arg[i]) ), ncol);
+             printOpField(os, " -d=", play->par_one( size_t(arg[i]) ), ncol);
       break;
 
       case LdpOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
       printOpField(os, "off=", arg[0], ncol);
-      printOpField(os, "  p=", play->GetPar( size_t(arg[1]) ), ncol);
+      printOpField(os, "  p=", play->par_one( size_t(arg[1]) ), ncol);
       break;
 
       case LdvOp:
@@ -965,14 +820,14 @@ void printOp(
       case StppOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
       printOpField(os, "off=", arg[0], ncol);
-      printOpField(os, " pl=", play->GetPar( size_t(arg[1]) ), ncol);
-      printOpField(os, " pr=", play->GetPar( size_t(arg[2]) ), ncol);
+      printOpField(os, " pl=", play->par_one( size_t(arg[1]) ), ncol);
+      printOpField(os, " pr=", play->par_one( size_t(arg[2]) ), ncol);
       break;
 
       case StpvOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
       printOpField(os, "off=", arg[0], ncol);
-      printOpField(os, "  p=", play->GetPar( size_t(arg[1]) ), ncol);
+      printOpField(os, "  p=", play->par_one( size_t(arg[1]) ), ncol);
       printOpField(os, "  v=", arg[2], ncol);
       break;
 
@@ -980,7 +835,7 @@ void printOp(
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 3 );
       printOpField(os, "off=", arg[0], ncol);
       printOpField(os, "  v=", arg[1], ncol);
-      printOpField(os, "  p=", play->GetPar( size_t(arg[2]) ), ncol);
+      printOpField(os, "  p=", play->par_one( size_t(arg[2]) ), ncol);
       break;
 
       case StvvOp:
@@ -1016,7 +871,7 @@ void printOp(
       case PowpvOp:
       case ZmulpvOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 2 );
-      printOpField(os, " pl=", play->GetPar( size_t(arg[0]) ), ncol);
+      printOpField(os, " pl=", play->par_one( size_t(arg[0]) ), ncol);
       printOpField(os, " vr=", arg[1], ncol);
       break;
 
@@ -1028,7 +883,7 @@ void printOp(
       case ZmulvpOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 2 );
       printOpField(os, " vl=", arg[0], ncol);
-      printOpField(os, " pr=", play->GetPar( size_t(arg[1]) ), ncol);
+      printOpField(os, " pr=", play->par_one( size_t(arg[1]) ), ncol);
       break;
 
       case AbsOp:
@@ -1068,7 +923,7 @@ void printOp(
       case FunapOp:
       case FunrpOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 1 );
-      printOpField(os, "  p=", play->GetPar( size_t(arg[0]) ), ncol);
+      printOpField(os, "  p=", play->par_one( size_t(arg[0]) ), ncol);
       break;
 
       case AFunOp:
@@ -1093,12 +948,12 @@ void printOp(
       if( arg[0] & 1 )
          printOpField(os, " v=", arg[1], ncol);
       else
-         printOpField(os, " p=", play->GetPar( size_t(arg[1]) ), ncol);
+         printOpField(os, " p=", play->par_one( size_t(arg[1]) ), ncol);
       os << "before=\"" << play->GetTxt( size_t(arg[2]) ) << "\"";
       if( arg[0] & 2 )
          printOpField(os, " v=", arg[3], ncol);
       else
-         printOpField(os, " p=", play->GetPar( size_t(arg[3]) ), ncol);
+         printOpField(os, " p=", play->par_one( size_t(arg[3]) ), ncol);
       os << "after=\"" << play->GetTxt( size_t(arg[4]) ) << "\"";
       break;
 
@@ -1128,19 +983,19 @@ void printOp(
       if( arg[1] & 1 )
          printOpField(os, " vl=", arg[2], ncol);
       else
-         printOpField(os, " pl=", play->GetPar( size_t(arg[2]) ), ncol);
+         printOpField(os, " pl=", play->par_one( size_t(arg[2]) ), ncol);
       if( arg[1] & 2 )
          printOpField(os, " vr=", arg[3], ncol);
       else
-         printOpField(os, " pr=", play->GetPar( size_t(arg[3]) ), ncol);
+         printOpField(os, " pr=", play->par_one( size_t(arg[3]) ), ncol);
       if( arg[1] & 4 )
          printOpField(os, " vt=", arg[4], ncol);
       else
-         printOpField(os, " pt=", play->GetPar( size_t(arg[4]) ), ncol);
+         printOpField(os, " pt=", play->par_one( size_t(arg[4]) ), ncol);
       if( arg[1] & 8 )
          printOpField(os, " vf=", arg[5], ncol);
       else
-         printOpField(os, " pf=", play->GetPar( size_t(arg[5]) ), ncol);
+         printOpField(os, " pf=", play->par_one( size_t(arg[5]) ), ncol);
       break;
 
       case EqppOp:
@@ -1148,8 +1003,8 @@ void printOp(
       case LtppOp:
       case NeppOp:
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 2 );
-      printOpField(os, " pl=", play->GetPar( size_t(arg[0]) ), ncol);
-      printOpField(os, " pr=", play->GetPar( size_t(arg[1]) ), ncol);
+      printOpField(os, " pl=", play->par_one( size_t(arg[0]) ), ncol);
+      printOpField(os, " pr=", play->par_one( size_t(arg[1]) ), ncol);
       break;
 
       default:
@@ -1158,7 +1013,7 @@ void printOp(
 }
 
 /*!
-Prints the result values correspnding to an operator.
+Prints the result values corresponding to an operator.
 
 \tparam Base
 Is the base type for these AD< Base > operations.
@@ -1256,7 +1111,7 @@ void arg_is_variable(
    switch(op)
    {
       // -------------------------------------------------------------------
-      // cases where true number of arugments = NumArg(op) == 0
+      // cases where true number of arguments = NumArg(op) == 0
 
       case EndOp:
       case InvOp:
@@ -1411,10 +1266,10 @@ void arg_is_variable(
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 6 );
       is_variable[0] = false;
       is_variable[1] = false;
-      is_variable[2] = (arg[0] & 1) != 0;
-      is_variable[3] = (arg[0] & 2) != 0;
-      is_variable[4] = (arg[0] & 4) != 0;
-      is_variable[5] = (arg[0] & 8) != 0;
+      is_variable[2] = (arg[1] & 1) != 0;
+      is_variable[3] = (arg[1] & 2) != 0;
+      is_variable[4] = (arg[1] & 4) != 0;
+      is_variable[5] = (arg[1] & 8) != 0;
       break;
 
       // -------------------------------------------------------------------
@@ -1439,7 +1294,7 @@ void arg_is_variable(
       CPPAD_ASSERT_UNKNOWN( NumArg(op) == 0 )
       //
       // true number of arguments
-      num_arg = size_t(arg[4]);
+      num_arg = size_t(arg[4] + 1);
       //
       is_variable.resize( num_arg );
       for(size_t i = 0; i < num_arg; ++i)

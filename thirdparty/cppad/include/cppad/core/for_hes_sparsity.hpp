@@ -7,7 +7,7 @@
 /*
 {xrst_begin for_hes_sparsity}
 {xrst_spell
-   andrea
+   rc
    walther
 }
 
@@ -179,7 +179,7 @@ void ADFun<Base,RecBase>::for_hes_sparsity(
       "for_hes_sparsity: size of select_range is not equal to "
       "number of dependent variables"
    );
-   // do not need transpose or depenency
+   // do not need transpose or dependency
    bool transpose  = false;
    bool dependency = false;
    //
@@ -199,7 +199,7 @@ void ADFun<Base,RecBase>::for_hes_sparsity(
          internal_rev_jac.add_element( dep_taddr_[i] , 0 );
       }
       // reverse Jacobian sparsity for all variables on tape
-      local::sweep::rev_jac<addr_t>(
+      local::sweep::rev_jac(
          &play_,
          dependency,
          n,
@@ -212,7 +212,7 @@ void ADFun<Base,RecBase>::for_hes_sparsity(
       internal_for_hes.resize(n + 1 + num_var_tape_, n + 1);
       //
       // compute forward Hessian sparsity pattern
-      local::sweep::for_hes<addr_t>(
+      local::sweep::for_hes(
          &play_,
          n,
          num_var_tape_,
@@ -239,7 +239,7 @@ void ADFun<Base,RecBase>::for_hes_sparsity(
          internal_rev_jac.add_element( dep_taddr_[i] , 0 );
       }
       // reverse Jacobian sparsity for all variables on tape
-      local::sweep::rev_jac<addr_t>(
+      local::sweep::rev_jac(
          &play_,
          dependency,
          n,
@@ -253,7 +253,7 @@ void ADFun<Base,RecBase>::for_hes_sparsity(
       internal_for_hes.resize(n + 1 + num_var_tape_, n + 1);
       //
       // compute forward Hessian sparsity pattern
-      local::sweep::for_hes<addr_t>(
+      local::sweep::for_hes(
          &play_,
          n,
          num_var_tape_,

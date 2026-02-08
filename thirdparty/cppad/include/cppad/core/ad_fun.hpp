@@ -2,7 +2,7 @@
 # define CPPAD_CORE_AD_FUN_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin ADFun}
@@ -62,10 +62,10 @@ private:
    /// name of this function (so far only json operations use this value)
    std::string function_name_;
 
-   /// Did the previous optimzation exceed the collision limit
+   /// Did the previous optimization exceed the collision limit
    bool exceed_collision_limit_;
 
-   /// Has this ADFun object been optmized
+   /// Has this ADFun object been optimized
    bool has_been_optimized_;
 
    /// Check for nan's and report message to user (default value is true).
@@ -598,11 +598,11 @@ public:
 
    /// number of operators in the operation sequence
    size_t size_op(void) const
-   {  return play_.num_op_rec(); }
+   {  return play_.num_var_op(); }
 
    /// number of operator arguments in the operation sequence
    size_t size_op_arg(void) const
-   {  return play_.num_op_arg_rec(); }
+   {  return play_.num_var_arg(); }
 
    /// amount of memory required for the operation sequence
    size_t size_op_seq(void) const
@@ -615,11 +615,11 @@ public:
 
    /// number of parameters in the operation sequence
    size_t size_par(void) const
-   {  return play_.num_par_rec(); }
+   {  return play_.num_par_all(); }
 
    /// number of independent dynamic parameters
    size_t size_dyn_ind(void) const
-   {  return play_.num_dynamic_ind(); }
+   {  return play_.n_dyn_independent(); }
 
    /// number of dynamic parameters
    size_t size_dyn_par(void) const
@@ -639,15 +639,15 @@ public:
 
    /// number of characters in the operation sequence
    size_t size_text(void) const
-   {  return play_.num_text_rec(); }
+   {  return play_.num_var_text(); }
 
-   /// number of variables in opertion sequence
+   /// number of variables in operation sequence
    size_t size_var(void) const
    {  return num_var_tape_; }
 
    /// number of VecAD indices in the operation sequence
    size_t size_VecAD(void) const
-   {  return play_.num_var_vecad_ind_rec(); }
+   {  return play_.num_var_vec_ind(); }
 
    /// set number of orders currently allocated (user API)
    void capacity_order(size_t c);
@@ -807,7 +807,7 @@ public:
    template <class ADvector>
    void Dependent(const ADvector &y);
 
-   /// Deprecated: number of variables in opertion sequence
+   /// Deprecated: number of variables in operation sequence
    size_t Size(void) const
    {  return num_var_tape_; }
 
@@ -837,7 +837,7 @@ public:
    /// Deprecated: Does this AD operation sequence use
    /// VecAD<Base>::reference operands
    bool use_VecAD(void) const
-   {  return play_.num_var_vecad_ind_rec() > 0; }
+   {  return play_.num_var_vec_ind() > 0; }
 
    /// Deprecated: # taylor_ coefficient orders calculated
    /// (per variable,direction)
@@ -853,9 +853,9 @@ public:
 } // END_CPPAD_NAMESPACE
 
 // non-user interfaces
-# include <cppad/local/sweep/forward0.hpp>
-# include <cppad/local/sweep/forward1.hpp>
-# include <cppad/local/sweep/forward2.hpp>
+# include <cppad/local/sweep/forward_0.hpp>
+# include <cppad/local/sweep/forward_any.hpp>
+# include <cppad/local/sweep/forward_dir.hpp>
 # include <cppad/local/sweep/reverse.hpp>
 # include <cppad/local/sweep/for_jac.hpp>
 # include <cppad/local/sweep/rev_jac.hpp>

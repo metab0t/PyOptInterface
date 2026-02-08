@@ -2,7 +2,7 @@
 # define CPPAD_LOCAL_SWEEP_REV_HES_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/local/play/atom_op_info.hpp>
@@ -39,9 +39,9 @@ sparse::pack_setvec or sparse::list_setvec.
 \param n
 is the number of independent variables on the tape.
 
-\param numvar
+\param num_var
 is the total number of variables on the tape; i.e.,
- play->num_var_rec().
+ play->num_var().
 This is also the number of rows in the entire sparsity pattern
  rev_hes_sparse.
 
@@ -55,14 +55,14 @@ where \f$ n \f$ is the number of independent variables
 and \f$ m \f$ is the number of dependent variables.
 
 \param for_jac_sparse
-For i = 0 , ... , numvar - 1,
+For i = 0 , ... , num_var - 1,
 (for all the variables on the tape),
 the forward Jacobian sparsity pattern for the variable with index i
 corresponds to the set with index i in for_jac_sparse.
 
 \param RevJac
 \b Input:
-For i = 0, ... , numvar - 1
+For i = 0, ... , num_var - 1
 the if the variable with index i on the tape is an dependent variable and
 included in the Hessian, RevJac[ i ] is equal to true,
 otherwise it is equal to false.
@@ -76,7 +76,7 @@ The reverse Hessian sparsity pattern for the variable with index i
 corresponds to the set with index i in rev_hes_sparse.
 \n
 \n
-\b Input: For i = 0 , ... , numvar - 1
+\b Input: For i = 0 , ... , num_var - 1
 the reverse Hessian sparsity pattern for the variable with index i is empty.
 \n
 \n
@@ -91,11 +91,10 @@ they are used for temporary work space.
 Specifies RecBase for this call.
 */
 
-template <class Addr, class Base, class Vector_set, class RecBase>
+template <class Base, class Vector_set, class RecBase>
 void rev_hes(
    const local::player<Base>* play,
-   size_t                     n,
-   size_t                     numvar,
+   size_t                     num_var,
    const Vector_set&          for_jac_sparse,
    bool*                      RevJac,
    Vector_set&                rev_hes_sparse,
@@ -103,15 +102,15 @@ void rev_hes(
 )
 {
    // length of the parameter vector (used by CppAD assert macros)
-   const size_t num_par = play->num_par_rec();
+   const size_t num_par = play->num_par_all();
 
    size_t             i, j, k;
 
-   // check numvar argument
-   CPPAD_ASSERT_UNKNOWN( play->num_var_rec()    == numvar );
-   CPPAD_ASSERT_UNKNOWN( for_jac_sparse.n_set() == numvar );
-   CPPAD_ASSERT_UNKNOWN( rev_hes_sparse.n_set() == numvar );
-   CPPAD_ASSERT_UNKNOWN( numvar > 0 );
+   // check num_var argument
+   CPPAD_ASSERT_UNKNOWN( play->num_var()        == num_var );
+   CPPAD_ASSERT_UNKNOWN( for_jac_sparse.n_set() == num_var );
+   CPPAD_ASSERT_UNKNOWN( rev_hes_sparse.n_set() == num_var );
+   CPPAD_ASSERT_UNKNOWN( num_var > 0 );
 
    // upper limit exclusive for set elements
    size_t limit   = rev_hes_sparse.end();
@@ -125,8 +124,8 @@ void rev_hes(
    // vecad_sparsity contains a sparsity pattern for each VecAD object.
    // vecad_ind maps a VecAD index (beginning of the VecAD object)
    // to the index for the corresponding set in vecad_sparsity.
-   size_t num_vecad_ind   = play->num_var_vecad_ind_rec();
-   size_t num_vecad_vec   = play->num_var_vecad_rec();
+   size_t num_vecad_ind   = play->num_var_vec_ind();
+   size_t num_vecad_vec   = play->num_var_vecad();
    Vector_set vecad_sparse;
    pod_vector<size_t> vecad_ind;
    pod_vector<bool>   vecad_jac;
@@ -149,127 +148,124 @@ void rev_hes(
          // initialize this vector's reverse jacobian value
          vecad_jac[i] = false;
       }
-      CPPAD_ASSERT_UNKNOWN( j == play->num_var_vecad_ind_rec() );
+      CPPAD_ASSERT_UNKNOWN( j == play->num_var_vec_ind() );
    }
 
    // ----------------------------------------------------------------------
-   // work space used by AFunOp.
-   vector<Base>         atom_x;  // value of parameter arguments to function
-   vector<ad_type_enum> type_x;  // argument types
-   pod_vector<size_t>   atom_ix; // variable indices for argument vector
-   pod_vector<size_t>   atom_iy; // variable indices for result vector
    //
-   // information set by atomic forward (initialization to avoid warnings)
-   size_t atom_index=0, atom_old=0, atom_m=0, atom_n=0, atom_i=0, atom_j=0;
-   // information set by atomic forward (necessary initialization)
-   enum_atom_state atom_state = end_atom; // proper initialization
-   // ----------------------------------------------------------------------
+   // work space used by atomic functions
+   var_op::atomic_op_work<Base> atom_work;
    //
    // pointer to the beginning of the parameter vector
    // (used by atomic functions
    CPPAD_ASSERT_UNKNOWN( num_par > 0 )
-   const Base* parameter = play->GetPar();
-   //
-   // which parametes are dynamic
-   const pod_vector<bool>& dyn_par_is( play->dyn_par_is() );
+   const Base* parameter = play->par_ptr();
    //
    // skip the EndOp at the end of the recording
    play::const_sequential_iterator itr = play->end();
    // op_info
-   op_code_var op;
-   size_t i_var;
-   const Addr*   arg;
+   op_code_var   op;
+   size_t        i_var;
+   const addr_t* arg;
    itr.op_info(op, arg, i_var);
    CPPAD_ASSERT_UNKNOWN( op == EndOp );
 # if CPPAD_REV_HES_TRACE
    std::cout << std::endl;
    CppAD::vectorBool zf_value(limit);
    CppAD::vectorBool zh_value(limit);
+   bool atom_trace = true;
+# else
+   bool atom_trace = false;
 # endif
    bool more_operators = true;
    while(more_operators)
-   {  bool flag; // temporary for use in switch cases
+   {  bool linear[3];
       //
       // next op
       (--itr).op_info(op, arg, i_var);
 
       // rest of information depends on the case
       switch( op )
-      {
+      {  //
+         // linear operators with one primary result
+         // and where the first argument is the only variable
          case AbsOp:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
+         case DivvpOp:
+         case NegOp:
+         case SubvpOp:
+         case ZmulvpOp:
+         CPPAD_ASSERT_UNKNOWN( 0 < NumArg(op) );
+         linear[0] = true;
+         var_op::one_var_rev_hes(
+            i_var, size_t(arg[0]), linear,
+            RevJac, for_jac_sparse, rev_hes_sparse
+         );
+         break;
+         // -------------------------------------------------
+
+         // non-linear operators with one primary result
+         // and where the first argument is the only variable
+         case AcosOp:
+         case AcoshOp:
+         case AsinOp:
+         case AsinhOp:
+         case AtanOp:
+         case AtanhOp:
+         case CosOp:
+         case CoshOp:
+         case ErfOp:
+         case ErfcOp:
+         case ExpOp:
+         case Expm1Op:
+         case LogOp:
+         case Log1pOp:
+         case PowvpOp:
+         case SinOp:
+         case SinhOp:
+         case SqrtOp:
+         case TanOp:
+         case TanhOp:
+         CPPAD_ASSERT_UNKNOWN( 0 < NumArg(op) );
+         linear[0] = false;
+         var_op::one_var_rev_hes(
+            i_var, size_t(arg[0]), linear,
+            RevJac, for_jac_sparse, rev_hes_sparse
+         );
+         break;
+         // -------------------------------------------------
+
+         // linear and non-liner operators with one primary result
+         // and where the second argument is the only variable
+         case AddpvOp:
+         case MulpvOp:
+         case SubpvOp:
+         case ZmulpvOp:
+         CPPAD_ASSERT_UNKNOWN( 1 < NumArg(op) );
+         linear[0] = true;
+         var_op::one_var_rev_hes(
+            i_var, size_t(arg[1]), linear,
+            RevJac, for_jac_sparse, rev_hes_sparse
+         );
+         break;
+
+         case PowpvOp:
+         case DivpvOp:
+         CPPAD_ASSERT_UNKNOWN( 1 < NumArg(op) );
+         linear[0] = false;
+         var_op::one_var_rev_hes(
+            i_var, size_t(arg[1]), linear,
+            RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
 
          case AddvvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_addsub_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AddpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AcosOp:
-         // sqrt(1 - x * x), acos(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AcoshOp:
-         // sqrt(x * x - 1), acosh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AsinOp:
-         // sqrt(1 - x * x), asin(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AsinhOp:
-         // sqrt(1 + x * x), asinh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AtanOp:
-         // 1 + x * x, atan(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case AtanhOp:
-         // 1 - x * x, atanh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
+         case SubvvOp:
+         linear[0] = true;
+         linear[1] = true;
+         linear[2] = true;
+         var_op::two_var_rev_hes(
+            i_var, arg, linear, RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
@@ -287,33 +283,15 @@ void rev_hes(
 
          case CSumOp:
          itr.correct_after_decrement(arg);
-         var_op::csum_reverse_hes(
+         var_op::csum_rev_hes(
             i_var, arg, RevJac, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
 
          case CExpOp:
-         var_op::reverse_sparse_hessian_cond_op(
+         var_op::cexp_rev_hes(
             i_var, arg, num_par, RevJac, rev_hes_sparse
-         );
-         break;
-         // ---------------------------------------------------
-
-         case CosOp:
-         // sin(x), cos(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // ---------------------------------------------------
-
-         case CoshOp:
-         // sinh(x), cosh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
@@ -325,52 +303,12 @@ void rev_hes(
          // -------------------------------------------------
 
          case DivvvOp:
+         linear[0] = true;
+         linear[1] = false;
+         linear[2] = false;
          CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_div_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case DivpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case DivvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case ErfOp:
-         case ErfcOp:
-         // arg[1] is always the parameter 0
-         // arg[2] is always the parameter 2 / sqrt(pi)
-         CPPAD_ASSERT_NARG_NRES(op, 3, 5);
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case ExpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case Expm1Op:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
+         var_op::two_var_rev_hes(
+            i_var, arg, linear, RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
@@ -383,7 +321,7 @@ void rev_hes(
 
          case LdpOp:
          case LdvOp:
-         var_op::load_reverse_hes(
+         var_op::load_rev_hes(
             op,
             arg,
             num_vecad_ind,
@@ -415,65 +353,30 @@ void rev_hes(
          break;
          // -------------------------------------------------
 
-         case LogOp:
-         case NegOp:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case Log1pOp:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case MulpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
          case MulvvOp:
+         case ZmulvvOp:
+         linear[0] = true;
+         linear[1] = true;
+         linear[2] = false;
          CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_mul_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
+         var_op::two_var_rev_hes(
+            i_var, arg, linear, RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
 
          case ParOp:
          CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-
-         break;
-         // -------------------------------------------------
-
-         case PowpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 3)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case PowvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
          break;
          // -------------------------------------------------
 
          case PowvvOp:
+         linear[0] = false;
+         linear[1] = false;
+         linear[2] = false;
          CPPAD_ASSERT_NARG_NRES(op, 2, 3)
-         sparse::rev_hes_pow_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
+         var_op::two_var_rev_hes(
+            i_var, arg, linear, RevJac, for_jac_sparse, rev_hes_sparse
          );
          break;
          // -------------------------------------------------
@@ -489,37 +392,11 @@ void rev_hes(
          break;
          // -------------------------------------------------
 
-         case SinOp:
-         // cos(x), sin(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case SinhOp:
-         // cosh(x), sinh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case SqrtOp:
-         CPPAD_ASSERT_NARG_NRES(op, 1, 1)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
          case StppOp:
          case StpvOp:
          case StvpOp:
          case StvvOp:
-         var_op::store_reverse_hes(
+         var_op::store_rev_hes(
             op,
             arg,
             num_vecad_ind,
@@ -532,214 +409,67 @@ void rev_hes(
          break;
          // -------------------------------------------------
 
-         case SubvvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_addsub_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case SubpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case SubvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case TanOp:
-         // tan(x)^2, tan(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case TanhOp:
-         // tanh(x)^2, tanh(x)
-         CPPAD_ASSERT_NARG_NRES(op, 1, 2)
-         sparse::rev_hes_nl_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
          case AFunOp:
-         // start or end an atomic function call
-         CPPAD_ASSERT_UNKNOWN(
-            atom_state == start_atom || atom_state == end_atom
+         var_op::atomic_rev_hes<Vector_set, Base, RecBase>(
+            itr,
+            play,
+            parameter,
+            atom_trace,
+            atom_work,
+            for_jac_sparse,
+            RevJac,
+            rev_hes_sparse
          );
-         flag = atom_state == end_atom;
-         play::atom_op_info<RecBase>(
-            op, arg, atom_index, atom_old, atom_m, atom_n
-         );
-         if( flag )
-         {  atom_state = ret_atom;
-            atom_i     = atom_m;
-            atom_j     = atom_n;
-            //
-            atom_x.resize(atom_n);
-            type_x.resize(atom_n);
-            atom_ix.resize(atom_n);
-            atom_iy.resize(atom_m);
-         }
-         else
-         {  CPPAD_ASSERT_UNKNOWN( atom_i == 0 );
-            CPPAD_ASSERT_UNKNOWN( atom_j == 0 );
-            atom_state = end_atom;
-            //
-            // call atomic function for this operation
-            call_atomic_rev_hes_sparsity<Base,RecBase>(
-               atom_index, atom_old, atom_x, type_x, atom_ix, atom_iy,
-               for_jac_sparse, RevJac, rev_hes_sparse
-            );
-         }
          break;
 
          case FunapOp:
-         // parameter argument in an atomic operation sequence
-         CPPAD_ASSERT_UNKNOWN( NumArg(op) == 1 );
-         CPPAD_ASSERT_UNKNOWN( atom_state == arg_atom );
-         CPPAD_ASSERT_UNKNOWN( atom_i == 0 );
-         CPPAD_ASSERT_UNKNOWN( atom_j <= atom_n );
-         CPPAD_ASSERT_UNKNOWN( size_t( arg[0] ) < num_par );
-         //
-         --atom_j;
-         // argument parameter value
-         atom_x[atom_j] = parameter[arg[0]];
-         // argument type
-         if( dyn_par_is[arg[0]] )
-            type_x[atom_j] = dynamic_enum;
-         else
-            type_x[atom_j] = constant_enum;
-         // special variable index used for parameters
-         atom_ix[atom_j] = 0;
-         //
-         if( atom_j == 0 )
-            atom_state = start_atom;
-         break;
-
          case FunavOp:
-         // variable argument in an atomic operation sequence
-         CPPAD_ASSERT_UNKNOWN( NumArg(op) == 1 );
-         CPPAD_ASSERT_UNKNOWN( atom_state == arg_atom );
-         CPPAD_ASSERT_UNKNOWN( atom_i == 0 );
-         CPPAD_ASSERT_UNKNOWN( atom_j <= atom_n );
-         //
-         --atom_j;
-         // argument variables not available during sparsity calculations
-         atom_x[atom_j] = CppAD::numeric_limits<Base>::quiet_NaN();
-         type_x[atom_j] = variable_enum;
-         // variable index for this argument
-         atom_ix[atom_j] = size_t(arg[0]);
-         //
-         if( atom_j == 0 )
-            atom_state = start_atom;
-         break;
-
          case FunrpOp:
-         // parameter result for an atomic function
-         CPPAD_ASSERT_NARG_NRES(op, 1, 0);
-         CPPAD_ASSERT_UNKNOWN( atom_state == ret_atom );
-         CPPAD_ASSERT_UNKNOWN( atom_i <= atom_m );
-         CPPAD_ASSERT_UNKNOWN( atom_j == atom_n );
-         CPPAD_ASSERT_UNKNOWN( size_t( arg[0] ) < num_par );
-         //
-         --atom_i;
-         atom_iy[atom_i] = 0; // special variable used for parameters
-         //
-         if( atom_i == 0 )
-            atom_state = arg_atom;
-         break;
-
          case FunrvOp:
-         // variable result for an atomic function
-         CPPAD_ASSERT_NARG_NRES(op, 0, 1);
-         CPPAD_ASSERT_UNKNOWN( atom_state == ret_atom );
-         CPPAD_ASSERT_UNKNOWN( atom_i <= atom_m );
-         CPPAD_ASSERT_UNKNOWN( atom_j == atom_n );
-         //
-         --atom_i;
-         atom_iy[atom_i] = i_var; // variable for this result
-         //
-         if( atom_i == 0 )
-            atom_state = arg_atom;
+         CPPAD_ASSERT_UNKNOWN(false);
          break;
-         // -------------------------------------------------
-
-         case ZmulpvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[1]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case ZmulvpOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_lin_unary_op(
-         i_var, size_t(arg[0]), RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-         // -------------------------------------------------
-
-         case ZmulvvOp:
-         CPPAD_ASSERT_NARG_NRES(op, 2, 1)
-         sparse::rev_hes_mul_op(
-         i_var, arg, RevJac, for_jac_sparse, rev_hes_sparse
-         );
-         break;
-
          // -------------------------------------------------
 
          default:
          CPPAD_ASSERT_UNKNOWN(0);
       }
 # if CPPAD_REV_HES_TRACE
-      for(j = 0; j < limit; j++)
-      {  zf_value[j] = false;
-         zh_value[j] = false;
+      if( op != AFunOp )
+      {  for(j = 0; j < limit; j++)
+         {  zf_value[j] = false;
+            zh_value[j] = false;
+         }
+         typename Vector_set::const_iterator itr_jac(for_jac_sparse, i_var);
+         j = *itr_jac;
+         while( j < limit )
+         {  zf_value[j] = true;
+            j = *(++itr_jac);
+         }
+         typename Vector_set::const_iterator itr_hes(rev_hes_sparse, i_var);
+         j = *itr_hes;
+         while( j < limit )
+         {  zh_value[j] = true;
+            j = *(++itr_hes);
+         }
+         printOp<Base, RecBase>(
+            std::cout,
+            play,
+            itr.op_index(),
+            i_var,
+            op,
+            arg
+         );
+         // should also print RevJac[i_var], but printOpResult does not
+         // yet allow for this
+         if( NumRes(op) > 0 && op != BeginOp ) printOpResult(
+            std::cout,
+            1,
+            &zf_value,
+            1,
+            &zh_value
+         );
+         std::cout << std::endl;
       }
-      typename Vector_set::const_iterator itr_jac(for_jac_sparse, i_var);
-      j = *itr_jac;
-      while( j < limit )
-      {  zf_value[j] = true;
-         j = *(++itr_jac);
-      }
-      typename Vector_set::const_iterator itr_hes(rev_hes_sparse, i_var);
-      j = *itr_hes;
-      while( j < limit )
-      {  zh_value[j] = true;
-         j = *(++itr_hes);
-      }
-      printOp<Base, RecBase>(
-         std::cout,
-         play,
-         itr.op_index(),
-         i_var,
-         op,
-         arg
-      );
-      // should also print RevJac[i_var], but printOpResult does not
-      // yet allow for this
-      if( NumRes(op) > 0 && op != BeginOp ) printOpResult(
-         std::cout,
-         1,
-         &zf_value,
-         1,
-         &zh_value
-      );
-      std::cout << std::endl;
    }
    std::cout << std::endl;
 # else

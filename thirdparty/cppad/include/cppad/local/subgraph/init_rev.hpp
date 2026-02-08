@@ -32,7 +32,7 @@ in the recording. It determines the selected independent variables.
 \par in_subgraph_
 We use depend_yes (depend_no) for the value n_dep_ (n_dep_ + 1).
 The important properties are that depend_yes < depend_no and
-for a valid indpendent variable index i_ind < depend_yes.
+for a valid independent variable index i_ind < depend_yes.
 The input size and elements of in_subgraph_ do not matter.
 If in_subgraph_[i_op] == depend_yes (depend_no),
 the result for this operator depends (does not depend)
@@ -177,7 +177,7 @@ in the recording. It determines the selected independent variables.
 \par in_subgraph_
 We use depend_yes (depend_no) for the value n_dep_ (n_dep_ + 1).
 The important properties are that depend_yes < depend_no and
-for a valid indpendent variable index i_ind < depend_yes.
+for a valid independent variable index i_ind < depend_yes.
 The input size and elements of in_subgraph_ do not matter.
 If in_subgraph_[i_op] == depend_yes (depend_no),
 the result for this operator depends (does not depend)
@@ -203,9 +203,10 @@ void subgraph_info::init_rev(
    const BoolVector&   select_domain )
 {
    // get random access iterator for this player
-   play->template setup_random<Addr>();
+   Addr not_used;
+   play->setup_random( not_used );
    local::play::const_random_iterator<Addr> random_itr =
-      play->template get_random<Addr>();
+      play->get_random( not_used );
    //
    init_rev(random_itr, select_domain);
    //

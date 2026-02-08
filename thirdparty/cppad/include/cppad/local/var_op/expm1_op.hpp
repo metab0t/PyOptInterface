@@ -11,14 +11,20 @@ namespace CppAD { namespace local { namespace var_op {
 
 
 template <class Base>
-inline void forward_expm1_op(
-   size_t p           ,
-   size_t q           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void expm1_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(Expm1Op) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(Expm1Op) == 1 );
@@ -46,14 +52,20 @@ inline void forward_expm1_op(
 
 
 template <class Base>
-inline void forward_expm1_op_dir(
-   size_t q           ,
-   size_t r           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void expm1_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(Expm1Op) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(Expm1Op) == 1 );
@@ -76,12 +88,16 @@ inline void forward_expm1_op_dir(
 }
 
 template <class Base>
-inline void forward_expm1_op_0(
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void expm1_forward_0(
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(Expm1Op) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(Expm1Op) == 1 );
@@ -95,14 +111,18 @@ inline void forward_expm1_op_0(
 }
 
 template <class Base>
-inline void reverse_expm1_op(
-   size_t      i_z          ,
-   size_t      i_x          ,
-   size_t      cap_order    ,
-   const Base* taylor       ,
-   size_t      n_order      ,
-   Base*       partial      )
-{  // d
+inline void expm1_reverse(
+   size_t        i_z          ,
+   const addr_t* arg          ,
+   size_t        cap_order    ,
+   const Base*   taylor       ,
+   size_t        n_order      ,
+   Base*         partial      )
+{  // d  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    size_t d = n_order - 1;
    //
    // check assumptions

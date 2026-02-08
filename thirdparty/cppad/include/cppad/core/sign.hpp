@@ -8,7 +8,6 @@
 /*
 {xrst_begin sign}
 {xrst_spell
-   dirac
    rl
 }
 The Sign: sign
@@ -86,7 +85,7 @@ AD<Base> AD<Base>::sign_me (void) const
       return result;
 
    if(ad_type_ == dynamic_enum)
-   {  // dynamic paramter argument
+   {  // dynamic parameter argument
       result.taddr_   = tape->Rec_.put_dyn_par(
          result.value_, local::sign_dyn, taddr_
       );

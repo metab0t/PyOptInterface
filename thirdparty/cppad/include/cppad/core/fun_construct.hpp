@@ -2,7 +2,7 @@
 # define CPPAD_CORE_FUN_CONSTRUCT_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin fun_construct}
@@ -233,7 +233,7 @@ The C++ syntax for this operation is
 \endverbatim
 An empty ADFun object is created.
 The Dependent member function,
-or the ADFun<Base> assingment operator,
+or the ADFun<Base> assignment operator,
 can then be used to put an operation sequence in this ADFun object.
 
 \tparam Base
@@ -256,7 +256,7 @@ num_var_tape_(0)
 { }
 //
 // move semantics version of constructor
-// (none of the defualt constructor values matter to the destructor)
+// (none of the default constructor values matter to the destructor)
 template <class Base, class RecBase>
 ADFun<Base,RecBase>::ADFun(ADFun&& f)
 {  swap(f); }
@@ -405,7 +405,7 @@ The range dimension of this object will be the size of y.
 \par Taylor Coefficients
 A zero order forward mode sweep is done,
 and if NDEBUG is not defined the resulting values for the
-depenedent variables are checked against the values in y.
+dependent variables are checked against the values in y.
 Thus, the zero order Taylor coefficients
 corresponding to the value of the x vector
 are stored in this ADFun object.
@@ -470,7 +470,7 @@ ADFun<Base,RecBase>::ADFun(const ADVector &x, const ADVector &y)
    CPPAD_ASSERT_UNKNOWN( cap_order_taylor_     == c );
    CPPAD_ASSERT_UNKNOWN( num_direction_taylor_ == r );
 
-   // set zero order coefficients corresponding to indpendent variables
+   // set zero order coefficients corresponding to independent variables
    CPPAD_ASSERT_UNKNOWN( n == ind_taddr_.size() );
    for(j = 0; j < n; j++)
    {  CPPAD_ASSERT_UNKNOWN( ind_taddr_[j] == (j+1) );
@@ -479,15 +479,22 @@ ADFun<Base,RecBase>::ADFun(const ADVector &x, const ADVector &y)
    }
 
    // use independent variable values to fill in values for others
-   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_op_rec() );
-   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load_rec() );
-   local::sweep::forward0(&play_, std::cout, false,
-      n, num_var_tape_, cap_order_taylor_, taylor_.data(),
-      cskip_op_.data(), load_op2var_,
+   CPPAD_ASSERT_UNKNOWN( cskip_op_.size() == play_.num_var_op() );
+   CPPAD_ASSERT_UNKNOWN( load_op2var_.size()  == play_.num_var_load() );
+   bool print = false;
+   local::sweep::forward_0(
+      not_used_rec_base,
+      &play_,
+      num_var_tape_,
+      cap_order_taylor_,
+      cskip_op_.data(),
+      load_op2var_,
       compare_change_count_,
       compare_change_number_,
       compare_change_op_index_,
-      not_used_rec_base
+      std::cout,
+      print,
+      taylor_.data()
    );
    CPPAD_ASSERT_UNKNOWN( compare_change_count_    == 1 );
    CPPAD_ASSERT_UNKNOWN( compare_change_number_   == 0 );

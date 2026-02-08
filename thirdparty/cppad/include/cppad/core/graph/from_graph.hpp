@@ -2,7 +2,7 @@
 # define CPPAD_CORE_GRAPH_FROM_GRAPH_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 # include <cppad/core/ad_fun.hpp>
@@ -181,7 +181,7 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
       {  if( discrete_index[graph_index] != n_list_discrete )
          {  std::string msg = "from_graph: error in call to ";
             msg += name;
-            msg += ".\nThere is mor than one discrete ";
+            msg += ".\nThere is more than one discrete ";
             msg += "function with this name";
             //
             // use this source code as point of detection
@@ -246,8 +246,8 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
 
    // start a recording
    local::recorder<Base> rec;
-   CPPAD_ASSERT_UNKNOWN( rec.num_op_rec() == 0 );
-   rec.set_num_dynamic_ind(n_dynamic_ind_fun);
+   CPPAD_ASSERT_UNKNOWN( rec.num_var_op() == 0 );
+   rec.set_n_dyn_independent(n_dynamic_ind_fun);
    rec.set_abort_op_index(0);
    rec.set_record_compare(false);
 
@@ -263,7 +263,7 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
    Base nan = CppAD::numeric_limits<Base>::quiet_NaN();
 
    // Place the parameter with index 0 in the tape
-   const local::pod_vector_maybe<Base>& parameter( rec.all_par_vec());
+   const local::pod_vector_maybe<Base>& parameter( rec.par_all());
    CPPAD_ASSERT_UNKNOWN( parameter.size() == 0 );
    addr_t i_par = rec.put_con_par(nan);
    CPPAD_ASSERT_UNKNOWN( i_par == 0 );
@@ -548,7 +548,8 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
                if( type_x[j] == dynamic_enum )
                   temporary[ j_dynamic++ ]  = arg[j];
             }
-            temporary[j_dynamic] = j_dynamic;
+            // number of arguments to this operator
+            temporary[j_dynamic] = j_dynamic + 1;
             //
             temporary[0] = rec.put_con_par(sum_constant);
             CPPAD_ASSERT_UNKNOWN(parameter[temporary[0]] == sum_constant);
@@ -1505,16 +1506,16 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
    num_order_taylor_          = 0;
    cap_order_taylor_          = 0;
    num_direction_taylor_      = 0;
-   num_var_tape_              = rec.num_var_rec();
+   num_var_tape_              = rec.num_var();
    //
    // taylor_
    taylor_.resize(0);
    //
    // cskip_op_
-   cskip_op_.resize( rec.num_op_rec() );
+   cskip_op_.resize( rec.num_var_op() );
    //
    // load_op2var_
-   load_op2var_.resize( rec.num_var_load_rec() );
+   load_op2var_.resize( rec.num_var_load() );
    //
    // play_
    // Now that each dependent variable has a place in the recording,
@@ -1539,8 +1540,8 @@ void CppAD::ADFun<Base,RecBase>::from_graph(
    subgraph_info_.resize(
       ind_taddr_.size(),   // n_dep
       dep_taddr_.size(),   // n_ind
-      play_.num_op_rec(),  // n_op
-      play_.num_var_rec()  // n_var
+      play_.num_var_op(),  // n_op
+      play_.num_var()      // n_var
    );
    //
    // set the function name

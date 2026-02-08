@@ -2,7 +2,7 @@
 # define  CPPAD_LOCAL_VAL_GRAPH_FUN2VAL_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // --------------------------------------------------------------------------
 /*
 ------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void ADFun<Base, RecBase>::fun2val(
    addr_t invalid_addr_t = std::numeric_limits<addr_t>::max();
    //
    // parameter
-   const Base* parameter = play_.GetPar();
+   const Base* parameter = play_.par_ptr();
    //
    // dyn_op2val_op
    Vector<op_enum_t> dyn_op2val_op(number_dyn);
@@ -167,9 +167,9 @@ void ADFun<Base, RecBase>::fun2val(
    // mapping from dynamic parameter index to operator
    const pod_vector<opcode_t>& dyn_par_op ( play_.dyn_par_op()  );
    //
-   // dyn_ind2par_ind
-   // mapping from dynamic parameter index to parameter index
-   const pod_vector<addr_t>& dyn_ind2par_ind ( play_.dyn_ind2par_ind() );
+   // dyn2par_index
+     // mapping from dynamic parameter index to parameter index
+   const pod_vector<addr_t>& dyn2par_index ( play_.dyn2par_index() );
    //
    // dyn_par_arg
    // vector that contains arguments to all the dynamic parameter operators
@@ -177,26 +177,26 @@ void ADFun<Base, RecBase>::fun2val(
    //
    // n_parameter
    // number of parameters
-   size_t n_parameter = play_.num_par_rec();
+   size_t n_parameter = play_.num_par_all();
    //
    // n_dynamic
    // number of dynamic parameters
-   size_t n_dynamic = dyn_ind2par_ind.size();
+   size_t n_dynamic = dyn2par_index.size();
    //
    // n_dynamic_ind
    // number of independent dynamic parameters
-   size_t n_dynamic_ind = play_.num_dynamic_ind();
+   size_t n_dynamic_ind = play_.n_dyn_independent();
    //
    // n_variables
    // number of variables
-   const size_t n_variable = play_.num_var_rec();
+   const size_t n_variable = play_.num_var();
    //
    // n_variable_ind
-   // number of indepedent variables
+   // number of independent variables
    size_t n_variable_ind = ind_taddr_.size();
    //
    // n_val_ind
-   // number of indepedent valuse
+   // number of independent values
    addr_t n_val_ind = addr_t( n_dynamic_ind + n_variable_ind );
    //
 # ifndef NDEBUG
@@ -212,7 +212,7 @@ void ADFun<Base, RecBase>::fun2val(
    // Put dynamic vectors in val_tape and create vec_info_vec
    struct vec_info_t { size_t size; size_t offset; };
    Vector<vec_info_t> vec_info_vec;
-   {  size_t n_vecad_ind = play_.num_var_vecad_ind_rec();
+   {  size_t n_vecad_ind = play_.num_var_vec_ind();
       size_t index         = 0;
       while(index < n_vecad_ind)
       {  size_t size         = play_.GetVecInd(index++);
@@ -283,7 +283,7 @@ void ADFun<Base, RecBase>::fun2val(
    for(size_t i_dyn = n_dynamic_ind; i_dyn < n_dynamic; ++i_dyn)
    {  //
       // i_par
-      size_t i_par = size_t( dyn_ind2par_ind[i_dyn] );
+      size_t i_par = size_t( dyn2par_index[i_dyn] );
       //
       // dyn_op
       // operator for this dynamic parameter
@@ -581,7 +581,7 @@ void ADFun<Base, RecBase>::fun2val(
             // default
             default:
             CPPAD_ASSERT_UNKNOWN(false);
-            // set to avoid comiler warning
+            // set to avoid compiler warning
             compare_enum = local::val_graph::number_compare_enum;
             break;
 

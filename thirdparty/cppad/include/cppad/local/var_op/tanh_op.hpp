@@ -11,14 +11,20 @@ namespace CppAD { namespace local { namespace var_op {
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_tanh_op(
-   size_t p           ,
-   size_t q           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void tanh_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(TanOp) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(TanOp) == 2 );
@@ -51,14 +57,20 @@ inline void forward_tanh_op(
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_tanh_op_dir(
-   size_t q           ,
-   size_t r           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void tanh_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(TanOp) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(TanOp) == 2 );
@@ -87,12 +99,16 @@ inline void forward_tanh_op_dir(
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_tanh_op_0(
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void tanh_forward_0(
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(TanOp) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(TanOp) == 2 );
@@ -110,14 +126,18 @@ inline void forward_tanh_op_0(
 
 // See dev documentation: reverse_unary_op
 template <class Base>
-inline void reverse_tanh_op(
-   size_t      i_z          ,
-   size_t      i_x          ,
-   size_t      cap_order    ,
-   const Base* taylor       ,
-   size_t      n_order      ,
-   Base*       partial      )
-{  // d
+inline void tanh_reverse(
+   size_t        i_z          ,
+   const addr_t* arg          ,
+   size_t        cap_order    ,
+   const Base*   taylor       ,
+   size_t        n_order      ,
+   Base*         partial      )
+{  // d  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    size_t d = n_order - 1;
    //
    // check assumptions
@@ -133,7 +153,7 @@ inline void reverse_tanh_op(
    const Base* z  = taylor  + i_z * cap_order; // called z in doc
    Base* pz       = partial + i_z * n_order;
 
-   // Taylor coefficients and partials corresponding to auxillary result
+   // Taylor coefficients and partials corresponding to auxiliary result
    const Base* y  = z  - cap_order; // called y in documentation
    Base* py       = pz - n_order;
 

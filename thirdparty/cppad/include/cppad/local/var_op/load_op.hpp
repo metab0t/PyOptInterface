@@ -47,10 +47,15 @@ z
 is the new variable created by this load.
 (This new variable is like a copy of *y* .)
 
+RecBase
+*******
+is the base type use when recording this operator;
+i.e., this operation was recording using AD< *RecBase* > operations.
+
 Base
 ****
-base type for the operator; i.e., this operation was recorded
-using AD<Base> and computations by these operators done using type Base.
+is the type used for computations by this operator.
+This is either *RecBase* or AD< *RecBase* >.
 
 op_code
 *******
@@ -102,13 +107,6 @@ Is the number of this VecAD load instruction that came before this one.
 Zero Order Forward Load an Element of a VecAD Vector
 ####################################################
 
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_FORWARD_0
-   // END_LOAD_FORWARD_0
-}
-
 v, x, y, z
 **********
 see
@@ -116,6 +114,14 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_FORWARD_0
+   // END_LOAD_FORWARD_0
+}
+
 
 Base, op_code, i_z, num_vecad_ind, arg
 **************************************
@@ -140,11 +146,28 @@ This is the vector of parameters for this recording which has size *num_par* .
 
 cap_order
 *********
-number of columns in the matrix containing the Taylor coefficients.
+is the maximum number of orders that can fit in *taylor* .
 
 taylor
 ******
 Is the matrix of Taylor coefficients for all the variables.
+
+
+per_variable
+============
+For each variable there is one Taylor coefficient of order zero
+and *n_dir* coefficients for orders greater than zero.
+The taylor coefficients capacity per variable is::
+
+   per_variable = (cap_order - 1) * n_dir + 1
+
+Input
+=====
+For j = 0, ..., i_z - 1,  taylor[ j * per_variable + 0 ] is an input.
+
+Output
+======
+taylor[ i_z * per_variable + 0 ] is an output.
 
 i_vec
 *****
@@ -186,6 +209,7 @@ inline void load_forward_0(
    pod_vector<addr_t>&        load_op2var      )
 // END_LOAD_FORWARD_0
 {  CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
+   //
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( vec_ad2isvar.size() == num_vec_ind );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[2]) < load_op2var.size() );
@@ -212,7 +236,7 @@ inline void load_forward_0(
    //
    CPPAD_ASSERT_KNOWN(
       size_t(i_vec) < vec_ad2index[ arg[0] - 1 ] ,
-      "VecAD: dynamic parmaeter index out or range during zero order forward"
+      "VecAD: dynamic parameter index out or range during zero order forward"
    );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0] + i_vec) < num_vec_ind );
    //
@@ -244,13 +268,6 @@ inline void load_forward_0(
 Nonzero Order Forward Load an Element of a VecAD Vector
 #######################################################
 
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_FORWARD_NONZERO
-   // END_LOAD_FORWARD_NONZERO
-}
-
 v, x, y, z
 **********
 see
@@ -258,6 +275,19 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+n_res
+*****
+The number of results that are variables, *n_res* , is one for
+this operation.
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_FORWARD_NONZERO
+   // END_LOAD_FORWARD_NONZERO
+}
+
 
 Base, op_code, i_z, arg
 ***********************
@@ -267,26 +297,15 @@ see
 :ref:`var_load_op@i_z` ,
 :ref:`var_load_op@arg` .
 
-p
-*
-is the lowest order of the Taylor coefficient that we are computing.
-
-q
-*
-is the highest order of the Taylor coefficient that we are computing.
-
-r
-*
-is the number of directions for the Taylor coefficients that we
-are computing.
-
-cap_order
+order_low
 *********
-number of columns in the matrix containing the Taylor coefficients.
+is the lowest order Taylor coefficient that we are computing.
 
-y
-*
-see :ref:`var_load_op@y`
+{xrst_template ;
+   include/cppad/local/var_op/template/forward_dir.xrst
+   headers: n_dir, cap_order, order_up, taylor
+}
+
 
 load_op2var
 ***********
@@ -294,28 +313,6 @@ maps the load operator index *arg* [2] to the
 index corresponding to *y* for this load operation.
 If the case where the index is zero,
 *y* is a parameter; i.e., *y* is not a variable.
-
-taylor
-******
-
-num_taylor_per_var
-******************
-We use the notation num_taylor_per_var = (cap_order-1) * r + 1 .
-
-Input
-=====
-#. For k = 0, ..., q,
-   taylor[ i_z * num_taylor_per_var + (k-1)*r+1+ell
-   is the k-th order coefficient for *z* in the ell-th direction,
-#. For k = 0, ..., q,
-   taylor[ i_y * num_taylor_per_var + (k-1)*r+1+ell
-   is the k-th order coefficient for *y* in the ell-th direction,
-
-Output
-======
-for k = p, ..., q,
-taylor[ i_z * num_taylor_per_var + (k-1)*r+1+ell ]
-is set to the k-th order coefficient for *z* in the ell-th direction.
 
 {xrst_end var_load_forward_nonzero}
 */
@@ -325,14 +322,18 @@ inline void load_forward_nonzero(
    op_code_var                   op_code     ,
    size_t                        i_z         ,
    const addr_t*                 arg         ,
-   size_t                        p           ,
-   size_t                        q           ,
-   size_t                        r           ,
+   size_t                        order_low   ,
+   size_t                        order_up    ,
+   size_t                        n_dir       ,
    size_t                        cap_order   ,
    const pod_vector<addr_t>&     load_op2var ,
    Base*                         taylor      )
 // END_LOAD_FORWARD_NONZERO
-{
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
    CPPAD_ASSERT_UNKNOWN( q < cap_order );
    CPPAD_ASSERT_UNKNOWN( 0 < r);
@@ -371,17 +372,10 @@ inline void load_forward_nonzero(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_load_reverse_op dev}
+{xrst_begin var_load_reverse dev}
 
 Reverse Mode Load an Element of a VecAD Vector
 ##############################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_REVERSE_OP
-   // END_LOAD_REVERSE_OP
-}
 
 v, x, y, z
 **********
@@ -391,6 +385,13 @@ see
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
 
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_REVERSE
+   // END_LOAD_REVERSE
+}
+
 Base, op_code, i_z, arg
 ***********************
 see
@@ -399,13 +400,9 @@ see
 :ref:`var_load_op@i_z` ,
 :ref:`var_load_op@arg` .
 
-y
-*
-see :ref:`var_load_op@y`
-
 cap_order
 *********
-number of columns in the matrix containing the Taylor coefficients.
+is the maximum number of orders that can fit in *taylor* .
 
 load_op2var
 ***********
@@ -413,9 +410,10 @@ This vector maps the load instruction index *arg* [2] to the corresponding
 *y* variable index.
 If this index is zero, *y* is a parameter (not a variable).
 
-{xrst_comment document n_order, partial}
 {xrst_template ;
-   include/cppad/local/var_op/reverse.xrst
+   include/cppad/local/var_op/template/reverse_op.xrst
+   headers: n_order, partial
+
    @x, y@  ; y
 }
 
@@ -432,11 +430,11 @@ is added to the k-th order Taylor coefficient for *y*; i.e.,
 *partial* [ *i_y* * *n_order* + *k* ] +=
 *partial* [ *i_z* * *n_order* + *k* ]
 
-{xrst_end var_load_reverse_op}
+{xrst_end var_load_reverse}
 */
-// BEGIN_LOAD_REVERSE_OP
+// BEGIN_LOAD_REVERSE
 template <class Base>
-inline void load_reverse_op(
+inline void load_reverse(
    op_code_var               op_code     ,
    size_t                    i_z         ,
    const addr_t*             arg         ,
@@ -444,8 +442,9 @@ inline void load_reverse_op(
    size_t                    cap_order   ,
    size_t                    n_order     ,
    Base*                     partial     )
-// END_LOAD_REVERSE_OP
+// END_LOAD_REVERSE
 {  // d
+   //
    size_t d = n_order - 1;
    //
    //
@@ -467,17 +466,10 @@ inline void load_reverse_op(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_load_forward_jac dev}
+{xrst_begin var_load_for_jac dev}
 
 Forward Jacobian Sparsity for Store a VecAD Element
 ###################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_FORWARD_JAC
-   // END_LOAD_FORWARD_JAC
-}
 
 v, x, y, z
 **********
@@ -486,6 +478,13 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_FOR_JAC
+   // END_LOAD_FOR_JAC
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -527,11 +526,11 @@ vecad_sparsity
 The set with index *i_v* in *vecad_sparsity
 is the sparsity pattern for the vector *v*.
 
-{xrst_end var_load_forward_jac}
+{xrst_end var_load_for_jac}
 */
-// BEGIN_LOAD_FORWARD_JAC
+// BEGIN_LOAD_FOR_JAC
 template <class Vector_set>
-inline void load_forward_jac(
+inline void load_for_jac(
    op_code_var               op_code        ,
    size_t                    num_vecad_ind  ,
    size_t                    i_z            ,
@@ -540,8 +539,9 @@ inline void load_forward_jac(
    const pod_vector<size_t>& vecad_ind      ,
    Vector_set&               var_sparsity   ,
    const Vector_set&         vecad_sparsity )
-// END_LOAD_FORWARD_JAC
-{
+// END_LOAD_FOR_JAC
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( num_vecad_ind == vecad_ind.size() );
@@ -563,17 +563,10 @@ inline void load_forward_jac(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_load_reverse_jac dev}
+{xrst_begin var_load_rev_jac dev}
 
 Reverse Jacobian Sparsity for Load a VecAD Element
 ##################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_REVERSE_JAC
-   // END_LOAD_REVERSE_JAC
-}
 
 v, x, y, z
 **********
@@ -582,6 +575,13 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_REV_JAC
+   // END_LOAD_REV_JAC
+}
 
 op_code, num_vecad_ind, arg
 ***************************
@@ -624,11 +624,11 @@ The sparsity pattern for *z* is added to the sparsity pattern
 with index *i_v* in *vecad_sparsity ( the sparsity pattern for *v* ).
 
 
-{xrst_end var_load_reverse_jac}
+{xrst_end var_load_rev_jac}
 */
-// BEGIN_LOAD_REVERSE_JAC
+// BEGIN_LOAD_REV_JAC
 template <class Vector_set>
-inline void load_reverse_jac(
+inline void load_rev_jac(
    op_code_var               op_code        ,
    size_t                    num_vecad_ind  ,
    size_t                    i_z            ,
@@ -637,8 +637,9 @@ inline void load_reverse_jac(
    const pod_vector<size_t>& vecad_ind      ,
    Vector_set&               var_sparsity   ,
    Vector_set&               vecad_sparsity )
-// END_LOAD_REVERSE_JAC
-{
+// END_LOAD_REV_JAC
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_vecad_ind );
@@ -657,17 +658,10 @@ inline void load_reverse_jac(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_load_reverse_hes dev}
+{xrst_begin var_load_rev_hes dev}
 
 Reverse Hessian Sparsity for Load a VecAD Element
 #################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_REVERSE_HES
-   // END_LOAD_REVERSE_HES
-}
 
 v, x, y, z
 **********
@@ -676,6 +670,13 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_REV_HES
+   // END_LOAD_REV_HES
+}
 
 op_code, num_vecad_ind, i_z, arg
 ********************************
@@ -722,11 +723,11 @@ vecad_rev_jac
 If the scalar function has non-zero partial w.r.t *z* ,
 the *i_v* component of *vecad_rev_jac* is set to true.
 
-{xrst_end var_load_reverse_hes}
+{xrst_end var_load_rev_hes}
 */
-// BEGIN_LOAD_REVERSE_HES
+// BEGIN_LOAD_REV_HES
 template <class Vector_set>
-inline void load_reverse_hes(
+inline void load_rev_hes(
    op_code_var               op_code        ,
    const addr_t*             arg            ,
    size_t                    num_vecad_ind  ,
@@ -736,8 +737,9 @@ inline void load_reverse_hes(
    Vector_set&               vecad_sparsity ,
    const bool*               var_rev_jac    ,
    pod_vector<bool>&         vecad_rev_jac  )
-// END_LOAD_REVERSE_HES
-{
+// END_LOAD_REV_HES
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_vecad_ind );
@@ -757,17 +759,10 @@ inline void load_reverse_hes(
 }
 /*
 ------------------------------------------------------------------------------
-{xrst_begin var_load_forward_hes dev}
+{xrst_begin var_load_for_hes dev}
 
 Forward Hessian Sparsity for Load a VecAD Element
 #################################################
-
-Prototype
-*********
-{xrst_literal
-   // BEGIN_LOAD_FORWARD_HES
-   // END_LOAD_FORWARD_HES
-}
 
 v, x, y, z
 **********
@@ -776,6 +771,13 @@ see
 :ref:`var_load_op@x` ,
 :ref:`var_load_op@y` ,
 :ref:`var_load_op@z`
+
+Prototype
+*********
+{xrst_literal
+   // BEGIN_LOAD_FOR_HES
+   // END_LOAD_FOR_HES
+}
 
 op_code, num_vecad_ind, i_z, arg
 ********************************
@@ -814,11 +816,11 @@ for_hes_sparse
 **************
 see :ref:`local_sweep_for_hes@for_hes_sparse` .
 
-{xrst_end var_load_forward_hes}
+{xrst_end var_load_for_hes}
 */
-// BEGIN_LOAD_FORWARD_HES
+// BEGIN_LOAD_FOR_HES
 template <class Vector_set>
-inline void load_forward_hes(
+inline void load_for_hes(
    op_code_var               op_code        ,
    const addr_t*             arg            ,
    size_t                    num_vecad_ind  ,
@@ -827,8 +829,9 @@ inline void load_forward_hes(
    const pod_vector<size_t>& vecad_ind      ,
    const Vector_set&         vecad_sparsity ,
    Vector_set&               for_hes_sparse )
-// END_LOAD_FORWARD_HES
-{
+// END_LOAD_FOR_HES
+{  //
+   //
    CPPAD_ASSERT_NARG_NRES(op_code, 3, 1);
    CPPAD_ASSERT_UNKNOWN( 0 < arg[0] );
    CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_vecad_ind );

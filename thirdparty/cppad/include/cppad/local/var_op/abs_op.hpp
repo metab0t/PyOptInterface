@@ -10,14 +10,20 @@ namespace CppAD { namespace local { namespace var_op {
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_abs_op(
-   size_t p           ,
-   size_t q           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void abs_forward_any(
+   size_t        order_low   ,
+   size_t        order_up    ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // p, q
+   size_t p = order_low;
+   size_t q = order_up;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AbsOp) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AbsOp) == 1 );
@@ -34,14 +40,20 @@ inline void forward_abs_op(
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_abs_op_dir(
-   size_t q           ,
-   size_t r           ,
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void abs_forward_dir(
+   size_t        order_up    ,
+   size_t        n_dir       ,
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{   // q, r
+   size_t q = order_up;
+   size_t r = n_dir;
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AbsOp) == 1 );
    CPPAD_ASSERT_UNKNOWN( NumRes(AbsOp) == 1 );
@@ -60,12 +72,16 @@ inline void forward_abs_op_dir(
 
 // See dev documentation: forward_unary_op
 template <class Base>
-inline void forward_abs_op_0(
-   size_t i_z         ,
-   size_t i_x         ,
-   size_t cap_order   ,
-   Base*  taylor      )
-{
+inline void abs_forward_0(
+   size_t        i_z         ,
+   const addr_t* arg         ,
+   size_t        cap_order   ,
+   Base*         taylor      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
 
    // check assumptions
    CPPAD_ASSERT_UNKNOWN( NumArg(AbsOp) == 1 );
@@ -81,14 +97,18 @@ inline void forward_abs_op_0(
 
 // See dev documentation: reverse_unary_op
 template <class Base>
-inline void reverse_abs_op(
-   size_t      i_z          ,
-   size_t      i_x          ,
-   size_t      cap_order    ,
-   const Base* taylor       ,
-   size_t      n_order      ,
-   Base*       partial      )
-{
+inline void abs_reverse(
+   size_t        i_z          ,
+   const addr_t* arg          ,
+   size_t        cap_order    ,
+   const Base*   taylor       ,
+   size_t        n_order      ,
+   Base*         partial      )
+{  //
+   //
+   // i_x
+   size_t i_x = size_t(arg[0]);
+   //
    //
    size_t j;
 

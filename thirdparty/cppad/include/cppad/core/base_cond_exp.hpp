@@ -8,7 +8,7 @@
 /*
 {xrst_begin base_cond_exp}
 {xrst_spell
-   ge
+   adolc
 }
 
 Base Type Requirements for Conditional Expressions
@@ -198,7 +198,7 @@ is the type of the result, which is the same as CompareType except
 during forward and reverse mode sparese calculations.
 
 \param cop
-specifices which comparison to use; i.e.,
+spedifies which comparison to use; i.e.,
 $code <$$,
 $code <=$$,
 $code ==$$,

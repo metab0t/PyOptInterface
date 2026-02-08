@@ -2,7 +2,7 @@
 # define CPPAD_CORE_CHKPOINT_TWO_CHKPOINT_TWO_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-24 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 namespace CppAD { // BEGIN_CPPAD_NAMESPACE
@@ -119,7 +119,7 @@ private:
    /// can this checkpoint function be used in parallel mode
    const bool use_in_parallel_;
    //
-   /// Jacobian sparsity for g(x) with dependncy true.
+   /// Jacobian sparsity for g(x) with dependency true.
    /// This is set by the constructor and constant after that.
    sparse_rc< vector<size_t> > jac_sparsity_;
    //

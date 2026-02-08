@@ -2,7 +2,7 @@
 # define CPPAD_CORE_ABS_NORMAL_FUN_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-24 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 /*
 {xrst_begin abs_normal_fun}
@@ -322,7 +322,7 @@ namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 Create an abs-normal representation of an ADFun object.
 
 \tparam Base
-base type for this abs-normal form and for the function beging represented;
+base type for this abs-normal form and for the function being represented;
 i.e., f.
 
 \param f
@@ -376,7 +376,7 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
    // Forward sweep to create new recording
    // ------------------------------------------------------------------------
    // dynamic parameter information in player
-   const pod_vector<bool>&     dyn_par_is( play_.dyn_par_is() );
+   const pod_vector<bool>&     par_is_dyn( play_.par_is_dyn() );
    const pod_vector<opcode_t>& dyn_par_op( play_.dyn_par_op() );
    const pod_vector<addr_t>&   dyn_par_arg( play_.dyn_par_arg() );
    //
@@ -384,11 +384,11 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
    recorder<Base> rec;
    //
    // number of parameters in both operation sequences
-   size_t num_par = play_.num_par_rec();
+   size_t num_par = play_.num_par_all();
    //
    // number of independent dynamic parameters
-   size_t num_dynamic_ind = play_.num_dynamic_par();
-   rec.set_num_dynamic_ind(num_dynamic_ind);
+   size_t n_dyn_independent = play_.num_dynamic_par();
+   rec.set_n_dyn_independent(n_dyn_independent);
    //
    // set all parameter to be exactly the same in rec as in play
    size_t i_dyn = 0; // dynamic parameter index
@@ -399,8 +399,8 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
       size_t j_par = 0;
 # endif
       // value of this parameter
-      Base par = play_.GetPar(i_par);
-      if( ! dyn_par_is[i_par] )
+      Base par = play_.par_one(i_par);
+      if( ! par_is_dyn[i_par] )
          CPPAD_J_PAR_EQUAL_REC.put_con_par(par);
       else
       {  // operator for this dynamic parameter
@@ -453,7 +453,7 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
    //
    // number of variables in both operation sequences
    // (the AbsOp operators are replace by InvOp operators)
-   const size_t num_var = play_.num_var_rec();
+   const size_t num_var = play_.num_var();
    //
    // mapping from old variable index to new variable index
    CPPAD_ASSERT_UNKNOWN(
@@ -556,7 +556,7 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
          case SqrtOp:
          case TanOp:
          case TanhOp:
-         // some of these operators have an auxillary result; e.g.,
+         // some of these operators have an auxiliary result; e.g.,
          // sine and cosine are computed togeather.
          CPPAD_ASSERT_UNKNOWN( NumArg(op) ==  1 );
          CPPAD_ASSERT_UNKNOWN( NumRes(op) == 1 || NumRes(op) == 2 );
@@ -891,19 +891,19 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
          (++itr).op_info(op, arg, i_var);
    }
    // Check a few expected results
-   CPPAD_ASSERT_UNKNOWN( rec.num_op_rec() == play_.num_op_rec() );
-   CPPAD_ASSERT_UNKNOWN( rec.num_var_rec() == play_.num_var_rec() );
-   CPPAD_ASSERT_UNKNOWN( rec.num_var_load_rec() == play_.num_var_load_rec() );
+   CPPAD_ASSERT_UNKNOWN( rec.num_var_op() == play_.num_var_op() );
+   CPPAD_ASSERT_UNKNOWN( rec.num_var() == play_.num_var() );
+   CPPAD_ASSERT_UNKNOWN( rec.num_var_load() == play_.num_var_load() );
 
    // -----------------------------------------------------------------------
    // Use rec to create the function g
    // -----------------------------------------------------------------------
 
    // number of variables in the recording
-   g.num_var_tape_ = rec.num_var_rec();
+   g.num_var_tape_ = rec.num_var();
 
    // dimension cskip_op vector to number of operators
-   g.cskip_op_.resize( rec.num_op_rec() );
+   g.cskip_op_.resize( rec.num_var_op() );
 
    // independent variables in g: (x, u)
    size_t s = f_abs_res.size();
@@ -940,7 +940,7 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
       g.dep_parameter_[m + i] = false;
 
    // free memory allocated for sparse Jacobian calculation
-   // (the resutls are no longer valid)
+   // (the results are no longer valid)
    g.for_jac_sparse_pack_.resize(0, 0);
    g.for_jac_sparse_set_.resize(0, 0);
 
@@ -957,8 +957,8 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
    g.subgraph_info_.resize(
       g.ind_taddr_.size(),   // n_ind
       g.dep_taddr_.size(),   // n_dep
-      g.play_.num_op_rec(),  // n_op
-      g.play_.num_var_rec()  // n_var
+      g.play_.num_var_op(),  // n_op
+      g.play_.num_var()      // n_var
    );
 
    // ------------------------------------------------------------------------
@@ -977,7 +977,7 @@ void ADFun<Base,RecBase>::abs_normal_fun(ADFun& g, ADFun& a) const
    }
 
    // free memory allocated for sparse Jacobian calculation
-   // (the resutls are no longer valid)
+   // (the results are no longer valid)
    a.for_jac_sparse_pack_.resize(0, 0);
    a.for_jac_sparse_set_.resize(0, 0);
 

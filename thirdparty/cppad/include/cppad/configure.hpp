@@ -2,16 +2,17 @@
 # define CPPAD_CONFIGURE_HPP
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2003-23 Bradley M. Bell
+// SPDX-FileContributor: 2003-25 Bradley M. Bell
 // ----------------------------------------------------------------------------
 
 /*!
 {xrst_begin configure.hpp dev}
 {xrst_spell
-   cl
+   adolc
    cmd
-   complier
+   colpack
    gettimeofday
+   ipopt
    mkstemp
    noexcept
    nullptr
@@ -90,7 +91,7 @@ Deprecated 2020-12-03:
 Is it OK for CppAD use C++17 features.
 {xrst_spell_off}
 {xrst_code hpp} */
-# define CPPAD_USE_CPLUSPLUS_2017 0
+# define CPPAD_USE_CPLUSPLUS_2017 1
 /* {xrst_code}
 {xrst_spell_on}
 
@@ -99,7 +100,7 @@ CPPAD_PACKAGE_STRING
 cppad-yyyymmdd as a C string where yyyy is year, mm is month, and dd is day.
 {xrst_spell_off}
 {xrst_code hpp} */
-# define CPPAD_PACKAGE_STRING "cppad-20240602"
+# define CPPAD_PACKAGE_STRING "cppad-20260000"
 /* {xrst_code}
 {xrst_spell_on}
 

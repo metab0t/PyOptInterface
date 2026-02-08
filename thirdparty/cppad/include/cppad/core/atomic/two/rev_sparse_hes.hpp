@@ -7,7 +7,6 @@
 /*
 {xrst_begin atomic_two_rev_sparse_hes app}
 {xrst_spell
-   na
    vx
 }
 
@@ -203,7 +202,7 @@ Atomic reverse mode Hessian sparsity patterns.
 Link from reverse Hessian sparsity sweep to atomic_base
 
 \param vx [in]
-which componens of x are variables.
+which components of x are variables.
 
 \param s [in]
 is the reverse Jacobian sparsity pattern w.r.t the result vector y.
@@ -212,7 +211,7 @@ is the reverse Jacobian sparsity pattern w.r.t the result vector y.
 is the reverse Jacobian sparsity pattern w.r.t the argument vector x.
 
 \param q [in]
-is the column dimension for the sparsity partterns.
+is the column dimension for the sparsity patterns.
 
 \param r [in]
 is the forward Jacobian sparsity pattern w.r.t the argument vector x
@@ -294,7 +293,7 @@ bool atomic_base<Base>::rev_sparse_hes(
 Link, before case split, from rev_hes_sweep to atomic_base.
 
 \tparam InternalSparsity
-Is the used internaly for sparsity calculations; i.e.,
+Is the used internally for sparsity calculations; i.e.,
 sparse_pack or sparse_list.
 
 \param x
@@ -318,7 +317,7 @@ computing the Hessian of.
 On input, for i = 0, ... , m-1, the rev_jac_flag[ y_index[i] ] is true
 if the Jacobian of function (we are computing sparsity for) is no-zero.
 Upon return, for j = 0, ... , n-1, rev_jac_flag [ x_index[j] ]
-as been adjusted to accound removing this atomic function.
+as been adjusted to account removing this atomic function.
 
 \param rev_hes_sparsity
 This is the sparsity pattern for the Hessian.
@@ -329,15 +328,24 @@ template <class Base>
 template <class InternalSparsity>
 bool atomic_base<Base>::rev_sparse_hes(
    const vector<Base>&              x                ,
-   const local::pod_vector<size_t>& x_index          ,
-   const local::pod_vector<size_t>& y_index          ,
+   const vector<size_t>&            x_index          ,
+   const vector<size_t>&            y_index          ,
    const InternalSparsity&          for_jac_sparsity ,
    bool*                            rev_jac_flag     ,
    InternalSparsity&                rev_hes_sparsity )
 {  CPPAD_ASSERT_UNKNOWN( for_jac_sparsity.end() == rev_hes_sparsity.end() );
+   //
+   // pod_x_index, pod_y_index
+   local::pod_vector<size_t> pod_x_index( x_index.size() );
+   local::pod_vector<size_t> pod_y_index( y_index.size() );
+   for(size_t j = 0; j < x_index.size(); ++j)
+      pod_x_index[j] = x_index[j];
+   for(size_t i = 0; i < y_index.size(); ++i)
+      pod_y_index[i] = y_index[i];
+   //
    size_t q           = rev_hes_sparsity.end();
-   size_t n           = x_index.size();
-   size_t m           = y_index.size();
+   size_t n           = pod_x_index.size();
+   size_t m           = pod_y_index.size();
    bool   ok          = false;
    size_t thread      = thread_alloc::thread_num();
    allocate_work(thread);
@@ -348,7 +356,7 @@ bool atomic_base<Base>::rev_sparse_hes(
    // vx
    vector<bool> vx(n);
    for(size_t j = 0; j < n; j++)
-      vx[j] = x_index[j] != 0;
+      vx[j] = pod_x_index[j] != 0;
    //
    // note that s and t are vectors so transpose does not matter for bool case
    vector<bool> bool_s( work_[thread]->bool_s );
@@ -358,8 +366,8 @@ bool atomic_base<Base>::rev_sparse_hes(
    bool_t.resize(n);
    //
    for(size_t i = 0; i < m; i++)
-   {  if( y_index[i] > 0  )
-         bool_s[i] = rev_jac_flag[ y_index[i] ];
+   {  if( pod_y_index[i] > 0  )
+         bool_s[i] = rev_jac_flag[ pod_y_index[i] ];
    }
    //
    std::string msg = ": atomic_base.rev_sparse_hes: returned false";
@@ -371,10 +379,10 @@ bool atomic_base<Base>::rev_sparse_hes(
       pack_v.resize(n * q);
       //
       local::sparse::get_internal_pattern(
-         transpose, x_index, for_jac_sparsity, pack_r
+         transpose, pod_x_index, for_jac_sparsity, pack_r
       );
       local::sparse::get_internal_pattern(
-         transpose, y_index, rev_hes_sparsity, pack_u
+         transpose, pod_y_index, rev_hes_sparsity, pack_u
       );
       //
       ok = rev_sparse_hes(vx, bool_s, bool_t, q, pack_r, pack_u, pack_v, x);
@@ -385,7 +393,7 @@ bool atomic_base<Base>::rev_sparse_hes(
          CPPAD_ASSERT_KNOWN(false, msg.c_str());
       }
       local::sparse::set_internal_pattern(zero_empty, input_empty,
-         transpose, x_index, rev_hes_sparsity, pack_v
+         transpose, pod_x_index, rev_hes_sparsity, pack_v
       );
    }
    else if( sparsity_ == bool_sparsity_enum )
@@ -396,10 +404,10 @@ bool atomic_base<Base>::rev_sparse_hes(
       bool_v.resize(n * q);
       //
       local::sparse::get_internal_pattern(
-         transpose, x_index, for_jac_sparsity, bool_r
+         transpose, pod_x_index, for_jac_sparsity, bool_r
       );
       local::sparse::get_internal_pattern(
-         transpose, y_index, rev_hes_sparsity, bool_u
+         transpose, pod_y_index, rev_hes_sparsity, bool_u
       );
       //
       ok = rev_sparse_hes(vx, bool_s, bool_t, q, bool_r, bool_u, bool_v, x);
@@ -410,7 +418,7 @@ bool atomic_base<Base>::rev_sparse_hes(
          CPPAD_ASSERT_KNOWN(false, msg.c_str());
       }
       local::sparse::set_internal_pattern(zero_empty, input_empty,
-         transpose, x_index, rev_hes_sparsity, bool_v
+         transpose, pod_x_index, rev_hes_sparsity, bool_v
       );
    }
    else
@@ -422,10 +430,10 @@ bool atomic_base<Base>::rev_sparse_hes(
       set_v.resize(n);
       //
       local::sparse::get_internal_pattern(
-         transpose, x_index, for_jac_sparsity, set_r
+         transpose, pod_x_index, for_jac_sparsity, set_r
       );
       local::sparse::get_internal_pattern(
-         transpose, y_index, rev_hes_sparsity, set_u
+         transpose, pod_y_index, rev_hes_sparsity, set_u
       );
       //
       ok = rev_sparse_hes(vx, bool_s, bool_t, q, set_r, set_u, set_v, x);
@@ -436,12 +444,12 @@ bool atomic_base<Base>::rev_sparse_hes(
          CPPAD_ASSERT_KNOWN(false, msg.c_str());
       }
       local::sparse::set_internal_pattern(zero_empty, input_empty,
-         transpose, x_index, rev_hes_sparsity, set_v
+         transpose, pod_x_index, rev_hes_sparsity, set_v
       );
    }
    for(size_t j = 0; j < n; j++)
-   {  if( x_index[j] > 0  )
-         rev_jac_flag[ x_index[j] ] |= bool_t[j];
+   {  if( pod_x_index[j] > 0  )
+         rev_jac_flag[ pod_x_index[j] ] |= bool_t[j];
    }
    return ok;
 }

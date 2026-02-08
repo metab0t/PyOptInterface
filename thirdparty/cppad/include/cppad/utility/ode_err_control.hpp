@@ -16,7 +16,6 @@
    scur
    smax
    smin
-   tb
    tf
    xa
    xb
