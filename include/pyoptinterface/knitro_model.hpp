@@ -158,20 +158,8 @@ struct CallbackEvaluator
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hess_;
 	CppAD::sparse_hes_work hess_work_;
 
-	// std::vector<std::set<size_t>> jac_pattern;
-	// std::vector<size_t> jac_rows;
-	// std::vector<size_t> jac_cols;
-	// CppAD::sparse_jacobian_work jac_work;
-	// std::vector<std::set<size_t>> hess_pattern;
-	// std::vector<size_t> hess_rows;
-	// std::vector<size_t> hess_cols;
-	// CppAD::sparse_hessian_work hess_work;
-
 	std::vector<V> x;
 	std::vector<V> w;
-
-	// std::vector<V> jac;
-	// std::vector<V> hess;
 
 	void setup()
 	{
@@ -195,47 +183,10 @@ struct CallbackEvaluator
 			select_rows[fun_rows[k]] = true;
 		}
 		fun.rev_hes_sparsity(select_rows, false, true, hess_pattern_);
-		// size_t m = fun_rows.size();
-		// std::vector<std::set<size_t>> jac_sparsity(m);
-		// for (size_t k = 0; k < m; k++)
-		// {
-		// 	jac_sparsity[k].insert(fun_rows[k]);
-		// }
-		// jac_pattern = fun.RevSparseJac(jac_sparsity.size(), jac_sparsity);
-		// for (size_t k = 0; k < jac_pattern.size(); k++)
-		// {
-		// 	for (size_t i : jac_pattern[k])
-		// 	{
-		// 		jac_rows.push_back(fun_rows[k]);
-		// 		jac_cols.push_back(i);
-		// 	}
-		// }
-		// std::vector<std::set<size_t>> r_hess_sparsity(fun.Domain());
-		// for (size_t i = 0; i < fun.Domain(); i++)
-		// {
-		// 	r_hess_sparsity[i].insert(i);
-		// }
-		// fun.ForSparseJac(fun.Domain(), r_hess_sparsity);
-		// std::vector<std::set<size_t>> hess_sparsity(1);
-		// for (size_t k = 0; k < m; k++)
-		// {
-		// 	hess_sparsity[0].insert(fun_rows[k]);
-		// }
-		// hess_pattern = fun.RevSparseHes(r_hess_sparsity.size(), hess_sparsity);
-		// for (size_t k = 0; k < hess_pattern.size(); k++)
-		// {
-		// 	for (size_t i : hess_pattern[k])
-		// 	{
-		// 		hess_rows.push_back(k);
-		// 		hess_cols.push_back(i);
-		// 	}
-		// }
 		x.resize(fun.Domain(), 0.0);
 		w.resize(fun.Range(), 0.0);
 		jac_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jac_pattern_);
 		hess_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hess_pattern_);
-		// jac.resize(jac_rows.size());
-		// hess.resize(hess_rows.size());
 	}
 
 	void eval_fun(const V *req_x, V *res_y, bool aggregate = false)
