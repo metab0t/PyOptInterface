@@ -102,10 +102,10 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/highs/lib`
     - `/opt/highs/lib`
 *   - KNITRO
-    - `C:\Program Files\Artelys\KNITRO 16.0\lib`
-    - `/opt/knitro/16.0/lib`
-    - `/opt/knitro/16.0/lib`
-    - `/opt/knitro/16.0/lib`
+    - `C:\Program Files\Artelys\KNITRO 15.1\lib`
+    - `/opt/knitro/15.1/lib`
+    - `/opt/knitro/15.1/lib`
+    - `/opt/knitro/15.1/lib`
 :::
 
 ### Gurobi
@@ -164,7 +164,7 @@ We recommend using the official binary from [GitHub](https://github.com/coin-or/
 
 ### KNITRO
 
-The currently supported version is **16.0.x**. Other versions may work but are not tested.
+The currently supported version is **15.1.x**. Other versions may work but are not tested.
 
 For KNITRO, the automatic detection looks for the following things in order:
 1. The environment variable `KNITRODIR` set by the installer of KNITRO
@@ -239,10 +239,10 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/highs/lib/libhighs.dylib`
     - `/opt/highs/lib/libhighs.dylib`
 *   - KNITRO
-    - `C:\Program Files\Artelys\KNITRO 16.0\lib\knitro.dll`
-    - `/opt/knitro/16.0/lib/libknitro.so`
-    - `/opt/knitro/16.0/lib/libknitro.dylib`
-    - `/opt/knitro/16.0/lib/libknitro.dylib`
+    - `C:\Program Files\Artelys\KNITRO 15.1\lib\knitro.dll`
+    - `/opt/knitro/15.1/lib/libknitro.so`
+    - `/opt/knitro/15.1/lib/libknitro.dylib`
+    - `/opt/knitro/15.1/lib/libknitro.dylib`
 :::
 
 ## Let's build a simple model and solve it
