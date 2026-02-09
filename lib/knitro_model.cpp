@@ -409,14 +409,15 @@ void KNITROModel::_set_second_order_cone_constraint(const ConstraintIndex &const
 	error = knitro::KN_add_con_quadratic_term(m_kc.get(), indexCon, indexVar0, indexVar0, 1.0);
 	check_error(error);
 	size_t nnz = variables.size() - 1;
+	std::vector<KNINT> indexCons(nnz, indexCon);
 	std::vector<KNINT> indexVars(nnz);
 	for (size_t i = 0; i < nnz; ++i)
 	{
 		indexVars[i] = _variable_index(variables[i + 1]);
 	}
 	std::vector<double> coefs(nnz, -1.0);
-	error = knitro::KN_add_con_quadratic_struct_one(m_kc.get(), nnz, indexCon, indexVars.data(),
-	                                                indexVars.data(), coefs.data());
+	error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars.data(),
+	                                            indexVars.data(), coefs.data());
 	check_error(error);
 
 	m_soc_aux_cons[indexCon] = indexCon0;
@@ -451,14 +452,15 @@ void KNITROModel::_set_second_order_cone_constraint_rotated(const ConstraintInde
 	check_error(error);
 
 	size_t nnz = variables.size() - 2;
+	std::vector<KNINT> indexCons(nnz, indexCon);
 	std::vector<KNINT> indexVars(nnz);
 	for (size_t i = 0; i < nnz; ++i)
 	{
 		indexVars[i] = _variable_index(variables[i + 2]);
 	}
 	std::vector<double> coefs(nnz, -1.0);
-	error = knitro::KN_add_con_quadratic_struct_one(m_kc.get(), nnz, indexCon, indexVars.data(),
-	                                                indexVars.data(), coefs.data());
+	error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars.data(),
+	                                            indexVars.data(), coefs.data());
 	check_error(error);
 	error = knitro::KN_add_con_quadratic_term(m_kc.get(), indexCon, indexVar0, indexVar1, 2.0);
 	check_error(error);
@@ -636,10 +638,12 @@ void KNITROModel::_set_linear_constraint(const ConstraintIndex &constraint,
 	KNLONG nnz = ptr_form.numnz;
 	if (nnz > 0)
 	{
+		std::vector<KNINT> indexCons(nnz, indexCon);
 		KNINT *indexVars = ptr_form.index;
 		double *coefs = ptr_form.value;
 
-		error = knitro::KN_add_con_linear_struct_one(m_kc.get(), nnz, indexCon, indexVars, coefs);
+		error =
+		    knitro::KN_add_con_linear_struct(m_kc.get(), nnz, indexCons.data(), indexVars, coefs);
 		check_error(error);
 	}
 }
@@ -660,11 +664,12 @@ void KNITROModel::_set_quadratic_constraint(const ConstraintIndex &constraint,
 	KNLONG nnz = ptr_form.numnz;
 	if (nnz > 0)
 	{
+		std::vector<KNINT> indexCons(nnz, indexCon);
 		KNINT *indexVars1 = ptr_form.row;
 		KNINT *indexVars2 = ptr_form.col;
 		double *coefs = ptr_form.value;
-		error = knitro::KN_add_con_quadratic_struct_one(m_kc.get(), nnz, indexCon, indexVars1,
-		                                                indexVars2, coefs);
+		error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars1,
+		                                            indexVars2, coefs);
 		check_error(error);
 	}
 }
@@ -836,8 +841,7 @@ double KNITROModel::get_obj_value()
 	return m_result.obj_val;
 }
 
-void KNITROModel::_add_constraint_callback(ExpressionGraph *graph,
-                                           const Outputs &outputs)
+void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const Outputs &outputs)
 {
 	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
@@ -861,8 +865,7 @@ void KNITROModel::_add_constraint_callback(ExpressionGraph *graph,
 	_add_callback_impl(*graph, outputs.con_idxs, outputs.cons, trace, f, g, h);
 }
 
-void KNITROModel::_add_objective_callback(ExpressionGraph *graph,
-                                          const Outputs &outputs)
+void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs &outputs)
 {
 	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {

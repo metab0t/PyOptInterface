@@ -22,7 +22,7 @@ NB_MODULE(knitro_model_ext, m)
 	nb::class_<KNITROModel>(m, "RawModel")
 	    .def(nb::init<>())
 
-		// clang-format off
+	    // clang-format off
 		BIND_F(init)
 		BIND_F(close)
 		BIND_F(get_infinity)
@@ -32,8 +32,8 @@ NB_MODULE(knitro_model_ext, m)
 	    .def_ro("n_cons", &KNITROModel::n_cons)
 	    .def_ro("n_lincons", &KNITROModel::n_lincons)
 	    .def_ro("n_quadcons", &KNITROModel::n_quadcons)
-		.def_ro("n_coniccons", &KNITROModel::n_coniccons)
-		.def_ro("n_nlcons", &KNITROModel::n_nlcons)
+	    .def_ro("n_coniccons", &KNITROModel::n_coniccons)
+	    .def_ro("n_nlcons", &KNITROModel::n_nlcons)
 
 	    .def("add_variable", &KNITROModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -KN_INFINITY,
@@ -123,9 +123,9 @@ NB_MODULE(knitro_model_ext, m)
 	    .def("_add_single_nl_constraint", &KNITROModel::add_single_nl_constraint_from_comparison,
 	         nb::arg("graph"), nb::arg("expr"), nb::arg("name") = "")
 
-		// clang-format off
+	    // clang-format off
 	    BIND_F(delete_constraint)
-		// clang-format on
+	    // clang-format on
 
 	    .def("set_objective",
 	         nb::overload_cast<const ScalarAffineFunction &, ObjectiveSense>(

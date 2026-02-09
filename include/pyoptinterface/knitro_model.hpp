@@ -19,9 +19,6 @@
 	B(KN_new);                          \
 	B(KN_free);                         \
 	B(KN_update);                       \
-	B(KN_reset_params_to_defaults);     \
-	B(KN_load_param_file);              \
-	B(KN_save_param_file);              \
 	B(KN_get_param_id);                 \
 	B(KN_get_param_type);               \
 	B(KN_set_int_param);                \
@@ -46,7 +43,6 @@
 	B(KN_set_con_eqbnd);                \
 	B(KN_get_con_lobnd);                \
 	B(KN_get_con_upbnd);                \
-	B(KN_get_con_eqbnd);                \
 	B(KN_set_con_name);                 \
 	B(KN_get_con_name);                 \
 	B(KN_set_obj_goal);                 \
@@ -62,14 +58,9 @@
 	B(KN_del_obj_quadratic_struct_all); \
 	B(KN_add_con_constant);             \
 	B(KN_add_con_linear_struct);        \
-	B(KN_add_con_linear_struct_one);    \
 	B(KN_add_con_linear_term);          \
 	B(KN_add_con_quadratic_struct);     \
-	B(KN_add_con_quadratic_struct_one); \
 	B(KN_add_con_quadratic_term);       \
-	B(KN_add_con_L2norm);               \
-	B(KN_del_con_linear_struct);        \
-	B(KN_del_con_quadratic_struct);     \
 	B(KN_chg_con_linear_term);          \
 	B(KN_add_eval_callback);            \
 	B(KN_del_obj_eval_callback_all);    \
@@ -78,17 +69,12 @@
 	B(KN_set_cb_grad);                  \
 	B(KN_set_cb_hess);                  \
 	B(KN_solve);                        \
-	B(KN_get_solution);                 \
 	B(KN_get_obj_value);                \
 	B(KN_get_number_cons);              \
 	B(KN_get_number_vars);              \
-	B(KN_get_var_primal_values);        \
 	B(KN_get_var_primal_values_all);    \
-	B(KN_get_var_dual_values);          \
 	B(KN_get_var_dual_values_all);      \
-	B(KN_get_con_values);               \
 	B(KN_get_con_values_all);           \
-	B(KN_get_con_dual_values);          \
 	B(KN_get_con_dual_values_all);
 
 namespace knitro
