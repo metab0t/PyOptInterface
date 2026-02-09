@@ -13,7 +13,7 @@
     - ✅
     - ✅
 *   - DualStatus
-    - ✅
+    - ❌
     - ❌
 *   - PrimalStatus
     - ✅
@@ -25,25 +25,25 @@
     - ✅
     - ❌
 *   - BarrierIterations
-    - ❌
+    - ✅
     - ❌
 *   - DualObjectiveValue
     - ❌
     - ❌
 *   - NodeCount
-    - ❌
+    - ✅
     - ❌
 *   - NumberOfThreads
     - ✅
     - ✅
 *   - ObjectiveBound
-    - ❌
+    - ✅
     - ❌
 *   - ObjectiveValue
     - ✅
     - ❌
 *   - RelativeGap
-    - ❌
+    - ✅
     - ❌
 *   - Silent
     - ❌
@@ -52,13 +52,13 @@
     - ❌
     - ❌
 *   - SolverName
-    - ❌
+    - ✅
     - ❌
 *   - SolverVersion
-    - ❌
+    - ✅
     - ❌
 *   - SolveTimeSec
-    - ❌
+    - ✅
     - ❌
 *   - TimeLimitSec
     - ✅

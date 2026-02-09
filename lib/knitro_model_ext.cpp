@@ -26,6 +26,13 @@ NB_MODULE(knitro_model_ext, m)
 		BIND_F(init)
 		BIND_F(close)
 		BIND_F(get_infinity)
+		BIND_F(get_number_iterations)
+		BIND_F(get_mip_node_count)
+		BIND_F(get_obj_bound)
+		BIND_F(get_mip_relative_gap)
+		BIND_F(get_solve_time)
+		BIND_F(get_solver_name)
+		BIND_F(get_release)
 	    // clang-format on
 
 	    .def_ro("n_vars", &KNITROModel::n_vars)

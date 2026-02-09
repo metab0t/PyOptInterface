@@ -131,16 +131,16 @@ constraint_attribute_set_func_map = {
 _RAW_STATUS_STRINGS = [
     (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL),
     (TerminationStatusCode.OPTIMAL, KN.RC_OPTIMAL_OR_SATISFACTORY),
-    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_NEAR_OPT),
-    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_XTOL),
-    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_NO_IMPROVE),
-    (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_FTOL),
+    (TerminationStatusCode.ALMOST_OPTIMAL, KN.RC_NEAR_OPT),
+    (TerminationStatusCode.ALMOST_OPTIMAL, KN.RC_FEAS_XTOL),
+    (TerminationStatusCode.ALMOST_OPTIMAL, KN.RC_FEAS_NO_IMPROVE),
+    (TerminationStatusCode.ALMOST_OPTIMAL, KN.RC_FEAS_FTOL),
     (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_BEST),
     (TerminationStatusCode.LOCALLY_SOLVED, KN.RC_FEAS_MULTISTART),
     (TerminationStatusCode.INFEASIBLE, KN.RC_INFEASIBLE),
-    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_XTOL),
-    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_NO_IMPROVE),
-    (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_MULTISTART),
+    (TerminationStatusCode.LOCALLY_INFEASIBLE, KN.RC_INFEAS_XTOL),
+    (TerminationStatusCode.LOCALLY_INFEASIBLE, KN.RC_INFEAS_NO_IMPROVE),
+    (TerminationStatusCode.LOCALLY_INFEASIBLE, KN.RC_INFEAS_MULTISTART),
     (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_CON_BOUNDS),
     (TerminationStatusCode.INFEASIBLE, KN.RC_INFEAS_VAR_BOUNDS),
     (TerminationStatusCode.DUAL_INFEASIBLE, KN.RC_UNBOUNDED),
@@ -151,8 +151,8 @@ _RAW_STATUS_STRINGS = [
     (TerminationStatusCode.TIME_LIMIT, KN.RC_TIME_LIMIT_INFEAS),
     (TerminationStatusCode.OTHER_LIMIT, KN.RC_FEVAL_LIMIT_FEAS),
     (TerminationStatusCode.OTHER_LIMIT, KN.RC_FEVAL_LIMIT_INFEAS),
-    (TerminationStatusCode.SOLUTION_LIMIT, KN.RC_MIP_EXH_FEAS),
-    (TerminationStatusCode.SOLUTION_LIMIT, KN.RC_MIP_EXH_INFEAS),
+    (TerminationStatusCode.OTHER_LIMIT, KN.RC_MIP_EXH_FEAS),
+    (TerminationStatusCode.OTHER_LIMIT, KN.RC_MIP_EXH_INFEAS),
     (TerminationStatusCode.NODE_LIMIT, KN.RC_MIP_NODE_LIMIT_FEAS),
     (TerminationStatusCode.NODE_LIMIT, KN.RC_MIP_NODE_LIMIT_INFEAS),
     (TerminationStatusCode.INTERRUPTED, KN.RC_USER_TERMINATION),
@@ -225,16 +225,23 @@ model_attribute_get_func_map = {
     ModelAttribute.RawStatusString: lambda model: (
         f"KNITRO status code: {model.m_solve_status}"
     ),
-    ModelAttribute.DualStatus: _result_status_knitro,
     ModelAttribute.PrimalStatus: _result_status_knitro,
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter(KN.PARAM_THREADS),
     ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter(KN.PARAM_TIME_LIMIT),
+    # TODO: Bind this in C++
+    ModelAttribute.BarrierIterations: lambda model: model.get_number_iterations(),
+    ModelAttribute.NodeCount: lambda model: model.get_mip_node_count(),
+    ModelAttribute.ObjectiveBound: lambda model: model.get_obj_bound(),
+    ModelAttribute.RelativeGap: lambda model: model.get_mip_relative_gap(),
+    ModelAttribute.SolverName: lambda model: model.get_solver_name(),
+    ModelAttribute.SolverVersion: lambda model: model.get_release(),
+    ModelAttribute.SolveTimeSec: lambda model: model.get_solve_time(),
 }
 
 model_attribute_set_func_map = {
     ModelAttribute.ObjectiveSense: lambda model, x: model.set_obj_sense(x),
     ModelAttribute.NumberOfThreads: lambda model, x: model.set_raw_parameter(KN.PARAM_THREADS, x),
-    ModelAttribute.Silent: lambda model, x: model.set_raw_parameter(KN.PARAM_OUTLEV, KN.OUTLEV_NONE if x else KN.OUTLEV_ITER),
+    ModelAttribute.Silent: lambda model, x: model.set_raw_parameter(KN.PARAM_OUTLEV, KN.OUTLEV_NONE if x else KN.OUTLEV_ITER_10),
     ModelAttribute.TimeLimitSec: lambda model, x: model.set_raw_parameter(KN.PARAM_TIME_LIMIT, x),
 }
 

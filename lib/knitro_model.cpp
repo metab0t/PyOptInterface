@@ -87,6 +87,64 @@ double KNITROModel::get_infinity() const
 	return KN_INFINITY;
 }
 
+size_t KNITROModel::get_number_iterations()
+{
+	int error;
+	int iters;
+
+	error = knitro::KN_get_number_iters(m_kc.get(), &iters);
+	check_error(error);
+	return static_cast<size_t>(iters);
+}
+
+size_t KNITROModel::get_mip_node_count()
+{
+	int error;
+	int nodes;
+
+	error = knitro::KN_get_mip_number_nodes(m_kc.get(), &nodes);
+	check_error(error);
+	return static_cast<size_t>(nodes);
+}
+
+double KNITROModel::get_obj_bound()
+{
+	double bound;
+	int error = knitro::KN_get_mip_relaxation_bnd(m_kc.get(), &bound);
+	check_error(error);
+	return bound;
+}
+
+double KNITROModel::get_mip_relative_gap()
+{
+	double gap;
+	int error = knitro::KN_get_mip_rel_gap(m_kc.get(), &gap);
+	check_error(error);
+	return gap;
+}
+
+double KNITROModel::get_solve_time()
+{
+	double time;
+	int error = knitro::KN_get_solve_time_real(m_kc.get(), &time);
+	check_error(error);
+	return time;
+}
+
+std::string KNITROModel::get_solver_name()
+{
+	return std::string("KNITRO");
+}
+
+std::string KNITROModel::get_release()
+{
+	constexpr int buf_size = 20;
+	char release[buf_size];
+	int error = knitro::KN_get_release(buf_size, release);
+	check_error(error);
+	return std::string(release);
+}
+
 VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double ub,
                                         const char *name)
 {

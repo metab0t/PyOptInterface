@@ -75,7 +75,13 @@
 	B(KN_get_var_primal_values_all);    \
 	B(KN_get_var_dual_values_all);      \
 	B(KN_get_con_values_all);           \
-	B(KN_get_con_dual_values_all);
+	B(KN_get_con_dual_values_all);      \
+	B(KN_get_number_iters);             \
+	B(KN_get_mip_number_nodes);         \
+	B(KN_get_mip_relaxation_bnd);       \
+	B(KN_get_mip_rel_gap);              \
+	B(KN_get_solve_time_real);          \
+	B(KN_get_release);
 
 namespace knitro
 {
@@ -234,8 +240,7 @@ struct CallbackEvaluator
 		}
 	}
 
-	void eval_hess(const V *req_x, const V *req_w, V *res_hess,
-	               bool aggregate = false)
+	void eval_hess(const V *req_x, const V *req_w, V *res_hess, bool aggregate = false)
 	{
 		for (size_t i = 0; i < indexVars.size(); i++)
 		{
@@ -323,6 +328,13 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	double get_infinity() const;
 	KNINT _variable_index(const VariableIndex &variable);
 	KNINT _constraint_index(const ConstraintIndex &constraint);
+	size_t get_number_iterations();
+	size_t get_mip_node_count();
+	double get_obj_bound();
+	double get_mip_relative_gap();
+	double get_solve_time();
+	std::string get_solver_name();
+	std::string get_release();
 
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -KN_INFINITY, double ub = KN_INFINITY,
