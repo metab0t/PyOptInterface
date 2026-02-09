@@ -143,68 +143,99 @@ struct CallbackPattern
 template <typename V>
 struct CallbackEvaluator
 {
+	constexpr static std::string jac_coloring_ = "cppad";
+	constexpr static std::string hess_coloring_ = "cppad";
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
 	CppAD::ADFun<V> fun;
 
 	std::vector<size_t> fun_rows;
-	std::vector<std::set<size_t>> jac_pattern;
-	std::vector<size_t> jac_rows;
-	std::vector<size_t> jac_cols;
-	CppAD::sparse_jacobian_work jac_work;
-	std::vector<std::set<size_t>> hess_pattern;
-	std::vector<size_t> hess_rows;
-	std::vector<size_t> hess_cols;
-	CppAD::sparse_hessian_work hess_work;
+	CppAD::sparse_rc<std::vector<size_t>> jac_pattern_;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac_;
+	CppAD::sparse_jac_work jac_work_;
+	CppAD::sparse_rc<std::vector<size_t>> hess_pattern_;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hess_;
+	CppAD::sparse_hes_work hess_work_;
+
+	// std::vector<std::set<size_t>> jac_pattern;
+	// std::vector<size_t> jac_rows;
+	// std::vector<size_t> jac_cols;
+	// CppAD::sparse_jacobian_work jac_work;
+	// std::vector<std::set<size_t>> hess_pattern;
+	// std::vector<size_t> hess_rows;
+	// std::vector<size_t> hess_cols;
+	// CppAD::sparse_hessian_work hess_work;
 
 	std::vector<V> x;
-	std::vector<V> jac;
 	std::vector<V> w;
-	std::vector<V> hess;
+
+	// std::vector<V> jac;
+	// std::vector<V> hess;
 
 	void setup()
 	{
 		fun.optimize();
-		size_t m = fun_rows.size();
-		std::vector<std::set<size_t>> jac_sparsity(m);
-		for (size_t k = 0; k < m; k++)
+		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(fun.Range(), fun_rows.size(), fun_rows.size());
+		for (size_t k = 0; k < fun_rows.size(); k++)
 		{
-			jac_sparsity[k].insert(fun_rows[k]);
+			jac_pattern_in.set(k, fun_rows[k], fun_rows[k]);
 		}
-		jac_pattern = fun.RevSparseJac(jac_sparsity.size(), jac_sparsity);
-		for (size_t k = 0; k < jac_pattern.size(); k++)
-		{
-			for (size_t i : jac_pattern[k])
-			{
-				jac_rows.push_back(fun_rows[k]);
-				jac_cols.push_back(i);
-			}
-		}
-		std::vector<std::set<size_t>> r_hess_sparsity(fun.Domain());
+		fun.rev_jac_sparsity(jac_pattern_in, false, false, true, jac_pattern_);
+		jac_pattern_in.resize(fun.Domain(), fun.Domain(), fun.Domain());
 		for (size_t i = 0; i < fun.Domain(); i++)
 		{
-			r_hess_sparsity[i].insert(i);
+			jac_pattern_in.set(i, i, i);
 		}
-		fun.ForSparseJac(fun.Domain(), r_hess_sparsity);
-		std::vector<std::set<size_t>> hess_sparsity(1);
-		for (size_t k = 0; k < m; k++)
+		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_out;
+		fun.for_jac_sparsity(jac_pattern_in, false, false, true, jac_pattern_out);
+		std::vector<bool> select_rows(fun.Range(), false);
+		for (size_t k = 0; k < fun_rows.size(); k++)
 		{
-			hess_sparsity[0].insert(fun_rows[k]);
+			select_rows[fun_rows[k]] = true;
 		}
-		hess_pattern = fun.RevSparseHes(r_hess_sparsity.size(), hess_sparsity);
-		for (size_t k = 0; k < hess_pattern.size(); k++)
-		{
-			for (size_t i : hess_pattern[k])
-			{
-				hess_rows.push_back(k);
-				hess_cols.push_back(i);
-			}
-		}
-		x.resize(indexVars.size());
-		jac.resize(jac_rows.size());
+		fun.rev_hes_sparsity(select_rows, false, true, hess_pattern_);
+		// size_t m = fun_rows.size();
+		// std::vector<std::set<size_t>> jac_sparsity(m);
+		// for (size_t k = 0; k < m; k++)
+		// {
+		// 	jac_sparsity[k].insert(fun_rows[k]);
+		// }
+		// jac_pattern = fun.RevSparseJac(jac_sparsity.size(), jac_sparsity);
+		// for (size_t k = 0; k < jac_pattern.size(); k++)
+		// {
+		// 	for (size_t i : jac_pattern[k])
+		// 	{
+		// 		jac_rows.push_back(fun_rows[k]);
+		// 		jac_cols.push_back(i);
+		// 	}
+		// }
+		// std::vector<std::set<size_t>> r_hess_sparsity(fun.Domain());
+		// for (size_t i = 0; i < fun.Domain(); i++)
+		// {
+		// 	r_hess_sparsity[i].insert(i);
+		// }
+		// fun.ForSparseJac(fun.Domain(), r_hess_sparsity);
+		// std::vector<std::set<size_t>> hess_sparsity(1);
+		// for (size_t k = 0; k < m; k++)
+		// {
+		// 	hess_sparsity[0].insert(fun_rows[k]);
+		// }
+		// hess_pattern = fun.RevSparseHes(r_hess_sparsity.size(), hess_sparsity);
+		// for (size_t k = 0; k < hess_pattern.size(); k++)
+		// {
+		// 	for (size_t i : hess_pattern[k])
+		// 	{
+		// 		hess_rows.push_back(k);
+		// 		hess_cols.push_back(i);
+		// 	}
+		// }
+		x.resize(fun.Domain(), 0.0);
 		w.resize(fun.Range(), 0.0);
-		hess.resize(hess_rows.size());
+		jac_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jac_pattern_);
+		hess_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hess_pattern_);
+		// jac.resize(jac_rows.size());
+		// hess.resize(hess_rows.size());
 	}
 
 	void eval_fun(const V *req_x, V *res_y, bool aggregate = false)
@@ -233,8 +264,9 @@ struct CallbackEvaluator
 		{
 			x[i] = req_x[indexVars[i]];
 		}
-		fun.SparseJacobianReverse(x, jac_pattern, jac_rows, jac_cols, jac, jac_work);
-		for (size_t i = 0; i < jac.size(); i++)
+		fun.sparse_jac_rev(x, jac_, jac_pattern_, jac_coloring_, jac_work_);
+		auto jac = jac_.val();
+		for (size_t i = 0; i < jac_.nnz(); i++)
 		{
 			res_jac[i] = jac[i];
 		}
@@ -257,8 +289,9 @@ struct CallbackEvaluator
 				w[fun_rows[k]] = req_w[indexCons[k]];
 			}
 		}
-		fun.SparseHessian(x, w, hess_pattern, hess_rows, hess_cols, hess, hess_work);
-		for (size_t i = 0; i < hess.size(); i++)
+		fun.sparse_hes(x, w, hess_, hess_pattern_, hess_coloring_, hess_work_);
+		auto hess = hess_.val();
+		for (size_t i = 0; i < hess_.nnz(); i++)
 		{
 			res_hess[i] = hess[i];
 		}
@@ -269,36 +302,55 @@ struct CallbackEvaluator
 		CallbackPattern pattern;
 		pattern.indexCons = indexCons;
 
+		auto jac_rows = jac_pattern_.row();
+		auto jac_cols = jac_pattern_.col();
 		if (indexCons.empty())
 		{
-			for (size_t k = 0; k < jac_pattern.size(); k++)
+			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
 			{
-				for (size_t i : jac_pattern[k])
-				{
-					pattern.objGradIndexVars.push_back(indexVars[i]);
-				}
+				pattern.objGradIndexVars.push_back(indexVars[jac_cols[k]]);
 			}
+			// for (size_t k = 0; k < jac_pattern.size(); k++)
+			// {
+			// 	for (size_t i : jac_pattern[k])
+			// 	{
+			// 		pattern.objGradIndexVars.push_back(indexVars[i]);
+			// 	}
+			// }
 		}
 		else
 		{
-			for (size_t k = 0; k < jac_pattern.size(); k++)
+			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
 			{
-				for (size_t i : jac_pattern[k])
-				{
-					pattern.jacIndexCons.push_back(indexCons[k]);
-					pattern.jacIndexVars.push_back(indexVars[i]);
-				}
+				pattern.jacIndexCons.push_back(indexCons[jac_rows[k]]);
+				pattern.jacIndexVars.push_back(indexVars[jac_cols[k]]);
 			}
+			// for (size_t k = 0; k < jac_pattern.size(); k++)
+			// {
+			// 	for (size_t i : jac_pattern[k])
+			// 	{
+			// 		pattern.jacIndexCons.push_back(indexCons[k]);
+			// 		pattern.jacIndexVars.push_back(indexVars[i]);
+			// 	}
+			// }
 		}
 
-		for (size_t k = 0; k < hess_pattern.size(); k++)
+		auto hess_rows = hess_pattern_.row();
+		auto hess_cols = hess_pattern_.col();
+		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
 		{
-			for (size_t i : hess_pattern[k])
-			{
-				pattern.hessIndexVars1.push_back(indexVars[k]);
-				pattern.hessIndexVars2.push_back(indexVars[i]);
-			}
+			pattern.hessIndexVars1.push_back(indexVars[hess_rows[k]]);
+			pattern.hessIndexVars2.push_back(indexVars[hess_cols[k]]);
 		}
+
+		// for (size_t k = 0; k < hess_pattern.size(); k++)
+		// {
+		// 	for (size_t i : hess_pattern[k])
+		// 	{
+		// 		pattern.hessIndexVars1.push_back(indexVars[k]);
+		// 		pattern.hessIndexVars2.push_back(indexVars[i]);
+		// 	}
+		// }
 
 		return pattern;
 	}
