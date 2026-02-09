@@ -1,4 +1,4 @@
-from pyoptinterface import copt, ipopt, nl
+from pyoptinterface import copt, ipopt, knitro, nl
 import pytest
 import math
 
@@ -52,3 +52,4 @@ if __name__ == "__main__":
     test_nlp_reopt(llvm)
 
     test_nlp_reopt(copt.Model)
+    test_nlp_reopt(knitro.Model)

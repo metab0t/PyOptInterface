@@ -1,4 +1,3 @@
-import pyoptinterface as poi
 from pyoptinterface import nl
 
 import math
@@ -72,7 +71,7 @@ def test_rocket(nlp_model_ctor):
 
 
 if __name__ == "__main__":
-    from pyoptinterface import copt, ipopt
+    from pyoptinterface import copt, ipopt, knitro
 
     def c():
         return ipopt.Model(jit="C")
@@ -85,3 +84,5 @@ if __name__ == "__main__":
     test_rocket(llvm)
 
     test_rocket(copt.Model)
+
+    test_rocket(knitro.Model)
