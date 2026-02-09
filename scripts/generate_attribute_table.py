@@ -19,15 +19,13 @@ emoji_map = {True: "✅", False: "❌"}
 
 
 def print_table(io: IO[str], results):
-    io.write(
-        """:::{list-table}
+    io.write(""":::{list-table}
 :header-rows: 1
 
 *   - Attribute
     - Get
     - Set
-"""
-    )
+""")
 
     for attribute, support_get, support_set in results:
         io.write(f"*   - {attribute.name}\n")

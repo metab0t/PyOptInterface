@@ -26,6 +26,7 @@ if copt.is_library_loaded():
 if knitro.is_library_loaded():
     nlp_model_dict["knitro"] = knitro.Model
 
+
 @pytest.fixture(params=nlp_model_dict.keys())
 def nlp_model_ctor(request):
     name = request.param
@@ -54,4 +55,3 @@ def model_interface(request):
     name = request.param
     model_interface_class = model_interface_dict[name]
     return model_interface_class()
-

@@ -36,8 +36,7 @@ compare_ops_string = {
 
 
 def generate_csrc_prelude(io: IO[str]):
-    io.write(
-        """// includes
+    io.write("""// includes
 #include <stddef.h>
 
 // typedefs
@@ -77,8 +76,7 @@ float_point_t sign(float_point_t x)
     if( x == 0.0 ) return 0.0;
     return -1.0;
 }
-"""
-    )
+""")
 
 
 def generate_csrc_from_graph(
@@ -149,49 +147,41 @@ void {name}(
     else:
         nx = n_dynamic_ind + n_variable_ind - np - nw
     ny = n_dependent
-    io.write(
-        f"""{{
+    io.write(f"""{{
     // begin function body
 
     // size checks
     // const size_t nx = {nx};
     // const size_t np = {np};
     // const size_t ny = {ny};
-"""
-    )
+""")
     if hessian_lagrange:
         io.write(f"    // const size_t nw = {nw};\n")
 
-    io.write(
-        f"""
+    io.write(f"""
     // declare variables
     float_point_t v[{n_node}];
-    """
-    )
+    """)
 
     nc = n_constant
     if nc > 0:
         cs = (graph_obj.constant_vec_get(i) for i in range(nc))
         cs_str = ", ".join(f"{c}" for c in cs)
-        io.write(
-            f"""
+        io.write(f"""
     // constants
     // set c[i] for i = 0, ..., nc-1
     // nc = {nc}
     static const float_point_t c[{nc}] = {{
         {cs_str}
     }};
-"""
-        )
+""")
 
     n_result_node = n_node
-    io.write(
-        f"""
+    io.write(f"""
     // result nodes
     // set v[i] for i = 0, ..., n_result_node-1
     // n_result_node = {n_result_node}
-"""
-    )
+""")
 
     def get_node_name(node: int) -> str:
         if node < 1:
@@ -275,12 +265,10 @@ void {name}(
 
         result_node += n_result
 
-    io.write(
-        """
+    io.write("""
     // dependent variables
     // set y[i] for i = 0, ny-1
-"""
-    )
+""")
 
     op = "="
     if add_y:
@@ -294,9 +282,7 @@ void {name}(
             assignment = f"    y[{i}] {op} {node_name};\n"
         io.write(assignment)
 
-    io.write(
-        """
+    io.write("""
     // end function body
 }
-"""
-    )
+""")

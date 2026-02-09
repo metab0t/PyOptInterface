@@ -42,7 +42,9 @@ def test_clnlbeam(nlp_model_ctor):
 
     con_expr_val = np.zeros(N)
     for i in range(N):
-        con_expr_val[i] = xv[i + 1] - xv[i] - 0.5 * h * (np.sin(tv[i]) + np.sin(tv[i + 1]))
+        con_expr_val[i] = (
+            xv[i + 1] - xv[i] - 0.5 * h * (np.sin(tv[i]) + np.sin(tv[i + 1]))
+        )
 
     assert np.allclose(con_expr_val, 0.0, atol=1e-8)
 
@@ -60,7 +62,6 @@ def test_clnlbeam(nlp_model_ctor):
     objective_value = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
 
     assert np.isclose(obj_expr_val, objective_value, atol=1e-8)
-    assert (
-        objective_value == pytest.approx(328.0967, abs=1e-4)
-        or objective_value == pytest.approx(350.0, abs=1e-8)
-    )
+    assert objective_value == pytest.approx(
+        328.0967, abs=1e-4
+    ) or objective_value == pytest.approx(350.0, abs=1e-8)
