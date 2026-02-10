@@ -261,13 +261,6 @@ struct CallbackEvaluator
 			{
 				pattern.objGradIndexVars.push_back(indexVars[jac_cols[k]]);
 			}
-			// for (size_t k = 0; k < jac_pattern.size(); k++)
-			// {
-			// 	for (size_t i : jac_pattern[k])
-			// 	{
-			// 		pattern.objGradIndexVars.push_back(indexVars[i]);
-			// 	}
-			// }
 		}
 		else
 		{
@@ -276,14 +269,6 @@ struct CallbackEvaluator
 				pattern.jacIndexCons.push_back(indexCons[jac_rows[k]]);
 				pattern.jacIndexVars.push_back(indexVars[jac_cols[k]]);
 			}
-			// for (size_t k = 0; k < jac_pattern.size(); k++)
-			// {
-			// 	for (size_t i : jac_pattern[k])
-			// 	{
-			// 		pattern.jacIndexCons.push_back(indexCons[k]);
-			// 		pattern.jacIndexVars.push_back(indexVars[i]);
-			// 	}
-			// }
 		}
 
 		auto hess_rows = hess_pattern_.row();
@@ -293,15 +278,6 @@ struct CallbackEvaluator
 			pattern.hessIndexVars1.push_back(indexVars[hess_rows[k]]);
 			pattern.hessIndexVars2.push_back(indexVars[hess_cols[k]]);
 		}
-
-		// for (size_t k = 0; k < hess_pattern.size(); k++)
-		// {
-		// 	for (size_t i : hess_pattern[k])
-		// 	{
-		// 		pattern.hessIndexVars1.push_back(indexVars[k]);
-		// 		pattern.hessIndexVars2.push_back(indexVars[i]);
-		// 	}
-		// }
 
 		return pattern;
 	}
