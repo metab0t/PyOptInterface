@@ -369,6 +369,12 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">/opt/highs/lib</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/opt/highs/lib</span></code></p></td>
 </tr>
+<tr class="row-odd"><td><p>KNITRO</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Artelys\KNITRO</span> <span class="pre">15.1\lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib</span></code></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -429,6 +435,16 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">ipopt.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.so</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.dylib</span></code> in the system, we also look for <code class="docutils literal notranslate"><span class="pre">ipopt-3.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libipopt-3.dll</span></code> on Windows.</p></li>
 </ol>
 <p>We recommend using the official binary from <a class="reference external" href="https://github.com/coin-or/Ipopt/releases">GitHub</a> if you work on Windows, since compiling Ipopt on Windows from source is not an easy task.</p>
+</section>
+<section id="knitro">
+<h3>KNITRO<a class="headerlink" href="#knitro" title="Link to this heading">¶</a></h3>
+<p>The currently supported version is <strong>15.1.x</strong>. Other versions may work but are not tested.</p>
+<p>For KNITRO, the automatic detection looks for the following things in order:</p>
+<ol class="arabic simple">
+<li><p>The environment variable <code class="docutils literal notranslate"><span class="pre">KNITRODIR</span></code> set by the installer of KNITRO</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">knitro.dll</span></code>/<code class="docutils literal notranslate"><span class="pre">libknitro.so</span></code>/<code class="docutils literal notranslate"><span class="pre">libknitro.dylib</span></code> in the system loadable path</p></li>
+<li><p>The installation of <code class="docutils literal notranslate"><span class="pre">knitro</span></code> PyPI package.</p></li>
+</ol>
 </section>
 </section>
 <section id="manually-specifying-the-path-of-the-dynamic-library-of-optimizer">
@@ -495,6 +511,12 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">/opt/highs/lib/libhighs.so</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/opt/highs/lib/libhighs.dylib</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/opt/highs/lib/libhighs.dylib</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>KNITRO</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files\Artelys\KNITRO</span> <span class="pre">15.1\lib\knitro.dll</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib/libknitro.so</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib/libknitro.dylib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/opt/knitro/15.1/lib/libknitro.dylib</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -689,6 +711,7 @@ obj =  0.6666666666666667
 <li><a class="reference internal" href="#mosek">Mosek</a></li>
 <li><a class="reference internal" href="#highs">HiGHS</a></li>
 <li><a class="reference internal" href="#ipopt">Ipopt</a></li>
+<li><a class="reference internal" href="#knitro">KNITRO</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#manually-specifying-the-path-of-the-dynamic-library-of-optimizer">Manually specifying the path of the dynamic library of optimizer</a></li>

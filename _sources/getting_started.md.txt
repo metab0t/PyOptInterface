@@ -82,7 +82,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/gurobi1100/macos_universal2/lib`
     - `/opt/gurobi1100/macos_universal2/lib`
 *   - Xpress
-    - `C:\xpressmp\bin` 
+    - `C:\xpressmp\bin`
     - `/opt/xpressmp/lib`
     - `/Applications/FICO Xpress/xpressmp/lib`
     - `/Applications/FICO Xpress/xpressmp/lib`
@@ -101,7 +101,11 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/highs/lib`
     - `/opt/highs/lib`
     - `/opt/highs/lib`
-
+*   - KNITRO
+    - `C:\Program Files\Artelys\KNITRO 15.1\lib`
+    - `/opt/knitro/15.1/lib`
+    - `/opt/knitro/15.1/lib`
+    - `/opt/knitro/15.1/lib`
 :::
 
 ### Gurobi
@@ -158,6 +162,15 @@ For Ipopt, the automatic detection looks for the following things in order:
 
 We recommend using the official binary from [GitHub](https://github.com/coin-or/Ipopt/releases) if you work on Windows, since compiling Ipopt on Windows from source is not an easy task.
 
+### KNITRO
+
+The currently supported version is **15.1.x**. Other versions may work but are not tested.
+
+For KNITRO, the automatic detection looks for the following things in order:
+1. The environment variable `KNITRODIR` set by the installer of KNITRO
+2. `knitro.dll`/`libknitro.so`/`libknitro.dylib` in the system loadable path
+3. The installation of `knitro` PyPI package.
+
 ## Manually specifying the path of the dynamic library of optimizer
 
 If the automatic detection fails or you want to use the optimizer in a customized location, you can manually specify the path of the dynamic library of the optimizer.
@@ -211,7 +224,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/copt72/lib/libcopt.dylib`
     - `/opt/copt72/lib/libcopt.dylib`
 *   - Xpress
-    - `C:\xpressmp\bin\xprs.dll` 
+    - `C:\xpressmp\bin\xprs.dll`
     - `/opt/xpressmp/lib/libxprs.so`
     - `/Applications/FICO Xpress/xpressmp/lib/libxprs.dylib`
     - `/Applications/FICO Xpress/xpressmp/lib/libxprs.dylib`
@@ -225,7 +238,11 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `/opt/highs/lib/libhighs.so`
     - `/opt/highs/lib/libhighs.dylib`
     - `/opt/highs/lib/libhighs.dylib`
-
+*   - KNITRO
+    - `C:\Program Files\Artelys\KNITRO 15.1\lib\knitro.dll`
+    - `/opt/knitro/15.1/lib/libknitro.so`
+    - `/opt/knitro/15.1/lib/libknitro.dylib`
+    - `/opt/knitro/15.1/lib/libknitro.dylib`
 :::
 
 ## Let's build a simple model and solve it
