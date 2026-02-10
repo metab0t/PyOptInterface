@@ -64,6 +64,7 @@ It currently supports the following optimizers:
 - [HiGHS](https://github.com/ERGO-Code/HiGHS) ( Open source )
 - [Mosek](https://www.mosek.com/) ( Commercial )
 - [Ipopt](https://github.com/coin-or/Ipopt) ( Open source )
+- [KNITRO](https://www.artelys.com/solvers/knitro/) ( Commercial )
 
 ## Short Example
 ```python
@@ -113,7 +114,7 @@ It uses [nanobind](https://github.com/wjakob/nanobind), [fmtlib](https://github.
 
 The design of PyOptInterface is inspired by [JuMP.jl](https://jump.dev).
 
-Some solver-related code in `src` folder is adapted from the corresponding solver interface package in `JuMP.jl` 
+Some solver-related code in `src` folder is adapted from the corresponding solver interface package in `JuMP.jl`
 ecosystem, which is licensed under MIT License.
 
 The header files in `thirdparty/solvers` directory are from the corresponding distribution of optimizers and are licensed under their own licenses.

@@ -217,7 +217,7 @@ def _result_status_knitro(model: "Model"):
         return ResultStatusCode.INFEASIBLE_POINT
     return ResultStatusCode.NO_SOLUTION
 
-
+# Model Attribute
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),
     ModelAttribute.ObjectiveSense: lambda model: model.get_obj_sense(),
@@ -232,7 +232,6 @@ model_attribute_get_func_map = {
     ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter(
         KN.PARAM_TIME_LIMIT
     ),
-    # TODO: Bind this in C++
     ModelAttribute.BarrierIterations: lambda model: model.get_number_iterations(),
     ModelAttribute.NodeCount: lambda model: model.get_mip_node_count(),
     ModelAttribute.ObjectiveBound: lambda model: model.get_obj_bound(),
