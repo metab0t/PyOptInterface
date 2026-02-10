@@ -129,8 +129,8 @@ struct CallbackPattern
 template <typename V>
 struct CallbackEvaluator
 {
-	constexpr static std::string jac_coloring_ = "cppad";
-	constexpr static std::string hess_coloring_ = "cppad.symmetric";
+	static inline const std::string jac_coloring_ = "cppad";
+	static inline const std::string hess_coloring_ = "cppad.symmetric";
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
