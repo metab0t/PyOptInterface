@@ -277,6 +277,52 @@ struct Outputs
 	std::vector<ConstraintIndex> cons;
 };
 
+inline bool is_name_empty(const char *name)
+{
+	return name == nullptr || name[0] == '\0';
+}
+
+inline int knitro_var_type(VariableDomain domain)
+{
+	switch (domain)
+	{
+	case VariableDomain::Continuous:
+		return KN_VARTYPE_CONTINUOUS;
+	case VariableDomain::Integer:
+		return KN_VARTYPE_INTEGER;
+	case VariableDomain::Binary:
+		return KN_VARTYPE_BINARY;
+	default:
+		throw std::runtime_error("Unknown variable domain");
+	}
+}
+
+inline int knitro_obj_goal(ObjectiveSense sense)
+{
+	switch (sense)
+	{
+	case ObjectiveSense::Minimize:
+		return KN_OBJGOAL_MINIMIZE;
+	case ObjectiveSense::Maximize:
+		return KN_OBJGOAL_MAXIMIZE;
+	default:
+		throw std::runtime_error("Unknown objective sense");
+	}
+}
+
+inline ObjectiveSense knitro_obj_sense(int goal)
+{
+	switch (goal)
+	{
+	case KN_OBJGOAL_MINIMIZE:
+		return ObjectiveSense::Minimize;
+	case KN_OBJGOAL_MAXIMIZE:
+		return ObjectiveSense::Maximize;
+	default:
+		throw std::runtime_error("Unknown objective goal");
+	}
+}
+
 class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
                     public TwosideLinearConstraintMixin<KNITROModel>,
                     public OnesideQuadraticConstraintMixin<KNITROModel>,
@@ -368,34 +414,30 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
 	{
-		int error;
-		int param_id;
-		error = knitro::KN_get_param_id(m_kc.get(), name.c_str(), &param_id);
-		_check_error(error);
+		int param_id = _get_value<const char*, int>(knitro::KN_get_param_id, name.c_str());
 		set_raw_parameter<T>(param_id, value);
 	}
 
 	template <typename T>
 	void set_raw_parameter(int param_id, T value)
 	{
-		int error;
 		if constexpr (std::is_same_v<T, int>)
 		{
-			error = knitro::KN_set_int_param(m_kc.get(), param_id, value);
+			_set_value<int, T>(knitro::KN_set_int_param, param_id, value);
 		}
 		else if constexpr (std::is_same_v<T, double>)
 		{
-			error = knitro::KN_set_double_param(m_kc.get(), param_id, value);
+			_set_value<int, T>(knitro::KN_set_double_param, param_id, value);
 		}
 		else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char *>)
 		{
 			if constexpr (std::is_same_v<T, std::string>)
 			{
-				error = knitro::KN_set_char_param(m_kc.get(), param_id, value.c_str());
+				_set_value<int, const char *>(knitro::KN_set_char_param, param_id, value.c_str());
 			}
 			else
 			{
-				error = knitro::KN_set_char_param(m_kc.get(), param_id, value);
+				_set_value<int, const char *>(knitro::KN_set_char_param, param_id, value);
 			}
 		}
 		else
@@ -404,39 +446,31 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 			                  std::is_same_v<T, std::string> || std::is_same_v<T, const char *>,
 			              "T must be int, double, std::string, or const char*");
 		}
-		_check_error(error);
 	}
 
 	template <typename T>
 	T get_raw_parameter(const std::string &name)
 	{
-		int error;
-		int param_id;
-		error = knitro::KN_get_param_id(m_kc.get(), name.c_str(), &param_id);
-		_check_error(error);
+		int param_id = _get_value<const char*, int>(knitro::KN_get_param_id, name.c_str());
 		return get_raw_parameter<T>(param_id);
 	}
 
 	template <typename T>
 	T get_raw_parameter(int param_id)
 	{
-		int error;
-		T value;
 		if constexpr (std::is_same_v<T, int>)
 		{
-			error = knitro::KN_get_int_param(m_kc.get(), param_id, &value);
+			return _get_value<int, T>(knitro::KN_get_int_param, param_id);
 		}
 		else if constexpr (std::is_same_v<T, double>)
 		{
-			error = knitro::KN_get_double_param(m_kc.get(), param_id, &value);
+			return _get_value<int, T>(knitro::KN_get_double_param, param_id);
 		}
 		else
 		{
 			static_assert(std::is_same_v<T, int> || std::is_same_v<T, double>,
 			              "T must be int or double for get_raw_parameter");
 		}
-		_check_error(error);
-		return value;
 	}
 
 	// Internal helpers
@@ -465,39 +499,6 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 
 	bool m_is_dirty = true;
 	int m_solve_status = 0;
-
-	static bool is_name_empty(const char *name)
-	{
-		return name == nullptr || name[0] == '\0';
-	}
-
-	static int knitro_var_type(VariableDomain domain)
-	{
-		switch (domain)
-		{
-		case VariableDomain::Continuous:
-			return KN_VARTYPE_CONTINUOUS;
-		case VariableDomain::Integer:
-			return KN_VARTYPE_INTEGER;
-		case VariableDomain::Binary:
-			return KN_VARTYPE_BINARY;
-		default:
-			throw std::runtime_error("Unknown variable domain");
-		}
-	}
-
-	static int knitro_obj_goal(ObjectiveSense sense)
-	{
-		switch (sense)
-		{
-		case ObjectiveSense::Minimize:
-			return KN_OBJGOAL_MINIMIZE;
-		case ObjectiveSense::Maximize:
-			return KN_OBJGOAL_MAXIMIZE;
-		default:
-			throw std::runtime_error("Unknown objective sense");
-		}
-	}
 
   private:
 	std::tuple<double, double> _sense_to_interval(ConstraintSense sense, double rhs);
@@ -629,26 +630,6 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	using Getter = std::function<int(KN_context *, V*)>;
 	template <typename V>
 	using Setter = std::function<int(KN_context *, V)>;
-	template <typename V>
-	using IndexGetter = std::function<int(KN_context *, KNINT, V *)>;
-	template <typename V>
-	using IndexSetter = std::function<int(KN_context *, KNINT, V)>;
-
-	template <typename V>
-	V _get_value(IndexGetter<V> get, KNINT index) const
-	{
-		V value;
-		int error = get(m_kc.get(), index, &value);
-		_check_error(error);
-		return value;
-	}
-
-	template <typename V>
-	void _set_value(IndexSetter<V> set, KNINT index, V value)
-	{
-		int error = set(m_kc.get(), index, value);
-		_check_error(error);
-	}
 
 	template <typename V>
 	V _get_value(Getter<V> get) const
@@ -663,6 +644,27 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void _set_value(Setter<V> set, V value)
 	{
 		int error = set(m_kc.get(), value);
+		_check_error(error);
+	}
+
+	template <typename K, typename V>
+	using GetterMap = std::function<int(KN_context *, K, V *)>;
+	template <typename K, typename V>
+	using SetterMap = std::function<int(KN_context *, K, V)>;
+
+	template <typename K, typename V>
+	V _get_value(GetterMap<K, V> get, K key) const
+	{
+		V value;
+		int error = get(m_kc.get(), key, &value);
+		_check_error(error);
+		return value;
+	}
+
+	template <typename K, typename V>
+	void _set_value(SetterMap<K, V> set, K key, V value)
+	{
+		int error = set(m_kc.get(), key, value);
 		_check_error(error);
 	}
 
@@ -689,5 +691,11 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	{
 		int error = set(m_kc.get(), index, name.c_str());
 		_check_error(error);
+	}
+
+	template <typename I>
+	KNINT _get_index(const I &index) const
+	{
+		return index.index;
 	}
 };

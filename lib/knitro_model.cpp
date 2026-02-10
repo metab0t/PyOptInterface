@@ -113,7 +113,7 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 	VariableIndex variable(indexVar);
 
 	int var_type = knitro_var_type(domain);
-	_set_value<int>(knitro::KN_set_var_type, indexVar, var_type);
+	_set_value<KNINT, int>(knitro::KN_set_var_type, indexVar, var_type);
 
 	if (var_type == KN_VARTYPE_BINARY)
 	{
@@ -121,8 +121,8 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 		ub = (ub > 1.0) ? 1.0 : ub;
 	}
 
-	_set_value<double>(knitro::KN_set_var_lobnd, indexVar, lb);
-	_set_value<double>(knitro::KN_set_var_upbnd, indexVar, ub);
+	_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, lb);
+	_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, ub);
 
 	if (!is_name_empty(name))
 	{
@@ -138,25 +138,25 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 double KNITROModel::get_variable_lb(const VariableIndex &variable) const
 {
 	KNINT indexVar = _variable_index(variable);
-	return _get_value<double>(knitro::KN_get_var_lobnd, indexVar);
+	return _get_value<KNINT, double>(knitro::KN_get_var_lobnd, indexVar);
 }
 
 double KNITROModel::get_variable_ub(const VariableIndex &variable) const
 {
 	KNINT indexVar = _variable_index(variable);
-	return _get_value<double>(knitro::KN_get_var_upbnd, indexVar);
+	return _get_value<KNINT, double>(knitro::KN_get_var_upbnd, indexVar);
 }
 
 void KNITROModel::set_variable_lb(const VariableIndex &variable, double lb)
 {
 	KNINT indexVar = _variable_index(variable);
-	_set_value<double>(knitro::KN_set_var_lobnd, indexVar, lb);
+	_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, lb);
 }
 
 void KNITROModel::set_variable_ub(const VariableIndex &variable, double ub)
 {
 	KNINT indexVar = _variable_index(variable);
-	_set_value<double>(knitro::KN_set_var_upbnd, indexVar, ub);
+	_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, ub);
 }
 
 void KNITROModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
@@ -169,13 +169,13 @@ double KNITROModel::get_variable_value(const VariableIndex &variable) const
 {
 	_check_dirty();
 	KNINT indexVar = _variable_index(variable);
-	return _get_value<double>(knitro::KN_get_var_primal_value, indexVar);
+	return _get_value<KNINT, double>(knitro::KN_get_var_primal_value, indexVar);
 }
 
 void KNITROModel::set_variable_start(const VariableIndex &variable, double start)
 {
 	KNINT indexVar = _variable_index(variable);
-	_set_value<double>(knitro::KN_set_var_primal_init_value, indexVar, start);
+	_set_value<KNINT, double>(knitro::KN_set_var_primal_init_value, indexVar, start);
 }
 
 std::string KNITROModel::get_variable_name(const VariableIndex &variable) const
@@ -199,18 +199,18 @@ void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDom
 
 	if (var_type == KN_VARTYPE_BINARY)
 	{
-		lb = _get_value<double>(knitro::KN_get_var_lobnd, indexVar);
-		ub = _get_value<double>(knitro::KN_get_var_upbnd, indexVar);
+		lb = _get_value<KNINT, double>(knitro::KN_get_var_lobnd, indexVar);
+		ub = _get_value<KNINT, double>(knitro::KN_get_var_upbnd, indexVar);
 	}
 
-	_set_value<int>(knitro::KN_set_var_type, indexVar, var_type);
+	_set_value<KNINT, int>(knitro::KN_set_var_type, indexVar, var_type);
 
 	if (var_type == KN_VARTYPE_BINARY)
 	{
 		lb = (lb < 0.0) ? 0.0 : lb;
 		ub = (ub > 1.0) ? 1.0 : ub;
-		_set_value<double>(knitro::KN_set_var_lobnd, indexVar, lb);
-		_set_value<double>(knitro::KN_set_var_upbnd, indexVar, ub);
+		_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, lb);
+		_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, ub);
 	}
 
 	m_is_dirty = true;
@@ -220,16 +220,16 @@ double KNITROModel::get_variable_rc(const VariableIndex &variable) const
 {
 	_check_dirty();
 	KNINT indexVar = _variable_index(variable);
-	double dual = _get_value<double>(knitro::KN_get_var_dual_value, indexVar);
+	double dual = _get_value<KNINT, double>(knitro::KN_get_var_dual_value, indexVar);
 	return -dual;
 }
 
 void KNITROModel::delete_variable(const VariableIndex &variable)
 {
 	KNINT indexVar = _variable_index(variable);
-	_set_value<int>(knitro::KN_set_var_type, indexVar, KN_VARTYPE_CONTINUOUS);
-	_set_value<double>(knitro::KN_set_var_lobnd, indexVar, -get_infinity());
-	_set_value<double>(knitro::KN_set_var_upbnd, indexVar, get_infinity());
+	_set_value<KNINT, int>(knitro::KN_set_var_type, indexVar, KN_VARTYPE_CONTINUOUS);
+	_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, -get_infinity());
+	_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, get_infinity());
 	n_vars--;
 	m_is_dirty = true;
 }
@@ -372,8 +372,8 @@ void KNITROModel::_set_second_order_cone_constraint(const ConstraintIndex &const
 	error = knitro::KN_add_con_linear_term(m_kc.get(), indexCon0, indexVar0, 1.0);
 	_check_error(error);
 
-	_set_value<double>(knitro::KN_set_con_lobnd, indexCon0, 0.0);
-	_set_value<double>(knitro::KN_set_con_upbnd, indexCon0, KN_INFINITY);
+	_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon0, 0.0);
+	_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon0, KN_INFINITY);
 
 	error = knitro::KN_add_con_quadratic_term(m_kc.get(), indexCon, indexVar0, indexVar0, 1.0);
 	_check_error(error);
@@ -410,10 +410,10 @@ void KNITROModel::_set_second_order_cone_constraint_rotated(const ConstraintInde
 	error = knitro::KN_add_con_linear_term(m_kc.get(), indexCon1, indexVar1, 1.0);
 	_check_error(error);
 
-	_set_value<double>(knitro::KN_set_con_lobnd, indexCon0, 0.0);
-	_set_value<double>(knitro::KN_set_con_upbnd, indexCon0, KN_INFINITY);
-	_set_value<double>(knitro::KN_set_con_lobnd, indexCon1, 0.0);
-	_set_value<double>(knitro::KN_set_con_upbnd, indexCon1, KN_INFINITY);
+	_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon0, 0.0);
+	_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon0, KN_INFINITY);
+	_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon1, 0.0);
+	_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon1, KN_INFINITY);
 
 	size_t nnz = variables.size() - 2;
 	std::vector<KNINT> indexCons(nnz, indexCon);
@@ -435,8 +435,8 @@ void KNITROModel::_set_second_order_cone_constraint_rotated(const ConstraintInde
 void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 {
 	KNINT indexCon = _constraint_index(constraint);
-	_set_value<double>(knitro::KN_set_con_lobnd, indexCon, -get_infinity());
-	_set_value<double>(knitro::KN_set_con_upbnd, indexCon, get_infinity());
+	_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon, -get_infinity());
+	_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon, get_infinity());
 
 	n_cons--;
 	switch (constraint.type)
@@ -474,8 +474,8 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 
 		for (auto const &con : aux_cons)
 		{
-			_set_value<double>(knitro::KN_set_con_lobnd, con, -get_infinity());
-			_set_value<double>(knitro::KN_set_con_upbnd, con, get_infinity());
+			_set_value<KNINT, double>(knitro::KN_set_con_lobnd, con, -get_infinity());
+			_set_value<KNINT, double>(knitro::KN_set_con_upbnd, con, get_infinity());
 		}
 
 		m_soc_aux_cons.erase(it);
@@ -500,14 +500,14 @@ double KNITROModel::get_constraint_primal(const ConstraintIndex &constraint) con
 {
 	_check_dirty();
 	KNINT indexCon = _constraint_index(constraint);
-	return _get_value<double>(knitro::KN_get_con_value, indexCon);
+	return _get_value<KNINT, double>(knitro::KN_get_con_value, indexCon);
 }
 
 double KNITROModel::get_constraint_dual(const ConstraintIndex &constraint) const
 {
 	_check_dirty();
 	KNINT indexCon = _constraint_index(constraint);
-	return _get_value<double>(knitro::KN_get_con_dual_value, indexCon);
+	return _get_value<KNINT, double>(knitro::KN_get_con_dual_value, indexCon);
 }
 
 void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double rhs)
@@ -517,12 +517,12 @@ void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double r
 
 	if (flag & CON_LOBND)
 	{
-		_set_value<double>(knitro::KN_set_con_lobnd, indexCon, rhs);
+		_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon, rhs);
 	}
 
 	if (flag & CON_UPBND)
 	{
-		_set_value<double>(knitro::KN_set_con_upbnd, indexCon, rhs);
+		_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon, rhs);
 	}
 
 	m_is_dirty = true;
@@ -536,11 +536,11 @@ double KNITROModel::get_normalized_rhs(const ConstraintIndex &constraint) const
 	double rhs;
 	if (flag & CON_UPBND)
 	{
-		rhs = _get_value<double>(knitro::KN_get_con_upbnd, indexCon);
+		rhs = _get_value<KNINT, double>(knitro::KN_get_con_upbnd, indexCon);
 	}
 	else
 	{
-		rhs = _get_value<double>(knitro::KN_get_con_lobnd, indexCon);
+		rhs = _get_value<KNINT, double>(knitro::KN_get_con_lobnd, indexCon);
 	}
 	return rhs;
 }
@@ -665,18 +665,7 @@ void KNITROModel::set_obj_sense(ObjectiveSense sense)
 ObjectiveSense KNITROModel::get_obj_sense() const
 {
 	int goal = _get_value<int>(knitro::KN_get_obj_goal);
-	if (goal == KN_OBJGOAL_MINIMIZE)
-	{
-		return ObjectiveSense::Minimize;
-	}
-	else if (goal == KN_OBJGOAL_MAXIMIZE)
-	{
-		return ObjectiveSense::Maximize;
-	}
-	else
-	{
-		throw std::runtime_error("Unknown objective goal");
-	}
+	return knitro_obj_sense(goal);
 }
 
 void KNITROModel::_add_graph(ExpressionGraph &graph)
@@ -917,10 +906,10 @@ void KNITROModel::_check_dirty() const
 
 KNINT KNITROModel::_variable_index(const VariableIndex &variable) const
 {
-	return variable.index;
+	return _get_index(variable);
 }
 
 KNINT KNITROModel::_constraint_index(const ConstraintIndex &constraint) const
 {
-	return constraint.index;
+	return _get_index(constraint);
 }
