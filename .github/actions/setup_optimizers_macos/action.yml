@@ -1,15 +1,18 @@
 name: "Install optimizers on macOS"
 
 inputs:
-  GUROBI_WLS: 
+  GUROBI_WLS:
     description: "..."
-    required: true
+    required: false
+    default: ''
   COPT_CLIENT_INI:
     description: "..."
-    required: true
+    required: false
+    default: ''
   MOSEK_LICENSE:
     description: "..."
-    required: true
+    required: false
+    default: ''
   GITHUB_TOKEN:
     description: "..."
     required: true
@@ -66,6 +69,7 @@ runs:
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-darwin-aarch64.tar.gz
 
     - name: Setup Gurobi Installation
+      if: ${{ inputs.GUROBI_WLS != '' }}
       shell: bash
       env:
         GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
@@ -84,7 +88,7 @@ runs:
         echo "$GUROBI_WLS" > ~/gurobi.lic
         echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
     - name: Test Gurobi
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.GUROBI_WLS != '') }}
       shell: bash
       run: |
         gurobi_cl
@@ -114,7 +118,7 @@ runs:
         copt_cmd -c "quit"
 
     - name: Setup MOSEK X64 Installation
-      if: ${{ inputs.ARCH == 'X64' }}
+      if: ${{ (inputs.ARCH == 'X64') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       env:
         MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
@@ -133,7 +137,7 @@ runs:
         echo "$MOSEK_LICENSE" > ~/mosek.lic
         echo "MOSEKLM_LICENSE_FILE=${HOME}/mosek.lic" >> $GITHUB_ENV
     - name: Setup MOSEK ARM64 Installation
-      if: ${{ inputs.ARCH == 'ARM64' }}
+      if: ${{ (inputs.ARCH == 'ARM64') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       env:
         MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
@@ -152,7 +156,7 @@ runs:
         echo "$MOSEK_LICENSE" > ~/mosek.lic
         echo "MOSEKLM_LICENSE_FILE=${HOME}/mosek.lic" >> $GITHUB_ENV
     - name: Test MOSEK
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       run: |
         msktestlic

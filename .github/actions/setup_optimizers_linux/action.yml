@@ -1,15 +1,18 @@
 name: "Install optimizers on linux"
 
 inputs:
-  GUROBI_WLS: 
+  GUROBI_WLS:
     description: "..."
-    required: true
+    required: false
+    default: ''
   COPT_CLIENT_INI:
     description: "..."
-    required: true
+    required: false
+    default: ''
   MOSEK_LICENSE:
     description: "..."
-    required: true
+    required: false
+    default: ''
   GITHUB_TOKEN:
     description: "..."
     required: true
@@ -63,7 +66,7 @@ runs:
         curl -L -o ~/installers/idaes-solvers.tar.gz https://github.com/IDAES/idaes-ext/releases/download/3.4.2/idaes-solvers-ubuntu2204-aarch64.tar.gz
 
     - name: Setup Gurobi Installation Home
-      if: ${{ inputs.ARCH == 'X64' }}
+      if: ${{ (inputs.ARCH == 'X64') && (inputs.GUROBI_WLS != '') }}
       shell: bash
       run: |
         tar xfz ~/installers/gurobi.tar.gz -C ~/
@@ -72,7 +75,7 @@ runs:
         export GUROBI_HOME="${HOME}/gurobi1300/linux64"
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
     - name: Setup Gurobi Installation Home
-      if: ${{ inputs.ARCH == 'ARM64' }}
+      if: ${{ (inputs.ARCH == 'ARM64') && (inputs.GUROBI_WLS != '') }}
       shell: bash
       run: |
         tar xfz ~/installers/gurobi.tar.gz -C ~/
@@ -81,6 +84,7 @@ runs:
         export GUROBI_HOME="${HOME}/gurobi1300/armlinux64"
         echo "GUROBI_HOME=${GUROBI_HOME}" >> $GITHUB_ENV
     - name: Setup Gurobi Installation
+      if: ${{ inputs.GUROBI_WLS != '' }}
       shell: bash
       env:
         GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
@@ -93,7 +97,7 @@ runs:
         echo "$GUROBI_WLS" > ~/gurobi.lic
         echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
     - name: Test Gurobi
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.GUROBI_WLS != '') }}
       shell: bash
       run: |
         gurobi_cl
@@ -122,7 +126,7 @@ runs:
         copt_cmd -c "quit"
 
     - name: Setup MOSEK Installation Env
-      if: ${{ inputs.ARCH == 'X64' }}
+      if: ${{ (inputs.ARCH == 'X64') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       run: |
         tar jxf ~/installers/mosek.tar.bz2 -C ~/
@@ -131,7 +135,7 @@ runs:
         export MOSEK_10_2_BINDIR="${HOME}/mosek/10.2/tools/platform/linux64x86/bin"
         echo "MOSEK_10_2_BINDIR=${MOSEK_10_2_BINDIR}" >> $GITHUB_ENV
     - name: Setup MOSEK Installation Env
-      if: ${{ inputs.ARCH == 'ARM64' }}
+      if: ${{ (inputs.ARCH == 'ARM64') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       run: |
         tar jxf ~/installers/mosek.tar.bz2 -C ~/
@@ -140,6 +144,7 @@ runs:
         export MOSEK_10_2_BINDIR="${HOME}/mosek/10.2/tools/platform/linuxaarch64/bin"
         echo "MOSEK_10_2_BINDIR=${MOSEK_10_2_BINDIR}" >> $GITHUB_ENV
     - name: Setup MOSEK Installation
+      if: ${{ inputs.MOSEK_LICENSE != '' }}
       shell: bash
       env:
         MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
@@ -152,7 +157,7 @@ runs:
         echo "$MOSEK_LICENSE" > ~/mosek.lic
         echo "MOSEKLM_LICENSE_FILE=${HOME}/mosek.lic" >> $GITHUB_ENV
     - name: Test MOSEK
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.MOSEK_LICENSE != '') }}
       shell: bash
       run: |
         msktestlic

@@ -1,15 +1,18 @@
 name: "Install optimizers on windows"
 
 inputs:
-  GUROBI_WLS: 
+  GUROBI_WLS:
     description: "..."
-    required: true
+    required: false
+    default: ''
   COPT_CLIENT_INI:
     description: "..."
-    required: true
+    required: false
+    default: ''
   MOSEK_LICENSE:
     description: "..."
-    required: true
+    required: false
+    default: ''
   GITHUB_TOKEN:
     description: "..."
     required: true
@@ -62,6 +65,7 @@ runs:
         Get-ChildItem -Path D:\installers
 
     - name: Setup Gurobi Installation
+      if: ${{ inputs.GUROBI_WLS != '' }}
       shell: pwsh
       env:
         GUROBI_WLS: ${{ inputs.GUROBI_WLS }}
@@ -79,7 +83,7 @@ runs:
         echo $env:GUROBI_WLS > D:\gurobi.lic
         echo "GRB_LICENSE_FILE=D:\gurobi.lic" >> $env:GITHUB_ENV
     - name: Test Gurobi
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.GUROBI_WLS != '') }}
       shell: pwsh
       run: |
         gurobi_cl
@@ -107,6 +111,7 @@ runs:
         copt_cmd -c "quit"
 
     - name: Setup MOSEK Installation
+      if: ${{ inputs.MOSEK_LICENSE != '' }}
       shell: pwsh
       env:
         MOSEK_LICENSE: ${{ inputs.MOSEK_LICENSE }}
@@ -124,7 +129,7 @@ runs:
         echo $env:MOSEK_LICENSE > D:\mosek.lic
         echo "MOSEKLM_LICENSE_FILE=D:\mosek.lic" >> $env:GITHUB_ENV
     - name: Test MOSEK
-      if: ${{ inputs.CHECK_LICENSE == 'true' }}
+      if: ${{ (inputs.CHECK_LICENSE == 'true') && (inputs.MOSEK_LICENSE != '') }}
       shell: pwsh
       run: |
         msktestlic
