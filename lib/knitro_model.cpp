@@ -64,7 +64,7 @@ void KNITROModel::init()
 
 	KN_context *kc_ptr = nullptr;
 	int error = knitro::KN_new(&kc_ptr);
-	check_error(error);
+	_check_error(error);
 
 	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc_ptr);
 }
@@ -74,7 +74,7 @@ void KNITROModel::close()
 	m_kc.reset();
 }
 
-void KNITROModel::check_error(int error) const
+void KNITROModel::_check_error(int error) const
 {
 	if (error != 0)
 	{
@@ -82,53 +82,10 @@ void KNITROModel::check_error(int error) const
 	}
 }
 
+// Model information
 double KNITROModel::get_infinity() const
 {
 	return KN_INFINITY;
-}
-
-size_t KNITROModel::get_number_iterations()
-{
-	int error;
-	int iters;
-
-	error = knitro::KN_get_number_iters(m_kc.get(), &iters);
-	check_error(error);
-	return static_cast<size_t>(iters);
-}
-
-size_t KNITROModel::get_mip_node_count()
-{
-	int error;
-	int nodes;
-
-	error = knitro::KN_get_mip_number_nodes(m_kc.get(), &nodes);
-	check_error(error);
-	return static_cast<size_t>(nodes);
-}
-
-double KNITROModel::get_obj_bound()
-{
-	double bound;
-	int error = knitro::KN_get_mip_relaxation_bnd(m_kc.get(), &bound);
-	check_error(error);
-	return bound;
-}
-
-double KNITROModel::get_mip_relative_gap()
-{
-	double gap;
-	int error = knitro::KN_get_mip_rel_gap(m_kc.get(), &gap);
-	check_error(error);
-	return gap;
-}
-
-double KNITROModel::get_solve_time()
-{
-	double time;
-	int error = knitro::KN_get_solve_time_real(m_kc.get(), &time);
-	check_error(error);
-	return time;
 }
 
 std::string KNITROModel::get_solver_name()
@@ -141,22 +98,23 @@ std::string KNITROModel::get_release()
 	constexpr int buf_size = 20;
 	char release[buf_size];
 	int error = knitro::KN_get_release(buf_size, release);
-	check_error(error);
+	_check_error(error);
 	return std::string(release);
 }
 
+// Variable functions
 VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double ub,
                                         const char *name)
 {
 	KNINT indexVar;
 	int error = knitro::KN_add_var(m_kc.get(), &indexVar);
-	check_error(error);
+	_check_error(error);
 
 	VariableIndex variable(indexVar);
 
 	int var_type = knitro_var_type(domain);
 	error = knitro::KN_set_var_type(m_kc.get(), indexVar, var_type);
-	check_error(error);
+	_check_error(error);
 
 	if (var_type == KN_VARTYPE_BINARY)
 	{
@@ -165,14 +123,14 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 	}
 
 	error = knitro::KN_set_var_lobnd(m_kc.get(), indexVar, lb);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_var_upbnd(m_kc.get(), indexVar, ub);
-	check_error(error);
+	_check_error(error);
 
 	if (!is_name_empty(name))
 	{
 		int error = knitro::KN_set_var_name(m_kc.get(), indexVar, name);
-		check_error(error);
+		_check_error(error);
 	}
 
 	n_vars++;
@@ -188,7 +146,7 @@ double KNITROModel::get_variable_lb(const VariableIndex &variable)
 	double lb;
 
 	error = knitro::KN_get_var_lobnd(m_kc.get(), indexVar, &lb);
-	check_error(error);
+	_check_error(error);
 	return lb;
 }
 
@@ -199,7 +157,7 @@ double KNITROModel::get_variable_ub(const VariableIndex &variable)
 	double ub;
 
 	error = knitro::KN_get_var_upbnd(m_kc.get(), indexVar, &ub);
-	check_error(error);
+	_check_error(error);
 	return ub;
 }
 
@@ -207,7 +165,7 @@ void KNITROModel::set_variable_lb(const VariableIndex &variable, double lb)
 {
 	KNINT indexVar = _variable_index(variable);
 	int error = knitro::KN_set_var_lobnd(m_kc.get(), indexVar, lb);
-	check_error(error);
+	_check_error(error);
 	m_is_dirty = true;
 }
 
@@ -215,7 +173,7 @@ void KNITROModel::set_variable_ub(const VariableIndex &variable, double ub)
 {
 	KNLONG indexVar = _variable_index(variable);
 	int error = knitro::KN_set_var_upbnd(m_kc.get(), indexVar, ub);
-	check_error(error);
+	_check_error(error);
 	m_is_dirty = true;
 }
 
@@ -227,18 +185,19 @@ void KNITROModel::set_variable_bounds(const VariableIndex &variable, double lb, 
 
 double KNITROModel::get_variable_value(const VariableIndex &variable)
 {
-	if (!m_result.is_valid)
-	{
-		throw std::runtime_error("No solution available");
-	}
-	return m_result.x[_variable_index(variable)];
+	_check_dirty();
+	KNINT indexVar = _variable_index(variable);
+	double value;
+	int error = knitro::KN_get_var_primal_value(m_kc.get(), indexVar, &value);
+	_check_error(error);
+	return value;
 }
 
 void KNITROModel::set_variable_start(const VariableIndex &variable, double start)
 {
 	KNINT indexVar = _variable_index(variable);
 	int error = knitro::KN_set_var_primal_init_value(m_kc.get(), indexVar, start);
-	check_error(error);
+	_check_error(error);
 }
 
 std::string KNITROModel::get_variable_name(const VariableIndex &variable)
@@ -264,22 +223,22 @@ void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDom
 	if (var_type == KN_VARTYPE_BINARY)
 	{
 		error = knitro::KN_get_var_lobnd(m_kc.get(), indexVar, &lb);
-		check_error(error);
+		_check_error(error);
 		error = knitro::KN_get_var_upbnd(m_kc.get(), indexVar, &ub);
-		check_error(error);
+		_check_error(error);
 	}
 
 	error = knitro::KN_set_var_type(m_kc.get(), indexVar, var_type);
-	check_error(error);
+	_check_error(error);
 
 	if (var_type == KN_VARTYPE_BINARY)
 	{
 		lb = (lb < 0.0) ? 0.0 : lb;
 		ub = (ub > 1.0) ? 1.0 : ub;
 		error = knitro::KN_set_var_lobnd(m_kc.get(), indexVar, lb);
-		check_error(error);
+		_check_error(error);
 		error = knitro::KN_set_var_upbnd(m_kc.get(), indexVar, ub);
-		check_error(error);
+		_check_error(error);
 	}
 
 	m_is_dirty = true;
@@ -287,25 +246,25 @@ void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDom
 
 double KNITROModel::get_variable_rc(const VariableIndex &variable)
 {
-	if (!m_result.is_valid)
-	{
-		throw std::runtime_error("No solution available");
-	}
+	_check_dirty();
 	KNINT indexVar = _variable_index(variable);
-	return m_result.lambda[indexVar];
+	double value;
+	int error = knitro::KN_get_var_dual_value(m_kc.get(), indexVar, &value);
+	_check_error(error);
+	return -value;
 }
 
 void KNITROModel::delete_variable(const VariableIndex &variable)
 {
-	int indexVar = _variable_index(variable);
+	KNINT indexVar = _variable_index(variable);
 	int error;
 
 	error = knitro::KN_set_var_type(m_kc.get(), indexVar, KN_VARTYPE_CONTINUOUS);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_var_lobnd(m_kc.get(), indexVar, -KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_var_upbnd(m_kc.get(), indexVar, KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 
 	n_vars--;
 	m_is_dirty = true;
@@ -316,16 +275,7 @@ std::string KNITROModel::pprint_variable(const VariableIndex &variable)
 	return get_variable_name(variable);
 }
 
-KNINT KNITROModel::_variable_index(const VariableIndex &variable)
-{
-	return variable.index;
-}
-
-KNINT KNITROModel::_constraint_index(const ConstraintIndex &constraint)
-{
-	return constraint.index;
-}
-
+// Constraint functions
 ConstraintIndex KNITROModel::add_linear_constraint(const ScalarAffineFunction &function,
                                                    ConstraintSense sense, double rhs,
                                                    const char *name)
@@ -453,19 +403,19 @@ void KNITROModel::_set_second_order_cone_constraint(const ConstraintIndex &const
 
 	KNINT indexCon0;
 	error = knitro::KN_add_con(m_kc.get(), &indexCon0);
-	check_error(error);
+	_check_error(error);
 
 	KNINT indexVar0 = _variable_index(variables[0]);
 	error = knitro::KN_add_con_linear_term(m_kc.get(), indexCon0, indexVar0, 1.0);
-	check_error(error);
+	_check_error(error);
 
 	error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon0, 0.0);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon0, KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 
 	error = knitro::KN_add_con_quadratic_term(m_kc.get(), indexCon, indexVar0, indexVar0, 1.0);
-	check_error(error);
+	_check_error(error);
 	size_t nnz = variables.size() - 1;
 	std::vector<KNINT> indexCons(nnz, indexCon);
 	std::vector<KNINT> indexVars(nnz);
@@ -476,7 +426,7 @@ void KNITROModel::_set_second_order_cone_constraint(const ConstraintIndex &const
 	std::vector<double> coefs(nnz, -1.0);
 	error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars.data(),
 	                                            indexVars.data(), coefs.data());
-	check_error(error);
+	_check_error(error);
 
 	m_soc_aux_cons[indexCon] = indexCon0;
 }
@@ -489,25 +439,25 @@ void KNITROModel::_set_second_order_cone_constraint_rotated(const ConstraintInde
 
 	KNINT indexCon0, indexCon1;
 	error = knitro::KN_add_con(m_kc.get(), &indexCon0);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_add_con(m_kc.get(), &indexCon1);
-	check_error(error);
+	_check_error(error);
 
 	KNINT indexVar0 = _variable_index(variables[0]);
 	KNINT indexVar1 = _variable_index(variables[1]);
 	error = knitro::KN_add_con_linear_term(m_kc.get(), indexCon0, indexVar0, 1.0);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_add_con_linear_term(m_kc.get(), indexCon1, indexVar1, 1.0);
-	check_error(error);
+	_check_error(error);
 
 	error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon0, 0.0);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon0, KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon1, 0.0);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon1, KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 
 	size_t nnz = variables.size() - 2;
 	std::vector<KNINT> indexCons(nnz, indexCon);
@@ -519,9 +469,9 @@ void KNITROModel::_set_second_order_cone_constraint_rotated(const ConstraintInde
 	std::vector<double> coefs(nnz, -1.0);
 	error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars.data(),
 	                                            indexVars.data(), coefs.data());
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_add_con_quadratic_term(m_kc.get(), indexCon, indexVar0, indexVar1, 2.0);
-	check_error(error);
+	_check_error(error);
 
 	m_soc_aux_cons[indexCon] = std::make_pair(indexCon0, indexCon1);
 }
@@ -532,9 +482,9 @@ void KNITROModel::delete_constraint(ConstraintIndex constraint)
 	int error;
 
 	error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon, -KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 	error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon, KN_INFINITY);
-	check_error(error);
+	_check_error(error);
 
 	n_cons--;
 	switch (constraint.type)
@@ -573,9 +523,9 @@ void KNITROModel::delete_constraint(ConstraintIndex constraint)
 		for (auto const &con : aux_cons)
 		{
 			error = knitro::KN_set_con_lobnd(m_kc.get(), con, -KN_INFINITY);
-			check_error(error);
+			_check_error(error);
 			error = knitro::KN_set_con_upbnd(m_kc.get(), con, KN_INFINITY);
-			check_error(error);
+			_check_error(error);
 		}
 
 		m_soc_aux_cons.erase(it);
@@ -598,24 +548,22 @@ std::string KNITROModel::get_constraint_name(const ConstraintIndex &constraint)
 
 double KNITROModel::get_constraint_primal(const ConstraintIndex &constraint)
 {
-	if (!m_result.is_valid)
-	{
-		throw std::runtime_error("No solution available");
-	}
-
+	_check_dirty();
 	KNINT indexCon = _constraint_index(constraint);
-	return m_result.con_values[indexCon];
+	double value;
+	int error = knitro::KN_get_con_value(m_kc.get(), indexCon, &value);
+	_check_error(error);
+	return value;
 }
 
 double KNITROModel::get_constraint_dual(const ConstraintIndex &constraint)
 {
-	if (!m_result.is_valid)
-	{
-		throw std::runtime_error("No solution available");
-	}
-
+	_check_dirty();
 	KNINT indexCon = _constraint_index(constraint);
-	return m_result.con_duals[indexCon];
+	double value;
+	int error = knitro::KN_get_con_dual_value(m_kc.get(), indexCon, &value);
+	_check_error(error);
+	return -value;
 }
 
 void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double rhs)
@@ -628,13 +576,13 @@ void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double r
 	if (flag & CON_LOBND)
 	{
 		error = knitro::KN_set_con_lobnd(m_kc.get(), indexCon, rhs);
-		check_error(error);
+		_check_error(error);
 	}
 
 	if (flag & CON_UPBND)
 	{
 		error = knitro::KN_set_con_upbnd(m_kc.get(), indexCon, rhs);
-		check_error(error);
+		_check_error(error);
 	}
 
 	m_is_dirty = true;
@@ -649,12 +597,12 @@ double KNITROModel::get_normalized_rhs(const ConstraintIndex &constraint)
 	if (flag & CON_UPBND)
 	{
 		error = knitro::KN_get_con_upbnd(m_kc.get(), indexCon, &rhs);
-		check_error(error);
+		_check_error(error);
 	}
 	else
 	{
 		error = knitro::KN_get_con_lobnd(m_kc.get(), indexCon, &rhs);
-		check_error(error);
+		_check_error(error);
 	}
 	return rhs;
 }
@@ -670,7 +618,7 @@ void KNITROModel::set_normalized_coefficient(const ConstraintIndex &constraint,
 	// we need to call KN_update before changing the linear term
 	_update();
 	error = knitro::KN_chg_con_linear_term(m_kc.get(), indexCon, indexVar, coefficient);
-	check_error(error);
+	_check_error(error);
 	m_is_dirty = true;
 }
 
@@ -686,7 +634,7 @@ void KNITROModel::_set_linear_constraint(const ConstraintIndex &constraint,
 		if (constant != 0.0)
 		{
 			error = knitro::KN_add_con_constant(m_kc.get(), indexCon, constant);
-			check_error(error);
+			_check_error(error);
 		}
 	}
 
@@ -702,7 +650,7 @@ void KNITROModel::_set_linear_constraint(const ConstraintIndex &constraint,
 
 		error =
 		    knitro::KN_add_con_linear_struct(m_kc.get(), nnz, indexCons.data(), indexVars, coefs);
-		check_error(error);
+		_check_error(error);
 	}
 }
 
@@ -728,10 +676,11 @@ void KNITROModel::_set_quadratic_constraint(const ConstraintIndex &constraint,
 		double *coefs = ptr_form.value;
 		error = knitro::KN_add_con_quadratic_struct(m_kc.get(), nnz, indexCons.data(), indexVars1,
 		                                            indexVars2, coefs);
-		check_error(error);
+		_check_error(error);
 	}
 }
 
+// Objective functions
 void KNITROModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
 	_set_objective_impl(sense, [this, &function]() { _set_linear_objective(function); });
@@ -770,21 +719,20 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 	m_need_to_add_callbacks = true;
 	m_obj_flag |= OBJ_NONLINEAR;
 	m_is_dirty = true;
-	m_result.is_valid = false;
 }
 
 void KNITROModel::set_obj_sense(ObjectiveSense sense)
 {
 	int goal = knitro_obj_goal(sense);
 	int error = knitro::KN_set_obj_goal(m_kc.get(), goal);
-	check_error(error);
+	_check_error(error);
 }
 
 ObjectiveSense KNITROModel::get_obj_sense()
 {
 	int goal;
 	int error = knitro::KN_get_obj_goal(m_kc.get(), &goal);
-	check_error(error);
+	_check_error(error);
 	if (goal == KN_OBJGOAL_MINIMIZE)
 	{
 		return ObjectiveSense::Minimize;
@@ -814,22 +762,22 @@ void KNITROModel::_reset_objective()
 	if (m_obj_flag & OBJ_CONSTANT)
 	{
 		error = knitro::KN_del_obj_constant(m_kc.get());
-		check_error(error);
+		_check_error(error);
 	}
 	if (m_obj_flag & OBJ_LINEAR)
 	{
 		error = knitro::KN_del_obj_linear_struct_all(m_kc.get());
-		check_error(error);
+		_check_error(error);
 	}
 	if (m_obj_flag & OBJ_QUADRATIC)
 	{
 		error = knitro::KN_del_obj_quadratic_struct_all(m_kc.get());
-		check_error(error);
+		_check_error(error);
 	}
 	if (m_obj_flag & OBJ_NONLINEAR)
 	{
 		error = knitro::KN_del_obj_eval_callback_all(m_kc.get());
-		check_error(error);
+		_check_error(error);
 		for (auto &[graph, outputs] : m_pending_outputs)
 		{
 			outputs.obj_idxs.clear();
@@ -849,7 +797,7 @@ void KNITROModel::_set_linear_objective(const ScalarAffineFunction &function)
 		if (constant != 0.0)
 		{
 			error = knitro::KN_add_obj_constant(m_kc.get(), constant);
-			check_error(error);
+			_check_error(error);
 			m_obj_flag |= OBJ_CONSTANT;
 		}
 	}
@@ -862,7 +810,7 @@ void KNITROModel::_set_linear_objective(const ScalarAffineFunction &function)
 		KNINT *indexVars = ptr_form.index;
 		double *coefs = ptr_form.value;
 		error = knitro::KN_add_obj_linear_struct(m_kc.get(), nnz, indexVars, coefs);
-		check_error(error);
+		_check_error(error);
 		m_obj_flag |= OBJ_LINEAR;
 	}
 }
@@ -885,18 +833,18 @@ void KNITROModel::_set_quadratic_objective(const ScalarQuadraticFunction &functi
 		KNINT *indexVars2 = ptr_form.col;
 		double *coefs = ptr_form.value;
 		error = knitro::KN_add_obj_quadratic_struct(m_kc.get(), nnz, indexVars1, indexVars2, coefs);
-		check_error(error);
+		_check_error(error);
 		m_obj_flag |= OBJ_QUADRATIC;
 	}
 }
 
 double KNITROModel::get_obj_value()
 {
-	if (!m_result.is_valid)
-	{
-		throw std::runtime_error("No solution available");
-	}
-	return m_result.obj_val;
+	_check_dirty();
+	double value;
+	int error = knitro::KN_get_obj_value(m_kc.get(), &value);
+	_check_error(error);
+	return value;
 }
 
 void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const Outputs &outputs)
@@ -971,11 +919,12 @@ void KNITROModel::_add_callbacks()
 	m_need_to_add_callbacks = false;
 }
 
+// Solve functions
 void KNITROModel::_update()
 {
 	_add_callbacks();
 	int error = knitro::KN_update(m_kc.get());
-	check_error(error);
+	_check_error(error);
 }
 
 void KNITROModel::_pre_solve()
@@ -992,47 +941,6 @@ void KNITROModel::_solve()
 
 void KNITROModel::_post_solve()
 {
-	int error;
-
-	KNINT nV, nC;
-	error = knitro::KN_get_number_vars(m_kc.get(), &nV);
-	check_error(error);
-	error = knitro::KN_get_number_cons(m_kc.get(), &nC);
-	check_error(error);
-
-	m_result.x.resize(nV);
-	m_result.lambda.resize(nV);
-	m_result.con_values.resize(nC);
-	m_result.con_duals.resize(nC);
-
-	error = knitro::KN_get_var_primal_values_all(m_kc.get(), m_result.x.data());
-	check_error(error);
-
-	error = knitro::KN_get_var_dual_values_all(m_kc.get(), m_result.lambda.data());
-	check_error(error);
-	for (size_t i = 0; i < nV; i++)
-	{
-		m_result.lambda[i] = -m_result.lambda[i];
-	}
-
-	if (nC > 0)
-	{
-		error = knitro::KN_get_con_values_all(m_kc.get(), m_result.con_values.data());
-		check_error(error);
-
-		error = knitro::KN_get_con_dual_values_all(m_kc.get(), m_result.con_duals.data());
-		check_error(error);
-		for (size_t i = 0; i < nC; i++)
-		{
-			m_result.con_duals[i] = -m_result.con_duals[i];
-		}
-	}
-
-	error = knitro::KN_get_obj_value(m_kc.get(), &m_result.obj_val);
-	check_error(error);
-
-	m_result.status = m_solve_status;
-	m_result.is_valid = true;
 }
 
 void KNITROModel::optimize()
@@ -1041,4 +949,68 @@ void KNITROModel::optimize()
 	_solve();
 	_post_solve();
 	m_is_dirty = false;
+}
+
+// Solve information
+size_t KNITROModel::get_number_iterations()
+{
+	int error;
+	int iters;
+
+	error = knitro::KN_get_number_iters(m_kc.get(), &iters);
+	_check_error(error);
+	return static_cast<size_t>(iters);
+}
+
+size_t KNITROModel::get_mip_node_count()
+{
+	int error;
+	int nodes;
+
+	error = knitro::KN_get_mip_number_nodes(m_kc.get(), &nodes);
+	_check_error(error);
+	return static_cast<size_t>(nodes);
+}
+
+double KNITROModel::get_obj_bound()
+{
+	double bound;
+	int error = knitro::KN_get_mip_relaxation_bnd(m_kc.get(), &bound);
+	_check_error(error);
+	return bound;
+}
+
+double KNITROModel::get_mip_relative_gap()
+{
+	double gap;
+	int error = knitro::KN_get_mip_rel_gap(m_kc.get(), &gap);
+	_check_error(error);
+	return gap;
+}
+
+double KNITROModel::get_solve_time()
+{
+	double time;
+	int error = knitro::KN_get_solve_time_real(m_kc.get(), &time);
+	_check_error(error);
+	return time;
+}
+
+// Internal helpers
+void KNITROModel::_check_dirty() const
+{
+	if (m_is_dirty)
+	{
+		throw std::runtime_error("No solution available");
+	}
+}
+
+KNINT KNITROModel::_variable_index(const VariableIndex &variable)
+{
+	return variable.index;
+}
+
+KNINT KNITROModel::_constraint_index(const ConstraintIndex &constraint)
+{
+	return constraint.index;
 }
