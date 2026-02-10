@@ -192,7 +192,8 @@ def test_acopf(nlp_model_ctor):
 
 
 if __name__ == "__main__":
-    from pyoptinterface import ipopt, copt
+    from pyoptinterface import ipopt, copt, knitro
 
     test_acopf(ipopt.Model)
     test_acopf(copt.Model)
+    test_acopf(knitro.Model)

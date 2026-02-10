@@ -101,6 +101,7 @@ def test_nlfunc_ifelse(nlp_model_ctor):
         assert x_value == pytest.approx(x_)
 
 
+@pytest.mark.skipif(not ipopt.is_library_loaded(), reason="IPOPT library not available")
 def test_ipopt_optimizer_not_called():
     model = ipopt.Model()
 
