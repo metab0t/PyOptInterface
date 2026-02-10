@@ -414,7 +414,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
 	{
-		int param_id = _get_value<const char*, int>(knitro::KN_get_param_id, name.c_str());
+		int param_id = _get_value<const char *, int>(knitro::KN_get_param_id, name.c_str());
 		set_raw_parameter<T>(param_id, value);
 	}
 
@@ -451,7 +451,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	template <typename T>
 	T get_raw_parameter(const std::string &name)
 	{
-		int param_id = _get_value<const char*, int>(knitro::KN_get_param_id, name.c_str());
+		int param_id = _get_value<const char *, int>(knitro::KN_get_param_id, name.c_str());
 		return get_raw_parameter<T>(param_id);
 	}
 
@@ -627,7 +627,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	}
 
 	template <typename V>
-	using Getter = std::function<int(KN_context *, V*)>;
+	using Getter = std::function<int(KN_context *, V *)>;
 	template <typename V>
 	using Setter = std::function<int(KN_context *, V)>;
 
