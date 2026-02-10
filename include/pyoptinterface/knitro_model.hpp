@@ -63,19 +63,16 @@
 	B(KN_add_con_quadratic_term);       \
 	B(KN_chg_con_linear_term);          \
 	B(KN_add_eval_callback);            \
-	B(KN_del_obj_eval_callback_all);    \
-	B(KN_del_eval_callbacks);           \
 	B(KN_set_cb_user_params);           \
 	B(KN_set_cb_grad);                  \
 	B(KN_set_cb_hess);                  \
+	B(KN_del_obj_eval_callback_all);    \
 	B(KN_solve);                        \
-	B(KN_get_obj_value);                \
-	B(KN_get_number_cons);              \
-	B(KN_get_number_vars);              \
 	B(KN_get_var_primal_value);         \
 	B(KN_get_var_dual_value);           \
 	B(KN_get_con_value);                \
 	B(KN_get_con_dual_value);           \
+	B(KN_get_obj_value);                \
 	B(KN_get_number_iters);             \
 	B(KN_get_mip_number_nodes);         \
 	B(KN_get_mip_relaxation_bnd);       \
@@ -153,7 +150,8 @@ struct CallbackEvaluator
 	void setup()
 	{
 		fun.optimize();
-		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(fun.Range(), fun_rows.size(), fun_rows.size());
+		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(fun.Range(), fun_rows.size(),
+		                                                     fun_rows.size());
 		for (size_t k = 0; k < fun_rows.size(); k++)
 		{
 			jac_pattern_in.set(k, fun_rows[k], fun_rows[k]);
@@ -296,26 +294,26 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 
 	// Model information
 	double get_infinity() const;
-	std::string get_solver_name();
-	std::string get_release();
+	std::string get_solver_name() const;
+	std::string get_release() const;
 
 	// Variable functions
 	VariableIndex add_variable(VariableDomain domain = VariableDomain::Continuous,
 	                           double lb = -KN_INFINITY, double ub = KN_INFINITY,
 	                           const char *name = nullptr);
 	void delete_variable(const VariableIndex &variable);
-	double get_variable_lb(const VariableIndex &variable);
-	double get_variable_ub(const VariableIndex &variable);
+	double get_variable_lb(const VariableIndex &variable) const;
+	double get_variable_ub(const VariableIndex &variable) const;
 	void set_variable_lb(const VariableIndex &variable, double lb);
 	void set_variable_ub(const VariableIndex &variable, double ub);
 	void set_variable_bounds(const VariableIndex &variable, double lb, double ub);
-	double get_variable_value(const VariableIndex &variable);
+	double get_variable_value(const VariableIndex &variable) const;
 	void set_variable_start(const VariableIndex &variable, double start);
-	std::string get_variable_name(const VariableIndex &variable);
+	std::string get_variable_name(const VariableIndex &variable) const;
 	void set_variable_name(const VariableIndex &variable, const std::string &name);
 	void set_variable_domain(const VariableIndex &variable, VariableDomain domain);
-	double get_variable_rc(const VariableIndex &variable);
-	std::string pprint_variable(const VariableIndex &variable);
+	double get_variable_rc(const VariableIndex &variable) const;
+	std::string pprint_variable(const VariableIndex &variable) const;
 
 	// Constraint functions
 	ConstraintIndex add_linear_constraint(const ScalarAffineFunction &f, ConstraintSense sense,
@@ -338,13 +336,13 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	                                                   const ExpressionHandle &result,
 	                                                   ConstraintSense sense, double rhs,
 	                                                   const char *name = nullptr);
-	void delete_constraint(ConstraintIndex constraint);
+	void delete_constraint(const ConstraintIndex &constraint);
 	void set_constraint_name(const ConstraintIndex &constraint, const std::string &name);
-	std::string get_constraint_name(const ConstraintIndex &constraint);
-	double get_constraint_primal(const ConstraintIndex &constraint);
-	double get_constraint_dual(const ConstraintIndex &constraint);
+	std::string get_constraint_name(const ConstraintIndex &constraint) const;
+	double get_constraint_primal(const ConstraintIndex &constraint) const;
+	double get_constraint_dual(const ConstraintIndex &constraint) const;
 	void set_normalized_rhs(const ConstraintIndex &constraint, double rhs);
-	double get_normalized_rhs(const ConstraintIndex &constraint);
+	double get_normalized_rhs(const ConstraintIndex &constraint) const;
 	void set_normalized_coefficient(const ConstraintIndex &constraint,
 	                                const VariableIndex &variable, double coefficient);
 
@@ -353,19 +351,19 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void set_objective(const ScalarQuadraticFunction &f, ObjectiveSense sense);
 	void set_objective(const ExprBuilder &expr, ObjectiveSense sense);
 	void add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result);
-	double get_obj_value();
+	double get_obj_value() const;
 	void set_obj_sense(ObjectiveSense sense);
-	ObjectiveSense get_obj_sense();
+	ObjectiveSense get_obj_sense() const;
 
 	// Solve functions
 	void optimize();
 
 	// Solve information
-	size_t get_number_iterations();
-	size_t get_mip_node_count();
-	double get_obj_bound();
-	double get_mip_relative_gap();
-	double get_solve_time();
+	size_t get_number_iterations() const;
+	size_t get_mip_node_count() const;
+	double get_obj_bound() const;
+	double get_mip_relative_gap() const;
+	double get_solve_time() const;
 
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
@@ -444,8 +442,8 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	// Internal helpers
 	void _check_error(int error) const;
 	void _check_dirty() const;
-	KNINT _variable_index(const VariableIndex &variable);
-	KNINT _constraint_index(const ConstraintIndex &constraint);
+	KNINT _variable_index(const VariableIndex &variable) const;
+	KNINT _constraint_index(const ConstraintIndex &constraint) const;
 
 	// Member variables
 	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
@@ -579,9 +577,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	{
 		_reset_objective();
 		setter();
-		int goal = knitro_obj_goal(sense);
-		int error = knitro::KN_set_obj_goal(m_kc.get(), goal);
-		_check_error(error);
+		set_obj_sense(sense);
 		m_is_dirty = true;
 	}
 
@@ -629,8 +625,49 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 		m_evaluators.push_back(std::move(evaluator_ptr));
 	}
 
+	template <typename V>
+	using Getter = std::function<int(KN_context *, V*)>;
+	template <typename V>
+	using Setter = std::function<int(KN_context *, V)>;
+	template <typename V>
+	using IndexGetter = std::function<int(KN_context *, KNINT, V *)>;
+	template <typename V>
+	using IndexSetter = std::function<int(KN_context *, KNINT, V)>;
+
+	template <typename V>
+	V _get_value(IndexGetter<V> get, KNINT index) const
+	{
+		V value;
+		int error = get(m_kc.get(), index, &value);
+		_check_error(error);
+		return value;
+	}
+
+	template <typename V>
+	void _set_value(IndexSetter<V> set, KNINT index, V value)
+	{
+		int error = set(m_kc.get(), index, value);
+		_check_error(error);
+	}
+
+	template <typename V>
+	V _get_value(Getter<V> get) const
+	{
+		V value;
+		int error = get(m_kc.get(), &value);
+		_check_error(error);
+		return value;
+	}
+
+	template <typename V>
+	void _set_value(Setter<V> set, V value)
+	{
+		int error = set(m_kc.get(), value);
+		_check_error(error);
+	}
+
 	template <typename F>
-	std::string _get_name(KNINT index, F get, const char *prefix) const
+	std::string _get_name(F get, KNINT index, const char *prefix) const
 	{
 		char name[1024];
 		name[0] = '\0';
@@ -648,10 +685,9 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	}
 
 	template <typename F>
-	void _set_name(KNINT index, const std::string &name, F set)
+	void _set_name(F set, KNINT index, const std::string &name)
 	{
 		int error = set(m_kc.get(), index, name.c_str());
 		_check_error(error);
-		m_is_dirty = true;
 	}
 };
