@@ -469,7 +469,7 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph)
 	return f;
 }
 
-ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph)
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggregate)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
@@ -503,14 +503,21 @@ ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph)
 		y[i] = cppad_trace_expression(graph, output, x, p, seen_expressions);
 	}
 
-	CppAD::AD<double> y_sum = 0.0;
-	for (size_t i = 0; i < N_outputs; i++)
-	{
-		y_sum += y[i];
-	}
-
 	ADFunDouble f;
-	f.Dependent(x, {y_sum});
+
+	if (aggregate)
+	{
+		CppAD::AD<double> y_sum = 0.0;
+		for (size_t i = 0; i < N_outputs; i++)
+		{
+			y_sum += y[i];
+		}
+		f.Dependent(x, {y_sum});
+	}
+	else
+	{
+		f.Dependent(x, y);
+	}
 
 	return f;
 }
