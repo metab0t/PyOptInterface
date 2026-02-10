@@ -507,7 +507,8 @@ double KNITROModel::get_constraint_dual(const ConstraintIndex &constraint) const
 {
 	_check_dirty();
 	KNINT indexCon = _constraint_index(constraint);
-	return _get_value<KNINT, double>(knitro::KN_get_con_dual_value, indexCon);
+	double dual = _get_value<KNINT, double>(knitro::KN_get_con_dual_value, indexCon);
+	return -dual;
 }
 
 void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double rhs)
