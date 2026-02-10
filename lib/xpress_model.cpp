@@ -946,7 +946,7 @@ ConstraintIndex Model::add_exp_cone_constraint(const Vector<VariableIndex> &vari
 		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_MULTIPLY}, // *
 		    Tvp{POI_XPRS_TOK_EOF, {}});                 // EOF
 
-		int begs[] = {0, std::ssize(types)};
+		int begs[] = {0, static_cast<int>(std::ssize(types))};
 		_check(XPRSnlpaddformulas(m_model.get(), 1, &rowidx, begs, 1, types, values));
 	}
 	else
@@ -963,7 +963,7 @@ ConstraintIndex Model::add_exp_cone_constraint(const Vector<VariableIndex> &vari
 		    Tvp{POI_XPRS_TOK_OP, POI_XPRS_OP_UMINUS},   // -
 		    Tvp{POI_XPRS_TOK_EOF, {}});                 // EOF
 
-		int begs[] = {0, std::ssize(types)};
+		int begs[] = {0, static_cast<int>(std::ssize(types))};
 		_check(XPRSnlpaddformulas(m_model.get(), 1, &rowidx, begs, 1, types, values));
 	}
 
