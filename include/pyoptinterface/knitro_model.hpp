@@ -56,6 +56,7 @@
 	B(KN_add_obj_quadratic_struct);     \
 	B(KN_del_obj_quadratic_struct);     \
 	B(KN_del_obj_quadratic_struct_all); \
+	B(KN_chg_obj_linear_term);          \
 	B(KN_add_con_constant);             \
 	B(KN_add_con_linear_struct);        \
 	B(KN_add_con_linear_term);          \
@@ -400,6 +401,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	double get_obj_value() const;
 	void set_obj_sense(ObjectiveSense sense);
 	ObjectiveSense get_obj_sense() const;
+	void set_objective_coefficient(const VariableIndex &variable, double coefficient);
 
 	// Solve functions
 	void optimize();
