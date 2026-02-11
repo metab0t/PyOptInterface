@@ -806,7 +806,9 @@ void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs 
 		evaluator->eval_hess(req->x, req->sigma, res->hess, true);
 		return 0;
 	};
-	auto trace = cppad_trace_graph_objective;
+	auto trace = [](const ExpressionGraph &graph) {
+		return cppad_trace_graph_objective(graph, false);
+	};
 	_add_callback_impl(*graph, outputs.obj_idxs, {}, trace, f, g, h);
 }
 
