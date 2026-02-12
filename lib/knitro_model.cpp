@@ -646,6 +646,17 @@ void KNITROModel::set_objective(const ExprBuilder &expr, ObjectiveSense sense)
 	}
 }
 
+void KNITROModel::set_objective_coefficient(const VariableIndex &variable, double coefficient)
+{
+	KNINT indexVar = _variable_index(variable);
+	// NOTE: To make sure the coefficient is updated correctly,
+	// we need to call KN_update before changing the linear term
+	_update();
+	int error = knitro::KN_chg_obj_linear_term(m_kc.get(), indexVar, coefficient);
+	_check_error(error);
+	m_is_dirty = true;
+}
+
 void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result)
 {
 	_add_graph(graph);

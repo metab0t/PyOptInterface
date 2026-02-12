@@ -154,6 +154,8 @@ NB_MODULE(knitro_model_ext, m)
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("_add_single_nl_objective", &KNITROModel::add_single_nl_objective, nb::arg("graph"),
 	         nb::arg("result"))
+		.def("set_objective_coefficient", &KNITROModel::set_objective_coefficient, nb::arg("variable"),
+			 nb::arg("coefficient"))
 
 	    // clang-format off
 		BIND_F(get_obj_value)
