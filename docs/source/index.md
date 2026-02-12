@@ -28,6 +28,7 @@ copt.md
 mosek.md
 highs.md
 ipopt.md
+knitro.md
 changelog.md
 ```
 
