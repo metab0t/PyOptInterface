@@ -23,7 +23,7 @@ from .core_ext import (
     ScalarQuadraticFunction,
     VariableIndex,
 )
-from .knitro_model_ext import KN, RawModel, load_library
+from .knitro_model_ext import KN, RawEnv, RawModel, load_library
 from .matrix import add_matrix_constraints
 from .nlexpr_ext import ExpressionGraph, ExpressionHandle
 from .nlfunc import ExpressionGraphContext, convert_to_expressionhandle
@@ -256,14 +256,49 @@ model_attribute_set_func_map = {
 }
 
 
+class Env(RawEnv):
+    """
+    KNITRO license manager environment.
+    """
+    @property
+    def is_empty(self):
+        return self.empty()
+
+
 class Model(RawModel):
     """
     KNITRO model class for PyOptInterface.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, env: Env = None):
+        if env is not None:
+            super().__init__(env)
+        else:
+            super().__init__()
+        self._reset_graph_map()
+
+    def _reset_graph_map(self):
         self.graph_map: dict[ExpressionGraph, int] = {}
+
+    def _add_graph_expr(self, expr: ExpressionHandle):
+        graph = ExpressionGraphContext.current_graph()
+        expr = convert_to_expressionhandle(graph, expr)
+        if not isinstance(expr, ExpressionHandle):
+            raise ValueError("Expression should be convertible to ExpressionHandle")
+        if graph not in self.graph_map:
+            self.graph_map[graph] = len(self.graph_map)
+        return graph, expr
+
+    def init(self, env: Env = None):
+        if env is not None:
+            super().init(env)
+        else:
+            super().init()
+        self._reset_graph_map()
+
+    def close(self):
+        super().close()
+        self._reset_graph_map()
 
     @staticmethod
     def supports_variable_attribute(
@@ -395,21 +430,11 @@ class Model(RawModel):
     ): ...
 
     def add_nl_constraint(self, expr, *args, **kwargs):
-        graph = ExpressionGraphContext.current_graph()
-        expr = convert_to_expressionhandle(graph, expr)
-        if not isinstance(expr, ExpressionHandle):
-            raise ValueError("Expression should be convertible to ExpressionHandle")
-        if graph not in self.graph_map:
-            self.graph_map[graph] = len(self.graph_map)
+        graph, expr = self._add_graph_expr(expr)
         return self._add_single_nl_constraint(graph, expr, *args, **kwargs)
 
     def add_nl_objective(self, expr):
-        graph = ExpressionGraphContext.current_graph()
-        expr = convert_to_expressionhandle(graph, expr)
-        if not isinstance(expr, ExpressionHandle):
-            raise ValueError("Expression should be convertible to ExpressionHandle")
-        if graph not in self.graph_map:
-            self.graph_map[graph] = len(self.graph_map)
+        graph, expr = self._add_graph_expr(expr)
         self._add_single_nl_objective(graph, expr)
 
     def get_model_attribute(self, attr: ModelAttribute):

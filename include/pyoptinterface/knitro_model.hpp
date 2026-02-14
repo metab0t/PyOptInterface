@@ -16,6 +16,9 @@
 
 // Define Knitro C APIs to be dynamically loaded
 #define APILIST                         \
+	B(KN_checkout_license);             \
+	B(KN_release_license);              \
+	B(KN_new_lm);                       \
 	B(KN_new);                          \
 	B(KN_free);                         \
 	B(KN_update);                       \
@@ -99,6 +102,17 @@ struct KNITROFreeProblemT
 		if (kc != nullptr)
 		{
 			knitro::KN_free(&kc);
+		}
+	}
+};
+
+struct KNITROFreeLicenseT
+{
+	void operator()(LM_context *lmc) const
+	{
+		if (lmc != nullptr)
+		{
+			knitro::KN_release_license(&lmc);
 		}
 	}
 };
@@ -334,6 +348,35 @@ inline ObjectiveSense knitro_obj_sense(int goal)
 	}
 }
 
+inline void knitro_throw(int error)
+{
+	if (error != 0)
+	{
+		throw std::runtime_error(fmt::format("KNITRO error code: {}", error));
+	}
+}
+
+class KNITROEnv
+{
+  public:
+	KNITROEnv(bool empty = false);
+
+	KNITROEnv(const KNITROEnv &) = delete;
+	KNITROEnv &operator=(const KNITROEnv &) = delete;
+
+	KNITROEnv(KNITROEnv &&) = default;
+	KNITROEnv &operator=(KNITROEnv &&) = default;
+
+	void start();
+	bool empty() const;
+	std::shared_ptr<LM_context> get_lm() const;
+	void close();
+
+  private:
+	void _check_error(int code) const;
+	std::shared_ptr<LM_context> m_lm = nullptr;
+};
+
 class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
                     public TwosideLinearConstraintMixin<KNITROModel>,
                     public OnesideQuadraticConstraintMixin<KNITROModel>,
@@ -346,7 +389,16 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
   public:
 	// Constructor/Init/Close
 	KNITROModel();
+	KNITROModel(const KNITROEnv &env);
+
+	KNITROModel(const KNITROModel &) = delete;
+	KNITROModel &operator=(const KNITROModel &) = delete;
+
+	KNITROModel(KNITROModel &&) = default;
+	KNITROModel &operator=(KNITROModel &&) = default;
+
 	void init();
+	void init(const KNITROEnv &env);
 	void close();
 
 	// Model information
@@ -492,6 +544,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	KNINT _constraint_index(const ConstraintIndex &constraint) const;
 
 	// Member variables
+	std::shared_ptr<LM_context> m_lm = nullptr;
 	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
 
 	size_t n_vars = 0;
@@ -513,6 +566,8 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	int m_solve_status = 0;
 
   private:
+	void _init();
+	void _reset_state();
 	std::tuple<double, double> _sense_to_interval(ConstraintSense sense, double rhs);
 	void _update_con_sense_flags(const ConstraintIndex &constraint, ConstraintSense sense);
 
@@ -534,6 +589,19 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void _pre_solve();
 	void _solve();
 	void _post_solve();
+
+	template <typename F>
+	void _init_impl(const F &ctor)
+	{
+		if (!knitro::is_library_loaded())
+		{
+			throw std::runtime_error("KNITRO library not loaded");
+		}
+		KN_context *kc = nullptr;
+		int error = ctor(&kc);
+		_check_error(error);
+		m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc);
+	}
 
 	template <typename F>
 	ConstraintIndex _add_constraint_impl(ConstraintType type,

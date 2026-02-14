@@ -18,12 +18,19 @@ NB_MODULE(knitro_model_ext, m)
 
 	bind_knitro_constants(m);
 
+	nb::class_<KNITROEnv>(m, "RawEnv")
+	    .def(nb::init<bool>(), nb::arg("empty") = false)
+	    .def("start", &KNITROEnv::start)
+	    .def("empty", &KNITROEnv::empty)
+	    .def("close", &KNITROEnv::close);
+
 #define BIND_F(f) .def(#f, &KNITROModel::f)
 	nb::class_<KNITROModel>(m, "RawModel")
 	    .def(nb::init<>())
-
-	    // clang-format off
-		BIND_F(init)
+	    .def(nb::init<const KNITROEnv &>())
+		.def("init", nb::overload_cast<>(&KNITROModel::init))
+		.def("init", nb::overload_cast<const KNITROEnv &>(&KNITROModel::init))
+		// clang-format off
 		BIND_F(close)
 		BIND_F(get_infinity)
 		BIND_F(get_number_iterations)
