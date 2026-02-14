@@ -475,6 +475,14 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	double get_mip_relative_gap() const;
 	double get_solve_time() const;
 
+	// Model state
+	bool dirty() const;
+	bool empty() const;
+
+	// Solve status
+	int get_solve_status() const;
+
+	// Parameter management
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
 	{
@@ -539,13 +547,11 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 
 	// Internal helpers
 	void _check_error(int error) const;
+	void _mark_dirty();
+	void _unmark_dirty();
 	void _check_dirty() const;
 	KNINT _variable_index(const VariableIndex &variable) const;
 	KNINT _constraint_index(const ConstraintIndex &constraint) const;
-
-	// Member variables
-	std::shared_ptr<LM_context> m_lm = nullptr;
-	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
 
 	size_t n_vars = 0;
 	size_t n_cons = 0;
@@ -554,6 +560,11 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	size_t n_coniccons = 0;
 	size_t n_nlcons = 0;
 
+  private:
+	// Member variables
+	std::shared_ptr<LM_context> m_lm = nullptr;
+	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
+
 	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_soc_aux_cons;
 	std::unordered_map<KNINT, uint8_t> m_con_sense_flags;
 	uint8_t m_obj_flag = 0;
@@ -561,9 +572,8 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	std::unordered_map<ExpressionGraph *, Outputs> m_pending_outputs;
 	std::vector<std::unique_ptr<CallbackEvaluator<double>>> m_evaluators;
 	bool m_need_to_add_callbacks = false;
-
-	bool m_is_dirty = true;
 	int m_solve_status = 0;
+	bool m_is_dirty = true;
 
   private:
 	void _init();
@@ -589,19 +599,6 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	void _pre_solve();
 	void _solve();
 	void _post_solve();
-
-	template <typename F>
-	void _init_impl(const F &ctor)
-	{
-		if (!knitro::is_library_loaded())
-		{
-			throw std::runtime_error("KNITRO library not loaded");
-		}
-		KN_context *kc = nullptr;
-		int error = ctor(&kc);
-		_check_error(error);
-		m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc);
-	}
 
 	template <typename F>
 	ConstraintIndex _add_constraint_impl(ConstraintType type,
