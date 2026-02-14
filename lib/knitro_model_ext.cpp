@@ -232,8 +232,15 @@ NB_MODULE(knitro_model_ext, m)
 	        },
 	        nb::arg("param_id"))
 
-	    .def_rw("m_is_dirty", &KNITROModel::m_is_dirty)
-	    .def_ro("m_solve_status", &KNITROModel::m_solve_status);
+	    // clang-format off
+		BIND_F(dirty)
+		BIND_F(empty)
+	    // clang-format on
+
+		// clang-format off
+		BIND_F(get_solve_status)
+		// clang-format on
+	    ;
 
 #undef BIND_F
 }

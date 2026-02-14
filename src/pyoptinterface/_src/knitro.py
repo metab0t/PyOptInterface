@@ -166,17 +166,21 @@ _RAW_STATUS_STRINGS = [
 
 
 def _termination_status_knitro(model: "Model"):
-    if model.m_is_dirty:
+    if model.is_dirty:
         return TerminationStatusCode.OPTIMIZE_NOT_CALLED
-    status_code = model.m_solve_status
+
+    code = model.solve_status
     for ts, rs in _RAW_STATUS_STRINGS:
-        if status_code == rs:
+        if code == rs:
             return ts
     return TerminationStatusCode.OTHER_ERROR
 
 
 def _result_status_knitro(model: "Model"):
-    status_code = model.m_solve_status
+    if model.is_dirty:
+        return ResultStatusCode.NO_SOLUTION
+
+    code = model.solve_status
 
     feasible = {
         KN.RC_OPTIMAL,
@@ -211,9 +215,9 @@ def _result_status_knitro(model: "Model"):
         KN.RC_MIP_NODE_LIMIT_INFEAS,
     }
 
-    if status_code in feasible:
+    if code in feasible:
         return ResultStatusCode.FEASIBLE_POINT
-    if status_code in infeasible:
+    if code in infeasible:
         return ResultStatusCode.INFEASIBLE_POINT
     return ResultStatusCode.NO_SOLUTION
 
@@ -223,16 +227,15 @@ model_attribute_get_func_map = {
     ModelAttribute.ObjectiveSense: lambda model: model.get_obj_sense(),
     ModelAttribute.TerminationStatus: _termination_status_knitro,
     ModelAttribute.RawStatusString: lambda model: (
-        f"KNITRO status code: {model.m_solve_status}"
+        f"KNITRO status code: {model.solve_status}"
     ),
     ModelAttribute.PrimalStatus: _result_status_knitro,
     ModelAttribute.NumberOfThreads: lambda model: model.get_raw_parameter(
-        KN.PARAM_THREADS
+        KN.PARAM_NUMTHREADS
     ),
     ModelAttribute.TimeLimitSec: lambda model: model.get_raw_parameter(
-        KN.PARAM_TIME_LIMIT
+        KN.PARAM_MAXTIME
     ),
-    # TODO: Bind this in C++
     ModelAttribute.BarrierIterations: lambda model: model.get_number_iterations(),
     ModelAttribute.NodeCount: lambda model: model.get_mip_node_count(),
     ModelAttribute.ObjectiveBound: lambda model: model.get_obj_bound(),
@@ -245,13 +248,13 @@ model_attribute_get_func_map = {
 model_attribute_set_func_map = {
     ModelAttribute.ObjectiveSense: lambda model, x: model.set_obj_sense(x),
     ModelAttribute.NumberOfThreads: lambda model, x: model.set_raw_parameter(
-        KN.PARAM_THREADS, x
+        KN.PARAM_NUMTHREADS, x
     ),
     ModelAttribute.Silent: lambda model, x: model.set_raw_parameter(
         KN.PARAM_OUTLEV, KN.OUTLEV_NONE if x else KN.OUTLEV_ITER_10
     ),
     ModelAttribute.TimeLimitSec: lambda model, x: model.set_raw_parameter(
-        KN.PARAM_TIME_LIMIT, x
+        KN.PARAM_MAXTIME, x
     ),
 }
 
@@ -270,17 +273,19 @@ class Model(RawModel):
     KNITRO model class for PyOptInterface.
     """
 
-    def __init__(self, env: Env = None):
+    def __init__(self, env: Env = None) -> None:
         if env is not None:
             super().__init__(env)
         else:
             super().__init__()
-        self._reset_graph_map()
-
-    def _reset_graph_map(self):
         self.graph_map: dict[ExpressionGraph, int] = {}
 
-    def _add_graph_expr(self, expr: ExpressionHandle):
+    def _reset_graph_map(self) -> None:
+        self.graph_map.clear()
+
+    def _add_graph_expr(
+        self, expr: ExpressionHandle
+    ) -> tuple[ExpressionGraph, ExpressionHandle]:
         graph = ExpressionGraphContext.current_graph()
         expr = convert_to_expressionhandle(graph, expr)
         if not isinstance(expr, ExpressionHandle):
@@ -289,14 +294,14 @@ class Model(RawModel):
             self.graph_map[graph] = len(self.graph_map)
         return graph, expr
 
-    def init(self, env: Env = None):
+    def init(self, env: Env = None) -> None:
         if env is not None:
             super().init(env)
         else:
             super().init()
         self._reset_graph_map()
 
-    def close(self):
+    def close(self) -> None:
         super().close()
         self._reset_graph_map()
 
@@ -327,12 +332,12 @@ class Model(RawModel):
         else:
             return attribute in model_attribute_get_func_map
 
-    def number_of_variables(self):
+    def number_of_variables(self) -> int:
         return self.n_vars
 
     def number_of_constraints(
         self, constraint_type: Union[ConstraintType, None] = None
-    ):
+    ) -> int:
         if constraint_type is None:
             return self.n_cons
         elif constraint_type == ConstraintType.Linear:
@@ -361,16 +366,16 @@ class Model(RawModel):
         expr: Union[VariableIndex, ScalarAffineFunction, ExprBuilder],
         interval: Tuple[float, float],
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
     @overload
     def add_linear_constraint(
         self,
         con: ComparisonConstraint,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
-    def add_linear_constraint(self, arg, *args, **kwargs):
+    def add_linear_constraint(self, arg, *args, **kwargs) -> ConstraintIndex:
         if isinstance(arg, ComparisonConstraint):
             return self._add_linear_constraint(
                 arg.lhs, arg.sense, arg.rhs, *args, **kwargs
@@ -385,16 +390,16 @@ class Model(RawModel):
         sense: ConstraintSense,
         rhs: float,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
     @overload
     def add_quadratic_constraint(
         self,
         con: ComparisonConstraint,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
-    def add_quadratic_constraint(self, arg, *args, **kwargs):
+    def add_quadratic_constraint(self, arg, *args, **kwargs) -> ConstraintIndex:
         if isinstance(arg, ComparisonConstraint):
             return self._add_quadratic_constraint(
                 arg.lhs, arg.sense, arg.rhs, *args, **kwargs
@@ -410,7 +415,7 @@ class Model(RawModel):
         rhs: float,
         /,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
     @overload
     def add_nl_constraint(
@@ -419,7 +424,7 @@ class Model(RawModel):
         interval: Tuple[float, float],
         /,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
     @overload
     def add_nl_constraint(
@@ -427,13 +432,13 @@ class Model(RawModel):
         con,
         /,
         name: str = "",
-    ): ...
+    ) -> ConstraintIndex: ...
 
-    def add_nl_constraint(self, expr, *args, **kwargs):
+    def add_nl_constraint(self, expr, *args, **kwargs) -> ConstraintIndex:
         graph, expr = self._add_graph_expr(expr)
         return self._add_single_nl_constraint(graph, expr, *args, **kwargs)
 
-    def add_nl_objective(self, expr):
+    def add_nl_objective(self, expr) -> None:
         graph, expr = self._add_graph_expr(expr)
         self._add_single_nl_objective(graph, expr)
 
@@ -506,10 +511,20 @@ class Model(RawModel):
             value,
             constraint_attribute_set_func_map,
             {},
+            e,
         )
 
-    def is_empty(self):
-        return self.n_vars == 0
+    @property
+    def is_dirty(self) -> bool:
+        return self.dirty()
+
+    @property
+    def is_empty(self) -> bool:
+        return self.empty() and not self.graph_map
+
+    @property
+    def solve_status(self) -> int:
+        return self.get_solve_status()
 
 
 Model.add_variables = make_variable_tupledict
