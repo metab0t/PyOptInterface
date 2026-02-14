@@ -1,4 +1,5 @@
 name: "Install optimizers on macOS"
+description: "Install optimizers and Setup licenses on macOS"
 
 inputs:
   GUROBI_WLS:
@@ -13,10 +14,14 @@ inputs:
     description: "..."
     required: false
     default: ''
+  KNITRO_LICENSE:
+    description: "..."
+    required: false
+    default: ''
   GITHUB_TOKEN:
     description: "..."
     required: true
-  CHECK_LICENSE: 
+  CHECK_LICENSE:
     description: "..."
     required: true
   ARCH:
@@ -83,7 +88,7 @@ runs:
         echo "DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${GUROBI_HOME}/lib" >> $GITHUB_ENV
         echo $GUROBI_HOME
         ls $GUROBI_HOME
-        
+
         # setup license using secrets
         echo "$GUROBI_WLS" > ~/gurobi.lic
         echo "GRB_LICENSE_FILE=${HOME}/gurobi.lic" >> $GITHUB_ENV
@@ -173,3 +178,17 @@ runs:
       shell: bash
       run: |
         ipopt -v
+
+    - name: Setup KNITRO License
+      if: ${{ inputs.KNITRO_LICENSE != '' }}
+      shell: bash
+      env:
+        KNITRO_LICENSE: ${{ inputs.KNITRO_LICENSE }}
+      run: |
+        echo "$KNITRO_LICENSE" > ~/artelys_lic.txt
+        echo "ARTELYS_LICENSE=${HOME}/artelys_lic.txt" >> $GITHUB_ENV
+    - name: Install KNITRO (using pip)
+      if: ${{ inputs.KNITRO_LICENSE != '' }}
+      shell: bash
+      run: |
+        python -m pip install knitro

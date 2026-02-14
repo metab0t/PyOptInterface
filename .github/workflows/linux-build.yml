@@ -1,10 +1,10 @@
 name: linux-build
 
 on:
-    pull_request:
-    push:
-        branches:
-            - master
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
 
@@ -37,6 +37,7 @@ jobs:
           GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
           COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
           MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
+          KNITRO_LICENSE: ${{ secrets.KNITRO_LICENSE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_LICENSE: true
           ARCH: ${{ runner.arch }}

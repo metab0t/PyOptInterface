@@ -1,4 +1,5 @@
 name: "Install optimizers on windows"
+description: "Install optimizers and Setup licenses on windows"
 
 inputs:
   GUROBI_WLS:
@@ -13,10 +14,14 @@ inputs:
     description: "..."
     required: false
     default: ''
+  KNITRO_LICENSE:
+    description: "..."
+    required: false
+    default: ''
   GITHUB_TOKEN:
     description: "..."
     required: true
-  CHECK_LICENSE: 
+  CHECK_LICENSE:
     description: "..."
     required: true
 
@@ -78,7 +83,7 @@ runs:
         echo "GUROBI_HOME=D:\SourceDir\gurobi1300\win64" >> $env:GITHUB_ENV
         echo "PATH=$env:PATH;D:\SourceDir\gurobi1300\win64\bin" >> $env:GITHUB_ENV
         echo $env:GUROBI_HOME
-        
+
         # setup license using secrets
         echo $env:GUROBI_WLS > D:\gurobi.lic
         echo "GRB_LICENSE_FILE=D:\gurobi.lic" >> $env:GITHUB_ENV
@@ -144,3 +149,18 @@ runs:
       shell: pwsh
       run: |
         ipopt -v
+
+    - name: Setup KNITRO License
+      if: ${{ inputs.KNITRO_LICENSE != '' }}
+      shell: pwsh
+      env:
+        KNITRO_LICENSE: ${{ inputs.KNITRO_LICENSE }}
+      run: |
+        # setup license using secrets
+        echo $env:KNITRO_LICENSE > D:\artelys_lic.txt
+        echo "ARTELYS_LICENSE=D:\artelys_lic.txt" >> $env:GITHUB_ENV
+    - name: Install KNITRO (using pip)
+      if: ${{ inputs.KNITRO_LICENSE != '' }}
+      shell: pwsh
+      run: |
+        python -m pip install knitro

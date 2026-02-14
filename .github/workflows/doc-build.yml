@@ -1,9 +1,9 @@
 name: gh-pages
 
 on:
-    push:
-        branches:
-            - master
+  push:
+    branches:
+      - master
 
 permissions:
   contents: write
@@ -32,6 +32,7 @@ jobs:
           GUROBI_WLS: ${{ secrets.GUROBI_WLS }}
           COPT_CLIENT_INI: ${{ secrets.COPT_CLIENT_INI }}
           MOSEK_LICENSE: ${{ secrets.MOSEK_LICENSE }}
+          KNITRO_LICENSE: ${{ secrets.KNITRO_LICENSE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_LICENSE: false
 

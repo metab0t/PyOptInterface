@@ -12,7 +12,7 @@ on:
           - pypi
           - none
         default: none
-          
+
 
 jobs:
   build_wheels:
