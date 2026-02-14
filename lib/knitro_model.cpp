@@ -50,36 +50,90 @@ bool load_library(const std::string &path)
 }
 } // namespace knitro
 
+void ensure_library_loaded()
+{
+	if (!knitro::is_library_loaded())
+	{
+		throw std::runtime_error("KNITRO library not loaded");
+	}
+}
+
+KNITROEnv::KNITROEnv(bool empty)
+{
+	if (!empty)
+	{
+		start();
+	}
+}
+
+void KNITROEnv::start()
+{
+	if (!empty())
+	{
+		return;
+	}
+	ensure_library_loaded();
+	LM_context *lm = nullptr;
+	int error = knitro::KN_checkout_license(&lm);
+	_check_error(error);
+	m_lm = std::shared_ptr<LM_context>(lm, KNITROFreeLicenseT());
+}
+
+bool KNITROEnv::empty() const
+{
+	return m_lm == nullptr;
+}
+
+std::shared_ptr<LM_context> KNITROEnv::get_lm() const
+{
+	return m_lm;
+}
+
+void KNITROEnv::close()
+{
+	m_lm.reset();
+}
+
+void KNITROEnv::_check_error(int code) const
+{
+	knitro_throw(code);
+}
+
 KNITROModel::KNITROModel()
 {
 	init();
 }
 
+KNITROModel::KNITROModel(const KNITROEnv &env)
+{
+	init(env);
+}
+
 void KNITROModel::init()
 {
-	if (!knitro::is_library_loaded())
+	m_lm.reset();
+	_init();
+}
+
+void KNITROModel::init(const KNITROEnv &env)
+{
+	if (env.empty())
 	{
-		throw std::runtime_error("KNITRO library is not loaded");
+		throw std::runtime_error("Empty environment provided. Call start()...");
 	}
-
-	KN_context *kc_ptr = nullptr;
-	int error = knitro::KN_new(&kc_ptr);
-	_check_error(error);
-
-	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc_ptr);
+	m_lm = env.get_lm();
+	_init();
 }
 
 void KNITROModel::close()
 {
-	m_kc.reset();
+	_reset_state();
+	m_lm.reset();
 }
 
-void KNITROModel::_check_error(int error) const
+void KNITROModel::_check_error(int code) const
 {
-	if (error != 0)
-	{
-		throw std::runtime_error(fmt::format("KNITRO error code: {}", error));
-	}
+	knitro_throw(code);
 }
 
 // Model information
@@ -917,6 +971,38 @@ void KNITROModel::_check_dirty() const
 		throw std::runtime_error("Model has been modified since last solve. Call optimize()...");
 	}
 }
+
+void KNITROModel::_reset_state()
+{
+	m_kc.reset();
+	n_vars = 0;
+	n_cons = 0;
+	n_lincons = 0;
+	n_quadcons = 0;
+	n_coniccons = 0;
+	n_nlcons = 0;
+	m_soc_aux_cons.clear();
+	m_con_sense_flags.clear();
+	m_obj_flag = 0;
+	m_pending_outputs.clear();
+	m_evaluators.clear();
+	m_need_to_add_callbacks = false;
+	m_is_dirty = true;
+	m_solve_status = 0;
+}
+
+void KNITROModel::_init()
+{
+	ensure_library_loaded();
+	_reset_state();
+
+	// Create new KNITRO problem
+	KN_context *kc = nullptr;
+	int error = m_lm ? knitro::KN_new_lm(m_lm.get(), &kc) : knitro::KN_new(&kc);
+	knitro_throw(error);
+	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc);
+}
+
 
 KNINT KNITROModel::_variable_index(const VariableIndex &variable) const
 {
