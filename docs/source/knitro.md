@@ -10,6 +10,23 @@ model = knitro.Model()
 
 You need to follow the instructions in [Getting Started](getting_started.md#knitro) to set up the optimizer correctly.
 
+If you want to manage the license of KNITRO manually, you can create a `knitro.Env` object and pass it to the constructor of the `knitro.Model` object, otherwise a check of the license will be performed when initializing the `knitro.Model` object.
+
+```python
+env = knitro.Env()
+model = knitro.Model(env)
+```
+
+For users who want to release the license immediately after the optimization, you can call the `close` method of all models created and the `knitro.Env` object.
+
+```python
+env = knitro.Env()
+model = knitro.Model(env)
+# do something with the model
+model.close()
+env.close()
+```
+
 ## The capability of `knitro.Model`
 
 ### Supported constraints
@@ -116,3 +133,7 @@ name = model.get_constraint_name(constraint)
 primal = model.get_constraint_primal(constraint)
 dual = model.get_constraint_dual(constraint)
 ```
+
+## Support for KNITRO callbacks
+
+Unfortunately, KNITRO's callback interface is not supported in PyOptInterface at the moment.
