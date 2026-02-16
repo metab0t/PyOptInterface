@@ -33,7 +33,7 @@ ADFunDouble sparse_hessian(const ADFunDouble &f, const sparsity_pattern_t &patte
 
 // Transform ExpressionGraph to CppAD function
 ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph);
-ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph);
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggregate = true);
 
 struct CppADAutodiffGraph
 {

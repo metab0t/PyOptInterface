@@ -50,36 +50,90 @@ bool load_library(const std::string &path)
 }
 } // namespace knitro
 
+void ensure_library_loaded()
+{
+	if (!knitro::is_library_loaded())
+	{
+		throw std::runtime_error("KNITRO library not loaded");
+	}
+}
+
+KNITROEnv::KNITROEnv(bool empty)
+{
+	if (!empty)
+	{
+		start();
+	}
+}
+
+void KNITROEnv::start()
+{
+	if (!empty())
+	{
+		return;
+	}
+	ensure_library_loaded();
+	LM_context *lm = nullptr;
+	int error = knitro::KN_checkout_license(&lm);
+	_check_error(error);
+	m_lm = std::shared_ptr<LM_context>(lm, KNITROFreeLicenseT());
+}
+
+bool KNITROEnv::empty() const
+{
+	return m_lm == nullptr;
+}
+
+std::shared_ptr<LM_context> KNITROEnv::get_lm() const
+{
+	return m_lm;
+}
+
+void KNITROEnv::close()
+{
+	m_lm.reset();
+}
+
+void KNITROEnv::_check_error(int code) const
+{
+	knitro_throw(code);
+}
+
 KNITROModel::KNITROModel()
 {
 	init();
 }
 
+KNITROModel::KNITROModel(const KNITROEnv &env)
+{
+	init(env);
+}
+
 void KNITROModel::init()
 {
-	if (!knitro::is_library_loaded())
+	m_lm.reset();
+	_init();
+}
+
+void KNITROModel::init(const KNITROEnv &env)
+{
+	if (env.empty())
 	{
-		throw std::runtime_error("KNITRO library is not loaded");
+		throw std::runtime_error("Empty environment provided. Call start()...");
 	}
-
-	KN_context *kc_ptr = nullptr;
-	int error = knitro::KN_new(&kc_ptr);
-	_check_error(error);
-
-	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc_ptr);
+	m_lm = env.get_lm();
+	_init();
 }
 
 void KNITROModel::close()
 {
-	m_kc.reset();
+	_reset_state();
+	m_lm.reset();
 }
 
-void KNITROModel::_check_error(int error) const
+void KNITROModel::_check_error(int code) const
 {
-	if (error != 0)
-	{
-		throw std::runtime_error(fmt::format("KNITRO error code: {}", error));
-	}
+	knitro_throw(code);
 }
 
 // Model information
@@ -130,7 +184,7 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 	}
 
 	n_vars++;
-	m_is_dirty = true;
+	_mark_dirty();
 
 	return variable;
 }
@@ -213,7 +267,7 @@ void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDom
 		_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, ub);
 	}
 
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 double KNITROModel::get_variable_rc(const VariableIndex &variable) const
@@ -231,7 +285,7 @@ void KNITROModel::delete_variable(const VariableIndex &variable)
 	_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, -get_infinity());
 	_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, get_infinity());
 	n_vars--;
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 std::string KNITROModel::pprint_variable(const VariableIndex &variable) const
@@ -481,7 +535,7 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 		m_soc_aux_cons.erase(it);
 	}
 
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 void KNITROModel::set_constraint_name(const ConstraintIndex &constraint, const std::string &name)
@@ -526,7 +580,7 @@ void KNITROModel::set_normalized_rhs(const ConstraintIndex &constraint, double r
 		_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon, rhs);
 	}
 
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 double KNITROModel::get_normalized_rhs(const ConstraintIndex &constraint) const
@@ -557,7 +611,7 @@ void KNITROModel::set_normalized_coefficient(const ConstraintIndex &constraint,
 	_update();
 	int error = knitro::KN_chg_con_linear_term(m_kc.get(), indexCon, indexVar, coefficient);
 	_check_error(error);
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 void KNITROModel::_set_linear_constraint(const ConstraintIndex &constraint,
@@ -646,6 +700,17 @@ void KNITROModel::set_objective(const ExprBuilder &expr, ObjectiveSense sense)
 	}
 }
 
+void KNITROModel::set_objective_coefficient(const VariableIndex &variable, double coefficient)
+{
+	KNINT indexVar = _variable_index(variable);
+	// NOTE: To make sure the coefficient is updated correctly,
+	// we need to call KN_update before changing the linear term
+	_update();
+	int error = knitro::KN_chg_obj_linear_term(m_kc.get(), indexVar, coefficient);
+	_check_error(error);
+	_mark_dirty();
+}
+
 void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const ExpressionHandle &result)
 {
 	_add_graph(graph);
@@ -654,7 +719,7 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 	m_pending_outputs[&graph].obj_idxs.push_back(i);
 	m_need_to_add_callbacks = true;
 	m_obj_flag |= OBJ_NONLINEAR;
-	m_is_dirty = true;
+	_mark_dirty();
 }
 
 void KNITROModel::set_obj_sense(ObjectiveSense sense)
@@ -806,7 +871,9 @@ void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs 
 		evaluator->eval_hess(req->x, req->sigma, res->hess, true);
 		return 0;
 	};
-	auto trace = cppad_trace_graph_objective;
+	auto trace = [](const ExpressionGraph &graph) {
+		return cppad_trace_graph_objective(graph, false);
+	};
 	_add_callback_impl(*graph, outputs.obj_idxs, {}, trace, f, g, h);
 }
 
@@ -860,7 +927,7 @@ void KNITROModel::optimize()
 	_pre_solve();
 	_solve();
 	_post_solve();
-	m_is_dirty = false;
+	_unmark_dirty();
 }
 
 // Solve information
@@ -896,13 +963,72 @@ double KNITROModel::get_solve_time() const
 	return _get_value<double>(knitro::KN_get_solve_time_real);
 }
 
+// Dirty state management
+void KNITROModel::_mark_dirty()
+{
+	m_is_dirty = true;
+}
+
+void KNITROModel::_unmark_dirty()
+{
+	m_is_dirty = false;
+}
+
+bool KNITROModel::dirty() const
+{
+	return m_is_dirty;
+}
+
+// Model state
+bool KNITROModel::empty() const
+{
+	return m_kc == nullptr;
+}
+
+int KNITROModel::get_solve_status() const
+{
+	_check_dirty();
+	return m_solve_status;
+}
+
 // Internal helpers
 void KNITROModel::_check_dirty() const
 {
-	if (m_is_dirty)
+	if (dirty())
 	{
 		throw std::runtime_error("Model has been modified since last solve. Call optimize()...");
 	}
+}
+
+void KNITROModel::_reset_state()
+{
+	m_kc.reset();
+	n_vars = 0;
+	n_cons = 0;
+	n_lincons = 0;
+	n_quadcons = 0;
+	n_coniccons = 0;
+	n_nlcons = 0;
+	m_soc_aux_cons.clear();
+	m_con_sense_flags.clear();
+	m_obj_flag = 0;
+	m_pending_outputs.clear();
+	m_evaluators.clear();
+	m_need_to_add_callbacks = false;
+	_mark_dirty();
+	m_solve_status = 0;
+}
+
+void KNITROModel::_init()
+{
+	ensure_library_loaded();
+	_reset_state();
+
+	// Create new KNITRO problem
+	KN_context *kc = nullptr;
+	int error = m_lm ? knitro::KN_new_lm(m_lm.get(), &kc) : knitro::KN_new(&kc);
+	knitro_throw(error);
+	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc);
 }
 
 KNINT KNITROModel::_variable_index(const VariableIndex &variable) const

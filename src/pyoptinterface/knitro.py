@@ -1,4 +1,4 @@
-from pyoptinterface._src.knitro import Model, autoload_library
+from pyoptinterface._src.knitro import Env, Model, autoload_library
 from pyoptinterface._src.knitro_model_ext import (
     KN,
     load_library,
@@ -6,6 +6,7 @@ from pyoptinterface._src.knitro_model_ext import (
 )
 
 __all__ = [
+    "Env",
     "Model",
     "KN",
     "autoload_library",

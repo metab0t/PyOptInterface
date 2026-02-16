@@ -183,6 +183,7 @@ NB_MODULE(cppad_interface_ext, m)
 	    .def_ro("hessian", &CppADAutodiffGraph::hessian_graph);
 
 	m.def("cppad_trace_graph_constraints", cppad_trace_graph_constraints);
-	m.def("cppad_trace_graph_objective", cppad_trace_graph_objective);
+	m.def("cppad_trace_graph_objective", cppad_trace_graph_objective, nb::arg("graph"),
+	      nb::arg("aggregate") = true);
 	m.def("cppad_autodiff", &cppad_autodiff);
 }

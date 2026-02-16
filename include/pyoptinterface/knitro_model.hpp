@@ -16,6 +16,9 @@
 
 // Define Knitro C APIs to be dynamically loaded
 #define APILIST                         \
+	B(KN_checkout_license);             \
+	B(KN_release_license);              \
+	B(KN_new_lm);                       \
 	B(KN_new);                          \
 	B(KN_free);                         \
 	B(KN_update);                       \
@@ -56,6 +59,7 @@
 	B(KN_add_obj_quadratic_struct);     \
 	B(KN_del_obj_quadratic_struct);     \
 	B(KN_del_obj_quadratic_struct_all); \
+	B(KN_chg_obj_linear_term);          \
 	B(KN_add_con_constant);             \
 	B(KN_add_con_linear_struct);        \
 	B(KN_add_con_linear_term);          \
@@ -102,6 +106,17 @@ struct KNITROFreeProblemT
 	}
 };
 
+struct KNITROFreeLicenseT
+{
+	void operator()(LM_context *lmc) const
+	{
+		if (lmc != nullptr)
+		{
+			knitro::KN_release_license(&lmc);
+		}
+	}
+};
+
 enum ObjectiveFlags
 {
 	OBJ_CONSTANT = 1 << 0,  // 0x01
@@ -141,6 +156,7 @@ struct CallbackEvaluator
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac_;
 	CppAD::sparse_jac_work jac_work_;
 	CppAD::sparse_rc<std::vector<size_t>> hess_pattern_;
+	CppAD::sparse_rc<std::vector<size_t>> hess_pattern_symm_;
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hess_;
 	CppAD::sparse_hes_work hess_work_;
 
@@ -170,10 +186,19 @@ struct CallbackEvaluator
 			select_rows[fun_rows[k]] = true;
 		}
 		fun.rev_hes_sparsity(select_rows, false, true, hess_pattern_);
+		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
+		{
+			size_t row = hess_pattern_.row()[k];
+			size_t col = hess_pattern_.col()[k];
+			if (row <= col)
+			{
+				hess_pattern_symm_.push_back(row, col);
+			}
+		}
 		x.resize(fun.Domain(), 0.0);
 		w.resize(fun.Range(), 0.0);
 		jac_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jac_pattern_);
-		hess_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hess_pattern_);
+		hess_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hess_pattern_symm_);
 	}
 
 	void eval_fun(const V *req_x, V *res_y, bool aggregate = false)
@@ -203,7 +228,7 @@ struct CallbackEvaluator
 			x[i] = req_x[indexVars[i]];
 		}
 		fun.sparse_jac_rev(x, jac_, jac_pattern_, jac_coloring_, jac_work_);
-		auto jac = jac_.val();
+		auto &jac = jac_.val();
 		for (size_t i = 0; i < jac_.nnz(); i++)
 		{
 			res_jac[i] = jac[i];
@@ -228,7 +253,7 @@ struct CallbackEvaluator
 			}
 		}
 		fun.sparse_hes(x, w, hess_, hess_pattern_, hess_coloring_, hess_work_);
-		auto hess = hess_.val();
+		auto &hess = hess_.val();
 		for (size_t i = 0; i < hess_.nnz(); i++)
 		{
 			res_hess[i] = hess[i];
@@ -240,8 +265,8 @@ struct CallbackEvaluator
 		CallbackPattern pattern;
 		pattern.indexCons = indexCons;
 
-		auto jac_rows = jac_pattern_.row();
-		auto jac_cols = jac_pattern_.col();
+		auto &jac_rows = jac_pattern_.row();
+		auto &jac_cols = jac_pattern_.col();
 		if (indexCons.empty())
 		{
 			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
@@ -258,9 +283,9 @@ struct CallbackEvaluator
 			}
 		}
 
-		auto hess_rows = hess_pattern_.row();
-		auto hess_cols = hess_pattern_.col();
-		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
+		auto &hess_rows = hess_pattern_symm_.row();
+		auto &hess_cols = hess_pattern_symm_.col();
+		for (size_t k = 0; k < hess_pattern_symm_.nnz(); k++)
 		{
 			pattern.hessIndexVars1.push_back(indexVars[hess_rows[k]]);
 			pattern.hessIndexVars2.push_back(indexVars[hess_cols[k]]);
@@ -323,6 +348,35 @@ inline ObjectiveSense knitro_obj_sense(int goal)
 	}
 }
 
+inline void knitro_throw(int error)
+{
+	if (error != 0)
+	{
+		throw std::runtime_error(fmt::format("KNITRO error code: {}", error));
+	}
+}
+
+class KNITROEnv
+{
+  public:
+	KNITROEnv(bool empty = false);
+
+	KNITROEnv(const KNITROEnv &) = delete;
+	KNITROEnv &operator=(const KNITROEnv &) = delete;
+
+	KNITROEnv(KNITROEnv &&) = default;
+	KNITROEnv &operator=(KNITROEnv &&) = default;
+
+	void start();
+	bool empty() const;
+	std::shared_ptr<LM_context> get_lm() const;
+	void close();
+
+  private:
+	void _check_error(int code) const;
+	std::shared_ptr<LM_context> m_lm = nullptr;
+};
+
 class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
                     public TwosideLinearConstraintMixin<KNITROModel>,
                     public OnesideQuadraticConstraintMixin<KNITROModel>,
@@ -335,7 +389,16 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
   public:
 	// Constructor/Init/Close
 	KNITROModel();
+	KNITROModel(const KNITROEnv &env);
+
+	KNITROModel(const KNITROModel &) = delete;
+	KNITROModel &operator=(const KNITROModel &) = delete;
+
+	KNITROModel(KNITROModel &&) = default;
+	KNITROModel &operator=(KNITROModel &&) = default;
+
 	void init();
+	void init(const KNITROEnv &env);
 	void close();
 
 	// Model information
@@ -400,6 +463,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	double get_obj_value() const;
 	void set_obj_sense(ObjectiveSense sense);
 	ObjectiveSense get_obj_sense() const;
+	void set_objective_coefficient(const VariableIndex &variable, double coefficient);
 
 	// Solve functions
 	void optimize();
@@ -411,6 +475,14 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	double get_mip_relative_gap() const;
 	double get_solve_time() const;
 
+	// Model state
+	bool dirty() const;
+	bool empty() const;
+
+	// Solve status
+	int get_solve_status() const;
+
+	// Parameter management
 	template <typename T>
 	void set_raw_parameter(const std::string &name, T value)
 	{
@@ -475,12 +547,11 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 
 	// Internal helpers
 	void _check_error(int error) const;
+	void _mark_dirty();
+	void _unmark_dirty();
 	void _check_dirty() const;
 	KNINT _variable_index(const VariableIndex &variable) const;
 	KNINT _constraint_index(const ConstraintIndex &constraint) const;
-
-	// Member variables
-	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
 
 	size_t n_vars = 0;
 	size_t n_cons = 0;
@@ -489,6 +560,11 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	size_t n_coniccons = 0;
 	size_t n_nlcons = 0;
 
+  private:
+	// Member variables
+	std::shared_ptr<LM_context> m_lm = nullptr;
+	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
+
 	std::unordered_map<KNINT, std::variant<KNINT, std::pair<KNINT, KNINT>>> m_soc_aux_cons;
 	std::unordered_map<KNINT, uint8_t> m_con_sense_flags;
 	uint8_t m_obj_flag = 0;
@@ -496,11 +572,12 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	std::unordered_map<ExpressionGraph *, Outputs> m_pending_outputs;
 	std::vector<std::unique_ptr<CallbackEvaluator<double>>> m_evaluators;
 	bool m_need_to_add_callbacks = false;
-
-	bool m_is_dirty = true;
 	int m_solve_status = 0;
+	bool m_is_dirty = true;
 
   private:
+	void _init();
+	void _reset_state();
 	std::tuple<double, double> _sense_to_interval(ConstraintSense sense, double rhs);
 	void _update_con_sense_flags(const ConstraintIndex &constraint, ConstraintSense sense);
 

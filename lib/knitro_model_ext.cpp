@@ -18,12 +18,19 @@ NB_MODULE(knitro_model_ext, m)
 
 	bind_knitro_constants(m);
 
+	nb::class_<KNITROEnv>(m, "RawEnv")
+	    .def(nb::init<bool>(), nb::arg("empty") = false)
+	    .def("start", &KNITROEnv::start)
+	    .def("empty", &KNITROEnv::empty)
+	    .def("close", &KNITROEnv::close);
+
 #define BIND_F(f) .def(#f, &KNITROModel::f)
 	nb::class_<KNITROModel>(m, "RawModel")
 	    .def(nb::init<>())
-
+	    .def(nb::init<const KNITROEnv &>())
+	    .def("init", nb::overload_cast<>(&KNITROModel::init))
+	    .def("init", nb::overload_cast<const KNITROEnv &>(&KNITROModel::init))
 	    // clang-format off
-		BIND_F(init)
 		BIND_F(close)
 		BIND_F(get_infinity)
 		BIND_F(get_number_iterations)
@@ -154,6 +161,8 @@ NB_MODULE(knitro_model_ext, m)
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("_add_single_nl_objective", &KNITROModel::add_single_nl_objective, nb::arg("graph"),
 	         nb::arg("result"))
+	    .def("set_objective_coefficient", &KNITROModel::set_objective_coefficient,
+	         nb::arg("variable"), nb::arg("coefficient"))
 
 	    // clang-format off
 		BIND_F(get_obj_value)
@@ -223,8 +232,15 @@ NB_MODULE(knitro_model_ext, m)
 	        },
 	        nb::arg("param_id"))
 
-	    .def_rw("m_is_dirty", &KNITROModel::m_is_dirty)
-	    .def_ro("m_solve_status", &KNITROModel::m_solve_status);
+	    // clang-format off
+		BIND_F(dirty)
+		BIND_F(empty)
+	    // clang-format on
+
+	    // clang-format off
+		BIND_F(get_solve_status)
+	    // clang-format on
+	    ;
 
 #undef BIND_F
 }

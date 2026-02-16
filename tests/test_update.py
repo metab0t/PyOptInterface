@@ -37,3 +37,12 @@ def test_update(model_interface):
 
     assert model.get_value(x[0]) == approx(2.0)
     assert model.get_value(x[2]) == approx(1.0)
+
+    model.set_variable_attribute(x[0], poi.VariableAttribute.LowerBound, 1.5)
+    model.set_variable_attribute(x[2], poi.VariableAttribute.LowerBound, 0.5)
+    model.set_objective_coefficient(x[0], 2.0)
+    model.set_objective_coefficient(x[2], 1.0)
+    model.optimize()
+
+    assert model.get_value(x[0]) == approx(1.5)
+    assert model.get_value(x[2]) == approx(0.75)
