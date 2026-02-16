@@ -4,7 +4,6 @@ from pytest import approx
 from pyoptinterface import knitro
 import pyoptinterface as poi
 
-
 pytestmark = pytest.mark.skipif(
     not knitro.is_library_loaded(), reason="KNITRO library is not loaded"
 )
@@ -166,6 +165,7 @@ def test_model_init_with_empty_env_after_start():
     env.start()
     assert knitro.Model(env=env) is not None
 
+
 def test_model_dirty():
     """Test the dirty method."""
     model = knitro.Model()
@@ -256,20 +256,63 @@ def test_number_of_constraints():
 def test_supports_attribute_methods():
     """Test supports_*_attribute() static methods."""
     assert knitro.Model.supports_variable_attribute(poi.VariableAttribute.Value) is True
-    assert knitro.Model.supports_variable_attribute(poi.VariableAttribute.LowerBound) is True
-    assert knitro.Model.supports_variable_attribute(poi.VariableAttribute.LowerBound, setable=True) is True
-    assert knitro.Model.supports_variable_attribute(poi.VariableAttribute.Value, setable=True) is False
+    assert (
+        knitro.Model.supports_variable_attribute(poi.VariableAttribute.LowerBound)
+        is True
+    )
+    assert (
+        knitro.Model.supports_variable_attribute(
+            poi.VariableAttribute.LowerBound, setable=True
+        )
+        is True
+    )
+    assert (
+        knitro.Model.supports_variable_attribute(
+            poi.VariableAttribute.Value, setable=True
+        )
+        is False
+    )
 
-    assert knitro.Model.supports_constraint_attribute(poi.ConstraintAttribute.Primal) is True
-    assert knitro.Model.supports_constraint_attribute(poi.ConstraintAttribute.Name) is True
-    assert knitro.Model.supports_constraint_attribute(poi.ConstraintAttribute.Name, setable=True) is True
+    assert (
+        knitro.Model.supports_constraint_attribute(poi.ConstraintAttribute.Primal)
+        is True
+    )
+    assert (
+        knitro.Model.supports_constraint_attribute(poi.ConstraintAttribute.Name) is True
+    )
+    assert (
+        knitro.Model.supports_constraint_attribute(
+            poi.ConstraintAttribute.Name, setable=True
+        )
+        is True
+    )
 
-    assert knitro.Model.supports_model_attribute(poi.ModelAttribute.ObjectiveValue) is True
+    assert (
+        knitro.Model.supports_model_attribute(poi.ModelAttribute.ObjectiveValue) is True
+    )
     assert knitro.Model.supports_model_attribute(poi.ModelAttribute.SolverName) is True
-    assert knitro.Model.supports_model_attribute(poi.ModelAttribute.Silent, setable=True) is True
-    assert knitro.Model.supports_model_attribute(poi.ModelAttribute.ObjectiveValue, setable=True) is False
-    assert knitro.Model.supports_model_attribute(poi.ModelAttribute.NumberOfThreads, setable=True) is True
-    assert knitro.Model.supports_model_attribute(poi.ModelAttribute.TimeLimitSec, setable=True) is True
+    assert (
+        knitro.Model.supports_model_attribute(poi.ModelAttribute.Silent, setable=True)
+        is True
+    )
+    assert (
+        knitro.Model.supports_model_attribute(
+            poi.ModelAttribute.ObjectiveValue, setable=True
+        )
+        is False
+    )
+    assert (
+        knitro.Model.supports_model_attribute(
+            poi.ModelAttribute.NumberOfThreads, setable=True
+        )
+        is True
+    )
+    assert (
+        knitro.Model.supports_model_attribute(
+            poi.ModelAttribute.TimeLimitSec, setable=True
+        )
+        is True
+    )
 
 
 def test_model_attribute_solver_info():
@@ -334,11 +377,21 @@ def test_set_model_attribute_objective_sense():
     model = knitro.Model()
     model.add_variable(lb=0.0, ub=10.0)
 
-    model.set_model_attribute(poi.ModelAttribute.ObjectiveSense, poi.ObjectiveSense.Maximize)
-    assert model.get_model_attribute(poi.ModelAttribute.ObjectiveSense) == poi.ObjectiveSense.Maximize
+    model.set_model_attribute(
+        poi.ModelAttribute.ObjectiveSense, poi.ObjectiveSense.Maximize
+    )
+    assert (
+        model.get_model_attribute(poi.ModelAttribute.ObjectiveSense)
+        == poi.ObjectiveSense.Maximize
+    )
 
-    model.set_model_attribute(poi.ModelAttribute.ObjectiveSense, poi.ObjectiveSense.Minimize)
-    assert model.get_model_attribute(poi.ModelAttribute.ObjectiveSense) == poi.ObjectiveSense.Minimize
+    model.set_model_attribute(
+        poi.ModelAttribute.ObjectiveSense, poi.ObjectiveSense.Minimize
+    )
+    assert (
+        model.get_model_attribute(poi.ModelAttribute.ObjectiveSense)
+        == poi.ObjectiveSense.Minimize
+    )
 
 
 def test_set_model_attribute_silent():
@@ -434,7 +487,9 @@ def test_variable_attribute_domain():
     model = knitro.Model()
     x = model.add_variable(lb=0.0, ub=10.0)
 
-    model.set_variable_attribute(x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer)
+    model.set_variable_attribute(
+        x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer
+    )
 
     model.set_objective(x, poi.ObjectiveSense.Minimize)
     model.add_linear_constraint(x, poi.ConstraintSense.GreaterEqual, 2.5)
@@ -448,7 +503,9 @@ def test_constraint_attribute_name():
     model = knitro.Model()
     x = model.add_variable(lb=0.0, ub=10.0)
 
-    con = model.add_linear_constraint(x, poi.ConstraintSense.LessEqual, 5.0, name="my_con")
+    con = model.add_linear_constraint(
+        x, poi.ConstraintSense.LessEqual, 5.0, name="my_con"
+    )
 
     name = model.get_constraint_attribute(con, poi.ConstraintAttribute.Name)
     assert name == "my_con"

@@ -263,6 +263,7 @@ class Env(RawEnv):
     """
     KNITRO license manager environment.
     """
+
     @property
     def is_empty(self):
         return self.empty()

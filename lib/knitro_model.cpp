@@ -1031,7 +1031,6 @@ void KNITROModel::_init()
 	m_kc = std::unique_ptr<KN_context, KNITROFreeProblemT>(kc);
 }
 
-
 KNINT KNITROModel::_variable_index(const VariableIndex &variable) const
 {
 	return _get_index(variable);

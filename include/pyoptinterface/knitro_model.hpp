@@ -228,7 +228,7 @@ struct CallbackEvaluator
 			x[i] = req_x[indexVars[i]];
 		}
 		fun.sparse_jac_rev(x, jac_, jac_pattern_, jac_coloring_, jac_work_);
-		auto& jac = jac_.val();
+		auto &jac = jac_.val();
 		for (size_t i = 0; i < jac_.nnz(); i++)
 		{
 			res_jac[i] = jac[i];
@@ -253,7 +253,7 @@ struct CallbackEvaluator
 			}
 		}
 		fun.sparse_hes(x, w, hess_, hess_pattern_, hess_coloring_, hess_work_);
-		auto& hess = hess_.val();
+		auto &hess = hess_.val();
 		for (size_t i = 0; i < hess_.nnz(); i++)
 		{
 			res_hess[i] = hess[i];
@@ -265,8 +265,8 @@ struct CallbackEvaluator
 		CallbackPattern pattern;
 		pattern.indexCons = indexCons;
 
-		auto& jac_rows = jac_pattern_.row();
-		auto& jac_cols = jac_pattern_.col();
+		auto &jac_rows = jac_pattern_.row();
+		auto &jac_cols = jac_pattern_.col();
 		if (indexCons.empty())
 		{
 			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
@@ -283,8 +283,8 @@ struct CallbackEvaluator
 			}
 		}
 
-		auto& hess_rows = hess_pattern_symm_.row();
-		auto& hess_cols = hess_pattern_symm_.col();
+		auto &hess_rows = hess_pattern_symm_.row();
+		auto &hess_cols = hess_pattern_symm_.col();
 		for (size_t k = 0; k < hess_pattern_symm_.nnz(); k++)
 		{
 			pattern.hessIndexVars1.push_back(indexVars[hess_rows[k]]);
