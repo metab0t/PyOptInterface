@@ -306,6 +306,12 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.13.1 (git hash: 1d267d9): Copyright (c) 2026 under Apache 2.0 license terms
+Using BLAS: OpenBLAS 
+</pre></div>
+</div>
+</div>
 </div>
 <p>Next, we add the constraints to ensure that each row, each column has exact one queen, and each diagonal has at most one queen.</p>
 <div class="cell docutils container">
@@ -376,8 +382,8 @@ Solving report
   Max sub-MIP depth 0
   Nodes             1
   Repair LPs        0
-  LP iterations     0
 Termination status: TerminationStatusCode.OPTIMAL
+  LP iterations     0
 </pre></div>
 </div>
 </div>
@@ -438,7 +444,9 @@ Coefficient ranges:
   Cost    [1e+00, 1e+00]
   Bound   [0e+00, 0e+00]
   RHS     [1e+00, 1e+00]
-Presolving model
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Presolving model
 0 rows, 0 cols, 0 nonzeros  0s
 0 rows, 0 cols, 0 nonzeros  0s
 Presolve reductions: rows 0(-16); columns 0(-8); nonzeros 0(-16) - Reduced to empty
