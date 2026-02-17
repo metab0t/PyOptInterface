@@ -5,7 +5,8 @@ from pyoptinterface import knitro
 import pyoptinterface as poi
 
 pytestmark = pytest.mark.skipif(
-    not knitro.is_library_loaded(), reason="KNITRO library is not loaded"
+    not knitro.is_library_loaded() or not knitro.has_valid_license(),
+    reason="KNITRO library is not loaded or license is not valid",
 )
 
 

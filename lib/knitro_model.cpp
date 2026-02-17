@@ -48,6 +48,26 @@ bool load_library(const std::string &path)
 		return false;
 	}
 }
+
+bool has_valid_license()
+{
+	if (!is_library_loaded())
+	{
+		throw std::runtime_error("KNITRO library not loaded");
+	}
+
+	LM_context *lm = nullptr;
+	int error = KN_checkout_license(&lm);
+	if (error == 0)
+	{
+		KN_release_license(&lm);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 } // namespace knitro
 
 void ensure_library_loaded()
