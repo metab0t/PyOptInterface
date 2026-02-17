@@ -64,6 +64,7 @@ NB_MODULE(knitro_model_ext, m)
 		BIND_F(get_variable_name)
 		BIND_F(set_variable_name)
 		BIND_F(set_variable_domain)
+		BIND_F(get_variable_domain)
 		BIND_F(get_variable_rc)
 		BIND_F(delete_variable)
 	    // clang-format on
