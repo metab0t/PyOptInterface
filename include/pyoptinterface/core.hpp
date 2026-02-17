@@ -271,12 +271,8 @@ enum class ConstraintType
 	SOS,
 	SecondOrderCone,
 	ExponentialCone,
-	SolverDefinedOrNL,
-	Gurobi_General,
-	COPT_NL,
-	IPOPT_NL,
-	Xpress_Nlp,
-	KNITRO_NL,
+	NL,
+	SolverDefined,
 };
 
 enum class SOSType

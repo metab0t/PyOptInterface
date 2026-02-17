@@ -704,7 +704,7 @@ ConstraintIndex COPTModel::add_single_nl_constraint(ExpressionGraph &graph,
 
 	IndexT constraint_index = m_nl_constraint_index.add_index();
 
-	ConstraintIndex constraint(ConstraintType::COPT_NL, constraint_index);
+	ConstraintIndex constraint(ConstraintType::NL, constraint_index);
 
 	return constraint;
 }
@@ -1036,7 +1036,7 @@ double COPTModel::get_constraint_info(const ConstraintIndex &constraint, const c
 	case ConstraintType::Quadratic:
 		error = copt::COPT_GetQConstrInfo(m_model.get(), info_name, num, &row, &retval);
 		break;
-	case ConstraintType::COPT_NL:
+	case ConstraintType::NL:
 		error = copt::COPT_GetNLConstrInfo(m_model.get(), info_name, num, &row, &retval);
 		break;
 	default:
@@ -1059,7 +1059,7 @@ std::string COPTModel::get_constraint_name(const ConstraintIndex &constraint)
 	case ConstraintType::Quadratic:
 		error = copt::COPT_GetQConstrName(m_model.get(), row, NULL, 0, &reqsize);
 		break;
-	case ConstraintType::COPT_NL:
+	case ConstraintType::NL:
 		error = copt::COPT_GetNLConstrName(m_model.get(), row, NULL, 0, &reqsize);
 		break;
 	default:
@@ -1093,7 +1093,7 @@ void COPTModel::set_constraint_name(const ConstraintIndex &constraint, const cha
 	case ConstraintType::Quadratic:
 		error = copt::COPT_SetQConstrNames(m_model.get(), 1, &row, names);
 		break;
-	case ConstraintType::COPT_NL:
+	case ConstraintType::NL:
 		error = copt::COPT_SetNLConstrNames(m_model.get(), 1, &row, names);
 		break;
 	default:
@@ -1304,7 +1304,7 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_cone_constraint_index.get_index(constraint.index);
 	case ConstraintType::ExponentialCone:
 		return m_exp_cone_constraint_index.get_index(constraint.index);
-	case ConstraintType::COPT_NL:
+	case ConstraintType::NL:
 		return m_nl_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");

@@ -162,7 +162,7 @@ int IpoptModel::_constraint_internal_index(const ConstraintIndex &constraint)
 		return constraint.index;
 	case ConstraintType::Quadratic:
 		return m_linear_con_evaluator.n_constraints + constraint.index;
-	case ConstraintType::IPOPT_NL: {
+	case ConstraintType::NL: {
 		auto base = m_linear_con_evaluator.n_constraints + m_quadratic_con_evaluator.n_constraints;
 		auto internal_nl_index = nl_constraint_map_ext2int[constraint.index];
 		return base + internal_nl_index;
@@ -380,7 +380,7 @@ ConstraintIndex IpoptModel::add_single_nl_constraint(size_t graph_index,
 
 	m_is_dirty = true;
 
-	return ConstraintIndex(ConstraintType::IPOPT_NL, constraint_index);
+	return ConstraintIndex(ConstraintType::NL, constraint_index);
 }
 
 static bool eval_f(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data)

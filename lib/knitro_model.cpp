@@ -389,7 +389,7 @@ ConstraintIndex KNITROModel::add_single_nl_constraint(ExpressionGraph &graph,
 		m_pending_outputs[&graph].cons.push_back(constraint);
 		m_need_to_add_callbacks = true;
 	};
-	return _add_constraint_impl(ConstraintType::KNITRO_NL, interval, name, &n_nlcons, setter);
+	return _add_constraint_impl(ConstraintType::NL, interval, name, &n_nlcons, setter);
 }
 
 ConstraintIndex KNITROModel::add_single_nl_constraint_sense_rhs(ExpressionGraph &graph,
@@ -526,7 +526,7 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 	case ConstraintType::SecondOrderCone:
 		n_soccons--;
 		break;
-	case ConstraintType::KNITRO_NL:
+	case ConstraintType::NL:
 		n_nlcons--;
 		break;
 	default:
