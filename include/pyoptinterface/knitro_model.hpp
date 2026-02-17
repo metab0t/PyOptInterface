@@ -93,6 +93,8 @@ APILIST
 bool is_library_loaded();
 
 bool load_library(const std::string &path);
+
+bool has_valid_license();
 } // namespace knitro
 
 struct KNITROFreeProblemT

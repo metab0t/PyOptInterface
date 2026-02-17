@@ -15,6 +15,7 @@ NB_MODULE(knitro_model_ext, m)
 
 	m.def("is_library_loaded", &knitro::is_library_loaded);
 	m.def("load_library", &knitro::load_library);
+	m.def("has_valid_license", &knitro::has_valid_license);
 
 	bind_knitro_constants(m);
 

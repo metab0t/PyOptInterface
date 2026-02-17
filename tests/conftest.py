@@ -23,7 +23,7 @@ if ipopt.is_library_loaded():
 if copt.is_library_loaded():
     nlp_model_dict["copt"] = copt.Model
 
-if knitro.is_library_loaded():
+if knitro.is_library_loaded() and knitro.has_valid_license():
     nlp_model_dict["knitro"] = knitro.Model
 
 
@@ -46,7 +46,7 @@ if mosek.is_library_loaded():
     model_interface_dict_full["mosek"] = mosek.Model
 if highs.is_library_loaded():
     model_interface_dict_full["highs"] = highs.Model
-if knitro.is_library_loaded():
+if knitro.is_library_loaded() and knitro.has_valid_license():
     model_interface_dict_full["knitro"] = knitro.Model
 
 
