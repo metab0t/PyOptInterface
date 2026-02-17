@@ -203,7 +203,7 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 		_set_name(knitro::KN_set_var_name, indexVar, name);
 	}
 
-	n_vars++;
+	m_n_vars++;
 	_mark_dirty();
 
 	return variable;
@@ -304,7 +304,7 @@ void KNITROModel::delete_variable(const VariableIndex &variable)
 	_set_value<KNINT, int>(knitro::KN_set_var_type, indexVar, KN_VARTYPE_CONTINUOUS);
 	_set_value<KNINT, double>(knitro::KN_set_var_lobnd, indexVar, -get_infinity());
 	_set_value<KNINT, double>(knitro::KN_set_var_upbnd, indexVar, get_infinity());
-	n_vars--;
+	m_n_vars--;
 	_mark_dirty();
 }
 
@@ -330,7 +330,7 @@ ConstraintIndex KNITROModel::add_linear_constraint(const ScalarAffineFunction &f
 	auto setter = [this, &function](const ConstraintIndex &constraint) {
 		_set_linear_constraint(constraint, function);
 	};
-	return _add_constraint_impl(ConstraintType::Linear, interval, name, &n_lincons, setter);
+	return _add_constraint_impl(ConstraintType::Linear, interval, name, setter);
 }
 
 ConstraintIndex KNITROModel::add_quadratic_constraint(const ScalarQuadraticFunction &function,
@@ -349,7 +349,7 @@ ConstraintIndex KNITROModel::add_quadratic_constraint(const ScalarQuadraticFunct
 	auto setter = [this, &function](const ConstraintIndex &constraint) {
 		_set_quadratic_constraint(constraint, function);
 	};
-	return _add_constraint_impl(ConstraintType::Quadratic, interval, name, &n_quadcons, setter);
+	return _add_constraint_impl(ConstraintType::Quadratic, interval, name, setter);
 }
 
 ConstraintIndex KNITROModel::add_second_order_cone_constraint(
@@ -362,8 +362,7 @@ ConstraintIndex KNITROModel::add_second_order_cone_constraint(
 			_set_second_order_cone_constraint_rotated(constraint, variables);
 		};
 		std::pair<double, double> interval = {0.0, get_infinity()};
-		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, &n_soccons,
-		                            setter);
+		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, setter);
 	}
 	else
 	{
@@ -371,8 +370,7 @@ ConstraintIndex KNITROModel::add_second_order_cone_constraint(
 			_set_second_order_cone_constraint(constraint, variables);
 		};
 		std::pair<double, double> interval = {0.0, get_infinity()};
-		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, &n_soccons,
-		                            setter);
+		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, setter);
 	}
 }
 
@@ -389,7 +387,7 @@ ConstraintIndex KNITROModel::add_single_nl_constraint(ExpressionGraph &graph,
 		m_pending_outputs[&graph].cons.push_back(constraint);
 		m_need_to_add_callbacks = true;
 	};
-	return _add_constraint_impl(ConstraintType::NL, interval, name, &n_nlcons, setter);
+	return _add_constraint_impl(ConstraintType::NL, interval, name, setter);
 }
 
 ConstraintIndex KNITROModel::add_single_nl_constraint_sense_rhs(ExpressionGraph &graph,
@@ -514,24 +512,7 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 	_set_value<KNINT, double>(knitro::KN_set_con_lobnd, indexCon, -get_infinity());
 	_set_value<KNINT, double>(knitro::KN_set_con_upbnd, indexCon, get_infinity());
 
-	n_cons--;
-	switch (constraint.type)
-	{
-	case ConstraintType::Linear:
-		n_lincons--;
-		break;
-	case ConstraintType::Quadratic:
-		n_quadcons--;
-		break;
-	case ConstraintType::SecondOrderCone:
-		n_soccons--;
-		break;
-	case ConstraintType::NL:
-		n_nlcons--;
-		break;
-	default:
-		break;
-	}
+	m_n_cons_map[constraint.type]--;
 
 	auto it = m_soc_aux_cons.find(indexCon);
 	if (it != m_soc_aux_cons.end())
@@ -1007,6 +988,29 @@ bool KNITROModel::empty() const
 	return m_kc == nullptr;
 }
 
+size_t KNITROModel::get_num_vars() const
+{
+	return m_n_vars;
+}
+
+size_t KNITROModel::get_num_cons(std::optional<ConstraintType> type) const
+{
+	if (!type.has_value())
+	{
+		size_t total = 0;
+		for (const auto &[_, count] : m_n_cons_map)
+		{
+			total += count;
+		}
+		return total;
+	}
+	else
+	{
+		auto it = m_n_cons_map.find(type.value());
+		return it != m_n_cons_map.end() ? it->second : 0;
+	}
+}
+
 int KNITROModel::get_solve_status() const
 {
 	_check_dirty();
@@ -1025,12 +1029,8 @@ void KNITROModel::_check_dirty() const
 void KNITROModel::_reset_state()
 {
 	m_kc.reset();
-	n_vars = 0;
-	n_cons = 0;
-	n_lincons = 0;
-	n_quadcons = 0;
-	n_soccons = 0;
-	n_nlcons = 0;
+	m_n_vars = 0;
+	m_n_cons_map.clear();
 	m_soc_aux_cons.clear();
 	m_con_sense_flags.clear();
 	m_obj_flag = 0;

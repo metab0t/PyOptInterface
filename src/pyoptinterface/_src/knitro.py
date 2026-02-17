@@ -17,7 +17,6 @@ from .comparison_constraint import ComparisonConstraint
 from .core_ext import (
     ConstraintIndex,
     ConstraintSense,
-    ConstraintType,
     ExprBuilder,
     ScalarAffineFunction,
     ScalarQuadraticFunction,
@@ -333,25 +332,6 @@ class Model(RawModel):
             return attribute in model_attribute_set_func_map
         else:
             return attribute in model_attribute_get_func_map
-
-    def number_of_variables(self) -> int:
-        return self.n_vars
-
-    def number_of_constraints(
-        self, constraint_type: Union[ConstraintType, None] = None
-    ) -> int:
-        if constraint_type is None:
-            return self.n_cons
-        elif constraint_type == ConstraintType.Linear:
-            return self.n_lincons
-        elif constraint_type == ConstraintType.Quadratic:
-            return self.n_quadcons
-        elif constraint_type == ConstraintType.SecondOrderCone:
-            return self.n_soccons
-        elif constraint_type == ConstraintType.KNITRO_NL:
-            return self.n_nlcons
-        else:
-            raise ValueError(f"Unknown constraint type: {constraint_type}")
 
     @overload
     def add_linear_constraint(
