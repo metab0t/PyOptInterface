@@ -4,8 +4,8 @@ from pyoptinterface import nl, gurobi
 import pytest
 
 
-def test_linear_in_constraint(model_interface):
-    model = model_interface
+def test_linear_in_constraint(model_interface_oneshot):
+    model = model_interface_oneshot
 
     if isinstance(model, gurobi.Model):
         pytest.skip("Gurobi does not support range linear constraints")
