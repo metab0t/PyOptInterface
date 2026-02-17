@@ -4,8 +4,8 @@ from scipy.sparse import coo_array
 from pytest import approx
 
 
-def test_matrix_api(model_interface):
-    model = model_interface
+def test_matrix_api(model_interface_oneshot):
+    model = model_interface_oneshot
 
     N = 10
     x = model.add_m_variables(N, lb=0.0)
@@ -29,8 +29,8 @@ def test_matrix_api(model_interface):
     assert obj_value == approx(-N * ub)
 
 
-def test_quicksum_ndarray(model_interface):
-    model = model_interface
+def test_quicksum_ndarray(model_interface_oneshot):
+    model = model_interface_oneshot
 
     N = 10
     x = model.add_m_variables((N, 2 * N), lb=1.0, ub=3.0)

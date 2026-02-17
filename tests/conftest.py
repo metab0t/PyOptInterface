@@ -34,24 +34,36 @@ def nlp_model_ctor(request):
     return ctor
 
 
-model_interface_dict = {}
+model_interface_dict_full = {}
 
 if gurobi.is_library_loaded():
-    model_interface_dict["gurobi"] = gurobi.Model
+    model_interface_dict_full["gurobi"] = gurobi.Model
 if xpress.is_library_loaded():
-    model_interface_dict["xpress"] = xpress.Model
+    model_interface_dict_full["xpress"] = xpress.Model
 if copt.is_library_loaded():
-    model_interface_dict["copt"] = copt.Model
+    model_interface_dict_full["copt"] = copt.Model
 if mosek.is_library_loaded():
-    model_interface_dict["mosek"] = mosek.Model
+    model_interface_dict_full["mosek"] = mosek.Model
 if highs.is_library_loaded():
     model_interface_dict["highs"] = highs.Model
 if knitro.is_library_loaded() and knitro.has_valid_license():
     model_interface_dict["knitro"] = knitro.Model
 
 
-@pytest.fixture(params=model_interface_dict.keys())
+@pytest.fixture(params=model_interface_dict_full.keys())
 def model_interface(request):
     name = request.param
-    model_interface_class = model_interface_dict[name]
+    model_interface_class = model_interface_dict_full[name]
+    return model_interface_class()
+
+
+model_interface_dict_oneshot = model_interface_dict_full.copy()
+if ipopt.is_library_loaded():
+    model_interface_dict_oneshot["ipopt"] = ipopt.Model
+
+
+@pytest.fixture(params=model_interface_dict_oneshot.keys())
+def model_interface_oneshot(request):
+    name = request.param
+    model_interface_class = model_interface_dict_oneshot[name]
     return model_interface_class()

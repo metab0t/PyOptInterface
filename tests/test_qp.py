@@ -4,8 +4,8 @@ from pytest import approx
 import numpy as np
 
 
-def test_simple_qp(model_interface):
-    model = model_interface
+def test_simple_qp(model_interface_oneshot):
+    model = model_interface_oneshot
 
     N = 6
 
@@ -19,15 +19,18 @@ def test_simple_qp(model_interface):
 
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-    assert status == poi.TerminationStatusCode.OPTIMAL
+    assert (
+        status == poi.TerminationStatusCode.OPTIMAL
+        or status == poi.TerminationStatusCode.LOCALLY_SOLVED
+    )
 
     obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
     assert obj_val == approx(N**2, rel=1e-5)
 
 
 # reported by https://github.com/metab0t/PyOptInterface/issues/59
-def test_shuffle_qp_objective(model_interface):
-    model = model_interface
+def test_shuffle_qp_objective(model_interface_oneshot):
+    model = model_interface_oneshot
 
     N = 3
     weights = model.add_m_variables(N, lb=0)
@@ -68,8 +71,8 @@ def test_shuffle_qp_objective(model_interface):
     assert np.all(np.abs(obj_values - obj_values[0]) < 1e-8)
 
 
-def test_duplicated_quadratic_terms(model_interface):
-    model = model_interface
+def test_duplicated_quadratic_terms(model_interface_oneshot):
+    model = model_interface_oneshot
 
     x = model.add_m_variables(2, lb=1.0)
 

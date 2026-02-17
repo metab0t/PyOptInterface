@@ -221,6 +221,7 @@ def _result_status_knitro(model: "Model"):
         return ResultStatusCode.INFEASIBLE_POINT
     return ResultStatusCode.NO_SOLUTION
 
+
 # Model Attribute
 model_attribute_get_func_map = {
     ModelAttribute.ObjectiveValue: lambda model: model.get_obj_value(),

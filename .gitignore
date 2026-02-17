@@ -10,6 +10,7 @@ dist/
 
 .idea/
 .vscode/
+.claude/
 
 bench/local
 debug/

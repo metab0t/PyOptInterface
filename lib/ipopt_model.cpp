@@ -181,7 +181,8 @@ double IpoptModel::get_constraint_primal(const ConstraintIndex &constraint)
 double IpoptModel::get_constraint_dual(const ConstraintIndex &constraint)
 {
 	int index = _constraint_internal_index(constraint);
-	return m_result.mult_g[index];
+	auto dual = -m_result.mult_g[index];
+	return dual;
 }
 
 ConstraintIndex IpoptModel::add_linear_constraint(const ScalarAffineFunction &f,

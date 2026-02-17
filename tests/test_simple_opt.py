@@ -94,8 +94,8 @@ def test_simple_opt(model_interface):
     assert y_val == approx(8.0)
 
 
-def test_constant_objective(model_interface):
-    model = model_interface
+def test_constant_objective(model_interface_oneshot):
+    model = model_interface_oneshot
 
     x = model.add_variable(lb=0.0, ub=1.0)
     obj = 1.0
@@ -106,13 +106,16 @@ def test_constant_objective(model_interface):
     model.set_objective(obj, poi.ObjectiveSense.Maximize)
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-    assert status == poi.TerminationStatusCode.OPTIMAL
+    assert (
+        status == poi.TerminationStatusCode.OPTIMAL
+        or status == poi.TerminationStatusCode.LOCALLY_SOLVED
+    )
     obj_val = model.get_model_attribute(poi.ModelAttribute.ObjectiveValue)
     assert obj_val == approx(1.0)
 
 
-def test_constraint_primal_dual(model_interface):
-    model = model_interface
+def test_constraint_primal_dual(model_interface_oneshot):
+    model = model_interface_oneshot
 
     x = model.add_variable(lb=0.0, ub=1.0)
     y = model.add_variable(lb=0.0, ub=1.0)
@@ -128,7 +131,10 @@ def test_constraint_primal_dual(model_interface):
 
     model.optimize()
     status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-    assert status == poi.TerminationStatusCode.OPTIMAL
+    assert (
+        status == poi.TerminationStatusCode.OPTIMAL
+        or status == poi.TerminationStatusCode.LOCALLY_SOLVED
+    )
 
     primal_val = model.get_constraint_attribute(con1, poi.ConstraintAttribute.Primal)
     assert primal_val == approx(1.0)
@@ -137,8 +143,8 @@ def test_constraint_primal_dual(model_interface):
     assert dual_val == approx(0.5)
 
 
-def test_add_quadratic_expr_as_linear_throws_error(model_interface):
-    model = model_interface
+def test_add_quadratic_expr_as_linear_throws_error(model_interface_oneshot):
+    model = model_interface_oneshot
 
     xs = model.add_m_variables(10)
     x2_sum = poi.quicksum(x * x for x in xs.flat)
@@ -147,8 +153,8 @@ def test_add_quadratic_expr_as_linear_throws_error(model_interface):
         model.add_linear_constraint(x2_sum <= 1.0)
 
 
-def test_exprbuilder_self_operation(model_interface):
-    model = model_interface
+def test_exprbuilder_self_operation(model_interface_oneshot):
+    model = model_interface_oneshot
 
     x = model.add_m_variables(2, lb=1.0, ub=4.0)
 
