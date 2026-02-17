@@ -45,9 +45,9 @@ if copt.is_library_loaded():
 if mosek.is_library_loaded():
     model_interface_dict_full["mosek"] = mosek.Model
 if highs.is_library_loaded():
-    model_interface_dict["highs"] = highs.Model
+    model_interface_dict_full["highs"] = highs.Model
 if knitro.is_library_loaded() and knitro.has_valid_license():
-    model_interface_dict["knitro"] = knitro.Model
+    model_interface_dict_full["knitro"] = knitro.Model
 
 
 @pytest.fixture(params=model_interface_dict_full.keys())
