@@ -37,7 +37,8 @@ NB_MODULE(core_ext, m)
 	    .value("Linear", ConstraintType::Linear)
 	    .value("Quadratic", ConstraintType::Quadratic)
 	    .value("SOS", ConstraintType::SOS)
-	    .value("Cone", ConstraintType::Cone);
+	    .value("SecondOrderCone", ConstraintType::SecondOrderCone)
+	    .value("ExponentialCone", ConstraintType::ExponentialCone);
 
 	nb::enum_<SOSType>(m, "SOSType").value("SOS1", SOSType::SOS1).value("SOS2", SOSType::SOS2);
 

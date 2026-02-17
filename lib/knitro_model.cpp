@@ -362,7 +362,8 @@ ConstraintIndex KNITROModel::add_second_order_cone_constraint(
 			_set_second_order_cone_constraint_rotated(constraint, variables);
 		};
 		std::pair<double, double> interval = {0.0, get_infinity()};
-		return _add_constraint_impl(ConstraintType::Cone, interval, name, &n_coniccons, setter);
+		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, &n_soccons,
+		                            setter);
 	}
 	else
 	{
@@ -370,7 +371,8 @@ ConstraintIndex KNITROModel::add_second_order_cone_constraint(
 			_set_second_order_cone_constraint(constraint, variables);
 		};
 		std::pair<double, double> interval = {0.0, get_infinity()};
-		return _add_constraint_impl(ConstraintType::Cone, interval, name, &n_coniccons, setter);
+		return _add_constraint_impl(ConstraintType::SecondOrderCone, interval, name, &n_soccons,
+		                            setter);
 	}
 }
 
@@ -521,8 +523,8 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 	case ConstraintType::Quadratic:
 		n_quadcons--;
 		break;
-	case ConstraintType::Cone:
-		n_coniccons--;
+	case ConstraintType::SecondOrderCone:
+		n_soccons--;
 		break;
 	case ConstraintType::KNITRO_NL:
 		n_nlcons--;
@@ -1027,7 +1029,7 @@ void KNITROModel::_reset_state()
 	n_cons = 0;
 	n_lincons = 0;
 	n_quadcons = 0;
-	n_coniccons = 0;
+	n_soccons = 0;
 	n_nlcons = 0;
 	m_soc_aux_cons.clear();
 	m_con_sense_flags.clear();

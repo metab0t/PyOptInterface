@@ -346,8 +346,8 @@ class Model(RawModel):
             return self.n_lincons
         elif constraint_type == ConstraintType.Quadratic:
             return self.n_quadcons
-        elif constraint_type == ConstraintType.Cone:
-            return self.n_coniccons
+        elif constraint_type == ConstraintType.SecondOrderCone:
+            return self.n_soccons
         elif constraint_type == ConstraintType.KNITRO_NL:
             return self.n_nlcons
         else:

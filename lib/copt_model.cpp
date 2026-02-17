@@ -420,7 +420,7 @@ ConstraintIndex COPTModel::add_second_order_cone_constraint(const Vector<Variabl
                                                             const char *name, bool rotated)
 {
 	IndexT index = m_cone_constraint_index.add_index();
-	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+	ConstraintIndex constraint_index(ConstraintType::SecondOrderCone, index);
 
 	int N = variables.size();
 	std::vector<int> ind_v(N);
@@ -452,7 +452,7 @@ ConstraintIndex COPTModel::add_exp_cone_constraint(const Vector<VariableIndex> &
                                                    const char *name, bool dual)
 {
 	IndexT index = m_exp_cone_constraint_index.add_index();
-	ConstraintIndex constraint_index(ConstraintType::COPT_ExpCone, index);
+	ConstraintIndex constraint_index(ConstraintType::ExponentialCone, index);
 
 	int N = variables.size();
 	if (N != 3)
@@ -729,11 +729,11 @@ void COPTModel::delete_constraint(const ConstraintIndex &constraint)
 			m_sos_constraint_index.delete_index(constraint.index);
 			error = copt::COPT_DelSOSs(m_model.get(), 1, &constraint_row);
 			break;
-		case ConstraintType::Cone:
+		case ConstraintType::SecondOrderCone:
 			m_cone_constraint_index.delete_index(constraint.index);
 			error = copt::COPT_DelCones(m_model.get(), 1, &constraint_row);
 			break;
-		case ConstraintType::COPT_ExpCone:
+		case ConstraintType::ExponentialCone:
 			m_exp_cone_constraint_index.delete_index(constraint.index);
 			error = copt::COPT_DelExpCones(m_model.get(), 1, &constraint_row);
 			break;
@@ -754,9 +754,9 @@ bool COPTModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.has_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
-	case ConstraintType::Cone:
+	case ConstraintType::SecondOrderCone:
 		return m_cone_constraint_index.has_index(constraint.index);
-	case ConstraintType::COPT_ExpCone:
+	case ConstraintType::ExponentialCone:
 		return m_exp_cone_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1300,9 +1300,9 @@ int COPTModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.get_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);
-	case ConstraintType::Cone:
+	case ConstraintType::SecondOrderCone:
 		return m_cone_constraint_index.get_index(constraint.index);
-	case ConstraintType::COPT_ExpCone:
+	case ConstraintType::ExponentialCone:
 		return m_exp_cone_constraint_index.get_index(constraint.index);
 	case ConstraintType::COPT_NL:
 		return m_nl_constraint_index.get_index(constraint.index);

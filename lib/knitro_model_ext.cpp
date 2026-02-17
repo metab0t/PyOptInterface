@@ -47,7 +47,7 @@ NB_MODULE(knitro_model_ext, m)
 	    .def_ro("n_cons", &KNITROModel::n_cons)
 	    .def_ro("n_lincons", &KNITROModel::n_lincons)
 	    .def_ro("n_quadcons", &KNITROModel::n_quadcons)
-	    .def_ro("n_coniccons", &KNITROModel::n_coniccons)
+	    .def_ro("n_soccons", &KNITROModel::n_soccons)
 	    .def_ro("n_nlcons", &KNITROModel::n_nlcons)
 
 	    .def("add_variable", &KNITROModel::add_variable,

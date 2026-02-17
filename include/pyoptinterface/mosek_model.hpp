@@ -169,7 +169,8 @@ class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
 
 	std::vector<MSKint64t> add_variables_as_afe(const Vector<VariableIndex> &variables);
 	ConstraintIndex add_variables_in_cone_constraint(const Vector<VariableIndex> &variables,
-	                                                 MSKint64t domain_index, const char *name);
+	                                                 MSKint64t domain_index, ConstraintType type,
+	                                                 const char *name);
 
 	ConstraintIndex add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
 	                                                 const char *name, bool rotated = false);

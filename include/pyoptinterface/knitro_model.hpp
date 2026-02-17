@@ -559,7 +559,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	size_t n_cons = 0;
 	size_t n_lincons = 0;
 	size_t n_quadcons = 0;
-	size_t n_coniccons = 0;
+	size_t n_soccons = 0;
 	size_t n_nlcons = 0;
 
   private:
