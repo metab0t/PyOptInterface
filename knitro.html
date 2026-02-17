@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Changelog" href="changelog.html"><link rel="prev" title="Ipopt" href="ipopt.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>KNITRO - PyOptInterface documentation</title>
@@ -193,7 +193,7 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
@@ -215,6 +215,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ipopt.html">Ipopt</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">KNITRO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
@@ -285,6 +286,19 @@
 </pre></div>
 </div>
 <p>You need to follow the instructions in <a class="reference internal" href="getting_started.html#knitro"><span class="std std-ref">Getting Started</span></a> to set up the optimizer correctly.</p>
+<p>If you want to manage the license of KNITRO manually, you can create a <code class="docutils literal notranslate"><span class="pre">knitro.Env</span></code> object and pass it to the constructor of the <code class="docutils literal notranslate"><span class="pre">knitro.Model</span></code> object, otherwise a check of the license will be performed when initializing the <code class="docutils literal notranslate"><span class="pre">knitro.Model</span></code> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">knitro</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">knitro</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For users who want to release the license immediately after the optimization, you can call the <code class="docutils literal notranslate"><span class="pre">close</span></code> method of all models created and the <code class="docutils literal notranslate"><span class="pre">knitro.Env</span></code> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">knitro</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">knitro</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+<span class="c1"># do something with the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
 <section id="the-capability-of-knitro-model">
 <h2>The capability of <code class="docutils literal notranslate"><span class="pre">knitro.Model</span></code><a class="headerlink" href="#the-capability-of-knitro-model" title="Link to this heading">¶</a></h2>
@@ -569,6 +583,10 @@
 </div>
 </section>
 </section>
+<section id="support-for-knitro-callbacks">
+<h2>Support for KNITRO callbacks<a class="headerlink" href="#support-for-knitro-callbacks" title="Link to this heading">¶</a></h2>
+<p>Unfortunately, KNITRO’s callback interface is not supported in PyOptInterface at the moment.</p>
+</section>
 </section>
 
         </article>
@@ -576,8 +594,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="changelog.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Changelog</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ipopt.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Ipopt</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -622,6 +658,7 @@
 <li><a class="reference internal" href="#variable-and-constraint-properties">Variable and Constraint Properties</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#support-for-knitro-callbacks">Support for KNITRO callbacks</a></li>
 </ul>
 </li>
 </ul>

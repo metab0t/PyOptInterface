@@ -215,6 +215,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../mosek.html">Mosek</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../highs.html">HiGHS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ipopt.html">Ipopt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../knitro.html">KNITRO</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
@@ -402,10 +403,6 @@ Using BLAS: OpenBLAS
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TerminationStatusCode.OPTIMAL
-Objective value:  12684.0
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>QP has 162 rows; 72 cols; 348 matrix nonzeros; 72 Hessian nonzeros
 Coefficient ranges:
   Matrix  [1e+00, 1e+00]
@@ -423,6 +420,8 @@ QP ASM    iterations: 108
 Objective value     :  1.2684000000e+04
 P-D objective error :  1.6461008020e-06
 HiGHS run time      :          0.00
+TerminationStatusCode.OPTIMAL
+Objective value:  12684.0
 </pre></div>
 </div>
 </div>
@@ -490,6 +489,11 @@ Coefficient ranges:
           0        15430.248                0      0.00s
         100        14091.031                3      0.01s
         169        13740.237               10      0.01s
+Model status        : Optimal
+Simplex   iterations: 86
+QP ASM    iterations: 169
+Objective value     :  1.3740213571e+04
+P-D objective error :  1.6699127419e-06
 TerminationStatusCode.OPTIMAL
 Objective value:  13740.213571429404
 [[100.         100.         100.         100.         100.
@@ -507,12 +511,9 @@ Objective value:  13740.213571429404
    50.          50.          50.          50.          50.28576204
    50.71433367  51.14290531  51.57147694  52.00004857  52.4286202
    52.85719184  53.28576347  53.7143351   54.14290673]]
-Model status        : Optimal
-Simplex   iterations: 86
-QP ASM    iterations: 169
-Objective value     :  1.3740213571e+04
-P-D objective error :  1.6699127419e-06
-HiGHS run time      :          0.01
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>HiGHS run time      :          0.01
 </pre></div>
 </div>
 </div>
