@@ -629,7 +629,7 @@ ConstraintIndex GurobiModel::add_single_nl_constraint(const ExpressionGraph &gra
 
 	IndexT constraint_index = m_general_constraint_index.add_index();
 
-	ConstraintIndex constraint(ConstraintType::Gurobi_General, constraint_index);
+	ConstraintIndex constraint(ConstraintType::NL, constraint_index);
 	m_nlcon_resvar_map.emplace(constraint_index, resvar.index);
 
 	m_update_flag |= m_general_constraint_creation;
@@ -661,7 +661,7 @@ void GurobiModel::delete_constraint(const ConstraintIndex &constraint)
 			error = gurobi::GRBdelsos(m_model.get(), 1, &constraint_row);
 			m_update_flag |= m_sos_constraint_deletion;
 			break;
-		case ConstraintType::Gurobi_General: {
+		case ConstraintType::NL: {
 			m_general_constraint_index.delete_index(constraint.index);
 			error = gurobi::GRBdelgenconstrs(m_model.get(), 1, &constraint_row);
 			// delete the corresponding resvar variable as well
@@ -687,7 +687,7 @@ bool GurobiModel::is_constraint_active(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.has_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
-	case ConstraintType::Gurobi_General:
+	case ConstraintType::NL:
 		return m_general_constraint_index.has_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1253,7 +1253,7 @@ int GurobiModel::_constraint_index(const ConstraintIndex &constraint)
 		return m_quadratic_constraint_index.get_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);
-	case ConstraintType::Gurobi_General:
+	case ConstraintType::NL:
 		return m_general_constraint_index.get_index(constraint.index);
 	default:
 		throw std::runtime_error("Unknown constraint type");
@@ -1310,7 +1310,7 @@ void GurobiModel::_update_for_constraint_index(ConstraintType type)
 	case ConstraintType::SOS:
 		need_update = m_update_flag & (m_sos_constraint_creation | m_sos_constraint_deletion);
 		break;
-	case ConstraintType::Gurobi_General:
+	case ConstraintType::NL:
 		need_update =
 		    m_update_flag & (m_general_constraint_creation | m_general_constraint_deletion);
 		break;

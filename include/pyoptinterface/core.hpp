@@ -269,13 +269,10 @@ enum class ConstraintType
 	Linear,
 	Quadratic,
 	SOS,
-	Cone,
-	Gurobi_General,
-	COPT_ExpCone,
-	COPT_NL,
-	IPOPT_NL,
-	Xpress_Nlp,
-	KNITRO_NL,
+	SecondOrderCone,
+	ExponentialCone,
+	NL,
+	SolverDefined,
 };
 
 enum class SOSType

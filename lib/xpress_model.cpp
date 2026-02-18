@@ -888,7 +888,7 @@ ConstraintIndex Model::add_second_order_cone_constraint(const Vector<VariableInd
 	}
 	ConstraintIndex constraint_index =
 	    add_quadratic_constraint(quadconstr, ConstraintSense::GreaterEqual, 0.0, name);
-	constraint_index.type = ConstraintType::Cone;
+	constraint_index.type = ConstraintType::SecondOrderCone;
 	return constraint_index;
 }
 
@@ -917,7 +917,7 @@ ConstraintIndex Model::add_exp_cone_constraint(const Vector<VariableIndex> &vari
 	// Add affine part
 	auto constraint_index =
 	    add_linear_constraint_from_var(variables[0], ConstraintSense::GreaterEqual, 0.0);
-	constraint_index.type = ConstraintType::Xpress_Nlp; // Fix constraint type
+	constraint_index.type = ConstraintType::ExponentialCone; // Fix constraint type
 
 	int nnz = 0;
 	const int *types = {};
@@ -1241,7 +1241,7 @@ ConstraintIndex Model::add_single_nl_constraint(ExpressionGraph &graph,
 
 	int rowidx = get_raw_attribute_int_by_id(POI_XPRS_ROWS);
 	ConstraintIndex constraint = add_linear_constraint(ScalarAffineFunction{}, interval, name);
-	constraint.type = ConstraintType::Xpress_Nlp;
+	constraint.type = ConstraintType::NL;
 
 	auto [types, values] = _decode_graph_postfix_order(graph, result);
 
@@ -1269,8 +1269,9 @@ void Model::delete_constraint(ConstraintIndex constraint)
 		switch (constraint.type)
 		{
 		case ConstraintType::Quadratic:
-		case ConstraintType::Cone:
-		case ConstraintType::Xpress_Nlp:
+		case ConstraintType::SecondOrderCone:
+		case ConstraintType::ExponentialCone:
+		case ConstraintType::NL:
 			--m_quad_nl_constr_num;
 			[[fallthrough]];
 		case ConstraintType::Linear:
@@ -1294,8 +1295,9 @@ bool Model::is_constraint_active(ConstraintIndex constraint)
 	{
 	case ConstraintType::Linear:
 	case ConstraintType::Quadratic:
-	case ConstraintType::Cone:
-	case ConstraintType::Xpress_Nlp:
+	case ConstraintType::SecondOrderCone:
+	case ConstraintType::ExponentialCone:
+	case ConstraintType::NL:
 		return m_constraint_index.has_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.has_index(constraint.index);
@@ -1474,8 +1476,9 @@ int Model::_constraint_index(ConstraintIndex constraint)
 	{
 	case ConstraintType::Linear:
 	case ConstraintType::Quadratic:
-	case ConstraintType::Cone:
-	case ConstraintType::Xpress_Nlp:
+	case ConstraintType::SecondOrderCone:
+	case ConstraintType::ExponentialCone:
+	case ConstraintType::NL:
 		return m_constraint_index.get_index(constraint.index);
 	case ConstraintType::SOS:
 		return m_sos_constraint_index.get_index(constraint.index);

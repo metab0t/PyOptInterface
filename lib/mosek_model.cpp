@@ -581,13 +581,13 @@ std::vector<MSKint64t> MOSEKModel::add_variables_as_afe(const Vector<VariableInd
 
 ConstraintIndex MOSEKModel::add_variables_in_cone_constraint(const Vector<VariableIndex> &variables,
                                                              MSKint64t domain_index,
-                                                             const char *name)
+                                                             ConstraintType type, const char *name)
 {
 	auto N = variables.size();
 
 	IndexT index = m_acc_index.size();
 	m_acc_index.push_back(true);
-	ConstraintIndex constraint_index(ConstraintType::Cone, index);
+	ConstraintIndex constraint_index(type, index);
 
 	// afe part
 	std::vector<MSKint64t> afe_index = add_variables_as_afe(variables);
@@ -630,7 +630,8 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 	}
 	check_error(error);
 
-	auto con = add_variables_in_cone_constraint(variables, domain_index, name);
+	auto con = add_variables_in_cone_constraint(variables, domain_index,
+	                                            ConstraintType::SecondOrderCone, name);
 
 	return con;
 }
@@ -657,7 +658,8 @@ ConstraintIndex MOSEKModel::add_exp_cone_constraint(const Vector<VariableIndex> 
 	}
 	check_error(error);
 
-	auto con = add_variables_in_cone_constraint(variables, domain_index, name);
+	auto con = add_variables_in_cone_constraint(variables, domain_index,
+	                                            ConstraintType::ExponentialCone, name);
 
 	return con;
 }
@@ -676,7 +678,8 @@ void MOSEKModel::delete_constraint(const ConstraintIndex &constraint)
 		m_linear_quadratic_constraint_index.delete_index(constraint.index);
 		error = mosek::MSK_removecons(m_model.get(), 1, &constraint_row);
 		break;
-	case ConstraintType::Cone: {
+	case ConstraintType::SecondOrderCone:
+	case ConstraintType::ExponentialCone: {
 		m_acc_index[constraint.index] = false;
 		// ACC cannot be deleted, we just set its domain to R^n (no constraint)
 		// get the dimension of this ACC
@@ -1387,7 +1390,8 @@ MSKint32t MOSEKModel::_constraint_index(const ConstraintIndex &constraint)
 	case ConstraintType::Quadratic:
 		return m_linear_quadratic_constraint_index.get_index(constraint.index);
 		break;
-	case ConstraintType::Cone:
+	case ConstraintType::SecondOrderCone:
+	case ConstraintType::ExponentialCone:
 		return m_acc_index[constraint.index] ? constraint.index : -1;
 		break;
 	default:

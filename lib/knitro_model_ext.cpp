@@ -1,4 +1,5 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/tuple.h>
@@ -31,6 +32,7 @@ NB_MODULE(knitro_model_ext, m)
 	    .def(nb::init<const KNITROEnv &>())
 	    .def("init", nb::overload_cast<>(&KNITROModel::init))
 	    .def("init", nb::overload_cast<const KNITROEnv &>(&KNITROModel::init))
+
 	    // clang-format off
 		BIND_F(close)
 		BIND_F(get_infinity)
@@ -43,12 +45,8 @@ NB_MODULE(knitro_model_ext, m)
 		BIND_F(get_release)
 	    // clang-format on
 
-	    .def_ro("n_vars", &KNITROModel::n_vars)
-	    .def_ro("n_cons", &KNITROModel::n_cons)
-	    .def_ro("n_lincons", &KNITROModel::n_lincons)
-	    .def_ro("n_quadcons", &KNITROModel::n_quadcons)
-	    .def_ro("n_coniccons", &KNITROModel::n_coniccons)
-	    .def_ro("n_nlcons", &KNITROModel::n_nlcons)
+	    .def("number_of_variables", &KNITROModel::get_num_vars)
+	    .def("number_of_constraints", &KNITROModel::get_num_cons, nb::arg("type") = nb::none())
 
 	    .def("add_variable", &KNITROModel::add_variable,
 	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -KN_INFINITY,
@@ -163,10 +161,9 @@ NB_MODULE(knitro_model_ext, m)
 	         nb::arg("expr"), nb::arg("sense") = ObjectiveSense::Minimize)
 	    .def("_add_single_nl_objective", &KNITROModel::add_single_nl_objective, nb::arg("graph"),
 	         nb::arg("result"))
-	    .def("set_objective_coefficient", &KNITROModel::set_objective_coefficient,
-	         nb::arg("variable"), nb::arg("coefficient"))
 
 	    // clang-format off
+		BIND_F(set_objective_coefficient)
 		BIND_F(get_obj_value)
 		BIND_F(set_obj_sense)
 		BIND_F(get_obj_sense)

@@ -566,15 +566,13 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	KNINT _variable_index(const VariableIndex &variable) const;
 	KNINT _constraint_index(const ConstraintIndex &constraint) const;
 
-	size_t n_vars = 0;
-	size_t n_cons = 0;
-	size_t n_lincons = 0;
-	size_t n_quadcons = 0;
-	size_t n_coniccons = 0;
-	size_t n_nlcons = 0;
+	size_t get_num_vars() const;
+	size_t get_num_cons(std::optional<ConstraintType> type = std::nullopt) const;
 
   private:
 	// Member variables
+	size_t m_n_vars = 0;
+	std::unordered_map<ConstraintType, size_t> m_n_cons_map;
 	std::shared_ptr<LM_context> m_lm = nullptr;
 	std::unique_ptr<KN_context, KNITROFreeProblemT> m_kc = nullptr;
 
@@ -616,7 +614,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	template <typename F>
 	ConstraintIndex _add_constraint_impl(ConstraintType type,
 	                                     const std::tuple<double, double> &interval,
-	                                     const char *name, size_t *np, const F &setter)
+	                                     const char *name, const F &setter)
 	{
 		KNINT indexCon;
 		int error = knitro::KN_add_con(m_kc.get(), &indexCon);
@@ -643,11 +641,16 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 
 		m_con_sense_flags[indexCon] = CON_UPBND;
 
-		n_cons++;
-		if (np != nullptr)
+		auto it = m_n_cons_map.find(type);
+		if (it != m_n_cons_map.end())
 		{
-			(*np)++;
+			it->second++;
 		}
+		else
+		{
+			m_n_cons_map[type] = 1;
+		}
+
 		m_is_dirty = true;
 
 		return constraint;
