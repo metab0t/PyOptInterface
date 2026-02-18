@@ -290,6 +290,13 @@ void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDom
 	_mark_dirty();
 }
 
+VariableDomain KNITROModel::get_variable_domain(const VariableIndex &variable) const
+{
+	KNINT indexVar = _variable_index(variable);
+	int var_type = _get_value<KNINT, int>(knitro::KN_get_var_type, indexVar);
+	return knitro_variable_domain(var_type);
+}
+
 double KNITROModel::get_variable_rc(const VariableIndex &variable) const
 {
 	_check_dirty();

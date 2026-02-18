@@ -484,19 +484,31 @@ def test_variable_attribute_primal_start():
 
 
 def test_variable_attribute_domain():
-    """Test setting variable domain."""
+    """Test getting and setting variable domain."""
     model = knitro.Model()
     x = model.add_variable(lb=0.0, ub=10.0)
 
+    # Default domain should be Continuous
+    domain = model.get_variable_attribute(x, poi.VariableAttribute.Domain)
+    assert domain == poi.VariableDomain.Continuous
+
+    # Set to Integer and verify
     model.set_variable_attribute(
         x, poi.VariableAttribute.Domain, poi.VariableDomain.Integer
     )
+    domain = model.get_variable_attribute(x, poi.VariableAttribute.Domain)
+    assert domain == poi.VariableDomain.Integer
 
     model.set_objective(x, poi.ObjectiveSense.Minimize)
     model.add_linear_constraint(x, poi.ConstraintSense.GreaterEqual, 2.5)
     model.optimize()
 
     assert model.get_value(x) == approx(3.0)
+
+    # Test Binary domain
+    y = model.add_variable(domain=poi.VariableDomain.Binary)
+    domain = model.get_variable_attribute(y, poi.VariableAttribute.Domain)
+    assert domain == poi.VariableDomain.Binary
 
 
 def test_constraint_attribute_name():

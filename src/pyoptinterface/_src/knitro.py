@@ -106,6 +106,7 @@ variable_attribute_get_func_map = {
     VariableAttribute.LowerBound: lambda model, v: model.get_variable_lb(v),
     VariableAttribute.UpperBound: lambda model, v: model.get_variable_ub(v),
     VariableAttribute.Name: lambda model, v: model.get_variable_name(v),
+    VariableAttribute.Domain: lambda model, v: model.get_variable_domain(v),
     VariableAttribute.ReducedCost: lambda model, v: model.get_variable_rc(v),
 }
 

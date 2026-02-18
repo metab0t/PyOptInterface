@@ -22,6 +22,7 @@
 	B(KN_new);                          \
 	B(KN_free);                         \
 	B(KN_update);                       \
+	B(KN_solve);                        \
 	B(KN_get_param_id);                 \
 	B(KN_get_param_type);               \
 	B(KN_set_int_param);                \
@@ -29,9 +30,7 @@
 	B(KN_set_double_param);             \
 	B(KN_get_int_param);                \
 	B(KN_get_double_param);             \
-	B(KN_add_vars);                     \
 	B(KN_add_var);                      \
-	B(KN_add_cons);                     \
 	B(KN_add_con);                      \
 	B(KN_set_var_lobnd);                \
 	B(KN_set_var_upbnd);                \
@@ -43,7 +42,6 @@
 	B(KN_get_var_name);                 \
 	B(KN_set_con_lobnd);                \
 	B(KN_set_con_upbnd);                \
-	B(KN_set_con_eqbnd);                \
 	B(KN_get_con_lobnd);                \
 	B(KN_get_con_upbnd);                \
 	B(KN_set_con_name);                 \
@@ -54,10 +52,8 @@
 	B(KN_add_obj_constant);             \
 	B(KN_del_obj_constant);             \
 	B(KN_add_obj_linear_struct);        \
-	B(KN_del_obj_linear_struct);        \
 	B(KN_del_obj_linear_struct_all);    \
 	B(KN_add_obj_quadratic_struct);     \
-	B(KN_del_obj_quadratic_struct);     \
 	B(KN_del_obj_quadratic_struct_all); \
 	B(KN_chg_obj_linear_term);          \
 	B(KN_add_con_constant);             \
@@ -71,7 +67,6 @@
 	B(KN_set_cb_grad);                  \
 	B(KN_set_cb_hess);                  \
 	B(KN_del_obj_eval_callback_all);    \
-	B(KN_solve);                        \
 	B(KN_get_var_primal_value);         \
 	B(KN_get_var_dual_value);           \
 	B(KN_get_con_value);                \
@@ -324,6 +319,21 @@ inline int knitro_var_type(VariableDomain domain)
 	}
 }
 
+inline VariableDomain knitro_variable_domain(int var_type)
+{
+	switch (var_type)
+	{
+	case KN_VARTYPE_CONTINUOUS:
+		return VariableDomain::Continuous;
+	case KN_VARTYPE_INTEGER:
+		return VariableDomain::Integer;
+	case KN_VARTYPE_BINARY:
+		return VariableDomain::Binary;
+	default:
+		throw std::runtime_error("Unknown variable type");
+	}
+}
+
 inline int knitro_obj_goal(ObjectiveSense sense)
 {
 	switch (sense)
@@ -423,6 +433,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	std::string get_variable_name(const VariableIndex &variable) const;
 	void set_variable_name(const VariableIndex &variable, const std::string &name);
 	void set_variable_domain(const VariableIndex &variable, VariableDomain domain);
+	VariableDomain get_variable_domain(const VariableIndex &variable) const;
 	double get_variable_rc(const VariableIndex &variable) const;
 	std::string pprint_variable(const VariableIndex &variable) const;
 
