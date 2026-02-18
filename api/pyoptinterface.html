@@ -348,8 +348,8 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyoptinterface.</span></span><span class="sig-name descname"><span class="pre">ConstraintType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.ConstraintType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.Cone">
-<span class="sig-name descname"><span class="pre">Cone</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType.Cone" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.ExponentialCone">
+<span class="sig-name descname"><span class="pre">ExponentialCone</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType.ExponentialCone" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -365,6 +365,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SOS">
 <span class="sig-name descname"><span class="pre">SOS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType.SOS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyoptinterface.ConstraintType.SecondOrderCone">
+<span class="sig-name descname"><span class="pre">SecondOrderCone</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#pyoptinterface.ConstraintType.SecondOrderCone" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1121,10 +1126,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType"><code class="docutils literal notranslate"><span class="pre">ConstraintType</span></code></a><ul>
-<li><a class="reference internal" href="#pyoptinterface.ConstraintType.Cone"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Cone</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ConstraintType.ExponentialCone"><code class="docutils literal notranslate"><span class="pre">ConstraintType.ExponentialCone</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType.Linear"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Linear</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType.Quadratic"><code class="docutils literal notranslate"><span class="pre">ConstraintType.Quadratic</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.ConstraintType.SOS"><code class="docutils literal notranslate"><span class="pre">ConstraintType.SOS</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.ConstraintType.SecondOrderCone"><code class="docutils literal notranslate"><span class="pre">ConstraintType.SecondOrderCone</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyoptinterface.Eq"><code class="docutils literal notranslate"><span class="pre">Eq</span></code></a></li>

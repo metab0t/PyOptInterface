@@ -309,7 +309,9 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running HiGHS 1.13.1 (git hash: 1d267d9): Copyright (c) 2026 under Apache 2.0 license terms
-Using BLAS: OpenBLAS 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Using BLAS: OpenBLAS 
 </pre></div>
 </div>
 </div>
@@ -361,13 +363,12 @@ Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&
      I =&gt; Shifting; J =&gt; Feasibility jump; L =&gt; Sub-MIP; P =&gt; Empty MIP; R =&gt; Randomized rounding;
      S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded; X =&gt; User solution; Y =&gt; HiGHS solution;
      Z =&gt; ZI Round; l =&gt; Trivial lower; p =&gt; Trivial point; u =&gt; Trivial upper; z =&gt; Trivial zero
-Termination status: TerminationStatusCode.OPTIMAL
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+
+        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
 Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
 
  J       0       0         0 100.00%   -inf            0                  Large        0      0      0         0     0.0s
+Termination status: TerminationStatusCode.OPTIMAL
          1       0         1 100.00%   0               0                  0.00%        0      0      0         0     0.0s
 
 Solving report
@@ -381,7 +382,7 @@ Solving report
                     0 (bound viol.)
                     0 (int. viol.)
                     0 (row viol.)
-  Timing            0.01
+  Timing            0.02
   Max sub-MIP depth 0
   Nodes             1
   Repair LPs        0
@@ -442,9 +443,7 @@ Using BLAS: OpenBLAS
 Hessian has dimension 8 but no nonzeros, so is ignored
 LP has 16 rows; 8 cols; 16 nonzeros
 Coefficient ranges:
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Matrix  [1e+00, 1e+00]
+  Matrix  [1e+00, 1e+00]
   Cost    [1e+00, 1e+00]
   Bound   [0e+00, 0e+00]
   RHS     [1e+00, 1e+00]

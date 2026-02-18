@@ -549,50 +549,14 @@ b is an iterable of values or a single scalar</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_empty</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.is_empty" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_coniccons">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_coniccons</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_coniccons" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_cons">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_cons</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_cons" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_lincons">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_lincons</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_lincons" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_nlcons">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_nlcons</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_nlcons" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_quadcons">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_quadcons</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_quadcons" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyoptinterface.knitro.Model.n_vars">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_vars</span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.n_vars" title="Link to this definition">¶</a></dt>
-<dd><p>(self) -&gt; int</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.knitro.Model.number_of_constraints">
-<span class="sig-name descname"><span class="pre">number_of_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ConstraintType" title="pyoptinterface._src.core_ext.ConstraintType"><span class="pre">ConstraintType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.number_of_constraints" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">number_of_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.ConstraintType" title="pyoptinterface._src.core_ext.ConstraintType"><span class="pre">pyoptinterface._src.core_ext.ConstraintType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.number_of_constraints" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.knitro.Model.number_of_variables">
-<span class="sig-name descname"><span class="pre">number_of_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.number_of_variables" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">number_of_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.number_of_variables" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -656,7 +620,7 @@ b is an iterable of values or a single scalar</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.knitro.Model.set_objective_coefficient">
-<span class="sig-name descname"><span class="pre">set_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.VariableIndex" title="pyoptinterface._src.core_ext.VariableIndex"><span class="pre">pyoptinterface._src.core_ext.VariableIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.set_objective_coefficient" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_objective_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyoptinterface.html#pyoptinterface.VariableIndex" title="pyoptinterface._src.core_ext.VariableIndex"><span class="pre">pyoptinterface._src.core_ext.VariableIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyoptinterface.knitro.Model.set_objective_coefficient" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -826,12 +790,6 @@ b is an iterable of values or a single scalar</p>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.init"><code class="docutils literal notranslate"><span class="pre">Model.init()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.is_dirty"><code class="docutils literal notranslate"><span class="pre">Model.is_dirty</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.is_empty"><code class="docutils literal notranslate"><span class="pre">Model.is_empty</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_coniccons"><code class="docutils literal notranslate"><span class="pre">Model.n_coniccons</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_cons"><code class="docutils literal notranslate"><span class="pre">Model.n_cons</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_lincons"><code class="docutils literal notranslate"><span class="pre">Model.n_lincons</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_nlcons"><code class="docutils literal notranslate"><span class="pre">Model.n_nlcons</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_quadcons"><code class="docutils literal notranslate"><span class="pre">Model.n_quadcons</span></code></a></li>
-<li><a class="reference internal" href="#pyoptinterface.knitro.Model.n_vars"><code class="docutils literal notranslate"><span class="pre">Model.n_vars</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.number_of_constraints"><code class="docutils literal notranslate"><span class="pre">Model.number_of_constraints()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.number_of_variables"><code class="docutils literal notranslate"><span class="pre">Model.number_of_variables()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.knitro.Model.optimize"><code class="docutils literal notranslate"><span class="pre">Model.optimize()</span></code></a></li>
