@@ -361,8 +361,10 @@ Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&
      I =&gt; Shifting; J =&gt; Feasibility jump; L =&gt; Sub-MIP; P =&gt; Empty MIP; R =&gt; Randomized rounding;
      S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded; X =&gt; User solution; Y =&gt; HiGHS solution;
      Z =&gt; ZI Round; l =&gt; Trivial lower; p =&gt; Trivial point; u =&gt; Trivial upper; z =&gt; Trivial zero
-
-        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Termination status: TerminationStatusCode.OPTIMAL
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>        Nodes      |    B&amp;B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
 Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
 
  J       0       0         0 100.00%   -inf            0                  Large        0      0      0         0     0.0s
@@ -384,7 +386,6 @@ Solving report
   Nodes             1
   Repair LPs        0
   LP iterations     0
-Termination status: TerminationStatusCode.OPTIMAL
 </pre></div>
 </div>
 </div>
@@ -441,13 +442,13 @@ Using BLAS: OpenBLAS
 Hessian has dimension 8 but no nonzeros, so is ignored
 LP has 16 rows; 8 cols; 16 nonzeros
 Coefficient ranges:
-  Matrix  [1e+00, 1e+00]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Matrix  [1e+00, 1e+00]
   Cost    [1e+00, 1e+00]
   Bound   [0e+00, 0e+00]
   RHS     [1e+00, 1e+00]
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Presolving model
+Presolving model
 0 rows, 0 cols, 0 nonzeros  0s
 0 rows, 0 cols, 0 nonzeros  0s
 Presolve reductions: rows 0(-16); columns 0(-8); nonzeros 0(-16) - Reduced to empty
