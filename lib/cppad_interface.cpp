@@ -427,7 +427,8 @@ CppAD::AD<double> cppad_trace_expression(
 	return result;
 }
 
-ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph)
+ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph,
+                                          const std::vector<size_t> &selected_outputs)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
@@ -453,13 +454,29 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph)
 	}
 
 	auto &outputs = graph.m_constraint_outputs;
-	auto N_outputs = outputs.size();
+
+	std::vector<size_t> indices;
+	if (selected_outputs.empty())
+	{
+		indices.reserve(outputs.size());
+		for (size_t i = 0; i < outputs.size(); i++)
+		{
+			indices.push_back(i);
+		}
+	}
+	else
+	{
+		indices = selected_outputs;
+	}
+
+	auto N_outputs = indices.size();
 	std::vector<CppAD::AD<double>> y(N_outputs);
 
-	// Trace the outputs
+	// Trace the selected outputs
 	for (size_t i = 0; i < N_outputs; i++)
 	{
-		auto &output = outputs[i];
+		auto idx = indices[i];
+		auto &output = outputs[idx];
 		y[i] = cppad_trace_expression(graph, output, x, p, seen_expressions);
 	}
 
@@ -469,7 +486,8 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph)
 	return f;
 }
 
-ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggregate)
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggregate,
+                                        const std::vector<size_t> &selected_outputs)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
@@ -493,13 +511,28 @@ ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggre
 	}
 
 	auto &outputs = graph.m_objective_outputs;
-	auto N_outputs = outputs.size();
+
+	std::vector<size_t> indices;
+	if (selected_outputs.empty())
+	{
+		indices.reserve(outputs.size());
+		for (size_t i = 0; i < outputs.size(); i++)
+		{
+			indices.push_back(i);
+		}
+	}
+	else
+	{
+		indices = selected_outputs;
+	}
+
+	auto N_outputs = indices.size();
 	std::vector<CppAD::AD<double>> y(N_outputs);
 
-	// Trace the outputs
 	for (size_t i = 0; i < N_outputs; i++)
 	{
-		auto &output = outputs[i];
+		auto idx = indices[i];
+		auto &output = outputs[idx];
 		y[i] = cppad_trace_expression(graph, output, x, p, seen_expressions);
 	}
 

@@ -182,8 +182,9 @@ NB_MODULE(cppad_interface_ext, m)
 	    .def_ro("jacobian", &CppADAutodiffGraph::jacobian_graph)
 	    .def_ro("hessian", &CppADAutodiffGraph::hessian_graph);
 
-	m.def("cppad_trace_graph_constraints", cppad_trace_graph_constraints);
+	m.def("cppad_trace_graph_constraints", cppad_trace_graph_constraints, nb::arg("graph"),
+	      nb::arg("selected_outputs") = std::vector<size_t>{});
 	m.def("cppad_trace_graph_objective", cppad_trace_graph_objective, nb::arg("graph"),
-	      nb::arg("aggregate") = true);
+	      nb::arg("aggregate") = true, nb::arg("selected_outputs") = std::vector<size_t>{});
 	m.def("cppad_autodiff", &cppad_autodiff);
 }
