@@ -856,8 +856,10 @@ void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const Outputs
 		evaluator->eval_hess(req->x, req->lambda, res->hess);
 		return 0;
 	};
-	auto trace = cppad_trace_graph_constraints;
-	_add_callback_impl(*graph, outputs.con_idxs, outputs.cons, trace, f, g, h);
+	auto trace = [outputs](const ExpressionGraph &graph) {
+		return cppad_trace_graph_constraints(graph, outputs.con_idxs);
+	};
+	_add_callback_impl(*graph, outputs.cons, trace, f, g, h);
 }
 
 void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs &outputs)
@@ -881,10 +883,10 @@ void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs 
 		evaluator->eval_hess(req->x, req->sigma, res->hess, true);
 		return 0;
 	};
-	auto trace = [](const ExpressionGraph &graph) {
-		return cppad_trace_graph_objective(graph, false);
+	auto trace = [outputs](const ExpressionGraph &graph) {
+		return cppad_trace_graph_objective(graph, true, outputs.obj_idxs);
 	};
-	_add_callback_impl(*graph, outputs.obj_idxs, {}, trace, f, g, h);
+	_add_callback_impl(*graph, {}, trace, f, g, h);
 }
 
 void KNITROModel::_add_callbacks()

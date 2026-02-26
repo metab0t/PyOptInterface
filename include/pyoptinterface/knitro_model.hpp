@@ -147,8 +147,6 @@ struct CallbackEvaluator
 	std::vector<KNINT> indexCons;
 
 	CppAD::ADFun<V> fun;
-
-	std::vector<size_t> fun_rows;
 	CppAD::sparse_rc<std::vector<size_t>> jac_pattern_;
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac_;
 	CppAD::sparse_jac_work jac_work_;
@@ -163,11 +161,10 @@ struct CallbackEvaluator
 	void setup()
 	{
 		fun.optimize();
-		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(fun.Range(), fun_rows.size(),
-		                                                     fun_rows.size());
-		for (size_t k = 0; k < fun_rows.size(); k++)
+		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(fun.Range(), fun.Range(), fun.Range());
+		for (size_t k = 0; k < fun.Range(); k++)
 		{
-			jac_pattern_in.set(k, fun_rows[k], fun_rows[k]);
+			jac_pattern_in.set(k, k, k);
 		}
 		fun.rev_jac_sparsity(jac_pattern_in, false, false, true, jac_pattern_);
 		jac_pattern_in.resize(fun.Domain(), fun.Domain(), fun.Domain());
@@ -177,11 +174,7 @@ struct CallbackEvaluator
 		}
 		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_out;
 		fun.for_jac_sparsity(jac_pattern_in, false, false, true, jac_pattern_out);
-		std::vector<bool> select_rows(fun.Range(), false);
-		for (size_t k = 0; k < fun_rows.size(); k++)
-		{
-			select_rows[fun_rows[k]] = true;
-		}
+		std::vector<bool> select_rows(fun.Range(), true);
 		fun.rev_hes_sparsity(select_rows, false, true, hess_pattern_);
 		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
 		{
@@ -205,15 +198,15 @@ struct CallbackEvaluator
 			x[i] = req_x[indexVars[i]];
 		}
 		auto y = fun.Forward(0, x);
-		for (size_t k = 0; k < fun_rows.size(); k++)
+		for (size_t k = 0; k < fun.Range(); k++)
 		{
 			if (aggregate)
 			{
-				res_y[0] += y[fun_rows[k]];
+				res_y[0] += y[k];
 			}
 			else
 			{
-				res_y[k] = y[fun_rows[k]];
+				res_y[k] = y[k];
 			}
 		}
 	}
@@ -238,15 +231,15 @@ struct CallbackEvaluator
 		{
 			x[i] = req_x[indexVars[i]];
 		}
-		for (size_t k = 0; k < fun_rows.size(); k++)
+		for (size_t k = 0; k < fun.Range(); k++)
 		{
 			if (aggregate)
 			{
-				w[fun_rows[k]] = req_w[0];
+				w[k] = req_w[0];
 			}
 			else
 			{
-				w[fun_rows[k]] = req_w[indexCons[k]];
+				w[k] = req_w[indexCons[k]];
 			}
 		}
 		fun.sparse_hes(x, w, hess_, hess_pattern_, hess_coloring_, hess_work_);
@@ -696,14 +689,12 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 	}
 
 	template <typename T, typename F, typename G, typename H>
-	void _add_callback_impl(const ExpressionGraph &graph, const std::vector<size_t> &rows,
-	                        const std::vector<ConstraintIndex> cons, const T &trace, const F f,
-	                        const G g, const H h)
+	void _add_callback_impl(const ExpressionGraph &graph, const std::vector<ConstraintIndex> cons,
+	                        const T &trace, const F f, const G g, const H h)
 	{
 		auto evaluator_ptr = std::make_unique<CallbackEvaluator<double>>();
 		auto *evaluator = evaluator_ptr.get();
 		evaluator->fun = trace(graph);
-		evaluator->fun_rows = rows;
 		evaluator->indexVars.resize(graph.n_variables());
 		for (size_t i = 0; i < graph.n_variables(); i++)
 		{
