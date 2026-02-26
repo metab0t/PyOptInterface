@@ -914,7 +914,7 @@ void KNITROModel::_add_callback(const ExpressionGraph &graph, const std::vector<
 	}
 	if (evaluator->is_objective())
 	{
-		evaluator->fun = cppad_trace_graph_objective(graph, true, outputs);
+		evaluator->fun = cppad_trace_graph_objective(graph, outputs, true);
 	}
 	else
 	{

@@ -428,7 +428,7 @@ CppAD::AD<double> cppad_trace_expression(
 }
 
 ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph,
-                                          const std::vector<size_t> &selected_outputs)
+                                          const std::vector<size_t> &selected)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
@@ -456,7 +456,7 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph,
 	auto &outputs = graph.m_constraint_outputs;
 
 	std::vector<size_t> indices;
-	if (selected_outputs.empty())
+	if (selected.empty())
 	{
 		indices.reserve(outputs.size());
 		for (size_t i = 0; i < outputs.size(); i++)
@@ -466,7 +466,7 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph,
 	}
 	else
 	{
-		indices = selected_outputs;
+		indices = selected;
 	}
 
 	auto N_outputs = indices.size();
@@ -486,8 +486,8 @@ ADFunDouble cppad_trace_graph_constraints(const ExpressionGraph &graph,
 	return f;
 }
 
-ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggregate,
-                                        const std::vector<size_t> &selected_outputs)
+ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph,
+                                        const std::vector<size_t> &selected, bool aggregate)
 {
 	ankerl::unordered_dense::map<ExpressionHandle, CppAD::AD<double>> seen_expressions;
 
@@ -513,7 +513,7 @@ ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggre
 	auto &outputs = graph.m_objective_outputs;
 
 	std::vector<size_t> indices;
-	if (selected_outputs.empty())
+	if (selected.empty())
 	{
 		indices.reserve(outputs.size());
 		for (size_t i = 0; i < outputs.size(); i++)
@@ -523,7 +523,7 @@ ADFunDouble cppad_trace_graph_objective(const ExpressionGraph &graph, bool aggre
 	}
 	else
 	{
-		indices = selected_outputs;
+		indices = selected;
 	}
 
 	auto N_outputs = indices.size();
