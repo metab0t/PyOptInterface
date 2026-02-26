@@ -734,13 +734,6 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 		}
 	}
 
-	template <typename F>
-	void _set_name(F set, KNINT index, const std::string &name)
-	{
-		int error = set(m_kc.get(), index, name.c_str());
-		_check_error(error);
-	}
-
 	template <typename I>
 	KNINT _get_index(const I &index) const
 	{
