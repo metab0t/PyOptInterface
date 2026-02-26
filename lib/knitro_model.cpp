@@ -389,10 +389,10 @@ ConstraintIndex KNITROModel::add_single_nl_constraint(ExpressionGraph &graph,
 	_add_graph(graph);
 	graph.add_constraint_output(result);
 	size_t i = graph.m_constraint_outputs.size() - 1;
-	m_pending_outputs[&graph].con_idxs.push_back(i);
+	m_pending_outputs[&graph].constraint_outputs.push_back(i);
 	auto setter = [this, &graph](const ConstraintIndex &constraint) {
-		m_pending_outputs[&graph].cons.push_back(constraint);
-		m_need_to_add_callbacks = true;
+		m_pending_outputs[&graph].constraints.push_back(constraint);
+		m_has_pending_callbacks = true;
 	};
 	return _add_constraint_impl(ConstraintType::NL, interval, name, setter);
 }
@@ -726,8 +726,8 @@ void KNITROModel::add_single_nl_objective(ExpressionGraph &graph, const Expressi
 	_add_graph(graph);
 	graph.add_objective_output(result);
 	size_t i = graph.m_objective_outputs.size() - 1;
-	m_pending_outputs[&graph].obj_idxs.push_back(i);
-	m_need_to_add_callbacks = true;
+	m_pending_outputs[&graph].objective_outputs.push_back(i);
+	m_has_pending_callbacks = true;
 	m_obj_flag |= OBJ_NONLINEAR;
 	_mark_dirty();
 }
@@ -775,7 +775,7 @@ void KNITROModel::_reset_objective()
 		_check_error(error);
 		for (auto &[graph, outputs] : m_pending_outputs)
 		{
-			outputs.obj_idxs.clear();
+			outputs.objective_outputs.clear();
 		}
 	}
 	m_obj_flag = 0;
@@ -836,93 +836,135 @@ double KNITROModel::get_obj_value() const
 	return _get_value<double>(knitro::KN_get_obj_value);
 }
 
-void KNITROModel::_add_constraint_callback(ExpressionGraph *graph, const Outputs &outputs)
+void KNITROModel::_register_callback(CallbackEvaluator<double> *evaluator)
 {
-	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+	auto f = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		evaluator->eval_fun(req->x, res->c);
+		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		if (evaluator->is_objective())
+		{
+			evaluator->eval_fun(req->x, res->obj);
+		}
+		else
+		{
+			evaluator->eval_fun(req->x, res->c);
+		}
 		return 0;
 	};
-	auto g = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+
+	auto g = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		evaluator->eval_jac(req->x, res->jac);
+		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		if (evaluator->is_objective())
+		{
+			evaluator->eval_jac(req->x, res->objGrad);
+		}
+		else
+		{
+			evaluator->eval_jac(req->x, res->jac);
+		}
 		return 0;
 	};
-	auto h = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
+
+	auto h = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		evaluator->eval_hess(req->x, req->lambda, res->hess);
+		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		if (evaluator->is_objective())
+		{
+			evaluator->eval_hess(req->x, req->sigma, res->hess);
+		}
+		else
+		{
+			evaluator->eval_hess(req->x, req->lambda, res->hess);
+		}
 		return 0;
 	};
-	auto trace = [outputs](const ExpressionGraph &graph) {
-		return cppad_trace_graph_constraints(graph, outputs.con_idxs);
-	};
-	_add_callback_impl(*graph, outputs.cons, trace, f, g, h);
+
+	CB_context *cb = nullptr;
+	auto p = evaluator->get_callback_pattern();
+	int error;
+	error = knitro::KN_add_eval_callback(m_kc.get(), p.indexCons.empty(), p.indexCons.size(),
+	                                     p.indexCons.data(), f, &cb);
+	_check_error(error);
+	error = knitro::KN_set_cb_user_params(m_kc.get(), cb, evaluator);
+	_check_error(error);
+	error = knitro::KN_set_cb_grad(m_kc.get(), cb, p.objGradIndexVars.size(),
+	                               p.objGradIndexVars.data(), p.jacIndexCons.size(),
+	                               p.jacIndexCons.data(), p.jacIndexVars.data(), g);
+	_check_error(error);
+	error = knitro::KN_set_cb_hess(m_kc.get(), cb, p.hessIndexVars1.size(), p.hessIndexVars1.data(),
+	                               p.hessIndexVars2.data(), h);
+	_check_error(error);
 }
 
-void KNITROModel::_add_objective_callback(ExpressionGraph *graph, const Outputs &outputs)
+void KNITROModel::_add_callback(const ExpressionGraph &graph, const std::vector<size_t> &outputs,
+                                const std::vector<ConstraintIndex> &constraints)
 {
-	auto f = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		res->obj[0] = 0.0;
-		evaluator->eval_fun(req->x, res->obj, true);
-		return 0;
-	};
-	auto g = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		evaluator->eval_jac(req->x, res->objGrad);
-		return 0;
-	};
-	auto h = [](KN_context *, CB_context *, KN_eval_request *req, KN_eval_result *res,
-	            void *data) -> int {
-		auto *evaluator = static_cast<CallbackEvaluator<double> *>(data);
-		evaluator->eval_hess(req->x, req->sigma, res->hess, true);
-		return 0;
-	};
-	auto trace = [outputs](const ExpressionGraph &graph) {
-		return cppad_trace_graph_objective(graph, true, outputs.obj_idxs);
-	};
-	_add_callback_impl(*graph, {}, trace, f, g, h);
+	auto evaluator_ptr = std::make_unique<CallbackEvaluator<double>>();
+	auto *evaluator = evaluator_ptr.get();
+	evaluator->indexVars.resize(graph.n_variables());
+	for (size_t i = 0; i < graph.n_variables(); i++)
+	{
+		evaluator->indexVars[i] = _variable_index(graph.m_variables[i]);
+	}
+	evaluator->indexCons.resize(constraints.size());
+	for (size_t i = 0; i < constraints.size(); i++)
+	{
+		evaluator->indexCons[i] = _constraint_index(constraints[i]);
+	}
+	if (evaluator->is_objective())
+	{
+		evaluator->fun = cppad_trace_graph_objective(graph, true, outputs);
+	}
+	else
+	{
+		evaluator->fun = cppad_trace_graph_constraints(graph, outputs);
+	}
+	evaluator->setup();
+	_register_callback(evaluator);
+	m_evaluators.push_back(std::move(evaluator_ptr));
 }
 
-void KNITROModel::_add_callbacks()
+void KNITROModel::_add_callbacks(const ExpressionGraph &graph, const Outputs &outputs)
 {
-	if (!m_need_to_add_callbacks)
+	if (graph.has_constraint_output() && !outputs.constraint_outputs.empty())
+	{
+		_add_callback(graph, outputs.constraint_outputs, outputs.constraints);
+	}
+
+	if (graph.has_objective_output() && !outputs.objective_outputs.empty())
+	{
+		_add_callback(graph, outputs.objective_outputs, {});
+	}
+}
+
+void KNITROModel::_add_pending_callbacks()
+{
+	if (!m_has_pending_callbacks)
 	{
 		return;
 	}
 
 	for (const auto &[graph, outputs] : m_pending_outputs)
 	{
-		if (graph->has_constraint_output() && !outputs.con_idxs.empty())
-		{
-			_add_constraint_callback(graph, outputs);
-		}
-
-		if (graph->has_objective_output() && !outputs.obj_idxs.empty())
-		{
-			_add_objective_callback(graph, outputs);
-		}
+		_add_callbacks(*graph, outputs);
 	}
+
 	m_pending_outputs.clear();
-	m_need_to_add_callbacks = false;
+	m_has_pending_callbacks = false;
 }
 
 // Solve functions
 void KNITROModel::_update()
 {
-	_add_callbacks();
+	_add_pending_callbacks();
 	int error = knitro::KN_update(m_kc.get());
 	_check_error(error);
 }
 
 void KNITROModel::_pre_solve()
 {
-	_add_callbacks();
+	_add_pending_callbacks();
 }
 
 void KNITROModel::_solve()
@@ -1045,7 +1087,7 @@ void KNITROModel::_reset_state()
 	m_obj_flag = 0;
 	m_pending_outputs.clear();
 	m_evaluators.clear();
-	m_need_to_add_callbacks = false;
+	m_has_pending_callbacks = false;
 	_mark_dirty();
 	m_solve_status = 0;
 }
