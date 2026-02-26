@@ -200,7 +200,7 @@ VariableIndex KNITROModel::add_variable(VariableDomain domain, double lb, double
 
 	if (!is_name_empty(name))
 	{
-		_set_name(knitro::KN_set_var_name, indexVar, name);
+		_set_value<KNINT, const char *>(knitro::KN_set_var_name, indexVar, name);
 	}
 
 	m_n_vars++;
@@ -261,7 +261,7 @@ std::string KNITROModel::get_variable_name(const VariableIndex &variable) const
 void KNITROModel::set_variable_name(const VariableIndex &variable, const std::string &name)
 {
 	KNINT indexVar = _variable_index(variable);
-	_set_name(knitro::KN_set_var_name, indexVar, name);
+	_set_value<KNINT, const char *>(knitro::KN_set_var_name, indexVar, name.c_str());
 }
 
 void KNITROModel::set_variable_domain(const VariableIndex &variable, VariableDomain domain)
@@ -551,7 +551,7 @@ void KNITROModel::delete_constraint(const ConstraintIndex &constraint)
 void KNITROModel::set_constraint_name(const ConstraintIndex &constraint, const std::string &name)
 {
 	KNINT indexCon = _constraint_index(constraint);
-	_set_name(knitro::KN_set_con_name, indexCon, name);
+	_set_value<KNINT, const char *>(knitro::KN_set_con_name, indexCon, name.c_str());
 }
 
 std::string KNITROModel::get_constraint_name(const ConstraintIndex &constraint) const
