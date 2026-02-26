@@ -716,12 +716,12 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 		_check_error(error);
 	}
 
-	template <typename F>
-	std::string _get_name(F get, KNINT index, const char *prefix) const
+	template <typename F, typename K>
+	std::string _get_name(F get, K key, const char *prefix) const
 	{
 		char name[1024];
 		name[0] = '\0';
-		int error = get(m_kc.get(), index, 1024, name);
+		int error = get(m_kc.get(), key, 1024, name);
 		_check_error(error);
 
 		if (name[0] != '\0')
@@ -730,7 +730,7 @@ class KNITROModel : public OnesideLinearConstraintMixin<KNITROModel>,
 		}
 		else
 		{
-			return fmt::format("{}{}", prefix, index);
+			return fmt::format("{}{}", prefix, key);
 		}
 	}
 
