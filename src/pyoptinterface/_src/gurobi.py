@@ -2,6 +2,7 @@ import os
 import platform
 from pathlib import Path
 import re
+import sys
 import logging
 from typing import Tuple, Union, overload
 
@@ -80,6 +81,14 @@ def detected_libraries():
                 libs.append(str(path))
     except Exception:
         pass
+
+    # conda/pixi environment
+    prefix = Path(sys.prefix)
+    dir = prefix / subdir
+    for path in dir.glob(suffix_pattern):
+        match = re.match(libname_pattern, path.name)
+        if match:
+            libs.append(str(path))
 
     # default names
     gurobi_names = [
