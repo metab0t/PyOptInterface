@@ -167,12 +167,14 @@ struct CallbackEvaluator
 		fun.optimize();
 		size_t nx = fun.Domain();
 		size_t ny = fun.Range();
+
 		CppAD::sparse_rc<std::vector<size_t>> jp_in(nx, nx, nx);
 		for (size_t i = 0; i < nx; i++)
 		{
 			jp_in.set(i, i, i);
 		}
 		fun.for_jac_sparsity(jp_in, false, false, false, jp);
+
 		std::vector<bool> select_rows(ny, true);
 		CppAD::sparse_rc<std::vector<size_t>> hp_out;
 		fun.rev_hes_sparsity(select_rows, false, false, hp_out);
