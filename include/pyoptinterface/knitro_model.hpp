@@ -146,16 +146,21 @@ struct CallbackEvaluator
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
-	CppAD::ADFun<V> fun;
+	CppAD::ADFun<V> fun; /// < CppAD tape.
+
+	/// Sparsity patterns
 	CppAD::sparse_rc<std::vector<size_t>> jp;
-	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac;
-	CppAD::sparse_jac_work jw;
 	CppAD::sparse_rc<std::vector<size_t>> hp;
-	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hes;
+
+	/// Workspaces for sparse Jacobian and Hessian calculations
+	CppAD::sparse_jac_work jw;
 	CppAD::sparse_hes_work hw;
 
+	/// Temporary vectors for evaluations
 	std::vector<V> x;
 	std::vector<V> w;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hes;
 
 	void setup()
 	{
