@@ -141,19 +141,18 @@ struct CallbackPattern
 template <typename V>
 struct CallbackEvaluator
 {
-	static inline const std::string jac_coloring_ = "cppad";
-	static inline const std::string hess_coloring_ = "cppad.symmetric";
+	static inline constexpr const char *JAC_CLRNG = "cppad";
+	static inline constexpr const char *HES_CLRNG = "cppad.symmetric";
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
 	CppAD::ADFun<V> fun;
-	CppAD::sparse_rc<std::vector<size_t>> jac_pattern_;
-	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac_;
-	CppAD::sparse_jac_work jac_work_;
-	CppAD::sparse_rc<std::vector<size_t>> hess_pattern_;
-	CppAD::sparse_rc<std::vector<size_t>> hess_pattern_symm_;
-	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hess_;
-	CppAD::sparse_hes_work hess_work_;
+	CppAD::sparse_rc<std::vector<size_t>> jp;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac;
+	CppAD::sparse_jac_work jw;
+	CppAD::sparse_rc<std::vector<size_t>> hp;
+	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hes;
+	CppAD::sparse_hes_work hw;
 
 	std::vector<V> x;
 	std::vector<V> w;
@@ -161,31 +160,32 @@ struct CallbackEvaluator
 	void setup()
 	{
 		fun.optimize();
-		auto nx = fun.Domain();
-		auto ny = fun.Range();
-		CppAD::sparse_rc<std::vector<size_t>> jac_pattern_in(nx, nx, nx);
+		size_t nx = fun.Domain();
+		size_t ny = fun.Range();
+		CppAD::sparse_rc<std::vector<size_t>> jp_in(nx, nx, nx);
 		for (size_t i = 0; i < nx; i++)
 		{
-			jac_pattern_in.set(i, i, i);
+			jp_in.set(i, i, i);
 		}
-		fun.for_jac_sparsity(jac_pattern_in, false, false, false, jac_pattern_);
+		fun.for_jac_sparsity(jp_in, false, false, false, jp);
 		std::vector<bool> select_rows(ny, true);
-		fun.rev_hes_sparsity(select_rows, false, false, hess_pattern_);
-		auto &hess_rows = hess_pattern_.row();
-		auto &hess_cols = hess_pattern_.col();
-		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
+		CppAD::sparse_rc<std::vector<size_t>> hp_out;
+		fun.rev_hes_sparsity(select_rows, false, false, hp_out);
+		auto &hrow = hp_out.row();
+		auto &hcol = hp_out.col();
+		for (size_t k = 0; k < hp_out.nnz(); k++)
 		{
-			size_t row = hess_rows[k];
-			size_t col = hess_cols[k];
+			size_t row = hrow[k];
+			size_t col = hcol[k];
 			if (row <= col)
 			{
-				hess_pattern_symm_.push_back(row, col);
+				hp.push_back(row, col);
 			}
 		}
 		x.resize(nx, 0.0);
 		w.resize(ny, 0.0);
-		jac_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jac_pattern_);
-		hess_ = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hess_pattern_symm_);
+		jac = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jp);
+		hes = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hp);
 	}
 
 	bool is_objective() const
@@ -203,52 +203,50 @@ struct CallbackEvaluator
 	void eval_jac(const V *req_x, V *res_jac)
 	{
 		copy_ptr(req_x, indexVars.data(), x);
-		fun.sparse_jac_rev(x, jac_, jac_pattern_, jac_coloring_, jac_work_);
-		auto &jac = jac_.val();
-		copy_vec(jac, res_jac);
+		fun.sparse_jac_rev(x, jac, jp, JAC_CLRNG, jw);
+		copy_vec(jac.val(), res_jac);
 	}
 
 	void eval_hess(const V *req_x, const V *req_w, V *res_hess)
 	{
 		copy_ptr(req_x, indexVars.data(), x);
 		copy_ptr(req_w, indexCons.data(), w, is_objective());
-		fun.sparse_hes(x, w, hess_, hess_pattern_, hess_coloring_, hess_work_);
-		auto &hess = hess_.val();
-		copy_vec(hess, res_hess);
+		fun.sparse_hes(x, w, hes, hp, HES_CLRNG, hw);
+		copy_vec(hes.val(), res_hess);
 	}
 
 	CallbackPattern get_callback_pattern() const
 	{
-		CallbackPattern pattern;
-		pattern.indexCons = indexCons;
+		CallbackPattern p;
+		p.indexCons = indexCons;
 
-		auto &jac_rows = jac_pattern_.row();
-		auto &jac_cols = jac_pattern_.col();
+		auto &jrow = jp.row();
+		auto &jcol = jp.col();
 		if (indexCons.empty())
 		{
-			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
+			for (size_t k = 0; k < jp.nnz(); k++)
 			{
-				pattern.objGradIndexVars.push_back(indexVars[jac_cols[k]]);
+				p.objGradIndexVars.push_back(indexVars[jcol[k]]);
 			}
 		}
 		else
 		{
-			for (size_t k = 0; k < jac_pattern_.nnz(); k++)
+			for (size_t k = 0; k < jp.nnz(); k++)
 			{
-				pattern.jacIndexCons.push_back(indexCons[jac_rows[k]]);
-				pattern.jacIndexVars.push_back(indexVars[jac_cols[k]]);
+				p.jacIndexCons.push_back(indexCons[jrow[k]]);
+				p.jacIndexVars.push_back(indexVars[jcol[k]]);
 			}
 		}
 
-		auto &hess_rows = hess_pattern_symm_.row();
-		auto &hess_cols = hess_pattern_symm_.col();
-		for (size_t k = 0; k < hess_pattern_symm_.nnz(); k++)
+		auto &hrow = hp.row();
+		auto &hcol = hp.col();
+		for (size_t k = 0; k < hp.nnz(); k++)
 		{
-			pattern.hessIndexVars1.push_back(indexVars[hess_rows[k]]);
-			pattern.hessIndexVars2.push_back(indexVars[hess_cols[k]]);
+			p.hessIndexVars1.push_back(indexVars[hrow[k]]);
+			p.hessIndexVars2.push_back(indexVars[hcol[k]]);
 		}
 
-		return pattern;
+		return p;
 	}
 
   private:
