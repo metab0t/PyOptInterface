@@ -168,9 +168,9 @@ struct CallbackEvaluator
 		{
 			jac_pattern_in.set(i, i, i);
 		}
-		fun.for_jac_sparsity(jac_pattern_in, false, false, true, jac_pattern_);
+		fun.for_jac_sparsity(jac_pattern_in, false, false, false, jac_pattern_);
 		std::vector<bool> select_rows(ny, true);
-		fun.rev_hes_sparsity(select_rows, false, true, hess_pattern_);
+		fun.rev_hes_sparsity(select_rows, false, false, hess_pattern_);
 		auto &hess_rows = hess_pattern_.row();
 		auto &hess_cols = hess_pattern_.col();
 		for (size_t k = 0; k < hess_pattern_.nnz(); k++)
