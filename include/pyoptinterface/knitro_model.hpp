@@ -297,7 +297,7 @@ struct CallbackEvaluator
 				dst[i] = src[0];
 			}
 		}
-		else if (aggregate
+		else if (aggregate)
 		{
 			dst[0] = 0.0;
 			for (size_t i = 0; i < n; i++)
