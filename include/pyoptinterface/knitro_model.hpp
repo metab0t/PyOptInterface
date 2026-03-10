@@ -287,17 +287,17 @@ struct CallbackEvaluator
 
   private:
 	template <typename T, typename I>
-	static void copy(const size_t n, const T *src, const I *idx, V *dst, bool agg = false,
-	                 bool dpl = false)
+	static void copy(const size_t n, const T *src, const I *idx, V *dst, bool aggregate = false,
+	                 bool duplicate = false)
 	{
-		if (dpl)
+		if (duplicate)
 		{
 			for (size_t i = 0; i < n; i++)
 			{
 				dst[i] = src[0];
 			}
 		}
-		else if (agg)
+		else if (aggregate
 		{
 			dst[0] = 0.0;
 			for (size_t i = 0; i < n; i++)
