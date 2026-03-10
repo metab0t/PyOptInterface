@@ -13,6 +13,7 @@ def test_nlp_lukvle10(nlp_model_ctor):
     # Starting point: x[2i] = 1, x[2i+1] = -1
     model = nlp_model_ctor()
     if isinstance(model, ipopt.Model):
+        # LUKVLE10 is too large and IPOPT raises a bad_alloc error.
         pytest.skip("lukvle10 is too large to be supported with IPOPT")
 
     n = 100000
