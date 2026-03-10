@@ -139,51 +139,6 @@ struct CallbackPattern
 	std::vector<I> hessIndexVars2;
 };
 
-enum class CopyMode
-{
-	Normal,
-	Aggregate,
-	Duplicate
-};
-
-template <typename T, typename I>
-static void copy(const size_t n, const T *src, const I *idx, T *dst,
-                 CopyMode mode = CopyMode::Normal)
-{
-	if (mode == CopyMode::Duplicate)
-	{
-		for (size_t i = 0; i < n; i++)
-		{
-			dst[i] = src[0];
-		}
-	}
-	else if (mode == CopyMode::Aggregate)
-	{
-		dst[0] = T(0.0);
-		for (size_t i = 0; i < n; i++)
-		{
-			dst[0] += src[i];
-		}
-	}
-	else
-	{
-		if (idx == nullptr)
-		{
-			for (size_t i = 0; i < n; i++)
-			{
-				dst[i] = src[i];
-			}
-		}
-		else
-		{
-			for (size_t i = 0; i < n; i++)
-			{
-				dst[i] = src[idx[i]];
-			}
-		}
-	}
-}
-
 using namespace CppAD;
 
 template <typename V, typename S, typename I>
@@ -278,7 +233,7 @@ struct CallbackEvaluator
 		copy(fun.Domain(), req_x, indexVars.data(), x.data());
 		auto y = fun.Forward(0, x);
 		CopyMode mode = is_objective() ? CopyMode::Aggregate : CopyMode::Normal;
-		copy(fun.Range(), y.data(), (const KNINT *)nullptr, res_y, mode);
+		copy(fun.Range(), y.data(), (const I *)nullptr, res_y, mode);
 	}
 
 	void eval_jac(const V *req_x, V *res_jac)
@@ -329,6 +284,55 @@ struct CallbackEvaluator
 		}
 
 		return p;
+	}
+
+  private:
+	enum class CopyMode
+	{
+		Normal,
+		Aggregate,
+		Duplicate
+	};
+
+	static void copy(const size_t n, const V *src, const I *idx, V *dst,
+	                 CopyMode mode = CopyMode::Normal)
+	{
+		if (mode == CopyMode::Duplicate)
+		{
+			for (size_t i = 0; i < n; i++)
+			{
+				dst[i] = src[0];
+			}
+		}
+		else if (mode == CopyMode::Aggregate)
+		{
+			if (n == 0)
+			{
+				return;
+			}
+			dst[0] = src[0];
+			for (size_t i = 1; i < n; i++)
+			{
+				dst[0] += src[i];
+			}
+		}
+		else
+		{
+			if (idx == nullptr)
+			{
+				for (size_t i = 0; i < n; i++)
+				{
+					dst[i] = src[i];
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < n; i++)
+				{
+					dst[i] = src[idx[i]];
+				}
+			}
+		}
 	}
 };
 
