@@ -145,19 +145,19 @@ template <typename V, typename S, typename I>
 struct CallbackEvaluator
 {
 
-	static inline constexpr const char *JAC_CLRNG = "cppad";
-	static inline constexpr const char *HES_CLRNG = "cppad.symmetric";
+	static inline constexpr const char *CLRNG = "cppad";
+
 	std::vector<I> indexVars;
 	std::vector<I> indexCons;
 
 	ADFun<V> fun;  /// < CppAD tape.
-	ADFun<V> jfun; /// < CppAD tape for Jacobian
+	ADFun<V> jfun; /// < CppAD tape for Aggregated Jacobian
 
 	/// Sparsity patterns
 	sparse_rc<vector<S>> jp;
 	sparse_rc<vector<S>> hp;
 
-	/// Workspaces for sparse Jacobian and Hessian calculations
+	/// Workspaces for Jacobian and Hessian calculations
 	sparse_jac_work jw;
 	sparse_jac_work hw;
 
@@ -177,7 +177,7 @@ struct CallbackEvaluator
 		vector<bool> rng(ny, true);
 		fun.subgraph_sparsity(dom, rng, false, jp);
 
-		auto af = fun.base2ad();
+		ADFun<AD<V>, V> af = fun.base2ad();
 		vector<AD<V>> jaxw(nx + ny);
 		Independent(jaxw);
 		vector<AD<V>> jax(nx);
@@ -208,11 +208,9 @@ struct CallbackEvaluator
 		auto &hcol = hsp.col();
 		for (size_t k = 0; k < hsp.nnz(); k++)
 		{
-			S row = hrow[k];
-			S col = hcol[k];
-			if (row <= col)
+			if (hrow[k] <= hcol[k])
 			{
-				hp.push_back(row, col);
+				hp.push_back(hrow[k], hcol[k]);
 			}
 		}
 		x.resize(nx);
@@ -237,7 +235,7 @@ struct CallbackEvaluator
 	void eval_jac(const V *req_x, V *res_jac)
 	{
 		copy(fun.Domain(), req_x, indexVars.data(), x.data());
-		fun.sparse_jac_rev(x, jac, jp, JAC_CLRNG, jw);
+		fun.sparse_jac_rev(x, jac, jp, CLRNG, jw);
 		copy(jac.nnz(), jac.val().data(), (const I *)nullptr, res_jac);
 	}
 
@@ -246,7 +244,7 @@ struct CallbackEvaluator
 		copy(fun.Domain(), req_x, indexVars.data(), xw.data());
 		int mode = is_objective() ? 1 : 0;
 		copy(fun.Range(), req_w, indexCons.data(), xw.data() + fun.Domain(), mode);
-		jfun.sparse_jac_rev(xw, hes, hp, JAC_CLRNG, hw);
+		jfun.sparse_jac_rev(xw, hes, hp, CLRNG, hw);
 		copy(hes.nnz(), hes.val().data(), (const I *)nullptr, res_hess);
 	}
 
