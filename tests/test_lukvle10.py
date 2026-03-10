@@ -28,10 +28,10 @@ def test_nlp_lukvle10(nlp_model_ctor):
 
     with nl.graph():
         for i in range(n):
-            x_sq_2i = x[2 * i] * x[2 * i]
-            x_sq_2ip1 = x[2 * i + 1] * x[2 * i + 1]
+            x2i_sq = x[2 * i] * x[2 * i]
+            x2ip1_sq = x[2 * i + 1] * x[2 * i + 1]
             model.add_nl_objective(
-                nl.pow(x_sq_2i, x_sq_2ip1 + 1) + nl.pow(x_sq_2ip1, x_sq_2i + 1)
+                nl.pow(x2i_sq, x2ip1_sq + 1) + nl.pow(x2ip1_sq, x2i_sq + 1)
             )
 
     for i in range(n):
