@@ -146,7 +146,8 @@ struct CallbackEvaluator
 	std::vector<KNINT> indexVars;
 	std::vector<KNINT> indexCons;
 
-	CppAD::ADFun<V> fun; /// < CppAD tape.
+	CppAD::ADFun<V> fun;  /// < CppAD tape.
+	CppAD::ADFun<V> jfun; /// < CppAD tape for Jacobian
 
 	/// Sparsity patterns
 	CppAD::sparse_rc<std::vector<size_t>> jp;
@@ -154,11 +155,12 @@ struct CallbackEvaluator
 
 	/// Workspaces for sparse Jacobian and Hessian calculations
 	CppAD::sparse_jac_work jw;
-	CppAD::sparse_hes_work hw;
+	CppAD::sparse_jac_work hw;
 
 	/// Temporary vectors for evaluations
 	std::vector<V> x;
 	std::vector<V> w;
+	std::vector<V> xw;
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> jac;
 	CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>> hes;
 
@@ -168,19 +170,40 @@ struct CallbackEvaluator
 		size_t nx = fun.Domain();
 		size_t ny = fun.Range();
 
-		CppAD::sparse_rc<std::vector<size_t>> jp_in(nx, nx, nx);
+		std::vector<bool> dom(nx, true);
+		std::vector<bool> rng(ny, true);
+		fun.subgraph_sparsity(dom, rng, false, jp);
+
+		auto &af = fun.base2ad();
+		std::vector<CppAD::AD<V>> jaxw(nx + ny);
+		CppAD::Independent(jaxw);
+		std::vector<CppAD::AD<V>> jax(nx);
+		std::vector<CppAD::AD<V>> jaw(ny);
+		std::vector<CppAD::AD<V>> jaz(nx);
 		for (size_t i = 0; i < nx; i++)
 		{
-			jp_in.set(i, i, i);
+			jax[i] = jaxw[i];
 		}
-		fun.for_jac_sparsity(jp_in, false, false, false, jp);
+		for (size_t i = 0; i < ny; i++)
+		{
+			jaw[i] = jaxw[nx + i];
+		}
+		af.Forward(0, jax);
+		jaz = af.Reverse(1, jaw);
+		jfun.Dependent(jaxw, jaz);
+		jfun.optimize();
+		std::vector<bool> jdom(nx + ny, false);
+		for (size_t i = 0; i < nx; i++)
+		{
+			jdom[i] = true;
+		}
+		std::vector<bool> jrng(nx, true);
+		CppAD::sparse_rc<std::vector<size_t>> hsp;
+		jfun.subgraph_sparsity(jdom, jrng, false, hsp);
 
-		std::vector<bool> select_rows(ny, true);
-		CppAD::sparse_rc<std::vector<size_t>> hp_out;
-		fun.rev_hes_sparsity(select_rows, false, false, hp_out);
-		auto &hrow = hp_out.row();
-		auto &hcol = hp_out.col();
-		for (size_t k = 0; k < hp_out.nnz(); k++)
+		auto &hrow = hsp.row();
+		auto &hcol = hsp.col();
+		for (size_t k = 0; k < hsp.nnz(); k++)
 		{
 			size_t row = hrow[k];
 			size_t col = hcol[k];
@@ -189,8 +212,9 @@ struct CallbackEvaluator
 				hp.push_back(row, col);
 			}
 		}
-		x.resize(nx, 0.0);
-		w.resize(ny, 0.0);
+		x.resize(nx);
+		w.resize(ny);
+		xw.resize(nx + ny);
 		jac = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(jp);
 		hes = CppAD::sparse_rcv<std::vector<size_t>, std::vector<V>>(hp);
 	}
@@ -202,24 +226,29 @@ struct CallbackEvaluator
 
 	void eval_fun(const V *req_x, V *res_y)
 	{
-		copy_ptr(req_x, indexVars.data(), x);
+		size_t nx = fun.Domain();
+		size_t ny = fun.Range();
+		copy(nx, req_x, indexVars.data(), x.data());
 		auto y = fun.Forward(0, x);
-		copy_vec(y, res_y, is_objective());
+		copy(ny, y.data(), nullptr, res_y, is_objective());
 	}
 
 	void eval_jac(const V *req_x, V *res_jac)
 	{
-		copy_ptr(req_x, indexVars.data(), x);
+		size_t nx = fun.Domain();
+		copy(nx, req_x, indexVars.data(), x.data());
 		fun.sparse_jac_rev(x, jac, jp, JAC_CLRNG, jw);
-		copy_vec(jac.val(), res_jac);
+		copy_vec(jac.nnz(), jac.val().data(), nullptr, res_jac);
 	}
 
 	void eval_hess(const V *req_x, const V *req_w, V *res_hess)
 	{
-		copy_ptr(req_x, indexVars.data(), x);
-		copy_ptr(req_w, indexCons.data(), w, is_objective());
-		fun.sparse_hes(x, w, hes, hp, HES_CLRNG, hw);
-		copy_vec(hes.val(), res_hess);
+		size_t nx = fun.Domain();
+		size_t ny = fun.Range();
+		copy(nx, req_x, indexVars.data(), xw.data());
+		copy(ny, req_w, indexCons.data(), xw.data() + nx, false, is_objective());
+		jfun.sparse_jac_rev(xw, hes, hp, JAC_CLRNG, hw);
+		copy_vec(hes.nnz(), hes.val().data(), nullptr, res_hess);
 	}
 
 	CallbackPattern get_callback_pattern() const
@@ -258,37 +287,36 @@ struct CallbackEvaluator
 
   private:
 	template <typename T, typename I>
-	static void copy_ptr(const T *src, const I *idx, std::vector<V> &dst, bool duplicate = false)
+	static void copy(const size_t n, const T *src, const I *idx, V *dst, bool agg = false,
+	                 bool dpl = false)
 	{
-		for (size_t i = 0; i < dst.size(); i++)
+		if (dpl)
 		{
-			if (duplicate)
+			for (size_t i = 0; i < n; i++)
 			{
 				dst[i] = src[0];
 			}
-			else
-			{
-				dst[i] = src[idx[i]];
-			}
 		}
-	}
-
-	template <typename T>
-	static void copy_vec(const std::vector<T> &src, T *dst, bool aggregate = false)
-	{
-		if (aggregate)
+		else if (agg)
 		{
 			dst[0] = 0.0;
-		}
-		for (size_t i = 0; i < src.size(); i++)
-		{
-			if (aggregate)
+			for (size_t i = 0; i < n; i++)
 			{
 				dst[0] += src[i];
 			}
-			else
+		}
+		else if (idx == nullptr)
+		{
+			for (size_t i = 0; i < n; i++)
 			{
 				dst[i] = src[i];
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < n; i++)
+			{
+				dst[i] = src[idx[i]];
 			}
 		}
 	}
