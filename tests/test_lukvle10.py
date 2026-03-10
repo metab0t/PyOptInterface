@@ -1,7 +1,7 @@
 import pytest
 
 import pyoptinterface as poi
-from pyoptinterface import ipopt, nl
+from pyoptinterface import ipopt, nl, copt
 
 
 def test_nlp_lukvle10(nlp_model_ctor):
@@ -15,6 +15,10 @@ def test_nlp_lukvle10(nlp_model_ctor):
     if isinstance(model, ipopt.Model):
         # LUKVLE10 is too large and IPOPT raises a bad_alloc error.
         pytest.skip("lukvle10 is too large to be supported with IPOPT")
+    if isinstance(model, copt.Model):
+        # LUKVLE10 is too large the current license of COpt supports up
+        # to 2000 variables.
+        pytest.skip("lukvle10 is too large to be supported with COpt")
 
     n = 100000
     x = model.add_m_variables(2 * n, name="x")
