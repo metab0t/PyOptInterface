@@ -163,7 +163,6 @@ struct CallbackEvaluator
 
 	/// Temporary vectors for evaluations
 	vector<V> x;
-	vector<V> w;
 	vector<V> xw;
 	sparse_rcv<vector<S>, vector<V>> jac;
 	sparse_rcv<vector<S>, vector<V>> hes;
@@ -217,7 +216,6 @@ struct CallbackEvaluator
 			}
 		}
 		x.resize(nx);
-		w.resize(ny);
 		xw.resize(nx + ny);
 		jac = sparse_rcv<vector<S>, vector<V>>(jp);
 		hes = sparse_rcv<vector<S>, vector<V>>(hp);
@@ -232,7 +230,7 @@ struct CallbackEvaluator
 	{
 		copy(fun.Domain(), req_x, indexVars.data(), x.data());
 		auto y = fun.Forward(0, x);
-		CopyMode mode = is_objective() ? CopyMode::Aggregate : CopyMode::Normal;
+		int mode = is_objective() ? 2 : 0;
 		copy(fun.Range(), y.data(), (const I *)nullptr, res_y, mode);
 	}
 
@@ -246,7 +244,7 @@ struct CallbackEvaluator
 	void eval_hess(const V *req_x, const V *req_w, V *res_hess)
 	{
 		copy(fun.Domain(), req_x, indexVars.data(), xw.data());
-		CopyMode mode = is_objective() ? CopyMode::Duplicate : CopyMode::Normal;
+		int mode = is_objective() ? 1 : 0;
 		copy(fun.Range(), req_w, indexCons.data(), xw.data() + fun.Domain(), mode);
 		jfun.sparse_jac_rev(xw, hes, hp, JAC_CLRNG, hw);
 		copy(hes.nnz(), hes.val().data(), (const I *)nullptr, res_hess);
@@ -287,24 +285,20 @@ struct CallbackEvaluator
 	}
 
   private:
-	enum class CopyMode
+	// Copy mode:
+	// - 0: normal copy
+	// - 1: duplicate (copy first element of src to all elements of dst)
+	// - 2: aggregate (sum all elements of src and copy to all elements of dst)
+	static void copy(const size_t n, const V *src, const I *idx, V *dst, int mode = 0)
 	{
-		Normal,
-		Aggregate,
-		Duplicate
-	};
-
-	static void copy(const size_t n, const V *src, const I *idx, V *dst,
-	                 CopyMode mode = CopyMode::Normal)
-	{
-		if (mode == CopyMode::Duplicate)
+		if (mode == 1)
 		{
 			for (size_t i = 0; i < n; i++)
 			{
 				dst[i] = src[0];
 			}
 		}
-		else if (mode == CopyMode::Aggregate)
+		else if (mode == 2)
 		{
 			if (n == 0)
 			{
