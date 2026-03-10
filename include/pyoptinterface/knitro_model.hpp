@@ -174,7 +174,7 @@ struct CallbackEvaluator
 		std::vector<bool> rng(ny, true);
 		fun.subgraph_sparsity(dom, rng, false, jp);
 
-		auto &af = fun.base2ad();
+		auto af = fun.base2ad();
 		std::vector<CppAD::AD<V>> jaxw(nx + ny);
 		CppAD::Independent(jaxw);
 		std::vector<CppAD::AD<V>> jax(nx);
