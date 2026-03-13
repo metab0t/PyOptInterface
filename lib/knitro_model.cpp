@@ -836,11 +836,11 @@ double KNITROModel::get_obj_value() const
 	return _get_value<double>(knitro::KN_get_obj_value);
 }
 
-void KNITROModel::_register_callback(CallbackEvaluator<double> *evaluator)
+void KNITROModel::_register_callback(Evaluator *evaluator)
 {
 	auto f = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		auto evaluator = static_cast<Evaluator *>(data);
 		if (evaluator->is_objective())
 		{
 			evaluator->eval_fun(req->x, res->obj);
@@ -854,7 +854,7 @@ void KNITROModel::_register_callback(CallbackEvaluator<double> *evaluator)
 
 	auto g = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		auto evaluator = static_cast<Evaluator *>(data);
 		if (evaluator->is_objective())
 		{
 			evaluator->eval_jac(req->x, res->objGrad);
@@ -868,7 +868,7 @@ void KNITROModel::_register_callback(CallbackEvaluator<double> *evaluator)
 
 	auto h = [](KN_context *, CB_context *cb, KN_eval_request *req, KN_eval_result *res,
 	            void *data) -> int {
-		auto evaluator = static_cast<CallbackEvaluator<double> *>(data);
+		auto evaluator = static_cast<Evaluator *>(data);
 		if (evaluator->is_objective())
 		{
 			evaluator->eval_hess(req->x, req->sigma, res->hess);
@@ -900,7 +900,7 @@ void KNITROModel::_register_callback(CallbackEvaluator<double> *evaluator)
 void KNITROModel::_add_callback(const ExpressionGraph &graph, const std::vector<size_t> &outputs,
                                 const std::vector<ConstraintIndex> &constraints)
 {
-	auto evaluator_ptr = std::make_unique<CallbackEvaluator<double>>();
+	auto evaluator_ptr = std::make_unique<Evaluator>();
 	auto *evaluator = evaluator_ptr.get();
 	evaluator->indexVars.resize(graph.n_variables());
 	for (size_t i = 0; i < graph.n_variables(); i++)
