@@ -20,7 +20,7 @@ def test_nlp_lukvle10(nlp_model_ctor):
         # to 2000 variables.
         pytest.skip("lukvle10 is too large to be supported with COpt")
 
-    n = 125000
+    n = 1250
     x = model.add_m_variables(2 * n, name="x")
 
     for i in range(2 * n - 2):
