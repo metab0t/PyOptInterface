@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.0
+- Add support for KNITRO solver, including nonlinear optimization, callbacks, license management, and documentation
+- Add support for Xpress solver, including linear, quadratic, NLP, callbacks, and reduced cost support
+- Add `ReducedCost` variable attribute
+- Add checks in IpoptModel to raise an error when accessing variable values, objective value, constraint primal or dual before calling `optimize()` or after modifying the model
+- Fix the sign of dual multiplier in IPOPT
+- Fix Hessian matrix ordering in HiGHS (sort elements in the same column by row number)
+- Fix initial value of nonlinear optimization in COPT
+- Fix `poi.ExprBuilder` operation with itself
+- Allow `poi.quicksum` for high dimensional numpy array directly without needing `.flat`
+- Support Gurobi 13, COPT 8, HiGHS 1.12
+- Support finding Gurobi in pixi environment
+- Update CppAD to 20260000 and fmt to 12.1.0
+
 ## 0.5.1
 - Support llvmlite 0.45.0
 
