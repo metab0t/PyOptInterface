@@ -123,6 +123,11 @@ void IpoptModel::set_variable_start(const VariableIndex &variable, double start)
 
 double IpoptModel::get_variable_value(const VariableIndex &variable)
 {
+	if (m_is_dirty)
+	{
+		throw std::runtime_error(
+		    "Variable value is not available before optimization. Call optimize() first.");
+	}
 	return m_result.x[variable.index];
 }
 
@@ -151,6 +156,11 @@ std::string IpoptModel::pprint_variable(const VariableIndex &variable)
 
 double IpoptModel::get_obj_value()
 {
+	if (m_is_dirty)
+	{
+		throw std::runtime_error(
+		    "Objective value is not available before optimization. Call optimize() first.");
+	}
 	return m_result.obj_val;
 }
 
@@ -174,12 +184,22 @@ int IpoptModel::_constraint_internal_index(const ConstraintIndex &constraint)
 
 double IpoptModel::get_constraint_primal(const ConstraintIndex &constraint)
 {
+	if (m_is_dirty)
+	{
+		throw std::runtime_error(
+		    "Constraint primal value is not available before optimization. Call optimize() first.");
+	}
 	int index = _constraint_internal_index(constraint);
 	return m_result.g[index];
 }
 
 double IpoptModel::get_constraint_dual(const ConstraintIndex &constraint)
 {
+	if (m_is_dirty)
+	{
+		throw std::runtime_error(
+		    "Constraint dual value is not available before optimization. Call optimize() first.");
+	}
 	int index = _constraint_internal_index(constraint);
 	auto dual = -m_result.mult_g[index];
 	return dual;
