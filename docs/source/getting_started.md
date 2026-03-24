@@ -105,7 +105,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `C:\Program Files\Artelys\KNITRO 15.1\lib`
     - `/opt/knitro/15.1/lib`
     - `/opt/knitro/15.1/lib`
-    - `/opt/knitro/15.1/lib`
+    - ``
 :::
 
 ### Gurobi
@@ -170,6 +170,8 @@ For KNITRO, the automatic detection looks for the following things in order:
 1. The environment variable `KNITRODIR` set by the installer of KNITRO
 2. `knitro.dll`/`libknitro.so`/`libknitro.dylib` in the system loadable path
 3. The installation of `knitro` PyPI package.
+
+KNITRO dropped support for MacOS intel since version 15.0, so using KNITRO on MacOS intel is not supported.
 
 ## Manually specifying the path of the dynamic library of optimizer
 
@@ -242,7 +244,7 @@ The typical paths where the dynamic library of optimizers are located are as fol
     - `C:\Program Files\Artelys\KNITRO 15.1\lib\knitro.dll`
     - `/opt/knitro/15.1/lib/libknitro.so`
     - `/opt/knitro/15.1/lib/libknitro.dylib`
-    - `/opt/knitro/15.1/lib/libknitro.dylib`
+    - ``
 :::
 
 ## Let's build a simple model and solve it
