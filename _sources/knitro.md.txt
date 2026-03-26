@@ -62,7 +62,7 @@ For [solver-specific parameters](https://www.artelys.com/app/docs/knitro/2_userG
 model = knitro.Model()
 
 # Set the value of a parameter by name
-model.set_raw_parameter("algorithm", 1)
+model.set_raw_parameter("nlp_algorithm", 1)
 model.set_raw_parameter("feastol", 1e-8)
 model.set_raw_parameter("opttol", 1e-8)
 
