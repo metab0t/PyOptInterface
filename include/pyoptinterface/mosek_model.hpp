@@ -18,7 +18,7 @@
 	B(MSK_makeemptytask);              \
 	B(MSK_deletetask);                 \
 	B(MSK_writedata);                  \
-	B(MSK_writesolutionfile);          \
+	B(MSK_writesolution);              \
 	B(MSK_appendvars);                 \
 	B(MSK_getnumvar);                  \
 	B(MSK_putvartype);                 \

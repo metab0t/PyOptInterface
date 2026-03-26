@@ -184,14 +184,23 @@ void MOSEKModel::close()
 void MOSEKModel::write(const std::string &filename)
 {
 	bool is_solution = false;
-	if (filename.ends_with(".sol") || filename.ends_with(".bas") || filename.ends_with(".int"))
+	if (filename.ends_with(".sol") || filename.ends_with(".bas") || filename.ends_with(".int") ||
+	    filename.ends_with(".jsol"))
 	{
 		is_solution = true;
 	}
 	MSKrescodee error;
 	if (is_solution)
 	{
-		error = mosek::MSK_writesolutionfile(m_model.get(), filename.c_str());
+		if (m_soltype)
+		{
+			error = mosek::MSK_writesolution(m_model.get(), m_soltype.value(), filename.c_str());
+		}
+		else
+		{
+			throw std::runtime_error(
+			    "Solution type is unavailable. Please optimize before writing solution.");
+		}
 	}
 	else
 	{
