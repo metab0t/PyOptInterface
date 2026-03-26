@@ -203,6 +203,7 @@ void MOSEKModel::write(const std::string &filename)
 VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double ub,
                                        const char *name)
 {
+	m_is_dirty = true;
 	if (name != nullptr && name[0] == '\0')
 	{
 		name = nullptr;
@@ -316,6 +317,7 @@ VariableIndex MOSEKModel::add_variable(VariableDomain domain, double lb, double 
 
 void MOSEKModel::delete_variable(const VariableIndex &variable)
 {
+	m_is_dirty = true;
 	if (!is_variable_active(variable))
 	{
 		throw std::runtime_error("Variable does not exist");
@@ -331,6 +333,7 @@ void MOSEKModel::delete_variable(const VariableIndex &variable)
 
 void MOSEKModel::delete_variables(const Vector<VariableIndex> &variables)
 {
+	m_is_dirty = true;
 	int n_variables = variables.size();
 	if (n_variables == 0)
 		return;
@@ -378,6 +381,7 @@ std::string MOSEKModel::pprint_variable(const VariableIndex &variable)
 
 void MOSEKModel::set_variable_bounds(const VariableIndex &variable, double lb, double ub)
 {
+	m_is_dirty = true;
 	auto column = _checked_variable_index(variable);
 	MSKboundkeye bk;
 	if (lb == ub)
@@ -396,6 +400,7 @@ ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &fu
                                                   ConstraintSense sense, CoeffT rhs,
                                                   const char *name)
 {
+	m_is_dirty = true;
 	IndexT index = m_linear_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
 
@@ -439,6 +444,7 @@ ConstraintIndex MOSEKModel::add_linear_constraint(const ScalarAffineFunction &fu
                                                   const std::tuple<double, double> &interval,
                                                   const char *name)
 {
+	m_is_dirty = true;
 	IndexT index = m_linear_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Linear, index);
 
@@ -487,6 +493,7 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
                                                      ConstraintSense sense, CoeffT rhs,
                                                      const char *name)
 {
+	m_is_dirty = true;
 	IndexT index = m_linear_quadratic_constraint_index.add_index();
 	ConstraintIndex constraint_index(ConstraintType::Quadratic, index);
 
@@ -548,6 +555,7 @@ ConstraintIndex MOSEKModel::add_quadratic_constraint(const ScalarQuadraticFuncti
 
 std::vector<MSKint64t> MOSEKModel::add_variables_as_afe(const Vector<VariableIndex> &variables)
 {
+	m_is_dirty = true;
 	auto N = variables.size();
 
 	// afe part
@@ -583,6 +591,7 @@ ConstraintIndex MOSEKModel::add_variables_in_cone_constraint(const Vector<Variab
                                                              MSKint64t domain_index,
                                                              ConstraintType type, const char *name)
 {
+	m_is_dirty = true;
 	auto N = variables.size();
 
 	IndexT index = m_acc_index.size();
@@ -615,6 +624,7 @@ ConstraintIndex MOSEKModel::add_variables_in_cone_constraint(const Vector<Variab
 ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<VariableIndex> &variables,
                                                              const char *name, bool rotated)
 {
+	m_is_dirty = true;
 	auto N = variables.size();
 
 	// domain part
@@ -639,6 +649,7 @@ ConstraintIndex MOSEKModel::add_second_order_cone_constraint(const Vector<Variab
 ConstraintIndex MOSEKModel::add_exp_cone_constraint(const Vector<VariableIndex> &variables,
                                                     const char *name, bool dual)
 {
+	m_is_dirty = true;
 	auto N = variables.size();
 	if (N != 3)
 	{
@@ -666,6 +677,7 @@ ConstraintIndex MOSEKModel::add_exp_cone_constraint(const Vector<VariableIndex> 
 
 void MOSEKModel::delete_constraint(const ConstraintIndex &constraint)
 {
+	m_is_dirty = true;
 	MSKrescodee error;
 	MSKint32t constraint_row = _constraint_index(constraint);
 	if (constraint_row < 0)
@@ -758,11 +770,13 @@ void MOSEKModel::_set_affine_objective(const ScalarAffineFunction &function, Obj
 
 void MOSEKModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
+	m_is_dirty = true;
 	_set_affine_objective(function, sense, true);
 }
 
 void MOSEKModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
 {
+	m_is_dirty = true;
 	MSKrescodee error;
 
 	// Add quadratic term
@@ -802,6 +816,7 @@ void MOSEKModel::set_objective(const ScalarQuadraticFunction &function, Objectiv
 
 void MOSEKModel::set_objective(const ExprBuilder &function, ObjectiveSense sense)
 {
+	m_is_dirty = true;
 	auto deg = function.degree();
 	if (deg <= 1)
 	{
@@ -821,6 +836,7 @@ void MOSEKModel::set_objective(const ExprBuilder &function, ObjectiveSense sense
 
 int MOSEKModel::optimize()
 {
+	m_is_dirty = false;
 	auto error = mosek::MSK_optimize(m_model.get());
 	m_soltype = select_available_solution_after_optimization();
 	return error;
@@ -837,18 +853,21 @@ int MOSEKModel::raw_parameter_type(const char *name)
 
 void MOSEKModel::set_raw_parameter_int(const char *param_name, int value)
 {
+	m_is_dirty = true;
 	auto error = mosek::MSK_putnaintparam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void MOSEKModel::set_raw_parameter_double(const char *param_name, double value)
 {
+	m_is_dirty = true;
 	auto error = mosek::MSK_putnadouparam(m_model.get(), param_name, value);
 	check_error(error);
 }
 
 void MOSEKModel::set_raw_parameter_string(const char *param_name, const char *value)
 {
+	m_is_dirty = true;
 	auto error = mosek::MSK_putnastrparam(m_model.get(), param_name, value);
 	check_error(error);
 }
@@ -960,6 +979,7 @@ std::string MOSEKModel::get_variable_name(const VariableIndex &variable)
 
 void MOSEKModel::set_variable_name(const VariableIndex &variable, const char *name)
 {
+	m_is_dirty = true;
 	auto column = _checked_variable_index(variable);
 	auto error = mosek::MSK_putvarname(m_model.get(), column, name);
 	check_error(error);
@@ -980,6 +1000,7 @@ VariableDomain MOSEKModel::get_variable_type(const VariableIndex &variable)
 
 void MOSEKModel::set_variable_type(const VariableIndex &variable, VariableDomain domain)
 {
+	m_is_dirty = true;
 	MSKvariabletypee vtype = mosek_vtype(domain);
 	auto column = _checked_variable_index(variable);
 	auto error = mosek::MSK_putvartype(m_model.get(), column, vtype);
@@ -1049,6 +1070,7 @@ double MOSEKModel::get_variable_upper_bound(const VariableIndex &variable)
 
 void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double lb)
 {
+	m_is_dirty = true;
 	MSKboundkeye bound_type_old, bound_key;
 	MSKrealt lb_old, ub_old;
 	auto column = _checked_variable_index(variable);
@@ -1081,6 +1103,7 @@ void MOSEKModel::set_variable_lower_bound(const VariableIndex &variable, double 
 
 void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double ub)
 {
+	m_is_dirty = true;
 	MSKboundkeye bound_type_old, bound_key;
 	MSKrealt lb_old, ub_old;
 	auto column = _checked_variable_index(variable);
@@ -1113,6 +1136,7 @@ void MOSEKModel::set_variable_upper_bound(const VariableIndex &variable, double 
 
 void MOSEKModel::set_variable_primal(const VariableIndex &variable, double primal)
 {
+	m_is_dirty = true;
 	auto column = _checked_variable_index(variable);
 	MSKrealt val = primal;
 	auto error = mosek::MSK_putxxslice(m_model.get(), MSK_SOL_ITG, column, column + 1, &val);
@@ -1204,6 +1228,7 @@ std::string MOSEKModel::get_constraint_name(const ConstraintIndex &constraint)
 
 void MOSEKModel::set_constraint_name(const ConstraintIndex &constraint, const char *name)
 {
+	m_is_dirty = true;
 	auto row = _checked_constraint_index(constraint);
 	MSKrescodee error;
 	switch (constraint.type)
@@ -1230,6 +1255,7 @@ ObjectiveSense MOSEKModel::get_obj_sense()
 
 void MOSEKModel::set_obj_sense(ObjectiveSense sense)
 {
+	m_is_dirty = true;
 	auto obj_sense = mosek_obj_sense(sense);
 	auto error = mosek::MSK_putobjsense(m_model.get(), obj_sense);
 	check_error(error);
@@ -1279,6 +1305,7 @@ double MOSEKModel::get_normalized_rhs(const ConstraintIndex &constraint)
 
 void MOSEKModel::set_normalized_rhs(const ConstraintIndex &constraint, double value)
 {
+	m_is_dirty = true;
 	auto row = _checked_constraint_index(constraint);
 	MSKrescodee error;
 	switch (constraint.type)
@@ -1340,6 +1367,7 @@ double MOSEKModel::get_normalized_coefficient(const ConstraintIndex &constraint,
 void MOSEKModel::set_normalized_coefficient(const ConstraintIndex &constraint,
                                             const VariableIndex &variable, double value)
 {
+	m_is_dirty = true;
 	if (constraint.type != ConstraintType::Linear && constraint.type != ConstraintType::Quadratic)
 	{
 		throw std::runtime_error(
@@ -1362,6 +1390,7 @@ double MOSEKModel::get_objective_coefficient(const VariableIndex &variable)
 
 void MOSEKModel::set_objective_coefficient(const VariableIndex &variable, double value)
 {
+	m_is_dirty = true;
 	auto column = _checked_variable_index(variable);
 	auto error = mosek::MSK_putcj(m_model.get(), column, value);
 	check_error(error);
@@ -1419,6 +1448,7 @@ static void RealLoggingCallbackFunction(void *handle, const char *msg)
 
 void MOSEKModel::set_logging(const MOSEKLoggingCallback &callback)
 {
+	m_is_dirty = true;
 	m_logging_callback_userdata.callback = callback;
 	auto error = mosek::MSK_linkfunctotaskstream(
 	    m_model.get(), MSK_STREAM_LOG, &m_logging_callback_userdata, &RealLoggingCallbackFunction);

@@ -166,5 +166,5 @@ NB_MODULE(mosek_model_ext, m)
 		BIND_F(get_objective_coefficient)
 		BIND_F(set_objective_coefficient)
 	    // clang-format on
-	    ;
+	    .def_rw("m_is_dirty", &MOSEKModel::m_is_dirty);
 }

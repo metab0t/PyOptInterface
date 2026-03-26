@@ -138,6 +138,7 @@ class MOSEKModel : public OnesideLinearConstraintMixin<MOSEKModel>,
                    public GetValueMixin<MOSEKModel>
 {
   public:
+	bool m_is_dirty = true;
 	MOSEKModel() = default;
 	MOSEKModel(const MOSEKEnv &env);
 	void init(const MOSEKEnv &env);

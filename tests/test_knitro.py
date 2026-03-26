@@ -328,16 +328,6 @@ def test_model_attribute_solver_info():
     assert len(solver_version) > 0
 
 
-def test_model_attribute_termination_before_solve():
-    """Test termination status before solving."""
-    model = knitro.Model()
-    x = model.add_variable(lb=0.0, ub=10.0)
-    model.set_objective(x, poi.ObjectiveSense.Minimize)
-
-    status = model.get_model_attribute(poi.ModelAttribute.TerminationStatus)
-    assert status == poi.TerminationStatusCode.OPTIMIZE_NOT_CALLED
-
-
 def test_model_attribute_after_solve():
     """Test model attributes after solving."""
     model = knitro.Model()

@@ -47,7 +47,12 @@ def detected_libraries():
     }[platform.system()]
 
     # Environment
-    possible_envs = ["MOSEK_11_0_BINDIR", "MOSEK_10_2_BINDIR", "MOSEK_10_1_BINDIR"]
+    possible_envs = [
+        "MOSEK_11_1_BINDIR",
+        "MOSEK_11_0_BINDIR",
+        "MOSEK_10_2_BINDIR",
+        "MOSEK_10_1_BINDIR",
+    ]
     for env in possible_envs:
         home = os.environ.get(env, None)
         if home and os.path.exists(home):
@@ -86,7 +91,12 @@ def detected_libraries():
     default_libname = {
         "Linux": ["libmosek64.so"],
         "Darwin": ["libmosek64.dylib"],
-        "Windows": ["mosek64_11_0.dll", "mosek64_10_2.dll", "mosek64_10_1.dll"],
+        "Windows": [
+            "mosek64_11_1.dll",
+            "mosek64_11_0.dll",
+            "mosek64_10_2.dll",
+            "mosek64_10_1.dll",
+        ],
     }[platform.system()]
     libs.extend(default_libname)
 
@@ -140,6 +150,8 @@ variable_attribute_set_func_map = {
 
 
 def get_primalstatus(model):
+    if model.m_is_dirty:
+        return ResultStatusCode.NO_SOLUTION
     solsta = model.getsolsta()
     if solsta == Enum.MSK_SOL_STA_UNKNOWN:
         return ResultStatusCode.UNKNOWN_RESULT_STATUS
@@ -166,6 +178,8 @@ def get_primalstatus(model):
 
 
 def get_dualstatus(model):
+    if model.m_is_dirty:
+        return ResultStatusCode.NO_SOLUTION
     solsta = model.getsolsta()
     if solsta == Enum.MSK_SOL_STA_UNKNOWN:
         return ResultStatusCode.UNKNOWN_RESULT_STATUS
@@ -223,6 +237,8 @@ termination_names = {
 
 
 def get_rawstatusstring(model):
+    if model.m_is_dirty:
+        return "OPTIMIZE_NOT_CALLED"
     trm = model.last_solve_return_code
     if trm is None:
         return "OPTIMIZE_NOT_CALLED"
@@ -234,6 +250,8 @@ def get_rawstatusstring(model):
 
 
 def get_terminationstatus(model):
+    if model.m_is_dirty:
+        return TerminationStatusCode.OPTIMIZE_NOT_CALLED
     trm = model.last_solve_return_code
     prosta = model.getprosta()
     solsta = model.getsolsta()
