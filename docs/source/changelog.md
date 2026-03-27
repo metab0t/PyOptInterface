@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+- Fix some bugs in Mosek interface
+- Update documentation of Knitro
+
 ## 0.6.0
 - Add support for KNITRO solver, including nonlinear optimization, callbacks, license management, and documentation
 - Add support for Xpress solver, including linear, quadratic, NLP, callbacks, and reduced cost support
