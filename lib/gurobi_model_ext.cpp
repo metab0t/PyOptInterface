@@ -37,8 +37,8 @@ NB_MODULE(gurobi_model_ext, m)
 	nb::class_<GurobiModel>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const GurobiEnv &>())
+	    .def(nb::init<const GurobiEnv &, const OneShotModel &>())
 	    // clang-format off
-		BIND_F(init)
 		BIND_F(close)
 		BIND_F(write)
 	    // clang-format on

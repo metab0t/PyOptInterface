@@ -2,7 +2,7 @@ import logging
 import os
 import platform
 from pathlib import Path
-from typing import Dict, Union, overload
+from typing import Dict, Optional, Union, overload
 
 from .highs_model_ext import (
     RawModel,
@@ -33,6 +33,7 @@ from .solver_common import (
 )
 from .aml import make_variable_tupledict, make_variable_ndarray
 from .matrix import add_matrix_constraints
+from .oneshot_model import OneShotModel
 
 
 def detected_libraries():
@@ -293,8 +294,11 @@ highs_info_raw_type_map = {
 
 
 class Model(RawModel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model: Optional[OneShotModel] = None):
+        if model is not None:
+            super().__init__(model)
+        else:
+            super().__init__()
 
         self.mip_start_values: Dict[VariableIndex, float] = dict()
 
@@ -473,3 +477,7 @@ class Model(RawModel):
     add_variables = make_variable_tupledict
     add_m_variables = make_variable_ndarray
     add_m_linear_constraints = add_matrix_constraints
+
+
+def capture(model: OneShotModel):
+    return Model(model=model)

@@ -10,6 +10,7 @@
 #define USE_NLMIXIN
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
+#include "pyoptinterface/oneshot_model.hpp"
 
 // define Gurobi C APIs
 #define APILIST               \
@@ -19,8 +20,10 @@
 	B(GRBgetenv);             \
 	B(GRBwrite);              \
 	B(GRBaddvar);             \
+	B(GRBaddvars);            \
 	B(GRBdelvars);            \
 	B(GRBaddconstr);          \
+	B(GRBaddconstrs);         \
 	B(GRBaddqconstr);         \
 	B(GRBaddsos);             \
 	B(GRBaddgenconstrNL);     \
@@ -153,7 +156,8 @@ class GurobiModel : public OnesideLinearConstraintMixin<GurobiModel>,
   public:
 	GurobiModel() = default;
 	GurobiModel(const GurobiEnv &env);
-	void init(const GurobiEnv &env);
+	// build the model from OneShotModel directly
+	GurobiModel(const GurobiEnv &env, const OneShotModel &model);
 	void close();
 
 	void _reset(int clearall);
