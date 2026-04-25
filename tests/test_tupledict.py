@@ -68,3 +68,33 @@ def test_tupledict_map():
     assert list(td_m.values()) == [i**2 for i in range(10)]
 
     assert list(td_m.keys()) == list(td.keys())
+
+
+def test_tupledict_cache_invalidation():
+    # update() should invalidate select cache
+    td = tupledict({(1, 2): "a", (1, 3): "b", (2, 2): "c"})
+    assert list(td.select(1, WILDCARD)) == ["a", "b"]
+    td.update({(3, 2): "e"})
+    assert list(td.select(3, WILDCARD)) == ["e"]
+
+    # pop() should invalidate select cache
+    td2 = tupledict({(1, 2): "a", (1, 3): "b"})
+    assert list(td2.select(1, WILDCARD)) == ["a", "b"]
+    td2.pop((1, 3))
+    assert list(td2.select(1, WILDCARD)) == ["a"]
+
+    # clear() should invalidate select cache
+    td3 = tupledict({(1, 2): "a"})
+    list(td3.select(1, WILDCARD))  # build cache
+    td3.clear()
+    td3[(1, 2)] = "x"
+    assert list(td3.select(1, WILDCARD)) == ["x"]
+
+
+def test_tupledict_scalar_key_select():
+    # tupledict created via __init__ with scalar keys should work with select()
+    td = tupledict({1: "a", 2: "b", 3: "c"})
+    assert list(td.select(1)) == ["a"]
+    assert sorted(td.select(WILDCARD)) == ["a", "b", "c"]
+    assert list(td.select(1, with_key=True)) == [(1, "a")]
+    assert list(td.select(99)) == []
