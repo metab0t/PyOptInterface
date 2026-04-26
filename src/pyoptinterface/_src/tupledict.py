@@ -10,13 +10,44 @@ class tupledict(dict):
         self.__select_cache = None
         self.__scalar = False
 
+    def __invalidate_cache(self):
+        self.__select_cache = None
+
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
-        self.__select_cache = None
+        self.__invalidate_cache()
 
     def __delitem__(self, key):
         super().__delitem__(key)
-        self.__select_cache = None
+        self.__invalidate_cache()
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self.__invalidate_cache()
+
+    def pop(self, *args):
+        result = super().pop(*args)
+        self.__invalidate_cache()
+        return result
+
+    def popitem(self):
+        result = super().popitem()
+        self.__invalidate_cache()
+        return result
+
+    def clear(self):
+        super().clear()
+        self.__invalidate_cache()
+
+    def setdefault(self, key, default=None):
+        if key not in self:
+            self.__invalidate_cache()
+        return super().setdefault(key, default)
+
+    def __ior__(self, other):
+        result = super().__ior__(other)
+        self.__invalidate_cache()
+        return result
 
     def __check_key_length(self):
         if len(self) == 0:
@@ -40,6 +71,10 @@ class tupledict(dict):
         if len(keys) == 0:
             yield from ()
             return
+        # Ensure key type is detected before branching
+        if self.__select_cache is None:
+            self.__check_key_length()
+            self.__select_cache = dict()
         if self.__scalar:
             if len(keys) != 1:
                 raise ValueError(
@@ -60,9 +95,6 @@ class tupledict(dict):
                 else:
                     yield from ()
         else:
-            if self.__select_cache is None:
-                self.__check_key_length()
-                self.__select_cache = dict()
             key_len = self.__key_len
             if len(keys) > key_len:
                 raise ValueError(
