@@ -10,6 +10,7 @@
 #define USE_NLMIXIN
 #include "pyoptinterface/solver_common.hpp"
 #include "pyoptinterface/dylib.hpp"
+#include "pyoptinterface/oneshot_model.hpp"
 
 extern "C"
 {
@@ -29,8 +30,10 @@ extern "C"
 	B(COPT_WriteMst);              \
 	B(COPT_WriteParam);            \
 	B(COPT_AddCol);                \
+	B(COPT_AddCols);               \
 	B(COPT_DelCols);               \
 	B(COPT_AddRow);                \
+	B(COPT_AddRows);               \
 	B(COPT_AddQConstr);            \
 	B(COPT_AddSOSs);               \
 	B(COPT_AddCones);              \
@@ -189,7 +192,7 @@ class COPTModel : public OnesideLinearConstraintMixin<COPTModel>,
   public:
 	COPTModel() = default;
 	COPTModel(const COPTEnv &env);
-	void init(const COPTEnv &env);
+	COPTModel(const COPTEnv &env, const OneShotModel &model);
 	void close();
 
 	double get_infinity() const;

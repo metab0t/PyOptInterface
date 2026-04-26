@@ -31,11 +31,14 @@ def make_variable_ndarray(
     if start is not None:
         kw_args["start"] = start
 
-    for index in np.ndindex(shape):
-        if name is not None:
+    if name is not None:
+        for index in np.ndindex(shape):
             suffix = str(index)
             kw_args["name"] = f"{name}{suffix}"
-        variables[index] = model.add_variable(**kw_args)
+            variables[index] = model.add_variable(**kw_args)
+    else:
+        for index in np.ndindex(shape):
+            variables[index] = model.add_variable(**kw_args)
 
     return variables
 

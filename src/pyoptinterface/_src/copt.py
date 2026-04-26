@@ -2,7 +2,7 @@ import os
 import platform
 from pathlib import Path
 import logging
-from typing import Dict, Tuple, Union, overload
+from typing import Optional, Dict, Tuple, Union, overload
 
 from .copt_model_ext import RawModel, Env, COPT, load_library
 from .attributes import (
@@ -32,6 +32,7 @@ from .solver_common import (
 )
 from .aml import make_variable_tupledict, make_variable_ndarray
 from .matrix import add_matrix_constraints
+from .oneshot_model import OneShotModel
 
 
 def detected_libraries():
@@ -376,11 +377,14 @@ callback_info_typemap = {
 
 
 class Model(RawModel):
-    def __init__(self, env=None):
+    def __init__(self, env: Optional[Env] = None, model: Optional[OneShotModel] = None):
         if env is None:
             init_default_env()
             env = DEFAULT_ENV
-        super().__init__(env)
+        if model is not None:
+            super().__init__(env, model)
+        else:
+            super().__init__(env)
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
@@ -680,3 +684,7 @@ class Model(RawModel):
     add_variables = make_variable_tupledict
     add_m_variables = make_variable_ndarray
     add_m_linear_constraints = add_matrix_constraints
+
+
+def capture(model: OneShotModel, env: Optional[Env] = None):
+    return Model(env=env, model=model)
