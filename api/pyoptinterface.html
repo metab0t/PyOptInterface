@@ -1001,14 +1001,50 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.tupledict.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.tupledict.clear" title="Link to this definition">¶</a></dt>
+<dd><p>Remove all items from the dict.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.tupledict.map">
 <span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.tupledict.map" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.tupledict.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">v,</span> <span class="pre">remove</span> <span class="pre">specified</span> <span class="pre">key</span> <span class="pre">and</span> <span class="pre">return</span> <span class="pre">the</span> <span class="pre">corresponding</span> <span class="pre">value.</span></span></span><a class="headerlink" href="#pyoptinterface.tupledict.pop" title="Link to this definition">¶</a></dt>
+<dd><p>If the key is not found, return the default if given; otherwise,
+raise a KeyError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.tupledict.popitem">
+<span class="sig-name descname"><span class="pre">popitem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.tupledict.popitem" title="Link to this definition">¶</a></dt>
+<dd><p>Remove and return a (key, value) pair as a 2-tuple.</p>
+<p>Pairs are returned in LIFO (last-in, first-out) order.
+Raises KeyError if the dict is empty.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyoptinterface.tupledict.select">
 <span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.tupledict.select" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.tupledict.setdefault">
+<span class="sig-name descname"><span class="pre">setdefault</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyoptinterface.tupledict.setdefault" title="Link to this definition">¶</a></dt>
+<dd><p>Insert key with a value of default if key is not in the dictionary.</p>
+<p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyoptinterface.tupledict.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <span class="optional">]</span><em class="sig-param"><span class="n"><span class="pre">**F</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None.</span>&#160; <span class="pre">Update</span> <span class="pre">D</span> <span class="pre">from</span> <span class="pre">mapping/iterable</span> <span class="pre">E</span> <span class="pre">and</span> <span class="pre">F.</span></span></span><a class="headerlink" href="#pyoptinterface.tupledict.update" title="Link to this definition">¶</a></dt>
+<dd><p>If E is present and has a .keys() method, then does:  for k in E.keys(): D[k] = E[k]
+If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v
+In either case, this is followed by: for k in F:  D[k] = F[k]</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1276,8 +1312,13 @@
 <li><a class="reference internal" href="#pyoptinterface.quicksum_"><code class="docutils literal notranslate"><span class="pre">quicksum_()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.tupledict"><code class="docutils literal notranslate"><span class="pre">tupledict</span></code></a><ul>
 <li><a class="reference internal" href="#pyoptinterface.tupledict.clean"><code class="docutils literal notranslate"><span class="pre">tupledict.clean()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.tupledict.clear"><code class="docutils literal notranslate"><span class="pre">tupledict.clear()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.tupledict.map"><code class="docutils literal notranslate"><span class="pre">tupledict.map()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.tupledict.pop"><code class="docutils literal notranslate"><span class="pre">tupledict.pop()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.tupledict.popitem"><code class="docutils literal notranslate"><span class="pre">tupledict.popitem()</span></code></a></li>
 <li><a class="reference internal" href="#pyoptinterface.tupledict.select"><code class="docutils literal notranslate"><span class="pre">tupledict.select()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.tupledict.setdefault"><code class="docutils literal notranslate"><span class="pre">tupledict.setdefault()</span></code></a></li>
+<li><a class="reference internal" href="#pyoptinterface.tupledict.update"><code class="docutils literal notranslate"><span class="pre">tupledict.update()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>

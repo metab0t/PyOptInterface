@@ -394,7 +394,6 @@ Solving MIP model with:
 
 Src: B =&gt; Branching; C =&gt; Central rounding; F =&gt; Feasibility pump; H =&gt; Heuristic;
      I =&gt; Shifting; J =&gt; Feasibility jump; L =&gt; Sub-MIP; P =&gt; Empty MIP; R =&gt; Randomized rounding;
-Termination status: TerminationStatusCode.OPTIMAL
      S =&gt; Solve LP; T =&gt; Evaluate node; U =&gt; Unbounded; X =&gt; User solution; Y =&gt; HiGHS solution;
      Z =&gt; ZI Round; l =&gt; Trivial lower; p =&gt; Trivial point; u =&gt; Trivial upper; z =&gt; Trivial zero
 
@@ -402,6 +401,7 @@ Termination status: TerminationStatusCode.OPTIMAL
 Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
 
  J       0       0         0 100.00%   -inf            0                  Large        0      0      0         0     0.0s
+Termination status: TerminationStatusCode.OPTIMAL
          1       0         1 100.00%   0               0                  0.00%        0      0      0         0     0.0s
 
 Solving report
@@ -415,7 +415,7 @@ Solving report
                     0 (bound viol.)
                     0 (int. viol.)
                     0 (row viol.)
-  Timing            0.01
+  Timing            0.02
   Max sub-MIP depth 0
   Nodes             1
   Repair LPs        0
