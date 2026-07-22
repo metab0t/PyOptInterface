@@ -41,13 +41,13 @@ set(POI_INSTALL_DIR ${SKBUILD_PLATLIB_DIR}/pyoptinterface/_src)
 
 add_library(core STATIC)
 target_sources(core PRIVATE
-  include/pyoptinterface/cache_model.hpp
   include/pyoptinterface/core.hpp
   include/pyoptinterface/container.hpp
   include/pyoptinterface/dylib.hpp
+  include/pyoptinterface/oneshot_model.hpp
   include/pyoptinterface/solver_common.hpp
-  lib/cache_model.cpp
   lib/core.cpp
+  lib/oneshot_model.cpp
 )
 target_include_directories(core PUBLIC include thirdparty)
 target_link_libraries(core PUBLIC fmt)

@@ -130,11 +130,6 @@ static int copt_sostype(SOSType type)
 
 COPTModel::COPTModel(const COPTEnv &env)
 {
-	init(env);
-}
-
-void COPTModel::init(const COPTEnv &env)
-{
 	if (!copt::is_library_loaded())
 	{
 		throw std::runtime_error("COPT library is not loaded");
@@ -143,6 +138,114 @@ void COPTModel::init(const COPTEnv &env)
 	int error = copt::COPT_CreateProb(env.m_env, &model);
 	check_error(error);
 	m_model = std::unique_ptr<copt_prob, COPTfreemodelT>(model);
+}
+
+COPTModel::COPTModel(const COPTEnv &env, const OneShotModel &model) : COPTModel(env)
+{
+	int error = 0;
+
+	// Step 1: Batch add variables via COPT_AddCols
+	int num_vars = model.num_variables;
+	{
+		// Convert variable domains to COPT vtypes
+		std::vector<char> vtypes(num_vars);
+		for (int i = 0; i < num_vars; i++)
+		{
+			vtypes[i] = copt_vtype(model.variable_domains[i]);
+		}
+
+		// Build dense objective coefficient array
+		const auto &obj = model.linear_objective;
+		std::vector<double> obj_coeffs(num_vars, 0.0);
+		for (size_t i = 0; i < obj.size(); i++)
+		{
+			obj_coeffs[obj.variables[i]] = obj.coefficients[i];
+		}
+
+		// Get name pointers
+		std::vector<const char *> var_names;
+		if (!model.variable_names.is_essentially_empty())
+		{
+			var_names = model.variable_names.c_str_array();
+		}
+		const char **var_name_ptrs = var_names.empty() ? nullptr : var_names.data();
+
+		// COPT_AddCols: add variables without constraint matrix entries
+		error = copt::COPT_AddCols(
+		    m_model.get(), num_vars, obj_coeffs.data(), nullptr, nullptr, nullptr, nullptr,
+		    vtypes.data(), const_cast<double *>(model.variable_lbs.data()),
+		    const_cast<double *>(model.variable_ubs.data()), const_cast<char **>(var_name_ptrs));
+		check_error(error);
+
+		m_variable_index.init_indices(num_vars);
+	}
+
+	// Step 2: Batch add linear constraints via COPT_AddRows
+	int num_cons = model.num_linear_constraints;
+	if (num_cons > 0)
+	{
+		const auto &A = model.A_cache;
+
+		// Compute rowMatCnt from row_ptr differences
+		std::vector<int> rowMatCnt(num_cons);
+		for (int i = 0; i < num_cons; i++)
+		{
+			rowMatCnt[i] = A.row_ptr[i + 1] - A.row_ptr[i];
+		}
+
+		// Convert ConstraintSense to COPT char sense, and compute bounds
+		std::vector<char> c_senses(num_cons);
+		std::vector<double> c_bound(num_cons);
+		std::vector<double> c_upper(num_cons);
+		for (int i = 0; i < num_cons; i++)
+		{
+			c_senses[i] = copt_con_sense(model.linear_con_senses[i]);
+			switch (model.linear_con_senses[i])
+			{
+			case ConstraintSense::LessEqual:
+				c_bound[i] = model.linear_con_ubs[i];
+				c_upper[i] = model.linear_con_ubs[i];
+				break;
+			case ConstraintSense::GreaterEqual:
+				c_bound[i] = model.linear_con_lbs[i];
+				c_upper[i] = model.linear_con_lbs[i];
+				break;
+			case ConstraintSense::Equal:
+				c_bound[i] = model.linear_con_lbs[i];
+				c_upper[i] = model.linear_con_lbs[i];
+				break;
+			default:
+				throw std::runtime_error("Unsupported constraint sense");
+			}
+		}
+
+		// Get constraint name pointers
+		std::vector<const char *> con_names;
+		if (!model.linear_con_names.is_essentially_empty())
+		{
+			con_names = model.linear_con_names.c_str_array();
+		}
+		const char **con_name_ptrs = con_names.empty() ? nullptr : con_names.data();
+
+		error = copt::COPT_AddRows(
+		    m_model.get(), num_cons, const_cast<int *>(A.row_ptr.data()), rowMatCnt.data(),
+		    const_cast<int *>(A.variables.data()), const_cast<double *>(A.coefficients.data()),
+		    c_senses.data(), c_bound.data(), c_upper.data(), const_cast<char **>(con_name_ptrs));
+		check_error(error);
+
+		m_linear_constraint_index.init_indices(num_cons);
+	}
+
+	// Step 3: Set objective sense and constant
+	{
+		int obj_sense = copt_obj_sense(model.objective_sense);
+		error = copt::COPT_SetObjSense(m_model.get(), obj_sense);
+		check_error(error);
+
+		double obj_constant = model.linear_objective.constant.value_or(0.0);
+		error = copt::COPT_SetObjConst(m_model.get(), obj_constant);
+		check_error(error);
+	}
 }
 
 void COPTModel::close()

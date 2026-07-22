@@ -6,6 +6,7 @@
 
 #include "pyoptinterface/core.hpp"
 #include "pyoptinterface/container.hpp"
+#include "pyoptinterface/oneshot_model.hpp"
 
 #include <span>
 #include <algorithm>
@@ -30,7 +31,8 @@ NB_MODULE(core_ext, m)
 	nb::enum_<ConstraintSense>(m, "ConstraintSense")
 	    .value("LessEqual", ConstraintSense::LessEqual)
 	    .value("Equal", ConstraintSense::Equal)
-	    .value("GreaterEqual", ConstraintSense::GreaterEqual);
+	    .value("GreaterEqual", ConstraintSense::GreaterEqual)
+	    .value("Interval", ConstraintSense::Interval);
 
 	// ConstraintType
 	nb::enum_<ConstraintType>(m, "ConstraintType")
@@ -262,4 +264,17 @@ NB_MODULE(core_ext, m)
 	    .def("add_index", &IntMonotoneIndexer::add_index)
 	    .def("get_index", &IntMonotoneIndexer::get_index)
 	    .def("delete_index", &IntMonotoneIndexer::delete_index);
+
+	nb::class_<OneShotModel>(m, "RawOneShotModel")
+	    .def(nb::init<>())
+	    .def("add_variable", &OneShotModel::add_variable,
+	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -inf_d,
+	         nb::arg("ub") = inf_d, nb::arg("name") = "")
+	    .def("_batch_add_variables", &OneShotModel::batch_add_variables, nb::arg("shape"),
+	         nb::arg("domain") = VariableDomain::Continuous, nb::arg("lb") = -inf_d,
+	         nb::arg("ub") = inf_d, nb::arg("name") = "")
+	    .def("_add_linear_constraint", &OneShotModel::add_linear_constraint, nb::arg("expr"),
+	         nb::arg("sense"), nb::arg("rhs"), nb::arg("name") = "")
+	    .def("set_objective", &OneShotModel::set_objective, nb::arg("expr"),
+	         nb::arg("sense") = ObjectiveSense::Minimize);
 }

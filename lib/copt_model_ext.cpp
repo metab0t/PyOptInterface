@@ -30,8 +30,8 @@ NB_MODULE(copt_model_ext, m)
 	nb::class_<COPTModel>(m, "RawModel")
 	    .def(nb::init<>())
 	    .def(nb::init<const COPTEnv &>())
+	    .def(nb::init<const COPTEnv &, const OneShotModel &>())
 	    // clang-format off
-	    BIND_F(init)
 	    BIND_F(write)
 	    BIND_F(close)
 	    // clang-format on

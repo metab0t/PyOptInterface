@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import sys
 import logging
-from typing import Tuple, Union, overload
+from typing import Optional, Tuple, Union, overload
 
 from .gurobi_model_ext import RawModel, RawEnv, GRB, load_library
 from .attributes import (
@@ -38,6 +38,7 @@ from .solver_common import (
 from .constraint_bridge import bridge_soc_quadratic_constraint
 from .aml import make_variable_tupledict, make_variable_ndarray
 from .matrix import add_matrix_constraints
+from .oneshot_model import OneShotModel
 
 
 def detected_libraries():
@@ -559,11 +560,14 @@ class Env(RawEnv):
 
 
 class Model(RawModel):
-    def __init__(self, env=None):
+    def __init__(self, env: Optional[Env] = None, model: Optional[OneShotModel] = None):
         if env is None:
             init_default_env()
             env = DEFAULT_ENV
-        super().__init__(env)
+        if model is not None:
+            super().__init__(env, model)
+        else:
+            super().__init__(env)
 
         # We must keep a reference to the environment to prevent it from being garbage collected
         self._env = env
@@ -880,3 +884,7 @@ class Model(RawModel):
     add_m_variables = make_variable_ndarray
     add_m_linear_constraints = add_matrix_constraints
     add_second_order_cone_constraint = bridge_soc_quadratic_constraint
+
+
+def capture(model: OneShotModel, env: Optional[Env] = None):
+    return Model(env=env, model=model)

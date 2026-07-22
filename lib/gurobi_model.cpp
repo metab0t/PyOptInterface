@@ -165,21 +165,125 @@ static int gurobi_sostype(SOSType type)
 
 GurobiModel::GurobiModel(const GurobiEnv &env)
 {
-	init(env);
-}
-
-void GurobiModel::init(const GurobiEnv &env)
-{
 	if (!gurobi::is_library_loaded())
 	{
 		throw std::runtime_error("Gurobi library is not loaded");
 	}
 
-	GRBmodel *model;
-	int error = gurobi::GRBnewmodel(env.m_env, &model, NULL, 0, NULL, NULL, NULL, NULL, NULL);
+	GRBmodel *model_ptr;
+	int error = gurobi::GRBnewmodel(env.m_env, &model_ptr, NULL, 0, NULL, NULL, NULL, NULL, NULL);
 	check_error(error);
-	m_env = gurobi::GRBgetenv(model);
-	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model);
+	m_env = gurobi::GRBgetenv(model_ptr);
+	m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model_ptr);
+}
+
+GurobiModel::GurobiModel(const GurobiEnv &env, const OneShotModel &model)
+{
+	if (!gurobi::is_library_loaded())
+	{
+		throw std::runtime_error("Gurobi library is not loaded");
+	}
+	int error = 0;
+
+	// Step 1: Batch add variables (with objective coefficients)
+	int num_vars = model.num_variables;
+	{
+		// Convert variable domains to Gurobi vtypes
+		std::vector<char> vtypes(num_vars);
+		for (int i = 0; i < num_vars; i++)
+		{
+			vtypes[i] = gurobi_vtype(model.variable_domains[i]);
+		}
+
+		// Build dense objective coefficient array
+		const auto &obj = model.linear_objective;
+		std::vector<double> obj_coeffs(num_vars, 0.0);
+		for (size_t i = 0; i < obj.size(); i++)
+		{
+			obj_coeffs[obj.variables[i]] = obj.coefficients[i];
+		}
+
+		// Get name pointers
+		std::vector<const char *> var_names;
+		if (!model.variable_names.is_essentially_empty())
+		{
+			var_names = model.variable_names.c_str_array();
+		}
+		const char **var_name_ptrs = var_names.empty() ? nullptr : var_names.data();
+
+		GRBmodel *model_ptr;
+		error = gurobi::GRBnewmodel(env.m_env, &model_ptr, nullptr, num_vars, obj_coeffs.data(),
+		                            const_cast<double *>(model.variable_lbs.data()),
+		                            const_cast<double *>(model.variable_ubs.data()), vtypes.data(),
+		                            const_cast<char **>(var_name_ptrs));
+		check_error(error);
+		m_env = gurobi::GRBgetenv(model_ptr);
+		m_model = std::unique_ptr<GRBmodel, GRBfreemodelT>(model_ptr);
+
+		m_variable_index.init_indices(num_vars);
+
+		m_update_flag |= m_variable_creation;
+		m_update_flag |= m_objective_update;
+	}
+
+	// Step 2: Batch add linear constraints
+	int num_cons = model.num_linear_constraints;
+	if (num_cons > 0)
+	{
+		const auto &A = model.A_cache;
+		int numnz = static_cast<int>(A.variables.size());
+
+		// Convert ConstraintSense to Gurobi char sense
+		std::vector<char> g_senses(num_cons);
+		std::vector<double> g_rhs(num_cons);
+		for (int i = 0; i < num_cons; i++)
+		{
+			g_senses[i] = gurobi_con_sense(model.linear_con_senses[i]);
+			switch (model.linear_con_senses[i])
+			{
+			case ConstraintSense::LessEqual:
+				g_rhs[i] = model.linear_con_ubs[i];
+				break;
+			case ConstraintSense::GreaterEqual:
+				g_rhs[i] = model.linear_con_lbs[i];
+				break;
+			case ConstraintSense::Equal:
+				g_rhs[i] = model.linear_con_lbs[i];
+				break;
+			default:
+				throw std::runtime_error("Unsupported constraint sense");
+			}
+		}
+
+		// Get constraint name pointers
+		std::vector<const char *> con_names;
+		if (!model.linear_con_names.is_essentially_empty())
+		{
+			con_names = model.linear_con_names.c_str_array();
+		}
+		const char **con_name_ptrs = con_names.empty() ? nullptr : con_names.data();
+
+		error = gurobi::GRBaddconstrs(
+		    m_model.get(), num_cons, numnz, const_cast<int *>(A.row_ptr.data()),
+		    const_cast<int *>(A.variables.data()), const_cast<double *>(A.coefficients.data()),
+		    g_senses.data(), g_rhs.data(), const_cast<char **>(con_name_ptrs));
+		check_error(error);
+
+		m_linear_constraint_index.init_indices(num_cons);
+
+		m_update_flag |= m_linear_constraint_creation;
+	}
+
+	// Step 3: Set objective sense and constant
+	{
+		int obj_sense = gurobi_obj_sense(model.objective_sense);
+		error = gurobi::GRBsetintattr(m_model.get(), GRB_INT_ATTR_MODELSENSE, obj_sense);
+		check_error(error);
+
+		double obj_constant = model.linear_objective.constant.value_or(0.0);
+		error = gurobi::GRBsetdblattr(m_model.get(), GRB_DBL_ATTR_OBJCON, obj_constant);
+		check_error(error);
+	}
 }
 
 void GurobiModel::close()
@@ -733,7 +837,8 @@ void GurobiModel::_set_affine_objective(const ScalarAffineFunction &function, Ob
 
 void GurobiModel::set_objective(const ScalarAffineFunction &function, ObjectiveSense sense)
 {
-	_set_affine_objective(function, sense, true);
+	const bool clear_quadratic = true;
+	_set_affine_objective(function, sense, clear_quadratic);
 }
 
 void GurobiModel::set_objective(const ScalarQuadraticFunction &function, ObjectiveSense sense)
@@ -760,15 +865,16 @@ void GurobiModel::set_objective(const ScalarQuadraticFunction &function, Objecti
 
 	// Affine part
 	const auto &affine_part = function.affine_part;
+	const bool clear_quadratic = false;
 	if (affine_part)
 	{
 		const auto &affine_function = affine_part.value();
-		_set_affine_objective(affine_function, sense, false);
+		_set_affine_objective(affine_function, sense, clear_quadratic);
 	}
 	else
 	{
 		ScalarAffineFunction zero;
-		_set_affine_objective(zero, sense, false);
+		_set_affine_objective(zero, sense, clear_quadratic);
 	}
 }
 

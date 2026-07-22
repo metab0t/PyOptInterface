@@ -101,17 +101,150 @@ static HighsInt highs_obj_sense(ObjectiveSense sense)
 
 POIHighsModel::POIHighsModel()
 {
-	init();
-}
-
-void POIHighsModel::init()
-{
 	if (!highs::is_library_loaded())
 	{
 		throw std::runtime_error("HiGHS library is not loaded");
 	}
 	void *model = highs::Highs_create();
 	m_model = std::unique_ptr<void, HighsfreemodelT>(model);
+}
+
+POIHighsModel::POIHighsModel(const OneShotModel &model) : POIHighsModel()
+{
+	HighsInt error = 0;
+
+	// Step 1: Batch add variables via Highs_addCols
+	int num_vars = model.num_variables;
+	{
+		// Build dense objective coefficient array
+		const auto &obj = model.linear_objective;
+		std::vector<double> obj_coeffs(num_vars, 0.0);
+		for (size_t i = 0; i < obj.size(); i++)
+		{
+			obj_coeffs[obj.variables[i]] = obj.coefficients[i];
+		}
+
+		// Copy bounds and adjust for binary variables
+		std::vector<double> lbs(model.variable_lbs.begin(), model.variable_lbs.end());
+		std::vector<double> ubs(model.variable_ubs.begin(), model.variable_ubs.end());
+		for (int i = 0; i < num_vars; i++)
+		{
+			if (model.variable_domains[i] == VariableDomain::Binary)
+			{
+				lbs[i] = 0.0;
+				ubs[i] = 1.0;
+			}
+		}
+
+		// Add columns without constraint matrix entries
+		error = highs::Highs_addCols(m_model.get(), num_vars, obj_coeffs.data(), lbs.data(),
+		                             ubs.data(), 0, nullptr, nullptr, nullptr);
+		check_error(error);
+
+		// Batch set integrality for all variables via Highs_changeColsIntegralityByRange
+		std::vector<HighsInt> vtypes(num_vars);
+		bool has_integer = false;
+		for (int i = 0; i < num_vars; i++)
+		{
+			vtypes[i] = highs_vtype(model.variable_domains[i]);
+			if (model.variable_domains[i] != VariableDomain::Continuous)
+			{
+				has_integer = true;
+				if (model.variable_domains[i] == VariableDomain::Binary)
+				{
+					binary_variables.insert(i);
+				}
+			}
+		}
+		if (has_integer)
+		{
+			error = highs::Highs_changeColsIntegralityByRange(m_model.get(), 0, num_vars - 1,
+			                                                  vtypes.data());
+			check_error(error);
+		}
+
+		// Set variable names
+		if (!model.variable_names.is_essentially_empty())
+		{
+			for (int i = 0; i < num_vars; i++)
+			{
+				const char *name = model.variable_names.c_str(i);
+				if (name[0] != '\0')
+				{
+					error = highs::Highs_passColName(m_model.get(), i, name);
+					check_error(error);
+				}
+			}
+		}
+
+		m_variable_index.init_indices(num_vars);
+		m_n_variables = num_vars;
+	}
+
+	// Step 2: Batch add linear constraints via Highs_addRows
+	int num_cons = model.num_linear_constraints;
+	if (num_cons > 0)
+	{
+		const auto &A = model.A_cache;
+		HighsInt numnz = static_cast<HighsInt>(A.variables.size());
+
+		// Convert ConstraintSense to lower/upper bounds for HiGHS
+		std::vector<double> row_lower(num_cons);
+		std::vector<double> row_upper(num_cons);
+		for (int i = 0; i < num_cons; i++)
+		{
+			switch (model.linear_con_senses[i])
+			{
+			case ConstraintSense::LessEqual:
+				row_lower[i] = -kHighsInf;
+				row_upper[i] = model.linear_con_ubs[i];
+				break;
+			case ConstraintSense::GreaterEqual:
+				row_lower[i] = model.linear_con_lbs[i];
+				row_upper[i] = kHighsInf;
+				break;
+			case ConstraintSense::Equal:
+				row_lower[i] = model.linear_con_lbs[i];
+				row_upper[i] = model.linear_con_lbs[i];
+				break;
+			default:
+				throw std::runtime_error("Unsupported constraint sense");
+			}
+		}
+
+		error =
+		    highs::Highs_addRows(m_model.get(), num_cons, row_lower.data(), row_upper.data(), numnz,
+		                         A.row_ptr.data(), A.variables.data(), A.coefficients.data());
+		check_error(error);
+
+		// Set constraint names
+		if (!model.linear_con_names.is_essentially_empty())
+		{
+			for (int i = 0; i < num_cons; i++)
+			{
+				const char *name = model.linear_con_names.c_str(i);
+				if (name[0] != '\0')
+				{
+					error = highs::Highs_passRowName(m_model.get(), i, name);
+					check_error(error);
+				}
+			}
+		}
+
+		m_linear_constraint_index.init_indices(num_cons);
+		m_n_constraints = num_cons;
+	}
+
+	// Step 3: Set objective sense and constant
+	{
+		HighsInt obj_sense = highs_obj_sense(model.objective_sense);
+		error = highs::Highs_changeObjectiveSense(m_model.get(), obj_sense);
+		check_error(error);
+
+		double obj_constant = model.linear_objective.constant.value_or(0.0);
+		error = highs::Highs_changeObjectiveOffset(m_model.get(), obj_constant);
+		check_error(error);
+	}
 }
 
 void POIHighsModel::close()

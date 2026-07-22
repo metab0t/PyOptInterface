@@ -36,10 +36,10 @@ NB_MODULE(highs_model_ext, m)
 #define BIND_F(f) .def(#f, &HighsModel::f)
 	nb::class_<HighsModel>(m, "RawModel")
 	    .def(nb::init<>())
+	    .def(nb::init<const OneShotModel &>())
 	    .def_ro("m_n_variables", &HighsModel::m_n_variables)
 	    .def_ro("m_n_constraints", &HighsModel::m_n_constraints)
 	    // clang-format off
-	    BIND_F(init)
 	    BIND_F(close)
 	    // clang-format on
 	    .def("write", &HighsModel::write, nb::arg("filename"), nb::arg("pretty") = false)

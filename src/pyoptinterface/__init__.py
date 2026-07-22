@@ -26,6 +26,8 @@ from pyoptinterface._src.tupledict import (
 
 from pyoptinterface._src.aml import quicksum, quicksum_
 
+from pyoptinterface._src.oneshot_model import OneShotModel
+
 # Alias of ConstraintSense
 Eq = ConstraintSense.Equal
 """Alias of `ConstraintSense.Equal` for equality constraints.

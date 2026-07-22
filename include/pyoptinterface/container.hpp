@@ -187,6 +187,46 @@ class ChunkedBitVector
 		return result;
 	}
 
+	// Initialize the first N indices as 1
+	void init_indices(int N)
+	{
+		assert(N >= 0);
+		if (N == 0)
+		{
+			clear();
+			return;
+		}
+
+		auto N_full_elements = N >> LOG2_CHUNK_WIDTH;
+		auto N_remaining_bits = N & (CHUNK_WIDTH - 1);
+
+		// all bits set to 1
+		constexpr ChunkT newelement = ~0;
+
+		m_data.assign(N_full_elements, newelement);
+		m_cumulated_ranks.resize(N_full_elements);
+		for (std::size_t i = 0; i < N_full_elements; i++)
+		{
+			m_cumulated_ranks[i] = i * CHUNK_WIDTH + m_start;
+		}
+		m_chunk_ranks.assign(N_full_elements, CHUNK_WIDTH);
+
+		if (N_remaining_bits > 0)
+		{
+			// set the bits in [0, N_remaining_bits) to 1
+			ChunkT remaining_chunk = (ChunkT{1} << N_remaining_bits) - 1;
+			m_data.push_back(remaining_chunk);
+			m_cumulated_ranks.push_back(N_full_elements * CHUNK_WIDTH + m_start);
+			m_chunk_ranks.push_back(N_remaining_bits);
+			m_next_bit = N_remaining_bits;
+		}
+		else
+		{
+			m_next_bit = CHUNK_WIDTH;
+		}
+		m_last_correct_chunk = m_data.size() - 1;
+	}
+
 	// Add N new indices, return the start of index
 	IndexT add_indices(int N)
 	{
@@ -201,7 +241,7 @@ class ChunkedBitVector
 		IndexT result = last_chunk_end + m_next_bit;
 
 		// all bits set to 1
-		ChunkT newelement = ~0;
+		constexpr ChunkT newelement = ~0;
 
 		// The current chunk needs to be filled as 1
 		int extra_bits_in_current_chunk = CHUNK_WIDTH - m_next_bit;
@@ -337,9 +377,9 @@ class ChunkedBitVector
 
 	void clear()
 	{
-		m_data.resize(1, 0);
-		m_cumulated_ranks.resize(1, m_start);
-		m_chunk_ranks.resize(1, -1);
+		m_data.assign(1, 0);
+		m_cumulated_ranks.assign(1, m_start);
+		m_chunk_ranks.assign(1, -1);
 		m_last_correct_chunk = 0;
 		m_next_bit = 0;
 	}
