@@ -906,8 +906,8 @@ double POIHighsModel::get_normalized_rhs(const ConstraintIndex &constraint)
 	                                       nullptr, nullptr);
 	check_error(error);
 
-	bool lb_inf = lb < -kHighsInf + 1.0;
-	bool ub_inf = ub > kHighsInf - 1.0;
+	bool lb_inf = lb <= -kHighsInf;
+	bool ub_inf = ub >= kHighsInf;
 
 	if (!lb_inf)
 		return lb;
@@ -926,8 +926,8 @@ void POIHighsModel::set_normalized_rhs(const ConstraintIndex &constraint, double
 	                                       nullptr, nullptr);
 	check_error(error);
 
-	bool lb_inf = lb < -kHighsInf + 1.0;
-	bool ub_inf = ub > kHighsInf - 1.0;
+	bool lb_inf = lb <= -kHighsInf;
+	bool ub_inf = ub >= kHighsInf;
 
 	if (!lb_inf)
 		lb = value;
